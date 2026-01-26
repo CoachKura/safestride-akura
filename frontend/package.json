@@ -1,0 +1,11 @@
+{
+  "name": "safestride-frontend",
+  "version": "1.0.0",
+  "description": "SafeStride by AKURA - Elite Running Coach Platform",
+  "scripts": {
+    "build": "echo 'No build needed - static HTML'"
+  },
+  "keywords": ["running", "fitness", "coaching"],
+  "author": "AKURA",
+  "license": "MIT"
+}
