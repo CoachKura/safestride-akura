@@ -6,6 +6,7 @@
 const API_CONFIG = {
     baseURL: 'https://safestride-backend-cave.onrender.com',
     endpoints: {
+        athleteDashboard: '/api/athlete/dashboard',
         athlete: '/api/athlete',
         workouts: '/api/workouts',
         health: '/api/health'
@@ -78,8 +79,10 @@ document.addEventListener('DOMContentLoaded', async () => {
  */
 async function loadAthleteData() {
     try {
-        const response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.athlete}`, {
+        const response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.athleteDashboard}`, {
+            method: 'GET',
             headers: {
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${authToken}`
             }
         });
@@ -87,6 +90,9 @@ async function loadAthleteData() {
         if (response.ok) {
             currentAthlete = await response.json();
             displayAthleteData(currentAthlete);
+        } else if (response.status === 401) {
+            console.warn('Unauthorized - token expired');
+            window.location.href = 'index.html';
         } else {
             console.warn('Failed to load athlete data, using demo');
             loadDemoData();
@@ -283,49 +289,89 @@ function displayHRZones(zones) {
 /**
  * Display progress chart
  */
-function displayProgressChart(workoutHistory) {
-    const ctx = document.getElementById('progress-chart');
-    
-    // Prepare data for last 30 days
-    const dates = workoutHistory.map(w => w.date).reverse();
-    const paces = workoutHistory.map(w => {
-        const [min, sec] = w.pace.split(':').map(Number);
-        return min * 60 + sec;
-    }).reverse();
-    
+async function displayProgressChart(workoutHistory) {
+    const canvas = document.getElementById('progress-chart');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+
+    // Prefer live workouts from API; fall back to provided history
+    let workouts = workoutHistory || [];
+    try {
+        if (authToken) {
+            const response = await fetch(`${API_CONFIG.baseURL}${API_CONFIG.endpoints.workouts}`, {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                if (Array.isArray(data) && data.length > 0) {
+                    workouts = data;
+                }
+            }
+        }
+    } catch (error) {
+        console.warn('Progress chart API fallback to local data', error);
+    }
+
+    // Prepare chart data
+    const toSeconds = (paceStr) => {
+        if (!paceStr) return null;
+        const [min, sec] = paceStr.split(':').map(Number);
+        return (min || 0) * 60 + (sec || 0);
+    };
+
+    const dates = workouts.map(w => new Date(w.date).toLocaleDateString());
+    const paces = workouts.map(w => toSeconds(w.pace)).filter(v => v !== null);
+    const hrAvg = workouts.map(w => w.avgHeartRate || w.hr || null);
+
     new Chart(ctx, {
         type: 'line',
         data: {
             labels: dates,
-            datasets: [{
-                label: 'Pace (seconds/km)',
-                data: paces,
-                borderColor: '#667eea',
-                backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                tension: 0.4,
-                fill: true
-            }]
+            datasets: [
+                {
+                    label: 'Pace (min/km)',
+                    data: paces,
+                    borderColor: 'rgb(59, 130, 246)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    tension: 0.3,
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'Avg HR (bpm)',
+                    data: hrAvg,
+                    borderColor: 'rgb(239, 68, 68)',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    tension: 0.3,
+                    yAxisID: 'y1'
+                }
+            ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
             plugins: {
-                legend: {
-                    display: false
-                },
+                legend: { display: true },
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            const seconds = context.parsed.y;
-                            const min = Math.floor(seconds / 60);
-                            const sec = Math.round(seconds % 60);
-                            return `Pace: ${min}:${sec.toString().padStart(2, '0')}/km`;
+                            if (context.dataset.yAxisID === 'y') {
+                                const seconds = context.parsed.y;
+                                const min = Math.floor(seconds / 60);
+                                const sec = Math.round(seconds % 60);
+                                return `Pace: ${min}:${sec.toString().padStart(2, '0')}/km`;
+                            }
+                            return `Avg HR: ${context.parsed.y} bpm`;
                         }
                     }
                 }
             },
             scales: {
                 y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
                     reverse: true, // Lower pace is better
                     ticks: {
                         callback: function(value) {
@@ -334,6 +380,12 @@ function displayProgressChart(workoutHistory) {
                             return `${min}:${sec.toString().padStart(2, '0')}`;
                         }
                     }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    grid: { drawOnChartArea: false }
                 }
             }
         }

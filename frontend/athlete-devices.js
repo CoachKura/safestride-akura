@@ -13,6 +13,11 @@ const API_CONFIG = {
     }
 };
 
+// Strava OAuth constants
+const STRAVA_CLIENT_ID = API_CONFIG.stravaClientId;
+// Use the production frontend URL for the redirect target
+const STRAVA_REDIRECT_URI = 'https://safestride-frontend.onrender.com/athlete-devices.html';
+
 let authToken = null;
 
 /**
@@ -96,13 +101,11 @@ function updateDeviceStatus(device, connected) {
  * Connect to Strava
  */
 function connectStrava() {
-    // Strava OAuth URL
-    const redirectUri = encodeURIComponent(window.location.href.split('?')[0]);
-    const scope = 'activity:read_all,activity:write';
+    const redirectUri = encodeURIComponent(STRAVA_REDIRECT_URI);
+    const scope = 'activity:read_all';
     const state = 'strava';
-    
-    const authUrl = `https://www.strava.com/oauth/authorize?client_id=${API_CONFIG.stravaClientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}&state=${state}`;
-    
+    const approval = 'force';
+    const authUrl = `https://www.strava.com/oauth/authorize?client_id=${STRAVA_CLIENT_ID}&response_type=code&redirect_uri=${redirectUri}&approval_prompt=${approval}&scope=${scope}&state=${state}`;
     window.location.href = authUrl;
 }
 
