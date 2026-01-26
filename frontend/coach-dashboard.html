@@ -150,6 +150,60 @@
                 </div>
             </div>
 
+            <!-- Training System Quick Reference -->
+            <section class="dashboard-resources" style="margin: 30px 0; padding: 30px; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <h3 style="color: #1e3a8a; font-size: 1.8rem; margin-bottom: 25px;">
+                    🎓 Training System Quick Reference
+                </h3>
+                
+                <div class="resource-tabs" style="display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap;">
+                    <button class="tab-btn active" onclick="showResource('safety')" 
+                            style="padding: 12px 24px; background: #1e3a8a; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s ease;">
+                        Safety Gates
+                    </button>
+                    <button class="tab-btn" onclick="showResource('weekly')" 
+                            style="padding: 12px 24px; background: #e5e7eb; color: #374151; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s ease;">
+                        Weekly Structure
+                    </button>
+                    <button class="tab-btn" onclick="showResource('phases')" 
+                            style="padding: 12px 24px; background: #e5e7eb; color: #374151; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s ease;">
+                        6-Phase Roadmap
+                    </button>
+                    <button class="tab-btn" onclick="showResource('biomechanics')" 
+                            style="padding: 12px 24px; background: #e5e7eb; color: #374151; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s ease;">
+                        Biomechanics
+                    </button>
+                </div>
+                
+                <div id="safety" class="resource-content active" style="display: block;">
+                    <img src="images/04-Safety-Gates-Progressive-Gating.png" 
+                         alt="Safety Gates" 
+                         style="width: 100%; max-width: 1200px; height: auto; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"
+                         loading="lazy">
+                </div>
+                
+                <div id="weekly" class="resource-content" style="display: none;">
+                    <img src="images/14-AKURA-Weekly-Structure-FROZEN.png" 
+                         alt="Weekly Structure" 
+                         style="width: 100%; max-width: 1200px; height: auto; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"
+                         loading="lazy">
+                </div>
+                
+                <div id="phases" class="resource-content" style="display: none;">
+                    <img src="images/13-AKURA-6-Phase-Training-CORRECTED.png" 
+                         alt="6-Phase Roadmap" 
+                         style="width: 100%; max-width: 1200px; height: auto; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"
+                         loading="lazy">
+                </div>
+                
+                <div id="biomechanics" class="resource-content" style="display: none;">
+                    <img src="images/15-Biomechanics-Issues-Impact-Chain.png" 
+                         alt="Biomechanics Chain" 
+                         style="width: 100%; max-width: 1200px; height: auto; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"
+                         loading="lazy">
+                </div>
+            </section>
+
             <!-- Athlete Performance Grid -->
             <div class="mb-8">
                 <div class="flex justify-between items-center mb-4">
@@ -202,6 +256,26 @@
     <script src="chennai-athletes.js"></script>
     <script src="coach-dashboard.js"></script>
     <script>
+        function showResource(resourceId) {
+            // Hide all resource contents
+            document.querySelectorAll('.resource-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // Remove active styling from all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.style.background = '#e5e7eb';
+                btn.style.color = '#374151';
+            });
+            
+            // Show selected resource
+            document.getElementById(resourceId).style.display = 'block';
+            
+            // Add active styling to clicked button
+            event.target.style.background = '#1e3a8a';
+            event.target.style.color = 'white';
+        }
+
         if (!checkAuth()) {
             window.location.href = 'index.html';
         }
