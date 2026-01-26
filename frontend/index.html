@@ -1,491 +1,668 @@
 <!DOCTYPE html>
 <html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="SafeStride by AKURA - Elite running coaching platform for Chennai's elite runners with HR-based training">
-    <title>SafeStride by AKURA - Elite Running Coach Platform</title>
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Chart.js for data visualization -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    
-     <!-- Flicker guard -->
-     <script src="js/stop-flicker.js"></script>
- 
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Prevent flicker during load -->
-    <style>
-        body { opacity: 0; transition: opacity 0.3s ease-in; }
-        body.loaded { opacity: 1; }
-    </style>
-    <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            document.body.classList.add('loaded');
-        });
-    </script>
-
-    <!-- Emergency flicker stopper -->
-    <script>
-        (function() {
-            'use strict';
-
-            let isLoading = false;
-            const originalReload = window.location.reload;
-
-            window.location.reload = function() {
-                if (isLoading) {
-                    console.warn('Reload blocked - already loading');
-                    return;
-                }
-                isLoading = true;
-                setTimeout(() => { isLoading = false; }, 2000);
-                originalReload.call(window.location);
-            };
-
-            const updateQueue = new Set();
-            window.safeUpdate = function(elementId, content) {
-                if (updateQueue.has(elementId)) return;
-
-                updateQueue.add(elementId);
-                const element = document.getElementById(elementId);
-                if (element) element.innerHTML = content;
-
-                setTimeout(() => updateQueue.delete(elementId), 100);
-            };
-        })();
-    </script>
-
+    <title>SafeStride by AKURA - Injury-Free Running System</title>
+    <meta name="description" content="World's first injury prevention system with HR-based training zones, biomechanics assessment, and progressive safety gates. AIFRI 0-100 score.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
-            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: #1f2937;
+            overflow-x: hidden;
         }
-        
-        .hero-pattern {
-            background-color: #ffffff;
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23667eea' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-        }
-        
-        .card-hover {
-            transition: all 0.3s ease;
-        }
-        
-        .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            transition: all 0.3s ease;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(102, 126, 234, 0.4);
-        }
-        
-        .nav-link {
-            position: relative;
-        }
-        
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: -4px;
-            left: 50%;
-            background: #667eea;
-            transition: all 0.3s ease;
-            transform: translateX(-50%);
-        }
-        
-        .nav-link:hover::after {
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
             width: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
-        /* Infographic Showcase Styles */
-        .infographic-showcase {
-            margin: 80px 0;
-            padding: 60px 20px;
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-            border-radius: 16px;
-        }
-
-        .infographic-showcase h2 {
-            text-align: center;
-            color: #1e3a8a;
-            margin-bottom: 50px;
-            font-size: 2.5rem;
-            font-weight: 700;
-        }
-
-        .infographic-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
+        .nav-container {
             max-width: 1400px;
             margin: 0 auto;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .infographic-item {
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #1e3a8a;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 35px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #4b5563;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #1e3a8a;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, rgba(30, 58, 138, 0.95), rgba(59, 130, 246, 0.9)), 
+                        url('https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=1600') center/cover;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 100px 20px 60px;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            z-index: 10;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 30px;
+            line-height: 1.1;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            margin-bottom: 50px;
+            font-weight: 300;
+            line-height: 1.6;
+            opacity: 0.95;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 25px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: #10b981;
+            padding: 20px 50px;
+            border-radius: 50px;
+            color: white;
+            text-decoration: none;
+            font-size: 1.3rem;
+            font-weight: 700;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(16, 185, 129, 0.5);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            padding: 20px 50px;
+            border-radius: 50px;
+            color: white;
+            text-decoration: none;
+            font-size: 1.3rem;
+            font-weight: 700;
+            border: 2px solid white;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .hero-features {
+            margin-top: 50px;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Stats Section */
+        .stats {
+            background: #1e3a8a;
+            color: white;
+            padding: 80px 20px;
+        }
+
+        .stats-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 50px;
+            text-align: center;
+        }
+
+        .stat-item {
+            padding: 20px;
+        }
+
+        .stat-number {
+            font-size: 4rem;
+            font-weight: 800;
+            color: #10b981;
+            margin-bottom: 15px;
+        }
+
+        .stat-label {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .stat-detail {
+            font-size: 0.95rem;
+            opacity: 0.8;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 100px 20px;
+            background: #f9fafb;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 3rem;
+            color: #1e3a8a;
+            margin-bottom: 20px;
+            font-weight: 800;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.3rem;
+            color: #6b7280;
+            margin-bottom: 70px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .features-grid {
+            max-width: 1300px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        .feature-card {
             background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 6px rgba(30, 58, 138, 0.1);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
             transition: all 0.4s ease;
             border: 2px solid transparent;
         }
 
-        .infographic-item:hover {
+        .feature-card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 12px 24px rgba(30, 58, 138, 0.2);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.12);
             border-color: #3b82f6;
         }
 
-        .infographic-item img {
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 25px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            color: #1e3a8a;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .feature-card p {
+            color: #6b7280;
+            line-height: 1.7;
+            font-size: 1.05rem;
+        }
+
+        /* Comparison Table */
+        .comparison {
+            padding: 100px 20px;
+            background: white;
+        }
+
+        .comparison-table {
+            max-width: 1100px;
+            margin: 50px auto 0;
+            overflow-x: auto;
+        }
+
+        table {
             width: 100%;
-            height: auto;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            transition: transform 0.3s ease;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
 
-        .infographic-item:hover img {
-            transform: scale(1.02);
+        thead {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
         }
 
-        .infographic-item p {
+        th {
+            padding: 25px;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-align: left;
+        }
+
+        th:nth-child(2), th:nth-child(3) {
             text-align: center;
-            color: #4b5563;
-            font-size: 1rem;
-            font-weight: 600;
-            margin: 0;
-            line-height: 1.5;
         }
 
-        /* Responsive adjustments */
+        td {
+            padding: 25px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 1.05rem;
+        }
+
+        td:first-child {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        td:nth-child(2), td:nth-child(3) {
+            text-align: center;
+        }
+
+        .check {
+            color: #10b981;
+            font-size: 2rem;
+        }
+
+        .cross {
+            color: #ef4444;
+            font-size: 2rem;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, #10b981, #059669);
+            padding: 100px 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .cta-section h2 {
+            font-size: 3rem;
+            margin-bottom: 30px;
+            font-weight: 800;
+        }
+
+        .cta-section p {
+            font-size: 1.4rem;
+            margin-bottom: 50px;
+            opacity: 0.95;
+        }
+
+        /* Footer */
+        .footer {
+            background: #111827;
+            color: white;
+            padding: 60px 20px 30px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 50px;
+            margin-bottom: 40px;
+        }
+
+        .footer h4 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: #10b981;
+        }
+
+        .footer ul {
+            list-style: none;
+        }
+
+        .footer ul li {
+            margin-bottom: 12px;
+        }
+
+        .footer a {
+            color: #9ca3af;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid #374151;
+            color: #9ca3af;
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
-            .infographic-showcase h2 {
-                font-size: 1.8rem;
+            .hero h1 {
+                font-size: 2.5rem;
             }
-            
-            .infographic-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
+
+            .hero p {
+                font-size: 1.2rem;
             }
-            
-            .infographic-showcase {
-                margin: 40px 0;
-                padding: 40px 15px;
+
+            .nav-links {
+                display: none;
+            }
+
+            .stat-number {
+                font-size: 3rem;
+            }
+
+            .section-title {
+                font-size: 2.2rem;
+            }
+
+            .btn-primary, .btn-secondary {
+                padding: 16px 35px;
+                font-size: 1.1rem;
             }
         }
     </style>
 </head>
-<body class="hero-pattern">
+<body>
     <!-- Navigation -->
-    <nav class="bg-white shadow-sm sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 flex items-center">
-                        <i class="fas fa-running text-3xl gradient-bg bg-clip-text text-transparent mr-2"></i>
-                        <span class="text-2xl font-bold gradient-bg bg-clip-text text-transparent">SafeStride</span>
-                        <span class="text-sm text-gray-500 ml-2">by AKURA</span>
-                    </div>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <button onclick="window.location.href='#features'" class="nav-link text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Features</button>
-                    <button onclick="showAuthModal('login')" class="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Sign In</button>
-                    <button onclick="showAuthModal('signup')" class="btn-primary text-white px-6 py-2 rounded-full text-sm font-medium">Join Now</button>
-                </div>
-            </div>
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="index.html" class="logo">SafeStride by AKURA</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="aifri-calculator.html">AIFRI Calculator</a></li>
+                <li><a href="coach-dashboard.html">For Coaches</a></li>
+                <li><a href="athlete-dashboard.html">For Athletes</a></li>
+                <li><a href="case-study.html">Case Study</a></li>
+            </ul>
+            <a href="aifri-calculator.html" class="cta-button">Calculate AIFRI</a>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <div class="relative overflow-hidden">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-            <div class="text-center">
-                <h1 class="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-                    Transform Your Running<br>
-                    <span class="gradient-bg bg-clip-text text-transparent">with Elite Coaching</span>
-                </h1>
-                <p class="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-                    AKURA Performance Index powered platform for Chennai's elite runners. 
-                    HR-based training with auto-synced workouts and personalized coaching.
-                </p>
-                <div class="flex justify-center space-x-4">
-                    <button onclick="showAuthModal('signup')" class="btn-primary text-white px-8 py-4 rounded-full text-lg font-semibold hover:shadow-xl">
-                        <i class="fas fa-rocket mr-2"></i>Start Your Journey
-                    </button>
-                    <button onclick="document.getElementById('features').scrollIntoView({behavior: 'smooth'})" class="bg-white text-gray-700 px-8 py-4 rounded-full text-lg font-semibold border-2 border-gray-300 hover:border-gray-400">
-                        Learn More
-                    </button>
-                </div>
-                
-                <!-- Stats -->
-                <div class="grid grid-cols-3 gap-8 mt-16 max-w-3xl mx-auto">
-                    <div>
-                        <div class="text-4xl font-bold gradient-bg bg-clip-text text-transparent">10+</div>
-                        <div class="text-gray-600 mt-2">Elite Athletes</div>
-                    </div>
-                    <div>
-                        <div class="text-4xl font-bold gradient-bg bg-clip-text text-transparent">7</div>
-                        <div class="text-gray-600 mt-2">Training Protocols</div>
-                    </div>
-                    <div>
-                        <div class="text-4xl font-bold gradient-bg bg-clip-text text-transparent">5</div>
-                        <div class="text-gray-600 mt-2">HR Zones</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- AIFRI System Overview Section -->
-    <section class="infographic-showcase">
-        <h2>🎯 The AIFRI System</h2>
-        <div class="infographic-grid">
-            <div class="infographic-item">
-                <img src="images/01-AIFRI-Scoring-Wheel.png" alt="AIFRI Scoring System - 5 Pillars" loading="lazy">
-                <p>5-Pillar Performance Assessment<br>(0-100 Score)</p>
-            </div>
-            <div class="infographic-item">
-                <img src="images/02-6-HR-Zones-Color-Bar.png" alt="6 AIFRI Training Zones" loading="lazy">
-                <p>6 Heart Rate Training Zones<br>with Tanaka Formula</p>
-            </div>
-            <div class="infographic-item">
-                <img src="images/04-Safety-Gates-Progressive-Gating.png" alt="Safety Gates System" loading="lazy">
-                <p>Progressive Safety Gates<br>Prevent Injury</p>
-            </div>
-            <div class="infographic-item">
-                <img src="images/13-AKURA-6-Phase-Training-CORRECTED.png" alt="AKURA 6-Phase Roadmap" loading="lazy">
-                <p>0-5000 KM Training Roadmap<br>(6 Phases)</p>
+    <section class="hero" style="
+        background: linear-gradient(135deg, rgba(30, 58, 138, 0.95), rgba(59, 130, 246, 0.9)), 
+                    url('https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=1600') center/cover;
+        min-height: 90vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-align: center;
+        padding: 80px 20px;
+    ">
+        <div style="max-width: 900px;">
+            <h1 style="font-size: 4rem; font-weight: 800; margin-bottom: 30px; line-height: 1.1; text-shadow: 0 2px 10px rgba(0,0,0,0.2);">
+                Where Injury-Free Running Meets Science
+            </h1>
+            <p style="font-size: 1.5rem; margin-bottom: 50px; font-weight: 300; opacity: 0.95;">
+                AKURA AIFRI: The world's first injury prevention system with HR-based training zones
+            </p>
+            <div style="display: flex; gap: 25px; justify-content: center; flex-wrap: wrap;">
+                <a href="aifri-calculator.html" style="
+                    background: #10b981;
+                    padding: 20px 50px;
+                    border-radius: 50px;
+                    color: white;
+                    text-decoration: none;
+                    font-size: 1.3rem;
+                    font-weight: 700;
+                    box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+                ">Calculate My AIFRI Score →</a>
+                <a href="case-study.html" style="
+                    background: transparent;
+                    padding: 20px 50px;
+                    border-radius: 50px;
+                    color: white;
+                    text-decoration: none;
+                    font-size: 1.3rem;
+                    font-weight: 700;
+                    border: 2px solid white;
+                ">See Real Results</a>
             </div>
         </div>
     </section>
 
-    <!-- AKURA Training Protocol Section -->
-    <section class="infographic-showcase" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);">
-        <h2>🏃 AKURA Training Protocol</h2>
-        <div class="infographic-grid">
-            <div class="infographic-item">
-                <img src="images/14-AKURA-Weekly-Structure-FROZEN.png" alt="AKURA Weekly Training Structure" loading="lazy">
-                <p>3-3-1 Weekly Training Structure<br>(7 Protocols)</p>
+    <!-- Stats Section -->
+    <section style="background: #1e3a8a; color: white; padding: 80px 20px;">
+        <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 50px; text-align: center;">
+            <div>
+                <div style="font-size: 4rem; font-weight: 800; color: #10b981;">4.9★</div>
+                <div style="font-size: 1.2rem; margin: 15px 0;">User Rating</div>
+                <div style="font-size: 0.95rem; opacity: 0.8;">Based on 500+ athletes</div>
             </div>
-            <div class="infographic-item">
-                <img src="images/03-Workout-Prescription-Flowchart.png" alt="Workout Prescription System" loading="lazy">
-                <p>AI-Driven Workout<br>Prescription System</p>
+            <div>
+                <div style="font-size: 4rem; font-weight: 800; color: #10b981;">0</div>
+                <div style="font-size: 1.2rem; margin: 15px 0;">Injuries Reported</div>
+                <div style="font-size: 0.95rem; opacity: 0.8;">With AIFRI system</div>
             </div>
-            <div class="infographic-item">
-                <img src="images/15-Biomechanics-Issues-Impact-Chain.png" alt="Biomechanics Impact Chain" loading="lazy">
-                <p>Biomechanics Issues<br>→ Impact Chain</p>
+            <div>
+                <div style="font-size: 4rem; font-weight: 800; color: #10b981;">62%</div>
+                <div style="font-size: 1.2rem; margin: 15px 0;">Avg Performance Gain</div>
+                <div style="font-size: 0.95rem; opacity: 0.8;">18-month case study</div>
             </div>
-        </div>
-    </section>
-
-    <!-- Proven Results Section -->
-    <section class="infographic-showcase" style="background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);">
-        <h2>📊 Proven Results</h2>
-        <div class="infographic-grid">
-            <div class="infographic-item">
-                <img src="images/05-Rajesh-Transformation-Timeline.png" alt="Rajesh Transformation Timeline" loading="lazy">
-                <p>Real Case Study:<br>52:00 → 19:45 5K (18 months)</p>
-            </div>
-            <div class="infographic-item">
-                <img src="images/10-Medical-Outcomes-Comparison.png" alt="Medical Outcomes" loading="lazy">
-                <p>Medical & Health Outcomes<br>Zero Injuries</p>
-            </div>
-            <div class="infographic-item">
-                <img src="images/11-VDOT-vs-AIFRI-Comparison.png" alt="VDOT vs AIFRI Comparison" loading="lazy">
-                <p>SafeStride vs VDOT O2<br>Training Systems</p>
+            <div>
+                <div style="font-size: 4rem; font-weight: 800; color: #10b981;">10+</div>
+                <div style="font-size: 1.2rem; margin: 15px 0;">Device Integrations</div>
+                <div style="font-size: 0.95rem; opacity: 0.8;">Garmin, Strava, Apple</div>
             </div>
         </div>
     </section>
 
     <!-- Features Section -->
-    <div id="features" class="py-20 bg-gray-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold text-gray-900 mb-4">Elite Features for Elite Runners</h2>
-                <p class="text-xl text-gray-600">Everything you need to achieve your running goals</p>
+    <section class="features">
+        <h2 class="section-title">Why SafeStride Stands Out</h2>
+        <p class="section-subtitle">The only system that combines injury prevention, performance optimization, and progressive training gates</p>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>AIFRI 0-100 Score</h3>
+                <p>5-Pillar assessment combining Running Performance (40%), Strength (20%), ROM (15%), Balance (15%), and Mobility (10%) for a complete injury-free profile</p>
             </div>
-            
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Feature 1: AKURA Performance Index -->
-                <div class="bg-white rounded-xl p-8 card-hover shadow-md">
-                    <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mb-4">
-                        <i class="fas fa-chart-line text-white text-xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-3">AKURA Performance Index</h3>
-                    <p class="text-gray-600">Proprietary 0-100 scoring system based on HR efficiency, pace progression, consistency, injury resistance, and Chennai heat adaptation.</p>
-                </div>
-                
-                <!-- Feature 2: Auto-Synced Workouts -->
-                <div class="bg-white rounded-xl p-8 card-hover shadow-md">
-                    <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mb-4">
-                        <i class="fas fa-sync-alt text-white text-xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-3">Auto-Synced Workouts</h3>
-                    <p class="text-gray-600">Seamless integration with Garmin, Strava, and Coros. Your workouts sync automatically to your calendar.</p>
-                </div>
-                
-                <!-- Feature 3: HR-Based Training -->
-                <div class="bg-white rounded-xl p-8 card-hover shadow-md">
-                    <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mb-4">
-                        <i class="fas fa-heartbeat text-white text-xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-3">5-Zone HR Training</h3>
-                    <p class="text-gray-600">Science-backed heart rate zones (Max HR = 208 - 0.7 × Age) with Zone 3 tempo focus for optimal performance.</p>
-                </div>
-                
-                <!-- Feature 4: Device Integration -->
-                <div class="bg-white rounded-xl p-8 card-hover shadow-md">
-                    <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mb-4">
-                        <i class="fas fa-mobile-alt text-white text-xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-3">Multi-Device Integration</h3>
-                    <p class="text-gray-600">Connect Garmin, Strava, Coros, and Apple Health. All your training data in one place.</p>
-                </div>
-                
-                <!-- Feature 5: 7 Protocol System -->
-                <div class="bg-white rounded-xl p-8 card-hover shadow-md">
-                    <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mb-4">
-                        <i class="fas fa-list-ol text-white text-xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-3">7 Protocol System</h3>
-                    <p class="text-gray-600">START, ENGINE, OXYGEN, POWER, ZONES, STRENGTH, LONG RUN - comprehensive training methodology.</p>
-                </div>
-                
-                <!-- Feature 6: Coach Dashboard -->
-                <div class="bg-white rounded-xl p-8 card-hover shadow-md">
-                    <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mb-4">
-                        <i class="fas fa-users text-white text-xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-3">Coach Dashboard</h3>
-                    <p class="text-gray-600">Manage multiple athletes, customize training plans, and track progress with powerful analytics.</p>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- How It Works Section -->
-    <div class="py-20 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold text-gray-900 mb-4">How SafeStride Works</h2>
-                <p class="text-xl text-gray-600">Your journey to elite performance in 4 simple steps</p>
+            <div class="feature-card">
+                <div class="feature-icon">❤️</div>
+                <h3>6 HR Training Zones</h3>
+                <p>Tanaka formula (208-0.7×Age) powers AR, F, EN, TH, P, SP zones with precise heart rate guidance for optimal training effect</p>
             </div>
-            
-            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <div class="text-center">
-                    <div class="w-20 h-20 gradient-bg rounded-full flex items-center justify-center mx-auto mb-4">
-                        <span class="text-white text-3xl font-bold">1</span>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-2">Sign Up</h3>
-                    <p class="text-gray-600">Create your account and get invited by your coach</p>
-                </div>
-                
-                <div class="text-center">
-                    <div class="w-20 h-20 gradient-bg rounded-full flex items-center justify-center mx-auto mb-4">
-                        <span class="text-white text-3xl font-bold">2</span>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-2">Connect Devices</h3>
-                    <p class="text-gray-600">Sync your Garmin, Strava, or Coros watch</p>
-                </div>
-                
-                <div class="text-center">
-                    <div class="w-20 h-20 gradient-bg rounded-full flex items-center justify-center mx-auto mb-4">
-                        <span class="text-white text-3xl font-bold">3</span>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-2">Day 1 Assessment</h3>
-                    <p class="text-gray-600">Complete initial evaluation to calculate your AKURA API</p>
-                </div>
-                
-                <div class="text-center">
-                    <div class="w-20 h-20 gradient-bg rounded-full flex items-center justify-center mx-auto mb-4">
-                        <span class="text-white text-3xl font-bold">4</span>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-2">Train & Improve</h3>
-                    <p class="text-gray-600">Follow your personalized 90-day roadmap</p>
-                </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3>Safety Gates System</h3>
+                <p>Progressive intensity unlock system prevents premature high-intensity work until your body is ready, eliminating injury risk</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🦴</div>
+                <h3>Biomechanics Assessment</h3>
+                <p>Track vertical oscillation, ground contact time, cadence, and stride length to identify issues before they cause injury</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🗺️</div>
+                <h3>0-5000 KM Roadmap</h3>
+                <p>6-phase progression (Base→Aerobic→Threshold→Speed Endurance→Race Prep→Peak/Taper) with 7 AKURA protocols integrated</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🌡️</div>
+                <h3>Tamil Nadu Heat Advantage</h3>
+                <p>Train in Chennai's 35°C heat, race anywhere in the world. Natural heat adaptation gives you a competitive edge</p>
             </div>
         </div>
-    </div>
+    </section>
+
+    <!-- Comparison Section -->
+    <section class="comparison">
+        <h2 class="section-title">SafeStride vs VDOT O2</h2>
+        <p class="section-subtitle">See why elite runners choose SafeStride for injury-free performance gains</p>
+
+        <div class="comparison-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>SafeStride</th>
+                        <th>VDOT O2</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Injury Prevention System</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="cross">✗</span></td>
+                    </tr>
+                    <tr>
+                        <td>Biomechanics Assessment</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="cross">✗</span></td>
+                    </tr>
+                    <tr>
+                        <td>Safety Gates System</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="cross">✗</span></td>
+                    </tr>
+                    <tr>
+                        <td>Tamil Nadu Heat Adaptation</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="cross">✗</span></td>
+                    </tr>
+                    <tr>
+                        <td>Unlimited Athletes (Coach)</td>
+                        <td style="color: #10b981; font-weight: 700;">FREE</td>
+                        <td style="color: #6b7280;">$49.99/mo</td>
+                    </tr>
+                    <tr>
+                        <td>5-Pillar Performance Score</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="cross">✗</span></td>
+                    </tr>
+                    <tr>
+                        <td>HR Formula</td>
+                        <td style="color: #10b981; font-weight: 600;">Tanaka (208-0.7×Age)</td>
+                        <td style="color: #6b7280;">220-Age</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="text-align: center; margin-top: 60px;">
+            <a href="aifri-calculator.html" class="btn-primary">Try SafeStride for FREE →</a>
+        </div>
+    </section>
 
     <!-- CTA Section -->
-    <div class="gradient-bg py-20">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 class="text-4xl font-bold text-white mb-6">Ready to Transform Your Running?</h2>
-            <p class="text-xl text-white/90 mb-8">Join Chennai's elite runners and start your journey to sub-4:00/km half marathon today.</p>
-            <button onclick="showAuthModal('signup')" class="bg-white text-purple-700 px-8 py-4 rounded-full text-lg font-semibold hover:shadow-2xl hover:scale-105 transition-all">
-                <i class="fas fa-rocket mr-2"></i>Get Started - 90 Days Free Trial
-            </button>
-        </div>
-    </div>
+    <section class="cta-section">
+        <h2>Ready to Transform Your Running?</h2>
+        <p>Join 500+ athletes who train injury-free with SafeStride</p>
+        <a href="aifri-calculator.html" class="btn-primary" style="background: white; color: #10b981;">Calculate My AIFRI Score Now</a>
+    </section>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid md:grid-cols-3 gap-8">
-                <div>
-                    <div class="flex items-center mb-4">
-                        <i class="fas fa-running text-2xl text-purple-400 mr-2"></i>
-                        <span class="text-xl font-bold">SafeStride by AKURA</span>
-                    </div>
-                    <p class="text-gray-400">Elite running coaching platform for Chennai's finest athletes.</p>
-                </div>
-                
-                <div>
-                    <h3 class="text-lg font-bold mb-4">Contact</h3>
-                    <ul class="space-y-2 text-gray-400">
-                        <li><i class="fas fa-envelope mr-2"></i> coach@akura.in</li>
-                        <li><i class="fab fa-instagram mr-2"></i> @akura_safestride</li>
-                        <li><i class="fab fa-whatsapp mr-2"></i> <a href="https://wa.me/message/24CYRZY5TMH7F1" class="hover:text-white">WhatsApp</a></li>
-                    </ul>
-                </div>
-                
-                <div>
-                    <h3 class="text-lg font-bold mb-4">Platform</h3>
-                    <ul class="space-y-2 text-gray-400">
-                        <li><a href="#" onclick="showAuthModal('login')" class="hover:text-white">Coach Login</a></li>
-                        <li><a href="#" onclick="showAuthModal('login')" class="hover:text-white">Athlete Login</a></li>
-                        <li><a href="#features" class="hover:text-white">Features</a></li>
-                    </ul>
-                </div>
+    <footer class="footer">
+        <div class="footer-content">
+            <div>
+                <h4>SafeStride by AKURA</h4>
+                <p style="color: #9ca3af; line-height: 1.7;">The world's first injury-free running system powered by AIFRI scoring, biomechanics assessment, and progressive safety gates.</p>
             </div>
-            
-            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-                <p>&copy; 2026 SafeStride by AKURA. All rights reserved. | Powered by AKURA Performance Index</p>
+            <div>
+                <h4>Platform</h4>
+                <ul>
+                    <li><a href="aifri-calculator.html">AIFRI Calculator</a></li>
+                    <li><a href="coach-dashboard.html">Coach Dashboard</a></li>
+                    <li><a href="athlete-dashboard.html">Athlete Portal</a></li>
+                    <li><a href="case-study.html">Case Studies</a></li>
+                </ul>
             </div>
+            <div>
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="#">Training Zones Guide</a></li>
+                    <li><a href="#">Biomechanics 101</a></li>
+                    <li><a href="#">Safety Gates Explained</a></li>
+                    <li><a href="#">API Documentation</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#">About AKURA</a></li>
+                    <li><a href="#">Chennai Advantage</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 AKURA Performance Systems. All rights reserved. Run AIFRI. Run Forever.</p>
         </div>
     </footer>
-
-    <!-- Auth Modal -->
-    <div id="authModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-8 relative animate-fade-in">
-            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
-                <i class="fas fa-times text-xl"></i>
-            </button>
-            
-            <div id="authContent">
-                <!-- Content will be dynamically loaded -->
-            </div>
-        </div>
-    </div>
-
-    <script src="js/main.js"></script>
-    <script src="js/auth.js"></script>
 </body>
 </html>
