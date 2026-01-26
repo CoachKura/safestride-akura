@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeStride - Integration Test Suite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="max-w-6xl mx-auto p-8">
+        <h1 class="text-4xl font-bold mb-8 text-gray-900">SafeStride Integration Test Suite</h1>
+        
+        <div id="results" class="space-y-4"></div>
+        
+        <button onclick="runAllTests()" 
+                class="mt-8 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            Run All Tests
+        </button>
+    </div>
+
+    <script>
+        const API_BASE = 'https://safestride-backend-cave.onrender.com';
+        const STRAVA_CLIENT_ID = '162971';
+        
+        const tests = [
+            {
+                name: 'Backend Health Check',
+                test: async () => {
+                    const response = await fetch(`${API_BASE}/api/health`);
+                    const data = await response.json();
+                    return response.ok && data.status === 'ok';
+                }
+            },
+            {
+                name: 'CORS Headers Present',
+                test: async () => {
+                    const response = await fetch(`${API_BASE}/api/health`);
+                    return response.headers.has('access-control-allow-origin');
+                }
+            },
+            {
+                name: 'Login Endpoint Available',
+                test: async () => {
+                    const response = await fetch(`${API_BASE}/api/auth/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: 'test@test.com', password: 'test' })
+                    });
+                    // Should return 401 or 400, not 404
+                    return response.status !== 404;
+                }
+            },
+            {
+                name: 'Signup Endpoint Available',
+                test: async () => {
+                    const response = await fetch(`${API_BASE}/api/auth/signup`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: 'test@test.com', password: 'test' })
+                    });
+                    return response.status !== 404;
+                }
+            },
+            {
+                name: 'Strava Auth Endpoint Available',
+                test: async () => {
+                    const response = await fetch(`${API_BASE}/api/strava/auth`);
+                    return response.status !== 404;
+                }
+            },
+            {
+                name: 'Protected Route Returns 401',
+                test: async () => {
+                    const response = await fetch(`${API_BASE}/api/athlete/profile`);
+                    return response.status === 401;
+                }
+            },
+            {
+                name: 'Response Time < 2 seconds',
+                test: async () => {
+                    const start = Date.now();
+                    await fetch(`${API_BASE}/api/health`);
+                    const duration = Date.now() - start;
+                    return duration < 2000;
+                }
+            },
+            {
+                name: 'AKURA API Calculator Loaded',
+                test: async () => {
+                    return typeof AkuraAPI !== 'undefined';
+                }
+            },
+            {
+                name: 'Chart.js Loaded',
+                test: async () => {
+                    return typeof Chart !== 'undefined';
+                }
+            },
+            {
+                name: 'Chennai Athletes Data Available',
+                test: async () => {
+                    return typeof CHENNAI_ATHLETES !== 'undefined' && 
+                           CHENNAI_ATHLETES.length === 10;
+                }
+            }
+        ];
+
+        async function runAllTests() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<p class="text-gray-600">Running tests...</p>';
+            
+            const results = [];
+            
+            for (const test of tests) {
+                try {
+                    const passed = await test.test();
+                    results.push({
+                        name: test.name,
+                        passed,
+                        error: null
+                    });
+                } catch (error) {
+                    results.push({
+                        name: test.name,
+                        passed: false,
+                        error: error.message
+                    });
+                }
+            }
+            
+            displayResults(results);
+        }
+
+        function displayResults(results) {
+            const resultsDiv = document.getElementById('results');
+            const passedCount = results.filter(r => r.passed).length;
+            const totalCount = results.length;
+            
+            let html = `
+                <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                    <h2 class="text-2xl font-bold mb-4">
+                        Results: ${passedCount}/${totalCount} Tests Passed
+                    </h2>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex-1 h-4 bg-gray-200 rounded-full overflow-hidden">
+                            <div class="h-full bg-green-500" 
+                                 style="width: ${(passedCount/totalCount)*100}%"></div>
+                        </div>
+                        <span class="text-lg font-semibold">
+                            ${Math.round((passedCount/totalCount)*100)}%
+                        </span>
+                    </div>
+                </div>
+            `;
+            
+            results.forEach(result => {
+                const icon = result.passed ? '✅' : '❌';
+                const color = result.passed ? 'green' : 'red';
+                const errorMsg = result.error ? `<p class="text-sm text-red-600 mt-2">${result.error}</p>` : '';
+                
+                html += `
+                    <div class="bg-white rounded-lg shadow p-4 border-l-4 border-${color}-500">
+                        <div class="flex items-center justify-between">
+                            <span class="font-medium">${result.name}</span>
+                            <span class="text-2xl">${icon}</span>
+                        </div>
+                        ${errorMsg}
+                    </div>
+                `;
+            });
+            
+            resultsDiv.innerHTML = html;
+        }
+
+        // Load dependencies
+        const script1 = document.createElement('script');
+        script1.src = '../frontend/akuraAPI.js';
+        document.head.appendChild(script1);
+
+        const script2 = document.createElement('script');
+        script2.src = '../frontend/chennai-athletes.js';
+        document.head.appendChild(script2);
+
+        const script3 = document.createElement('script');
+        script3.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
+        document.head.appendChild(script3);
+    </script>
+</body>
+</html>
