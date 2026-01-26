@@ -41,6 +41,153 @@
             transform: scale(1.02);
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
         }
+
+        /* Modern Calculator Styling - KEEP EXISTING STRUCTURE */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            line-height: 1.6;
+        }
+
+        .calculator-container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 24px;
+            padding: 50px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        }
+
+        h1, h2, h3 {
+            color: #1e3a8a;
+            font-weight: 700;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            margin-top: 40px;
+        }
+
+        input[type="number"],
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 18px 24px;
+            font-size: 1.1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            background: white;
+            font-family: inherit;
+            margin-top: 8px;
+            margin-bottom: 20px;
+        }
+
+        input[type="number"]:focus,
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        label {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #374151;
+            margin-top: 20px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 18px 50px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+            transition: all 0.3s ease;
+            margin-top: 30px;
+            margin-right: 15px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(16, 185, 129, 0.4);
+        }
+
+        button[type="button"] {
+            background: #f3f4f6;
+            color: #4b5563;
+            box-shadow: none;
+        }
+
+        button[type="button"]:hover {
+            background: #e5e7eb;
+        }
+
+        .info-box {
+            background: #f0f9ff;
+            border-left: 4px solid #3b82f6;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            color: #1e40af;
+        }
+
+        /* Infographics Section */
+        .infographics-section {
+            margin-top: 80px;
+            padding: 50px;
+            background: #f9fafb;
+            border-radius: 16px;
+        }
+
+        .infographics-section h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #1e3a8a;
+            margin-bottom: 50px;
+        }
+
+        .infographic-card {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 50px;
+        }
+
+        .infographic-card h3 {
+            font-size: 1.8rem;
+            color: #1e3a8a;
+            margin-bottom: 25px;
+        }
+
+        .infographic-card img {
+            width: 100%;
+            max-width: 1000px;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .infographic-card p {
+            margin-top: 20px;
+            color: #6b7280;
+            font-size: 1.05rem;
+            text-align: center;
+            line-height: 1.7;
+        }
     </style>
 </head>
 <body>
@@ -135,6 +282,10 @@
                             <input type="number" id="weeklyKm" min="0" max="200" placeholder="Current weekly mileage" required>
                         </div>
                         <div class="form-group">
+                            <label for="squats">Max Unbroken Bodyweight Squats (reps)</label>
+                            <input type="number" id="squats" min="0" max="50" placeholder="e.g., 30" required>
+                        </div>
+                        <div class="form-group">
                             <label for="runningYears">Years of Running *</label>
                             <input type="number" id="runningYears" min="0" max="50" placeholder="Training experience" required>
                         </div>
@@ -147,6 +298,11 @@
                                 <option value="3">4+ injuries or major injury</option>
                             </select>
                         </div>
+                        <div class="form-group">
+                            <label for="painLevel">Current Pain Level (0-10 scale)</label>
+                            <input type="number" id="painLevel" min="0" max="10" value="0" placeholder="0 = no pain">
+                            <small>0 = Pain-free, 10 = Severe pain preventing running</small>
+                        </div>
                     </div>
                     <div class="step-buttons">
                         <button class="btn-secondary" onclick="prevStep(2)"><i class="fas fa-arrow-left"></i> Back</button>
@@ -157,32 +313,35 @@
                 <!-- Step 4: Biomechanics Assessment -->
                 <div class="calculator-step" id="step4">
                     <h2>Step 4: Biomechanics & Flexibility</h2>
-                    <p class="step-note">Rate each area from 1-10 (1=Poor, 10=Excellent)</p>
-                    <div class="form-grid">
+                    <div class="form-section">
                         <div class="form-group">
-                            <label for="ankleROM">Ankle Flexibility <i class="fas fa-info-circle" title="Can you squat deeply?"></i></label>
-                            <input type="range" id="ankleROM" min="1" max="10" value="5" oninput="updateRangeValue(this)">
-                            <span class="range-value">5</span>
+                            <label for="ankleFlexibility">Ankle Dorsiflexion (degrees)</label>
+                            <input type="number" id="ankleFlexibility" min="0" max="45" required>
+                            <small>Normal: 10-15°, Good: 15-20°, Excellent: 20°+</small>
                         </div>
+
                         <div class="form-group">
-                            <label for="hipROM">Hip Flexibility <i class="fas fa-info-circle" title="Can you do lunges comfortably?"></i></label>
-                            <input type="range" id="hipROM" min="1" max="10" value="5" oninput="updateRangeValue(this)">
-                            <span class="range-value">5</span>
+                            <label for="hipFlexibility">Hip Flexibility - Sit & Reach (cm)</label>
+                            <input type="number" id="hipFlexibility" min="-20" max="50" required>
+                            <small>Measure from toes: Negative = can't reach, Positive = past toes</small>
                         </div>
+
                         <div class="form-group">
-                            <label for="balance">Single-Leg Balance <i class="fas fa-info-circle" title="Can you stand 30s on one leg?"></i></label>
-                            <input type="range" id="balance" min="1" max="10" value="5" oninput="updateRangeValue(this)">
-                            <span class="range-value">5</span>
+                            <label for="singleLegBalance">Single-Leg Balance (seconds)</label>
+                            <input type="number" id="singleLegBalance" min="0" max="300" required>
+                            <small>Stand on one leg, eyes open. Average: 30s, Good: 60s, Excellent: 120s+</small>
                         </div>
+
                         <div class="form-group">
-                            <label for="coreStrength">Core Strength <i class="fas fa-info-circle" title="Can you plank 60s?"></i></label>
-                            <input type="range" id="coreStrength" min="1" max="10" value="5" oninput="updateRangeValue(this)">
-                            <span class="range-value">5</span>
+                            <label for="coreStrength">Plank Hold Time (seconds)</label>
+                            <input type="number" id="coreStrength" min="0" max="600" required>
+                            <small>Forearm plank, proper form. Average: 30s, Good: 60s, Excellent: 120s+</small>
                         </div>
+
                         <div class="form-group">
-                            <label for="mobility">Overall Mobility <i class="fas fa-info-circle" title="Dynamic movement quality"></i></label>
-                            <input type="range" id="mobility" min="1" max="10" value="5" oninput="updateRangeValue(this)">
-                            <span class="range-value">5</span>
+                            <label for="fmsScore">Functional Movement Screen (FMS) Score</label>
+                            <input type="number" id="fmsScore" min="0" max="21" required>
+                            <small>7 movement tests, 0-3 points each. Safe threshold: 14+</small>
                         </div>
                     </div>
                     <div class="step-buttons">
@@ -280,6 +439,35 @@
             </div>
         </div>
     </footer>
+
+    <!-- Infographics Section -->
+    <div class="infographics-section">
+        <h2>📊 Understanding Your Results</h2>
+        
+        <div class="infographic-card">
+            <h3>Your 6 HR Training Zones</h3>
+            <img src="images/02-6-HR-Zones-Color-Bar.png" alt="6 AIFRI Training Zones" loading="lazy">
+            <p>Your personalized zones are calculated using the Tanaka formula: Max HR = 208 - (0.7 × Age)</p>
+        </div>
+        
+        <div class="infographic-card">
+            <h3>AIFRI 5-Pillar Scoring System</h3>
+            <img src="images/01-AIFRI-Scoring-Wheel.png" alt="AIFRI 5-Pillar Scoring" loading="lazy">
+            <p>Your AIFRI score (0-100) combines Running Performance (40%), Strength (20%), ROM (15%), Balance (15%), and Mobility (10%)</p>
+        </div>
+        
+        <div class="infographic-card">
+            <h3>How Your Workouts Are Prescribed</h3>
+            <img src="images/03-Workout-Prescription-Flowchart.png" alt="Workout Prescription Flow" loading="lazy">
+            <p>SafeStride uses your AIFRI score to determine which training zones you can safely access</p>
+        </div>
+        
+        <div class="infographic-card">
+            <h3>Safety Gates Prevent Premature Intensity</h3>
+            <img src="images/04-Safety-Gates-Progressive-Gating.png" alt="Safety Gates System" loading="lazy">
+            <p>Progressive gating system unlocks higher intensity zones only when you meet readiness requirements</p>
+        </div>
+    </div>
 
     <script src="js/main.js"></script>
     <script src="js/calculator.js"></script>
