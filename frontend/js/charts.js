@@ -2,6 +2,22 @@
  * Chart.js utility for pace progression visualization
  */
 
+// Prevent multiple chart initializations per canvas
+const chartInstances = {};
+
+function createOrUpdateChart(elementId, config) {
+    const canvas = document.getElementById(elementId);
+    if (!canvas) return null;
+
+    // Destroy existing chart if present
+    if (chartInstances[elementId]) {
+        chartInstances[elementId].destroy();
+    }
+
+    chartInstances[elementId] = new Chart(canvas.getContext('2d'), config);
+    return chartInstances[elementId];
+}
+
 /**
  * Create a pace progression chart over 30 days
  */
@@ -11,8 +27,6 @@ async function createPaceProgressionChart(canvasId, authToken, apiBaseUrl) {
         console.error(`Canvas element #${canvasId} not found`);
         return null;
     }
-
-    const ctx = canvas.getContext('2d');
 
     try {
         // Fetch workouts from API
@@ -54,7 +68,7 @@ async function createPaceProgressionChart(canvasId, authToken, apiBaseUrl) {
         const distances = recentWorkouts.map(w => w.distance || 0);
 
         // Create Chart.js instance
-        const chart = new Chart(ctx, {
+        const chart = createOrUpdateChart(canvasId, {
             type: 'line',
             data: {
                 labels: dates,
@@ -209,7 +223,7 @@ async function createSimplePaceChart(canvasId, authToken, apiBaseUrl) {
         const paces = recentWorkouts.map(w => toSeconds(w.pace)).filter(v => v !== null);
 
         // Create Chart.js instance
-        const chart = new Chart(ctx, {
+        const chart = createOrUpdateChart(canvasId, {
             type: 'line',
             data: {
                 labels: dates,
@@ -280,3 +294,4 @@ async function createSimplePaceChart(canvasId, authToken, apiBaseUrl) {
 // Make functions globally available
 window.createPaceProgressionChart = createPaceProgressionChart;
 window.createSimplePaceChart = createSimplePaceChart;
+window.createOrUpdateChart = createOrUpdateChart;
