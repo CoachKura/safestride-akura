@@ -1,0 +1,67 @@
+# Netlify Configuration for AKURA SafeStride Frontend
+# Last Updated: 2026-01-27
+
+[build]
+  # No build command needed for static HTML
+  command = ""
+  # Publish directory (static HTML files)
+  publish = "frontend"
+  # Base directory
+  base = "."
+
+# Redirect /api/* requests to Render backend
+[[redirects]]
+  from = "/api/*"
+  to = "https://safestride-backend-cave.onrender.com/api/:splat"
+  status = 200
+  force = true
+
+# SPA fallback for client-side routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Security headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    # CORS headers for API proxy
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Authorization, Content-Type, X-Request-Id, X-Client-Id, Idempotency-Key"
+
+# Cache static assets aggressively
+[[headers]]
+  for = "/css/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/js/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# HTML files - short cache for updates
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+
+# Environment variables
+[build.environment]
+  NODE_VERSION = "18"
+  VITE_API_BASE_URL = "https://safestride-backend-cave.onrender.com/api"
+  VITE_ENABLE_OFFLINE_MODE = "false"
+  VITE_LOG_LEVEL = "info"

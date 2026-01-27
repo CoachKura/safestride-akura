@@ -578,6 +578,84 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Utility Classes */
+        .progress-dasharray {
+            stroke-dasharray: 339.29;
+            stroke-dashoffset: 50.89;
+        }
+
+        .svg-centered {
+            margin: 0 auto 15px;
+        }
+
+        .polyline-rpe {
+            stroke: var(--secondary);
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+        }
+
+        .emoji-large {
+            font-size: 48px;
+            margin: 15px 0;
+        }
+
+        .status-success {
+            color: var(--success);
+            font-size: 18px;
+        }
+
+        .font-18 {
+            font-size: 18px;
+        }
+
+        .link-centered {
+            text-align: center;
+            color: var(--secondary);
+            margin-top: 20px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .arrow-warning {
+            color: var(--warning);
+            font-weight: 600;
+        }
+
+        .arrow-primary {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .arrow-muted {
+            color: #999;
+            font-weight: 600;
+        }
+
+        .section-heading-primary {
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 20px;
+            margin-top: 30px;
+        }
+
+        .is-hidden {
+            display: none;
+        }
+
+        .z-1050 {
+            z-index: 1050;
+        }
+
+        .z-2000 {
+            z-index: 2000;
+        }
+
+        .spinner-large {
+            width: 3rem;
+            height: 3rem;
+        }
     </style>
 </head>
 <body>
@@ -624,7 +702,7 @@
                     <svg class="progress-ring" width="120" height="120" viewBox="0 0 120 120">
                         <circle class="progress-ring-circle" cx="60" cy="60" r="54" stroke-width="8"/>
                         <circle class="progress-ring-progress" cx="60" cy="60" r="54" stroke-width="8" 
-                                style="stroke-dasharray: 339.29; stroke-dashoffset: 50.89;"/>
+                                class="progress-dasharray"/>
                     </svg>
                     <div class="progress-text">85%</div>
                 </div>
@@ -633,9 +711,9 @@
 
             <div class="stat-card-dashboard">
                 <h4>Last 7 Days RPE</h4>
-                <svg class="progress-ring" width="120" height="120" viewBox="0 0 120 120" style="margin: 0 auto 15px;">
+                <svg class="progress-ring svg-centered" width="120" height="120" viewBox="0 0 120 120">
                     <polyline points="10,100 30,60 50,75 70,40 110,80" 
-                              style="stroke: var(--secondary); fill: none; stroke-width: 2; stroke-linecap: round;"/>
+                              class="polyline-rpe"/>
                 </svg>
                 <div class="stat-value">6.8</div>
                 <div class="stat-subtext">Average RPE</div>
@@ -643,14 +721,14 @@
 
             <div class="stat-card-dashboard">
                 <h4>Injury Status</h4>
-                <div style="font-size: 48px; margin: 15px 0;">🟢</div>
-                <div class="stat-value" style="color: var(--success); font-size: 18px;">All Clear</div>
+                <div class="emoji-large">🟢</div>
+                <div class="stat-value status-success">All Clear</div>
             </div>
 
             <div class="stat-card-dashboard">
                 <h4>Next Assessment</h4>
-                <div style="font-size: 48px; margin: 15px 0;">📅</div>
-                <div class="stat-value" style="font-size: 18px;">Feb 24</div>
+                <div class="emoji-large">📅</div>
+                <div class="stat-value font-18">Feb 24</div>
                 <div class="stat-subtext">28 days remaining</div>
             </div>
         </div>
@@ -745,7 +823,7 @@
                     </div>
                 </div>
             </div>
-            <p style="text-align: center; color: var(--secondary); margin-top: 20px; cursor: pointer; font-weight: 600;">
+            <p class="link-centered">
                 View Full History →
             </p>
         </div>
@@ -759,7 +837,7 @@
                         <div class="upcoming-day">Wednesday</div>
                         <div class="upcoming-workout">Threshold 10km</div>
                     </div>
-                    <div style="color: var(--warning); font-weight: 600;">→</div>
+                    <div class="arrow-warning">→</div>
                 </div>
 
                 <div class="upcoming-item">
@@ -767,7 +845,7 @@
                         <div class="upcoming-day">Friday</div>
                         <div class="upcoming-workout">Easy 6km</div>
                     </div>
-                    <div style="color: var(--warning); font-weight: 600;">→</div>
+                    <div class="arrow-warning">→</div>
                 </div>
 
                 <div class="upcoming-item">
@@ -775,7 +853,7 @@
                         <div class="upcoming-day">Saturday</div>
                         <div class="upcoming-workout">Long Run 18km</div>
                     </div>
-                    <div style="color: var(--primary); font-weight: 600;">🎯</div>
+                    <div class="arrow-primary">🎯</div>
                 </div>
 
                 <div class="upcoming-item">
@@ -783,7 +861,7 @@
                         <div class="upcoming-day">Sunday</div>
                         <div class="upcoming-workout">Rest + Mobility work</div>
                     </div>
-                    <div style="color: #999; font-weight: 600;">✓</div>
+                    <div class="arrow-muted">✓</div>
                 </div>
             </div>
         </div>
@@ -812,7 +890,7 @@
                 </div>
             </div>
 
-            <h4 style="font-weight: 700; color: var(--primary); margin-bottom: 20px; margin-top: 30px;">Your Body Type: Mesomorph</h4>
+            <h4 class="section-heading-primary">Your Body Type: Mesomorph</h4>
             <div class="body-type-card">
                 <div class="body-type-title">Recommended Focus for Your Profile</div>
                 <div class="body-type-characteristics">
@@ -864,6 +942,7 @@
 
     <!-- JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js"></script>
+    <script src="js/api-client.js"></script>
     <script>
         // Greeting based on time
         function updateGreeting() {
@@ -993,8 +1072,319 @@
             alert('🔗 Connecting to ' + service + '...');
         }
 
-        // Initialize on load
-        window.addEventListener('load', initPillarChart);
-    </script>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </script>
+
+        <!-- ============================================ -->
+        <!-- DAILY WORKOUT FEEDBACK FORM -->
+        <!-- ============================================ -->
+
+        <section id="dailyFeedbackSection" class="container mt-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4>📝 Daily Workout Feedback</h4>
+                    <p class="mb-0">Help us optimize your training by sharing today's workout experience</p>
+                </div>
+                <div class="card-body">
+                    <div id="currentWorkoutInfo" class="alert alert-info mb-4">
+                        <strong>Today's Workout:</strong> <span id="workoutType">Loading...</span><br>
+                        <strong>Scheduled Duration:</strong> <span id="workoutDuration">--</span> minutes<br>
+                        <strong>Date:</strong> <span id="workoutDate">--</span>
+                    </div>
+                    <form id="feedbackForm">
+                        <input type="hidden" id="workoutId" name="workoutId" value="">
+                        <input type="hidden" id="athleteId" name="athleteId" value="">
+                        <div class="form-group mb-4">
+                            <label class="form-label"><strong>Did you complete today's workout?</strong></label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="completed" id="completedYes" value="yes" required>
+                                <label class="form-check-label" for="completedYes">✅ Yes - Completed as planned</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="completed" id="completedPartial" value="partial">
+                                <label class="form-check-label" for="completedPartial">⚠️ Partially - Modified or shortened</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="completed" id="completedNo" value="no">
+                                <label class="form-check-label" for="completedNo">❌ No - Skipped or couldn't complete</label>
+                            </div>
+                        </div>
+                        <div class="form-group mb-4">
+                            <label for="rpe" class="form-label"><strong>Rate of Perceived Exertion (RPE)</strong> - How hard did the workout feel?</label>
+                            <input type="range" class="form-range" min="1" max="10" step="1" id="rpe" name="rpe" value="5">
+                            <div class="d-flex justify-content-between text-muted small">
+                                <span>1 - Very Easy</span>
+                                <span id="rpeValue" class="fw-bold">5</span>
+                                <span>10 - Maximum Effort</span>
+                            </div>
+                        </div>
+                        <div class="form-group mb-4">
+                            <label for="pain" class="form-label"><strong>Pain Level</strong> - Any discomfort during or after?</label>
+                            <input type="range" class="form-range" min="0" max="10" step="1" id="pain" name="pain" value="0">
+                            <div class="d-flex justify-content-between text-muted small">
+                                <span>0 - No Pain</span>
+                                <span id="painValue" class="fw-bold">0</span>
+                                <span>10 - Severe Pain</span>
+                            </div>
+                        </div>
+                        <div class="form-group mb-4 is-hidden" id="painLocationGroup">
+                            <label for="painLocation" class="form-label">Where did you feel pain?</label>
+                            <select class="form-select" id="painLocation" name="painLocation">
+                                <option value="">Select location...</option>
+                                <option value="knee">Knee</option>
+                                <option value="ankle">Ankle</option>
+                                <option value="hip">Hip</option>
+                                <option value="lower-back">Lower Back</option>
+                                <option value="calf">Calf</option>
+                                <option value="shin">Shin</option>
+                                <option value="foot">Foot (plantar fascia)</option>
+                                <option value="hamstring">Hamstring</option>
+                                <option value="quadriceps">Quadriceps</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-4">
+                            <label for="sleep" class="form-label"><strong>Sleep (last night)</strong> - Hours of quality sleep</label>
+                            <input type="number" class="form-control" id="sleep" name="sleep" min="0" max="14" step="0.5" value="7" required>
+                            <small class="form-text text-muted">Recommended: 7-9 hours for optimal recovery</small>
+                        </div>
+                        <div class="form-group mb-4">
+                            <label for="nutrition" class="form-label"><strong>Nutrition</strong> - Estimated daily calorie intake</label>
+                            <input type="number" class="form-control" id="nutrition" name="nutrition" min="1000" max="5000" step="50" value="2000" required>
+                            <small class="form-text text-muted">This helps us understand your energy balance</small>
+                        </div>
+                        <div class="form-group mb-4">
+                            <label for="stress" class="form-label"><strong>Stress Level</strong> - Overall daily stress (work, life, etc.)</label>
+                            <input type="range" class="form-range" min="1" max="10" step="1" id="stress" name="stress" value="5">
+                            <div class="d-flex justify-content-between text-muted small">
+                                <span>1 - Very Relaxed</span>
+                                <span id="stressValue" class="fw-bold">5</span>
+                                <span>10 - Very Stressed</span>
+                            </div>
+                        </div>
+                        <div class="form-group mb-4">
+                            <label for="notes" class="form-label"><strong>Additional Notes</strong> (optional)</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Any other observations, symptoms, or comments about today's workout..."></textarea>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg" id="submitFeedbackBtn">📤 Submit Feedback</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+        <div id="feedbackMessages" class="container mt-3 is-hidden">
+            <div id="successMessage" class="alert alert-success is-hidden"><strong>✅ Success!</strong> <span id="successText"></span></div>
+            <div id="errorMessage" class="alert alert-danger is-hidden"><strong>❌ Error:</strong> <span id="errorText"></span></div>
+        </div>
+        <div id="offlineBanner" class="position-fixed bottom-0 start-50 translate-middle-x mb-3 is-hidden z-1050">
+            <div class="alert alert-warning shadow-lg"><strong>📡 You're offline.</strong> Feedback saved locally and will sync when reconnected.</div>
+        </div>
+        <div id="feedbackSpinner" class="position-fixed top-50 start-50 translate-middle is-hidden z-2000">
+            <div class="spinner-border text-primary spinner-large" role="status"><span class="visually-hidden">Loading...</span></div>
+            <p class="mt-2 text-center"><strong id="spinnerText">Submitting feedback...</strong></p>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                console.log('🎯 Athlete Dashboard - Feedback module loading...');
+                initializeFeedbackForm();
+                loadCurrentWorkout();
+                setupRangeSliders();
+                setupPainConditional();
+            });
+
+            function loadCurrentWorkout() {
+                console.log('📥 Loading current workout...');
+                const protocolId = localStorage.getItem('protocolId');
+                const today = new Date().toISOString().split('T')[0];
+                const startDate = localStorage.getItem('protocolStartDate') || today;
+                const dayNumber = Math.floor((new Date(today) - new Date(startDate)) / (1000 * 60 * 60 * 24)) + 1;
+                const cachedProtocol = localStorage.getItem('protocol_' + protocolId);
+                if (cachedProtocol) {
+                    const protocol = JSON.parse(cachedProtocol);
+                    const todayWorkout = protocol.daily?.[dayNumber - 1] || { type: 'Easy Run', duration: 45, intensity: 'Moderate' };
+                    document.getElementById('workoutId').value = `workout_${protocolId}_day${dayNumber}`;
+                    document.getElementById('workoutType').textContent = todayWorkout.type || 'Easy Run';
+                    document.getElementById('workoutDuration').textContent = todayWorkout.duration || 45;
+                    document.getElementById('workoutDate').textContent = today;
+                    console.log('✅ Loaded workout:', todayWorkout);
+                } else {
+                    console.warn('⚠️ No cached protocol found');
+                    document.getElementById('currentWorkoutInfo').innerHTML = '<strong>⚠️ No workout scheduled.</strong> Please complete your assessment first.';
+                }
+            }
+
+            function initializeFeedbackForm() {
+                const form = document.getElementById('feedbackForm');
+                if (!form) {
+                    console.error('❌ Feedback form not found');
+                    return;
+                }
+                form.addEventListener('submit', handleFeedbackSubmission);
+                console.log('✅ Feedback form initialized');
+            }
+
+            async function handleFeedbackSubmission(event) {
+                event.preventDefault();
+                console.log('📤 Submitting workout feedback...');
+                showSpinner('Submitting feedback...');
+                const formData = new FormData(event.target);
+                const workoutId = document.getElementById('workoutId').value;
+                const feedbackData = {
+                    workoutId,
+                    date: new Date().toISOString(),
+                    completed: formData.get('completed'),
+                    rpe: parseInt(formData.get('rpe')),
+                    pain: parseInt(formData.get('pain')),
+                    painLocation: formData.get('painLocation') || '',
+                    sleep: parseFloat(formData.get('sleep')),
+                    nutrition: parseInt(formData.get('nutrition')),
+                    stress: parseInt(formData.get('stress')),
+                    notes: formData.get('notes') || ''
+                };
+                console.log('Feedback data:', feedbackData);
+                try {
+                    if (!navigator.onLine) {
+                        throw new Error('You are offline. Feedback will be saved locally.');
+                    }
+                    const result = await submitWorkoutFeedback(workoutId, feedbackData);
+                    console.log('✅ Feedback submitted successfully:', result);
+                    hideSpinner();
+                    showSuccessMessage('Feedback submitted successfully! Your training plan has been updated.');
+                    if (result.nextWorkouts) updateNextWorkouts(result.nextWorkouts);
+                    if (result.recommendations) displayRecommendations(result.recommendations);
+                    setTimeout(() => {
+                        document.getElementById('feedbackForm').reset();
+                        document.getElementById('rpeValue').textContent = '5';
+                        document.getElementById('painValue').textContent = '0';
+                        document.getElementById('stressValue').textContent = '5';
+                    }, 2000);
+                } catch (error) {
+                    console.error('❌ Feedback submission failed:', error);
+                    hideSpinner();
+                    if (!navigator.onLine || error.message.includes('offline')) {
+                        showOfflineBanner();
+                        showSuccessMessage('Feedback saved locally. Will sync when you reconnect.');
+                        console.log('💾 Feedback cached for later sync');
+                    } else {
+                        showErrorMessage(`Failed to submit feedback: ${error.message}`);
+                    }
+                }
+            }
+
+            function setupRangeSliders() {
+                const sliders = [
+                    { id: 'rpe', value: 'rpeValue' },
+                    { id: 'pain', value: 'painValue' },
+                    { id: 'stress', value: 'stressValue' }
+                ];
+                sliders.forEach((item) => {
+                    const slider = document.getElementById(item.id);
+                    const display = document.getElementById(item.value);
+                    if (slider && display) {
+                        slider.addEventListener('input', (e) => display.textContent = e.target.value);
+                    }
+                });
+                console.log('✅ Range sliders configured');
+            }
+
+            function setupPainConditional() {
+                const painSlider = document.getElementById('pain');
+                const painLocationGroup = document.getElementById('painLocationGroup');
+                const painLocation = document.getElementById('painLocation');
+                if (!painSlider || !painLocationGroup) return;
+                painSlider.addEventListener('input', (e) => {
+                    const painLevel = parseInt(e.target.value);
+                    if (painLevel > 0) {
+                        painLocationGroup.style.display = 'block';
+                        if (painLocation) painLocation.required = true;
+                    } else {
+                        painLocationGroup.style.display = 'none';
+                        if (painLocation) {
+                            painLocation.required = false;
+                            painLocation.value = '';
+                        }
+                    }
+                });
+            }
+
+            // UI Helpers
+            function showSpinner(message = 'Loading...') {
+                const spinner = document.getElementById('feedbackSpinner');
+                const spinnerText = document.getElementById('spinnerText');
+                if (spinner) {
+                    spinner.style.display = 'block';
+                    if (spinnerText) spinnerText.textContent = message;
+                }
+            }
+
+            function hideSpinner() {
+                const spinner = document.getElementById('feedbackSpinner');
+                if (spinner) spinner.style.display = 'none';
+            }
+
+            function showSuccessMessage(message) {
+                const container = document.getElementById('feedbackMessages');
+                const successDiv = document.getElementById('successMessage');
+                const successText = document.getElementById('successText');
+                if (container && successDiv && successText) {
+                    container.style.display = 'block';
+                    successDiv.style.display = 'block';
+                    successText.textContent = message;
+                    document.getElementById('errorMessage').style.display = 'none';
+                    setTimeout(() => successDiv.style.display = 'none', 5000);
+                }
+            }
+
+            function showErrorMessage(message) {
+                const container = document.getElementById('feedbackMessages');
+                const errorDiv = document.getElementById('errorMessage');
+                const errorText = document.getElementById('errorText');
+                if (container && errorDiv && errorText) {
+                    container.style.display = 'block';
+                    errorDiv.style.display = 'block';
+                    errorText.textContent = message;
+                    document.getElementById('successMessage').style.display = 'none';
+                    setTimeout(() => errorDiv.style.display = 'none', 7000);
+                }
+            }
+
+            function showOfflineBanner() {
+                const banner = document.getElementById('offlineBanner');
+                if (!banner) return;
+                banner.style.display = 'block';
+                window.addEventListener('online', () => { banner.style.display = 'none'; }, { once: true });
+            }
+
+            function updateNextWorkouts(nextWorkouts) {
+                console.log('🔄 Updating next workouts:', nextWorkouts);
+                const container = document.getElementById('upcomingWorkouts');
+                if (!container) return;
+                container.innerHTML = '<h4>Updated Next 7 Days</h4>';
+                nextWorkouts.forEach((workout, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'card mb-2';
+                    card.innerHTML = `
+                            <div class="card-body">
+                                <h5>Day ${index + 1}: ${workout.type}</h5>
+                                <p class="mb-0">${workout.duration} min | ${workout.intensity}</p>
+                            </div>`;
+                    container.appendChild(card);
+                });
+            }
+
+            function displayRecommendations(recommendations) {
+                console.log('💡 Displaying recommendations:', recommendations);
+                const container = document.getElementById('aiRecommendations');
+                if (!container) return;
+                container.innerHTML = `
+                    <div class="alert alert-info">
+                        <h5>🤖 AI Coach Recommendations</h5>
+                        <ul class="mb-0">
+                            ${recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                        </ul>
+                    </div>`;
+            }
+        </script>
 </body>
 </html>

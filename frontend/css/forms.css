@@ -361,11 +361,21 @@
 .form-actions-left {
   display: flex;
   gap: var(--spacing-sm);
+  flex: 1;
+}
+
+.form-actions-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 0 0 auto;
 }
 
 .form-actions-right {
   display: flex;
   gap: var(--spacing-sm);
+  flex: 1;
+  justify-content: flex-end;
 }
 
 .form-button {
@@ -397,6 +407,18 @@
 .form-button-secondary:hover {
   background-color: var(--primary-navy);
   color: white;
+}
+
+.step-counter {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+  color: var(--primary-navy);
+  white-space: nowrap;
+}
+
+.step-counter span {
+  color: var(--primary-teal);
+  font-weight: var(--font-weight-bold);
 }
 
 .form-button:disabled {

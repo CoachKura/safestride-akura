@@ -109,10 +109,15 @@
   }
 
   .form-actions-left,
+  .form-actions-center,
   .form-actions-right {
     flex-direction: column;
     width: 100%;
     gap: 12px;
+  }
+
+  .form-actions-center {
+    order: -1; /* Show step counter first on mobile */
   }
 
   .form-button {

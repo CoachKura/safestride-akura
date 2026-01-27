@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIFRI Alignment Scoring Test Suite</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .test-header {
+            border-bottom: 2px solid #00ff00;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .test-case {
+            background: #2a2a2a;
+            border-left: 4px solid #00ff00;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .test-case.pass {
+            border-left-color: #00ff00;
+        }
+        .test-case.fail {
+            border-left-color: #ff0000;
+        }
+        .result {
+            background: #1a1a1a;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        .pass-badge {
+            color: #00ff00;
+            font-weight: bold;
+        }
+        .fail-badge {
+            color: #ff0000;
+            font-weight: bold;
+        }
+        .detail {
+            color: #00bfff;
+            margin-left: 20px;
+        }
+        .summary {
+            background: #2a2a2a;
+            padding: 15px;
+            margin-top: 30px;
+            border-radius: 4px;
+            border: 2px solid #00ff00;
+        }
+        pre {
+            background: #1a1a1a;
+            padding: 10px;
+            overflow-x: auto;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-header">
+        <h1>🧪 AIFRI Alignment Scoring Test Suite</h1>
+        <p>6-Pillar AIFRI System with Medical Validation (NASM/ACSM Standards)</p>
+    </div>
+
+    <div id="test-output"></div>
+    <div id="test-summary"></div>
+
+    <!-- Load AIFRI Engine -->
+    <script src="js/aifri-engine.js"></script>
+
+    <script>
+        // ============================================
+        // ALIGNMENT SCORING TEST SUITE
+        // ============================================
+
+        const testResults = [];
+        const output = document.getElementById('test-output');
+
+        function logTest(testName, testData, expectedRanges) {
+            const testDiv = document.createElement('div');
+            testDiv.className = 'test-case';
+            
+            let html = `<h3>${testName}</h3>`;
+            
+            try {
+                // Create calculator instance
+                const calculator = new AIFRICalculator(testData);
+                const result = calculator.calculateAIFRI();
+                
+                // Check if results match expected ranges
+                const alignmentPass = result.pillars.alignment >= expectedRanges.alignmentMin && 
+                                     result.pillars.alignment <= expectedRanges.alignmentMax;
+                const totalPass = result.total >= expectedRanges.totalMin && 
+                                 result.total <= expectedRanges.totalMax;
+                const overallPass = alignmentPass && totalPass;
+                
+                testDiv.classList.add(overallPass ? 'pass' : 'fail');
+                
+                html += `<div class="result">
+                    <strong>Results:</strong>
+                    <div class="detail">Total AIFRI: ${result.total} (Expected: ${expectedRanges.totalMin}-${expectedRanges.totalMax})</div>
+                    <div class="detail">Alignment Score: ${result.pillars.alignment} (Expected: ${expectedRanges.alignmentMin}-${expectedRanges.alignmentMax})</div>
+                    <div class="detail">Grade: ${result.grade.label} - ${result.grade.description}</div>
+                    <div class="detail">Injury Risk: ${result.injuryRisk ? (result.injuryRisk.level || 'N/A') : 'N/A'}</div>
+                </div>`;
+                
+                html += `<div class="result">
+                    <strong>All Pillar Scores:</strong>
+                    <div class="detail">🏃 Running: ${result.pillars.running} (Weight: 40%)</div>
+                    <div class="detail">💪 Strength: ${result.pillars.strength} (Weight: 15%)</div>
+                    <div class="detail">🔄 ROM: ${result.pillars.rom} (Weight: 12%)</div>
+                    <div class="detail">⚖️ Balance: ${result.pillars.balance} (Weight: 13%)</div>
+                    <div class="detail">🧘 Mobility: ${result.pillars.mobility} (Weight: 10%)</div>
+                    <div class="detail">🦴 Alignment: ${result.pillars.alignment} (Weight: 10%)</div>
+                </div>`;
+                
+                html += `<div class="result">
+                    <strong>Status: </strong>
+                    <span class="${overallPass ? 'pass-badge' : 'fail-badge'}">
+                        ${overallPass ? '✅ PASS' : '❌ FAIL'}
+                    </span>
+                </div>`;
+                
+                testResults.push({ name: testName, passed: overallPass, result });
+                
+            } catch (error) {
+                testDiv.classList.add('fail');
+                html += `<div class="result">
+                    <span class="fail-badge">❌ ERROR: ${error.message}</span>
+                    <pre>${error.stack}</pre>
+                </div>`;
+                testResults.push({ name: testName, passed: false, error: error.message });
+            }
+            
+            testDiv.innerHTML = html;
+            output.appendChild(testDiv);
+        }
+
+        // ============================================
+        // TEST CASES
+        // ============================================
+
+        // Test Case 1: Good Alignment (Expected: ~100, Low Risk)
+        console.log('\n📊 TEST CASE 1: Good Alignment');
+        logTest(
+            '📊 TEST CASE 1: Good Alignment',
+            {
+                // Alignment - Perfect scores
+                qAngle: 16,
+                footPronation: 'neutral',
+                pelvisTilt: 'neutral',
+                forwardHeadPosture: 'none',
+                shoulderSymmetry: 'balanced',
+                scoliosis: 'no',
+                navicularDrop: 5,
+                
+                // Running - Good performance
+                raceTime5K: '22:00',
+                weeklyKm: 30,
+                runningYears: 3,
+                injuryHistory: '',
+                painLevel: 0,
+                
+                // Strength - Solid foundation
+                squats: 40,
+                plankSeconds: 90,
+                
+                // ROM - Excellent mobility
+                shoulderROM: 85,
+                hipROM: 90,
+                ankleROM: 85,
+                
+                // Balance - Strong stability
+                singleLegBalance: 25,
+                
+                // Mobility - Good flexibility
+                sitReach: 12,
+                
+                // Medical history
+                previousInjuries: []
+            },
+            {
+                totalMin: 70,
+                totalMax: 85,
+                alignmentMin: 95,
+                alignmentMax: 100
+            }
+        );
+
+        // Test Case 2: Moderate Issues (Expected: ~64-70, Elevated Risk)
+        console.log('\n📊 TEST CASE 2: Moderate Alignment Issues');
+        logTest(
+            '📊 TEST CASE 2: Moderate Alignment Issues',
+            {
+                // Alignment - Multiple moderate issues
+                qAngle: 22,
+                footPronation: 'over',
+                pelvisTilt: 'anterior',
+                forwardHeadPosture: 'moderate',
+                shoulderSymmetry: 'left-high',
+                scoliosis: 'no',
+                navicularDrop: 12,
+                
+                // Running - Average performance
+                raceTime5K: '26:00',
+                weeklyKm: 25,
+                runningYears: 2,
+                injuryHistory: 'knee',
+                painLevel: 2,
+                
+                // Strength - Moderate
+                squats: 30,
+                plankSeconds: 60,
+                
+                // ROM - Adequate
+                shoulderROM: 80,
+                hipROM: 85,
+                ankleROM: 80,
+                
+                // Balance - Fair
+                singleLegBalance: 20,
+                
+                // Mobility - Fair
+                sitReach: 10,
+                
+                // Medical history
+                previousInjuries: ['knee']
+            },
+            {
+                totalMin: 60,
+                totalMax: 75,
+                alignmentMin: 55,
+                alignmentMax: 70
+            }
+        );
+
+        // Test Case 3: Severe Issues (Expected: ~50-60, High Risk)
+        console.log('\n📊 TEST CASE 3: Severe Alignment Issues');
+        logTest(
+            '📊 TEST CASE 3: Severe Alignment Issues',
+            {
+                // Alignment - Severe problems
+                qAngle: 27,
+                footPronation: 'severe-over',
+                pelvisTilt: 'severe-anterior',
+                forwardHeadPosture: 'severe',
+                shoulderSymmetry: 'right-high',
+                scoliosis: 'minor',
+                navicularDrop: 18,
+                
+                // Running - Below average
+                raceTime5K: '32:00',
+                weeklyKm: 15,
+                runningYears: 1,
+                injuryHistory: 'knee,ankle,back',
+                painLevel: 4,
+                
+                // Strength - Weak
+                squats: 20,
+                plankSeconds: 45,
+                
+                // ROM - Limited
+                shoulderROM: 70,
+                hipROM: 75,
+                ankleROM: 70,
+                
+                // Balance - Poor
+                singleLegBalance: 15,
+                
+                // Mobility - Limited
+                sitReach: 8,
+                
+                // Medical history
+                previousInjuries: ['knee', 'ankle', 'back']
+            },
+            {
+                totalMin: 40,
+                totalMax: 60,
+                alignmentMin: 30,
+                alignmentMax: 55
+            }
+        );
+
+        // Test Case 4: Elite Athlete (Expected: 85-95, Low Risk)
+        console.log('\n📊 TEST CASE 4: Elite Athlete Profile');
+        logTest(
+            '📊 TEST CASE 4: Elite Athlete Profile',
+            {
+                // Alignment - Excellent
+                qAngle: 15,
+                footPronation: 'neutral',
+                pelvisTilt: 'neutral',
+                forwardHeadPosture: 'none',
+                shoulderSymmetry: 'balanced',
+                scoliosis: 'no',
+                navicularDrop: 6,
+                
+                // Running - Elite performance
+                raceTime5K: '18:00',
+                weeklyKm: 50,
+                runningYears: 8,
+                injuryHistory: '',
+                painLevel: 0,
+                
+                // Strength - Excellent
+                squats: 60,
+                plankSeconds: 120,
+                
+                // ROM - Optimal
+                shoulderROM: 90,
+                hipROM: 95,
+                ankleROM: 90,
+                
+                // Balance - Outstanding
+                singleLegBalance: 30,
+                
+                // Mobility - Superior
+                sitReach: 15,
+                
+                // Medical history
+                previousInjuries: []
+            },
+            {
+                totalMin: 82,
+                totalMax: 95,
+                alignmentMin: 95,
+                alignmentMax: 100
+            }
+        );
+
+        // ============================================
+        // TEST SUMMARY
+        // ============================================
+
+        setTimeout(() => {
+            const summary = document.getElementById('test-summary');
+            const totalTests = testResults.length;
+            const passedTests = testResults.filter(r => r.passed).length;
+            const failedTests = totalTests - passedTests;
+            
+            let summaryHTML = `<div class="summary">
+                <h2>Test Summary</h2>
+                <p><strong>Total Tests:</strong> ${totalTests}</p>
+                <p class="pass-badge"><strong>Passed:</strong> ${passedTests}</p>
+                ${failedTests > 0 ? `<p class="fail-badge"><strong>Failed:</strong> ${failedTests}</p>` : ''}
+                <p><strong>Success Rate:</strong> ${((passedTests/totalTests)*100).toFixed(1)}%</p>
+            </div>`;
+            
+            if (passedTests === totalTests) {
+                summaryHTML += `<div class="result" style="text-align: center; font-size: 18px; margin-top: 20px;">
+                    <span class="pass-badge">✅ ALL TESTS PASSED! Alignment scoring is working correctly.</span>
+                </div>`;
+            }
+            
+            summary.innerHTML = summaryHTML;
+            
+            // Log to console as well
+            console.log('\n' + '='.repeat(60));
+            console.log(`✅ Test suite complete: ${passedTests}/${totalTests} tests passed`);
+            console.log('='.repeat(60));
+        }, 100);
+    </script>
+</body>
+</html>

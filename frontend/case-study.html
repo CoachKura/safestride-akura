@@ -339,6 +339,7 @@
             padding: 30px;
             background: rgba(255,255,255,0.1);
             border-radius: 12px;
+            -webkit-backdrop-filter: blur(10px);
             backdrop-filter: blur(10px);
         }
 
@@ -409,6 +410,136 @@
             color: white;
         }
 
+        .navbar-gradient {
+            background: linear-gradient(135deg, #1e3a5f 0%, #33BEF3 100%);
+        }
+
+        .brand-strong {
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .case-subtitle {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .progress-row {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .progress-box {
+            text-align: center;
+        }
+
+        .progress-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .progress-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .progress-value-before {
+            color: #dc3545;
+        }
+
+        .progress-value-after {
+            color: #28a745;
+        }
+
+        .progress-arrow {
+            font-size: 2rem;
+            color: #28a745;
+        }
+
+        .progress-pill {
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 700;
+            margin-left: 15px;
+        }
+
+        .progress-pill-green {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+
+        .progress-pill-magenta {
+            background: linear-gradient(135deg, #9C27B0, #E91E63);
+        }
+
+        .metric-highlight {
+            color: #28a745;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .section-title-md {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+
+        .section-title-lg {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .section-title-spacing {
+            margin-bottom: 50px;
+        }
+
+        .text-primary-ink {
+            color: #1e3a5f;
+        }
+
+        .section-lead {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto 40px;
+        }
+
+        .section-lead-muted {
+            font-size: 1.2rem;
+            color: #666;
+            max-width: 700px;
+            margin: 20px auto;
+        }
+
+        .section-note {
+            font-size: 1.05rem;
+            opacity: 0.85;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .section-note-wrap {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .section-top-gap {
+            margin-top: 80px;
+        }
+
+        .quote-magenta {
+            background: linear-gradient(135deg, #9C27B0 0%, #E91E63 100%);
+        }
+
+        .cta-note {
+            margin-top: 40px;
+            color: #666;
+        }
+
         @media (max-width: 768px) {
             .hero-section h1 {
                 font-size: 2rem;
@@ -449,9 +580,9 @@
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, #1e3a5f 0%, #33BEF3 100%);">
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-gradient">
         <div class="container">
-            <a class="navbar-brand" href="index.html" style="font-weight: 700; font-size: 1.5rem;">⚡ SafeStride</a>
+            <a class="navbar-brand brand-strong" href="index.html">⚡ SafeStride</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="Toggle navigation menu">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -503,7 +634,7 @@
                 <img src="https://via.placeholder.com/200x200/1e3a5f/ffffff?text=RK" alt="Rajesh Kumar" class="athlete-photo">
                 <div class="athlete-info">
                     <h2>Rajesh Kumar</h2>
-                    <p style="font-size: 1.1rem; color: #666; margin-bottom: 15px;">From Chronic Knee Pain to Sub-4 Marathon</p>
+                    <p class="case-subtitle">From Chronic Knee Pain to Sub-4 Marathon</p>
                     <div class="athlete-meta">
                         <div class="meta-item">
                             <span>👤</span>
@@ -522,17 +653,17 @@
                             <span>150-day protocol</span>
                         </div>
                     </div>
-                    <div style="margin-top: 20px; display: flex; gap: 15px; align-items: center;">
-                        <div style="text-align: center;">
-                            <div style="font-size: 0.8rem; color: #666;">AIFRI Before</div>
-                            <div style="font-size: 1.8rem; font-weight: 700; color: #dc3545;">62</div>
+                    <div class="progress-row">
+                        <div class="progress-box">
+                            <div class="progress-label">AIFRI Before</div>
+                            <div class="progress-value progress-value-before">62</div>
                         </div>
-                        <div style="font-size: 2rem; color: #28a745;">→</div>
-                        <div style="text-align: center;">
-                            <div style="font-size: 0.8rem; color: #666;">AIFRI After</div>
-                            <div style="font-size: 1.8rem; font-weight: 700; color: #28a745;">81</div>
+                        <div class="progress-arrow">→</div>
+                        <div class="progress-box">
+                            <div class="progress-label">AIFRI After</div>
+                            <div class="progress-value progress-value-after">81</div>
                         </div>
-                        <div style="background: linear-gradient(135deg, #28a745, #20c997); color: white; padding: 8px 16px; border-radius: 8px; font-weight: 700; margin-left: 15px;">
+                        <div class="progress-pill progress-pill-green">
                             +19 IMPROVEMENT
                         </div>
                     </div>
@@ -553,7 +684,7 @@
                         <span class="metric-arrow">→</span>
                         <span class="metric-value metric-after">3:52:18</span>
                     </div>
-                    <div style="color: #28a745; font-weight: 600; margin-top: 10px;">23:14 improvement</div>
+                    <div class="metric-highlight">23:14 improvement</div>
                 </div>
                 
                 <div class="metric-card">
@@ -563,7 +694,7 @@
                         <span class="metric-arrow">→</span>
                         <span class="metric-value metric-after">0/10</span>
                     </div>
-                    <div style="color: #28a745; font-weight: 600; margin-top: 10px;">100% pain elimination</div>
+                    <div class="metric-highlight">100% pain elimination</div>
                 </div>
 
                 <div class="metric-card">
@@ -573,7 +704,7 @@
                         <span class="metric-arrow">→</span>
                         <span class="metric-value metric-after">65 km</span>
                     </div>
-                    <div style="color: #28a745; font-weight: 600; margin-top: 10px;">86% volume increase</div>
+                    <div class="metric-highlight">86% volume increase</div>
                 </div>
 
                 <div class="metric-card">
@@ -583,13 +714,13 @@
                         <span class="metric-arrow">→</span>
                         <span class="metric-value metric-after">24h</span>
                     </div>
-                    <div style="color: #28a745; font-weight: 600; margin-top: 10px;">67% faster recovery</div>
+                    <div class="metric-highlight">67% faster recovery</div>
                 </div>
             </div>
 
             <!-- Journey Timeline -->
             <div class="journey-timeline">
-                <h3 style="font-size: 1.8rem; font-weight: 700; margin-bottom: 30px; color: #1e3a5f;">The 150-Day Journey</h3>
+                <h3 class="section-title-md text-primary-ink">The 150-Day Journey</h3>
                 
                 <div class="timeline-item">
                     <div class="timeline-week">Week 1-2</div>
@@ -634,7 +765,7 @@
 
             <!-- AIFRI Progress Chart -->
             <div class="chart-section">
-                <h3 style="text-align: center; font-size: 1.8rem; font-weight: 700; margin-bottom: 30px; color: #1e3a5f;">AIFRI Progression Over 21 Weeks</h3>
+                <h3 class="section-title-md text-center text-primary-ink">AIFRI Progression Over 21 Weeks</h3>
                 <div class="chart-container">
                     <canvas id="rajeshChart"></canvas>
                 </div>
@@ -650,7 +781,7 @@
                 <img src="https://via.placeholder.com/200x200/9C27B0/ffffff?text=PS" alt="Priya Sharma" class="athlete-photo">
                 <div class="athlete-info">
                     <h2>Priya Sharma</h2>
-                    <p style="font-size: 1.1rem; color: #666; margin-bottom: 15px;">Comeback from Stress Fracture to 10K PR</p>
+                    <p class="case-subtitle">Comeback from Stress Fracture to 10K PR</p>
                     <div class="athlete-meta">
                         <div class="meta-item">
                             <span>👤</span>
@@ -669,17 +800,17 @@
                             <span>120-day protocol</span>
                         </div>
                     </div>
-                    <div style="margin-top: 20px; display: flex; gap: 15px; align-items: center;">
-                        <div style="text-align: center;">
-                            <div style="font-size: 0.8rem; color: #666;">AIFRI Before</div>
-                            <div style="font-size: 1.8rem; font-weight: 700; color: #dc3545;">58</div>
+                    <div class="progress-row">
+                        <div class="progress-box">
+                            <div class="progress-label">AIFRI Before</div>
+                            <div class="progress-value progress-value-before">58</div>
                         </div>
-                        <div style="font-size: 2rem; color: #28a745;">→</div>
-                        <div style="text-align: center;">
-                            <div style="font-size: 0.8rem; color: #666;">AIFRI After</div>
-                            <div style="font-size: 1.8rem; font-weight: 700; color: #28a745;">79</div>
+                        <div class="progress-arrow">→</div>
+                        <div class="progress-box">
+                            <div class="progress-label">AIFRI After</div>
+                            <div class="progress-value progress-value-after">79</div>
                         </div>
-                        <div style="background: linear-gradient(135deg, #9C27B0, #E91E63); color: white; padding: 8px 16px; border-radius: 8px; font-weight: 700; margin-left: 15px;">
+                        <div class="progress-pill progress-pill-magenta">
                             +21 IMPROVEMENT
                         </div>
                     </div>
@@ -687,7 +818,7 @@
             </div>
 
             <!-- Quote -->
-            <div class="quote-section" style="background: linear-gradient(135deg, #9C27B0 0%, #E91E63 100%);">
+            <div class="quote-section quote-magenta">
                 After my tibial stress fracture, I thought my running days were over. I was scared to run more than 5K. SafeStride identified my weak bones, poor biomechanics, and overtraining patterns. They rebuilt me from the ground up. Now I'm stronger and faster than ever, with a new 10K PR of 44:23!
             </div>
 
@@ -700,7 +831,7 @@
                         <span class="metric-arrow">→</span>
                         <span class="metric-value metric-after">44:23</span>
                     </div>
-                    <div style="color: #28a745; font-weight: 600; margin-top: 10px;">4:32 improvement</div>
+                    <div class="metric-highlight">4:32 improvement</div>
                 </div>
                 
                 <div class="metric-card">
@@ -710,7 +841,7 @@
                         <span class="metric-arrow">→</span>
                         <span class="metric-value metric-after">-0.6</span>
                     </div>
-                    <div style="color: #28a745; font-weight: 600; margin-top: 10px;">Normal range achieved</div>
+                    <div class="metric-highlight">Normal range achieved</div>
                 </div>
 
                 <div class="metric-card">
@@ -720,7 +851,7 @@
                         <span class="metric-arrow">→</span>
                         <span class="metric-value metric-after">365+</span>
                     </div>
-                    <div style="color: #28a745; font-weight: 600; margin-top: 10px;">Full year healthy!</div>
+                    <div class="metric-highlight">Full year healthy!</div>
                 </div>
 
                 <div class="metric-card">
@@ -730,13 +861,13 @@
                         <span class="metric-arrow">→</span>
                         <span class="metric-value metric-after">1.24</span>
                     </div>
-                    <div style="color: #28a745; font-weight: 600; margin-top: 10px;">51% strength gain</div>
+                    <div class="metric-highlight">51% strength gain</div>
                 </div>
             </div>
 
             <!-- Journey Timeline -->
             <div class="journey-timeline">
-                <h3 style="font-size: 1.8rem; font-weight: 700; margin-bottom: 30px; color: #1e3a5f;">The 120-Day Recovery Journey</h3>
+                <h3 class="section-title-md text-primary-ink">The 120-Day Recovery Journey</h3>
                 
                 <div class="timeline-item">
                     <div class="timeline-week">Week 1-4</div>
@@ -781,7 +912,7 @@
 
             <!-- AIFRI Progress Chart -->
             <div class="chart-section">
-                <h3 style="text-align: center; font-size: 1.8rem; font-weight: 700; margin-bottom: 30px; color: #1e3a5f;">AIFRI Progression Over 17 Weeks</h3>
+                <h3 class="section-title-md text-center text-primary-ink">AIFRI Progression Over 17 Weeks</h3>
                 <div class="chart-container">
                     <canvas id="priyaChart"></canvas>
                 </div>
@@ -790,8 +921,8 @@
     </section>
 
     <!-- Testimonials Grid -->
-    <section class="container" style="margin-top: 80px;">
-        <h2 style="text-align: center; font-size: 2.5rem; font-weight: 700; color: #1e3a5f; margin-bottom: 50px;">More Success Stories</h2>
+    <section class="container section-top-gap">
+        <h2 class="section-title-lg section-title-spacing text-center text-primary-ink">More Success Stories</h2>
         
         <div class="testimonial-grid">
             <div class="testimonial-card">
@@ -865,8 +996,8 @@
     <!-- Research-Backed Results -->
     <section class="research-section">
         <div class="container">
-            <h2 style="text-align: center; font-size: 2.5rem; font-weight: 700; margin-bottom: 20px;">Research-Backed Results</h2>
-            <p style="text-align: center; font-size: 1.2rem; opacity: 0.9; max-width: 800px; margin: 0 auto 40px;">Our methodology is validated by peer-reviewed research and real-world outcomes across 127 athletes over 2 years</p>
+            <h2 class="section-title-lg text-center">Research-Backed Results</h2>
+            <p class="section-lead text-center">Our methodology is validated by peer-reviewed research and real-world outcomes across 127 athletes over 2 years</p>
             
             <div class="research-stats">
                 <div class="research-stat">
@@ -887,8 +1018,8 @@
                 </div>
             </div>
 
-            <div style="text-align: center; margin-top: 50px;">
-                <p style="font-size: 1.05rem; opacity: 0.85; max-width: 700px; margin: 0 auto;">
+            <div class="section-note-wrap">
+                <p class="section-note">
                     <strong>Methodology:</strong> 12-week minimum protocol duration. AIFRI assessed every 4 weeks. Training load monitored via GPS devices. Pain levels tracked daily (0-10 VAS scale). Biomechanical analysis every 6 weeks.
                 </p>
             </div>
@@ -899,14 +1030,14 @@
     <section class="cta-section">
         <div class="container">
             <h2>Ready to Write Your Success Story?</h2>
-            <p style="font-size: 1.2rem; color: #666; max-width: 700px; margin: 20px auto;">Join 127 athletes who transformed their running with science-backed training protocols</p>
+            <p class="section-lead-muted text-center">Join 127 athletes who transformed their running with science-backed training protocols</p>
             
             <div class="cta-buttons">
                 <a href="assessment-intake.html" class="btn-primary-custom">Start Free Assessment</a>
                 <a href="aifri-calculator.html" class="btn-secondary-custom">Calculate Your AIFRI</a>
             </div>
 
-            <div style="margin-top: 40px; color: #666;">
+            <div class="cta-note">
                 <p><strong>What happens next:</strong></p>
                 <p>✓ Complete 15-minute AIFRI assessment<br>
                 ✓ Receive personalized training protocol within 24 hours<br>

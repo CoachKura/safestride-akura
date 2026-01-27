@@ -3,10 +3,31 @@
    ============================================================================= */
 
 class AkuraAPI {
-  constructor(baseURL = 'https://safestride-backend-cave.onrender.com/api', authToken = null) {
-    this.baseURL = baseURL;
+  constructor(baseURL = undefined, authToken = null) {
+    // Resolve env vars from Vite (import.meta.env) or window.__AKURA_ENV__ or process.env
+    const getEnv = (key, fallback = undefined) => {
+      try {
+        const vite = (typeof import !== 'undefined' && typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env[key] : undefined;
+        const win = (typeof window !== 'undefined' && window.__AKURA_ENV__) ? window.__AKURA_ENV__[key] : undefined;
+        const node = (typeof process !== 'undefined' && process.env) ? process.env[key] : undefined;
+        return vite ?? win ?? node ?? fallback;
+      } catch { return fallback; }
+    };
+
+    // Auto-detect environment: use /api proxy in production (Netlify), localhost:3000 in dev
+    const isDev = typeof window !== 'undefined' && 
+      (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+    const defaultBase = isDev ? 'http://localhost:3000/api' : '/api'; // Netlify proxy in production
+    
+    const envBase = getEnv('VITE_API_BASE_URL', defaultBase);
+    const envOffline = String(getEnv('VITE_ENABLE_OFFLINE_MODE', 'false')).toLowerCase() === 'true';
+    const envLog = String(getEnv('VITE_LOG_LEVEL', 'info')).toLowerCase();
+
+    this.baseURL = baseURL || envBase;
     this.authToken = authToken;
     this.timeout = 30000; // 30 second timeout
+    this.offlineMode = envOffline;
+    this.logLevel = ['debug', 'info', 'warn', 'error'].includes(envLog) ? envLog : 'info';
   }
 
   /**
@@ -40,6 +61,13 @@ class AkuraAPI {
   async request(endpoint, options = {}) {
     const url = `${this.baseURL}${endpoint}`;
     const token = this.getAuthToken();
+
+    // Offline mode short-circuit
+    if (this.offlineMode || (typeof navigator !== 'undefined' && navigator.onLine === false)) {
+      const err = new Error('Offline mode enabled');
+      err.status = 0;
+      throw err;
+    }
 
     const headers = {
       'Content-Type': 'application/json',
@@ -81,6 +109,8 @@ class AkuraAPI {
       if (error.name === 'AbortError') {
         throw new Error('Request timeout - please try again');
       }
+      // Debug log when enabled
+      this.log('debug', 'API request error', { endpoint, baseURL: this.baseURL, error });
       throw error;
     }
   }
@@ -91,9 +121,19 @@ class AkuraAPI {
   handleError(status, data) {
     let message = 'An error occurred';
 
+    // Structured validation error support
+    const structured = data && (data.error || data);
+    const reqId = structured?.requestId || structured?.error?.requestId;
+    const details = structured?.details || structured?.error?.details;
+
     switch (status) {
       case 400:
-        message = data.message || 'Invalid request - please check your data';
+        if (structured?.code === 'VALIDATION_ERROR' && details?.field) {
+          const val = typeof details?.value === 'string' ? details.value : JSON.stringify(details?.value);
+          message = `Validation error: ${details.field} → ${val}. Expected: ${details.expected}.`;
+        } else {
+          message = structured?.message || 'Invalid request - please check your data';
+        }
         break;
       case 401:
         this.clearAuth();
@@ -113,13 +153,26 @@ class AkuraAPI {
         message = 'Service temporarily unavailable';
         break;
       default:
-        message = `HTTP ${status}: ${data.message || 'Unknown error'}`;
+        message = `HTTP ${status}: ${structured?.message || 'Unknown error'}`;
     }
 
     const error = new Error(message);
     error.status = status;
     error.data = data;
+    if (reqId) error.requestId = reqId;
     throw error;
+  }
+
+  /**
+   * Lightweight logger controlled by logLevel
+   */
+  log(level, ...args) {
+    const order = { debug: 10, info: 20, warn: 30, error: 40 };
+    const current = order[this.logLevel] ?? 20;
+    const incoming = order[level] ?? 20;
+    if (incoming < current) return;
+    const fn = level === 'debug' ? console.debug : level === 'info' ? console.info : level === 'warn' ? console.warn : console.error;
+    try { fn('[AkuraAPI]', ...args); } catch { /* no-op */ }
   }
 
   /**
@@ -419,6 +472,7 @@ class AkuraAPI {
    */
   async checkHealth() {
     try {
+      if (this.offlineMode) return false;
       const response = await fetch(`${this.baseURL}/health`, {
         method: 'GET'
       });
@@ -442,4 +496,46 @@ const akuraAPI = new AkuraAPI();
 // Export for use
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = AkuraAPI;
+}
+
+// Alignment pillar: returns 0-100
+function calculateAlignmentScore({
+  qAngle,              // number (degrees)
+  footPronation,       // 'neutral' | 'over' | 'under'
+  pelvicTilt,          // 'neutral' | 'anterior' | 'posterior'
+  forwardHead          // 'none' | 'mild' | 'moderate' | 'severe'
+}) {
+  let score = 100;
+
+  // Q-angle (target 14-18° males, 15-20° females; using 14-20 window)
+  if (qAngle < 10) score -= 12;
+  else if (qAngle < 14) score -= 6;
+  else if (qAngle > 25) score -= 15;
+  else if (qAngle > 22) score -= 10;
+  else if (qAngle > 20) score -= 6;
+  // 14-20 is optimal → no penalty
+
+  // Foot pronation
+  if (footPronation === 'over') score -= 12;
+  else if (footPronation === 'under') score -= 8;
+
+  // Pelvic tilt
+  if (pelvicTilt === 'anterior') score -= 10;
+  else if (pelvicTilt === 'posterior') score -= 8;
+
+  // Forward head posture
+  if (forwardHead === 'severe') score -= 10;
+  else if (forwardHead === 'moderate') score -= 8;
+  else if (forwardHead === 'mild') score -= 4;
+
+  // Clamp
+  score = Math.max(0, Math.min(100, score));
+  return Math.round(score);
+}
+
+// Optional: risk label for UI
+function alignmentRiskLabel(score) {
+  if (score >= 85) return 'Low';
+  if (score >= 70) return 'Moderate';
+  return 'Elevated';
 }

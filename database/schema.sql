@@ -1,9 +1,83 @@
 -- SafeStride by AKURA - Database Schema
--- VDOT O2-style Coach Platform
+-- VDOT O2-style Coach Platform + AI Assessment System
 -- PostgreSQL (Supabase)
+-- Last Updated: 2026-01-27
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- ================================================
+-- ASSESSMENTS TABLE (New - AI-powered injury risk assessment)
+-- ================================================
+CREATE TABLE assessments (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  athlete_id TEXT NOT NULL, -- Email or UUID reference
+  assessment_data JSONB NOT NULL,
+  aifri_score NUMERIC(5,2) CHECK (aifri_score >= 0 AND aifri_score <= 100),
+  scores JSONB, -- Individual pillar scores (running, strength, rom, balance, mobility, alignment)
+  risk_level TEXT CHECK (risk_level IN ('Low', 'Moderate', 'High')),
+  protocol_id TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_assessments_athlete ON assessments(athlete_id);
+CREATE INDEX idx_assessments_created ON assessments(created_at DESC);
+CREATE INDEX idx_assessments_risk ON assessments(risk_level);
+
+-- ================================================
+-- PROTOCOLS TABLE (New - Personalized training protocols)
+-- ================================================
+CREATE TABLE protocols (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  assessment_id UUID REFERENCES assessments(id),
+  athlete_id TEXT NOT NULL,
+  protocol_data JSONB NOT NULL,
+  start_date DATE,
+  end_date DATE,
+  status TEXT CHECK (status IN ('active', 'completed', 'paused')) DEFAULT 'active',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_protocols_athlete ON protocols(athlete_id);
+CREATE INDEX idx_protocols_status ON protocols(status);
+
+-- ================================================
+-- WORKOUTS TABLE (New - Daily workout assignments)
+-- ================================================
+CREATE TABLE workouts (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  protocol_id UUID REFERENCES protocols(id) NOT NULL,
+  athlete_id TEXT NOT NULL,
+  day_number INTEGER NOT NULL,
+  workout_data JSONB NOT NULL,
+  scheduled_date DATE,
+  completed BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_workouts_protocol ON workouts(protocol_id);
+CREATE INDEX idx_workouts_athlete ON workouts(athlete_id);
+CREATE INDEX idx_workouts_scheduled ON workouts(scheduled_date);
+
+-- ================================================
+-- FEEDBACK TABLE (New - Athlete workout feedback)
+-- ================================================
+CREATE TABLE feedback (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  workout_id UUID REFERENCES workouts(id) NOT NULL,
+  athlete_id TEXT NOT NULL,
+  rpe INTEGER CHECK (rpe >= 1 AND rpe <= 10),
+  pain_level TEXT CHECK (pain_level IN ('none', 'mild', 'moderate', 'severe')),
+  sleep_hours NUMERIC(3,1),
+  nutrition_quality TEXT CHECK (nutrition_quality IN ('poor', 'fair', 'good', 'excellent')),
+  stress_level TEXT CHECK (stress_level IN ('low', 'moderate', 'high')),
+  notes TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_feedback_workout ON feedback(workout_id);
+CREATE INDEX idx_feedback_athlete ON feedback(athlete_id);
 
 -- ================================================
 -- COACHES TABLE

@@ -1,0 +1,912 @@
+openapi: 3.0.3
+info:
+  title: AKURA SafeStride API
+  description: |
+    Complete backend API specification for AKURA SafeStride platform.
+    
+    **Features:**
+    - Personalized fitness assessment with AIFRI scoring
+    - AI-driven 90-day training protocol generation
+    - Adaptive workout feedback and plan adjustments
+    - Injury risk prediction and prevention
+    
+    **Authentication:**
+    All endpoints (except public) require Bearer token authentication.
+    
+    **Base URL:**
+    - Production: `https://safestride-backend-cave.onrender.com/api`
+    - Development: `http://localhost:3000/api`
+  version: 1.0.0
+  contact:
+    name: AKURA Support
+    email: support@akura.in
+    url: https://akura.in
+  license:
+    name: Proprietary
+    url: https://akura.in/terms
+
+servers:
+  - url: https://safestride-backend-cave.onrender.com/api
+    description: Production server
+  - url: http://localhost:3000/api
+    description: Development server
+
+tags:
+  - name: Authentication
+    description: User signup and login endpoints
+  - name: Assessment (Flow 1)
+    description: Fitness assessment submission and AIFRI calculation
+  - name: Protocol (Flow 2)
+    description: Training protocol retrieval and management
+  - name: Feedback (Flow 3)
+    description: Workout feedback submission and plan adaptation
+  - name: Coach
+    description: Coach-specific endpoints
+
+security:
+  - BearerAuth: []
+
+paths:
+  /auth/signup:
+    post:
+      tags:
+        - Authentication
+      summary: Create new user account
+      description: Register a new coach or athlete account
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupRequest'
+      responses:
+        '201':
+          description: Account created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '409':
+          description: Email already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Authenticate user
+      description: Login and receive access token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /assessments:
+    post:
+      tags:
+        - Assessment (Flow 1)
+      summary: Submit fitness assessment
+      description: Submit complete 9-step assessment and generate AIFRI score + training protocol
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssessmentRequest'
+      responses:
+        '201':
+          description: Assessment submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssessmentResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          description: Protocol generation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /protocols/{protocolId}:
+    get:
+      tags:
+        - Protocol (Flow 2)
+      summary: Get training protocol
+      description: Retrieve personalized 90-day training protocol with weekly and daily workouts
+      parameters:
+        - name: protocolId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Protocol ID from assessment response
+      responses:
+        '200':
+          description: Protocol retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProtocolResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /workouts/{workoutId}/feedback:
+    post:
+      tags:
+        - Feedback (Flow 3)
+      summary: Submit workout feedback
+      description: Submit daily workout feedback for AI-driven plan adaptation
+      parameters:
+        - name: workoutId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Workout ID (format workout_{protocolId}_day{N})
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeedbackRequest'
+      responses:
+        '200':
+          description: Feedback submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeedbackResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Feedback already exists for this workout
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /coaches/{coachId}/athletes:
+    get:
+      tags:
+        - Coach
+      summary: Get coach's athletes
+      description: Fetch list of athletes assigned to a coach
+      parameters:
+        - name: coachId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Athletes retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoachAthletesResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /test/calculate-aifri:
+    post:
+      tags:
+        - Assessment (Flow 1)
+      summary: Test AIFRI calculation
+      description: Calculate AIFRI score without saving (development only)
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: AIFRI calculated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  aifriScore:
+                    type: number
+                  pillarScores:
+                    type: object
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    SignupRequest:
+      type: object
+      required:
+        - email
+        - password
+        - role
+        - firstName
+        - lastName
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+        role:
+          type: string
+          enum: [coach, athlete]
+        firstName:
+          type: string
+        lastName:
+          type: string
+        phone:
+          type: string
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    AuthResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        userId:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+        token:
+          type: string
+        expiresIn:
+          type: number
+        message:
+          type: string
+
+    AssessmentRequest:
+      type: object
+      required:
+        - personal
+        - medical
+        - alignment
+        - rom
+        - fms
+        - strength
+        - balance
+        - mobility
+        - running
+        - goals
+      properties:
+        userId:
+          type: string
+        submittedAt:
+          type: string
+          format: date-time
+        personal:
+          $ref: '#/components/schemas/Personal'
+        medical:
+          $ref: '#/components/schemas/Medical'
+        alignment:
+          $ref: '#/components/schemas/Alignment'
+        rom:
+          $ref: '#/components/schemas/ROM'
+        fms:
+          $ref: '#/components/schemas/FMS'
+        strength:
+          $ref: '#/components/schemas/Strength'
+        balance:
+          $ref: '#/components/schemas/Balance'
+        mobility:
+          $ref: '#/components/schemas/Mobility'
+        running:
+          $ref: '#/components/schemas/Running'
+        goals:
+          $ref: '#/components/schemas/Goals'
+        aifriScore:
+          type: number
+          description: Client-calculated AIFRI (for verification)
+
+    Personal:
+      type: object
+      required:
+        - name
+        - age
+        - gender
+        - height
+        - weight
+      properties:
+        name:
+          type: string
+        age:
+          type: integer
+          minimum: 18
+          maximum: 100
+        gender:
+          type: string
+          enum: [male, female, other]
+        height:
+          type: number
+          description: Height in cm
+        weight:
+          type: number
+          description: Weight in kg
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+
+    Medical:
+      type: object
+      properties:
+        injuries:
+          type: array
+          items:
+            type: string
+        conditions:
+          type: array
+          items:
+            type: string
+        medications:
+          type: string
+        surgeries:
+          type: string
+        currentPain:
+          type: object
+          properties:
+            level:
+              type: integer
+              minimum: 0
+              maximum: 10
+            location:
+              type: string
+            description:
+              type: string
+
+    Alignment:
+      type: object
+      properties:
+        bodyType:
+          type: string
+          enum: [ectomorph, mesomorph, endomorph]
+        qAngle:
+          type: number
+        footPronation:
+          type: string
+          enum: [neutral, overpronation, supination]
+        pelvicTilt:
+          type: string
+          enum: [neutral, anterior, posterior]
+        forwardHead:
+          type: string
+          enum: [normal, mild, moderate, severe]
+        shoulderSymmetry:
+          type: string
+        spinalCurves:
+          type: string
+
+    ROM:
+      type: object
+      properties:
+        cervical:
+          type: number
+        shoulder:
+          type: number
+        hip:
+          type: number
+        knee:
+          type: number
+        ankle:
+          type: number
+
+    FMS:
+      type: object
+      properties:
+        deepSquat:
+          type: integer
+          minimum: 0
+          maximum: 3
+        hurdleStep:
+          type: integer
+          minimum: 0
+          maximum: 3
+        inlineLunge:
+          type: integer
+          minimum: 0
+          maximum: 3
+        shoulderMobility:
+          type: integer
+          minimum: 0
+          maximum: 3
+        legRaise:
+          type: integer
+          minimum: 0
+          maximum: 3
+        pushUp:
+          type: integer
+          minimum: 0
+          maximum: 3
+        rotaryStability:
+          type: integer
+          minimum: 0
+          maximum: 3
+        totalScore:
+          type: integer
+          minimum: 0
+          maximum: 21
+
+    Strength:
+      type: object
+      properties:
+        plankHold:
+          type: number
+        singleLegBalance:
+          type: number
+        calfRaises:
+          type: integer
+        singleLegSquat:
+          type: string
+
+    Balance:
+      type: object
+      properties:
+        singleLegEyesOpen:
+          type: number
+        singleLegEyesClosed:
+          type: number
+        fmsTotal:
+          type: integer
+
+    Mobility:
+      type: object
+      properties:
+        sitReach:
+          type: number
+        ankleDorsiflex:
+          type: number
+        hipFlexor:
+          type: string
+
+    Running:
+      type: object
+      properties:
+        weeklyMileage:
+          type: number
+        longRun:
+          type: number
+        easyPace:
+          type: string
+        tempoPace:
+          type: string
+        intervalPace:
+          type: string
+        vdot:
+          type: number
+        recentRace:
+          type: string
+        experienceYears:
+          type: integer
+
+    Goals:
+      type: object
+      properties:
+        primary:
+          type: string
+        targetRace:
+          type: string
+        targetDate:
+          type: string
+          format: date
+        targetTime:
+          type: string
+        experience:
+          type: string
+          enum: [beginner, intermediate, advanced]
+
+    AssessmentResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        assessmentId:
+          type: string
+        userId:
+          type: string
+        submittedAt:
+          type: string
+          format: date-time
+        aifriScore:
+          type: number
+        grade:
+          type: string
+          enum: [BEGINNER, INTERMEDIATE, ADVANCED, ELITE]
+        pillarScores:
+          type: object
+          properties:
+            running:
+              type: number
+            strength:
+              type: number
+            rom:
+              type: number
+            balance:
+              type: number
+            mobility:
+              type: number
+            alignment:
+              type: number
+        injuryRisk:
+          type: object
+          properties:
+            overall:
+              type: string
+              enum: [Low, Moderate, High]
+            factors:
+              type: array
+              items:
+                type: string
+            recommendations:
+              type: array
+              items:
+                type: string
+        protocolId:
+          type: string
+        protocolGenerated:
+          type: boolean
+        message:
+          type: string
+
+    ProtocolResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        protocolId:
+          type: string
+        assessmentId:
+          type: string
+        userId:
+          type: string
+        athleteName:
+          type: string
+        generatedAt:
+          type: string
+          format: date-time
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        duration:
+          type: integer
+        aifriScore:
+          type: object
+        injuryRisk:
+          type: object
+        weeks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Week'
+        daily:
+          type: array
+          items:
+            $ref: '#/components/schemas/DailyWorkout'
+        milestones:
+          type: array
+          items:
+            type: object
+        adaptiveRules:
+          type: object
+        coachNotes:
+          type: string
+        message:
+          type: string
+
+    Week:
+      type: object
+      properties:
+        week:
+          type: integer
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        phase:
+          type: string
+        focus:
+          type: string
+        weeklyMileage:
+          type: number
+        workouts:
+          type: integer
+        restDays:
+          type: integer
+        keyWorkouts:
+          type: array
+          items:
+            type: object
+
+    DailyWorkout:
+      type: object
+      properties:
+        day:
+          type: integer
+        date:
+          type: string
+          format: date
+        week:
+          type: integer
+        dayOfWeek:
+          type: integer
+        type:
+          type: string
+        description:
+          type: string
+        duration:
+          type: number
+        distance:
+          type: number
+        intensity:
+          type: string
+        targetPace:
+          type: string
+        warmUp:
+          type: string
+        mainSet:
+          type: string
+        coolDown:
+          type: string
+        strengthWork:
+          type: array
+          items:
+            type: object
+        mobilityWork:
+          type: array
+          items:
+            type: string
+        rpe:
+          type: object
+        notes:
+          type: string
+
+    FeedbackRequest:
+      type: object
+      required:
+        - completed
+        - rpe
+      properties:
+        userId:
+          type: string
+        protocolId:
+          type: string
+        workoutId:
+          type: string
+        date:
+          type: string
+          format: date
+        timestamp:
+          type: string
+          format: date-time
+        completed:
+          type: string
+          enum: [yes, partial, no]
+        completionPercentage:
+          type: integer
+        rpe:
+          type: integer
+          minimum: 1
+          maximum: 10
+        duration:
+          type: number
+        distance:
+          type: number
+        pain:
+          type: object
+          properties:
+            level:
+              type: integer
+              minimum: 0
+              maximum: 10
+            location:
+              type: string
+            description:
+              type: string
+            beforeWorkout:
+              type: integer
+            duringWorkout:
+              type: integer
+            afterWorkout:
+              type: integer
+        recovery:
+          type: object
+          properties:
+            sleep:
+              type: number
+            sleepQuality:
+              type: string
+            nutrition:
+              type: integer
+            hydration:
+              type: string
+            stress:
+              type: integer
+        performance:
+          type: object
+        notes:
+          type: string
+        modifications:
+          type: array
+          items:
+            type: string
+        equipment:
+          type: object
+
+    FeedbackResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        feedbackId:
+          type: string
+        workoutId:
+          type: string
+        submittedAt:
+          type: string
+          format: date-time
+        aiAnalysis:
+          type: object
+          properties:
+            overallAssessment:
+              type: string
+            fatigueLevel:
+              type: string
+            injuryRiskChange:
+              type: string
+            recoveryStatus:
+              type: string
+        planAdjustments:
+          type: object
+          properties:
+            adjusted:
+              type: boolean
+            reason:
+              type: string
+            changes:
+              type: array
+              items:
+                type: object
+        nextWorkouts:
+          type: array
+          items:
+            type: object
+        recommendations:
+          type: array
+          items:
+            type: string
+        coachAlerts:
+          type: array
+          items:
+            type: object
+        aifriUpdate:
+          type: object
+        message:
+          type: string
+
+    CoachAthletesResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        coachId:
+          type: string
+        athletes:
+          type: array
+          items:
+            type: object
+            properties:
+              athleteId:
+                type: string
+              name:
+                type: string
+              currentAIFRI:
+                type: number
+              injuryRisk:
+                type: string
+              protocolId:
+                type: string
+              lastWorkout:
+                type: string
+                format: date
+              compliance:
+                type: number
+
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+        error:
+          type: string
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            type: object
+
+  responses:
+    ValidationError:
+      description: Invalid request data
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    Unauthorized:
+      description: Authentication token missing or invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    Forbidden:
+      description: Access denied - insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

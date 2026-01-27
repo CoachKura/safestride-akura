@@ -81,11 +81,14 @@ safestride/
 │   │   └── responsive.css         # Mobile/tablet/desktop breakpoints
 │   │
 │   └── js/                        # JavaScript modules (39.5 KB total)
-│       ├── aifri-engine.js        # AIFRI calculation algorithm
+│       ├── aifri-engine.js        # AIFRI calculation algorithm (6-pillar system)
 │       ├── form-validator.js      # Form validation logic
 │       ├── chart-utils.js         # Chart.js helper functions
 │       ├── storage-manager.js     # localStorage operations (auto-save)
 │       └── api-client.js          # Backend API wrapper
+│   │
+│   ├── test-alignment-scoring.html    # Alignment scoring test suite (browser UI)
+│   └── test-alignment-console.js      # Console test script for AIFRI validation
 │
 ├── backend/                       # Node.js Express server (separate deployment)
 │   ├── server.js                  # Express app entry point

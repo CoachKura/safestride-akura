@@ -8,7 +8,7 @@ Write-Host "========================================`n" -ForegroundColor Cyan
 
 # Step 1: Commit deployment files
 Write-Host "📝 Step 1: Committing deployment files..." -ForegroundColor Yellow
-cd "E:\Akura Safe Stride\safestride"
+Set-Location "E:\Akura Safe Stride\safestride"
 git add .
 git commit -m "Add deployment files and pre-launch checklist for January 27 launch"
 git push origin main

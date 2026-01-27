@@ -1,0 +1,335 @@
+{
+  "info": {
+    "name": "AKURA SafeStride API",
+    "description": "Complete API collection for AKURA SafeStride backend integration - Assessment submission, protocol retrieval, and workout feedback flows",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{authToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://safestride-backend-cave.onrender.com/api",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "assessmentId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "protocolId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Signup - Create Account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"coach@akura.in\",\n  \"password\": \"SecurePass123!\",\n  \"role\": \"coach\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Smith\",\n  \"phone\": \"+91-9876543210\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/signup",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "signup"]
+            },
+            "description": "Create a new user account (coach or athlete)"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has token\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.token).to.exist;",
+                  "    pm.environment.set(\"authToken\", jsonData.token);",
+                  "    pm.environment.set(\"userId\", jsonData.userId);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login - Get Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"coach@akura.in\",\n  \"password\": \"SecurePass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Authenticate user and get access token"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has token\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.token).to.exist;",
+                  "    pm.environment.set(\"authToken\", jsonData.token);",
+                  "    pm.environment.set(\"userId\", jsonData.userId);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Flow 1 - Assessment Submission",
+      "item": [
+        {
+          "name": "Submit Assessment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"submittedAt\": \"2026-01-27T10:30:00.000Z\",\n  \"personal\": {\n    \"name\": \"Subramaniyam Sivakumar\",\n    \"age\": 47,\n    \"gender\": \"male\",\n    \"height\": 169,\n    \"weight\": 82,\n    \"email\": \"athlete@akura.in\",\n    \"phone\": \"+91-9876543210\"\n  },\n  \"medical\": {\n    \"injuries\": [\"knee\"],\n    \"conditions\": [],\n    \"medications\": \"None\",\n    \"surgeries\": \"None\",\n    \"currentPain\": {\n      \"level\": 2,\n      \"location\": \"knee\",\n      \"description\": \"Mild discomfort during running\"\n    }\n  },\n  \"alignment\": {\n    \"bodyType\": \"mesomorph\",\n    \"qAngle\": 172,\n    \"footPronation\": \"neutral\",\n    \"pelvicTilt\": \"neutral\",\n    \"forwardHead\": \"normal\",\n    \"shoulderSymmetry\": \"balanced\",\n    \"spinalCurves\": \"normal\"\n  },\n  \"rom\": {\n    \"cervical\": 75,\n    \"shoulder\": 85,\n    \"hip\": 90,\n    \"knee\": 92,\n    \"ankle\": 85\n  },\n  \"fms\": {\n    \"deepSquat\": 2,\n    \"hurdleStep\": 2,\n    \"inlineLunge\": 2,\n    \"shoulderMobility\": 2,\n    \"legRaise\": 2,\n    \"pushUp\": 2,\n    \"rotaryStability\": 2,\n    \"totalScore\": 14\n  },\n  \"strength\": {\n    \"plankHold\": 90,\n    \"singleLegBalance\": 25,\n    \"calfRaises\": 20,\n    \"singleLegSquat\": \"good\"\n  },\n  \"balance\": {\n    \"singleLegEyesOpen\": 25,\n    \"singleLegEyesClosed\": 10,\n    \"fmsTotal\": 14\n  },\n  \"mobility\": {\n    \"sitReach\": 12,\n    \"ankleDorsiflex\": 11,\n    \"hipFlexor\": \"normal\"\n  },\n  \"running\": {\n    \"weeklyMileage\": 30,\n    \"longRun\": 12,\n    \"easyPace\": \"6:00\",\n    \"tempoPace\": \"5:30\",\n    \"intervalPace\": \"5:00\",\n    \"vdot\": 45,\n    \"recentRace\": \"10K in 45:00\",\n    \"experienceYears\": 3\n  },\n  \"goals\": {\n    \"primary\": \"injury-prevention\",\n    \"targetRace\": \"Half Marathon\",\n    \"targetDate\": \"2026-06-01\",\n    \"targetTime\": \"1:45:00\",\n    \"experience\": \"intermediate\"\n  },\n  \"aifriScore\": 76\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/assessments",
+              "host": ["{{baseUrl}}"],
+              "path": ["assessments"]
+            },
+            "description": "Submit complete 9-step fitness assessment and calculate AIFRI score"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has assessmentId and protocolId\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.assessmentId).to.exist;",
+                  "    pm.expect(jsonData.protocolId).to.exist;",
+                  "    pm.environment.set(\"assessmentId\", jsonData.assessmentId);",
+                  "    pm.environment.set(\"protocolId\", jsonData.protocolId);",
+                  "});",
+                  "",
+                  "pm.test(\"AIFRI score is valid\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.aifriScore).to.be.within(0, 100);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Flow 2 - Protocol Retrieval",
+      "item": [
+        {
+          "name": "Get Training Protocol",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/protocols/{{protocolId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["protocols", "{{protocolId}}"]
+            },
+            "description": "Fetch personalized 90-day training protocol with weekly and daily workouts"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Protocol has weeks and daily workouts\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.weeks).to.be.an('array');",
+                  "    pm.expect(jsonData.daily).to.be.an('array');",
+                  "    pm.expect(jsonData.weeks.length).to.be.at.least(1);",
+                  "    pm.expect(jsonData.daily.length).to.be.at.least(1);",
+                  "});",
+                  "",
+                  "pm.test(\"Protocol has injury risk assessment\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.injuryRisk).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Flow 3 - Workout Feedback",
+      "item": [
+        {
+          "name": "Submit Workout Feedback",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"protocolId\": \"{{protocolId}}\",\n  \"workoutId\": \"workout_{{protocolId}}_day1\",\n  \"date\": \"2026-01-27\",\n  \"timestamp\": \"2026-01-27T18:30:00.000Z\",\n  \"completed\": \"yes\",\n  \"completionPercentage\": 100,\n  \"rpe\": 7,\n  \"duration\": 45,\n  \"distance\": 5.2,\n  \"pain\": {\n    \"level\": 2,\n    \"location\": \"knee\",\n    \"description\": \"Mild discomfort during last 10 minutes\",\n    \"beforeWorkout\": 1,\n    \"duringWorkout\": 2,\n    \"afterWorkout\": 2\n  },\n  \"recovery\": {\n    \"sleep\": 7.5,\n    \"sleepQuality\": \"good\",\n    \"nutrition\": 2200,\n    \"hydration\": \"adequate\",\n    \"stress\": 4\n  },\n  \"performance\": {\n    \"avgPace\": \"5:55\",\n    \"avgHeartRate\": 145,\n    \"maxHeartRate\": 165,\n    \"felt\": \"good\"\n  },\n  \"notes\": \"Felt good overall. Slight knee discomfort in last 10 min but went away after stretching.\",\n  \"modifications\": [\n    \"Reduced distance from 6km to 5.2km due to knee discomfort\"\n  ],\n  \"equipment\": {\n    \"shoes\": \"Nike Pegasus 40\",\n    \"shoeAge\": 150,\n    \"surface\": \"road\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/workouts/workout_{{protocolId}}_day1/feedback",
+              "host": ["{{baseUrl}}"],
+              "path": ["workouts", "workout_{{protocolId}}_day1", "feedback"]
+            },
+            "description": "Submit daily workout feedback for AI-driven plan adaptation"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has feedback ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.feedbackId).to.exist;",
+                  "});",
+                  "",
+                  "pm.test(\"Response has AI analysis\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.aiAnalysis).to.exist;",
+                  "});",
+                  "",
+                  "pm.test(\"Response has plan adjustments\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.planAdjustments).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Additional Endpoints",
+      "item": [
+        {
+          "name": "Get Coach's Athletes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/coaches/{{userId}}/athletes",
+              "host": ["{{baseUrl}}"],
+              "path": ["coaches", "{{userId}}", "athletes"]
+            },
+            "description": "Fetch list of athletes assigned to a coach"
+          },
+          "response": []
+        },
+        {
+          "name": "Calculate AIFRI (Test Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"personal\": { \"age\": 47, \"gender\": \"male\", \"height\": 169, \"weight\": 82 },\n  \"rom\": { \"cervical\": 75, \"shoulder\": 85, \"hip\": 90, \"knee\": 92, \"ankle\": 85 },\n  \"fms\": { \"totalScore\": 14 },\n  \"strength\": { \"plankHold\": 90, \"singleLegBalance\": 25 },\n  \"balance\": { \"singleLegEyesOpen\": 25, \"singleLegEyesClosed\": 10 },\n  \"mobility\": { \"sitReach\": 12, \"ankleDorsiflex\": 11 },\n  \"running\": { \"weeklyMileage\": 30, \"vdot\": 45 }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/test/calculate-aifri",
+              "host": ["{{baseUrl}}"],
+              "path": ["test", "calculate-aifri"]
+            },
+            "description": "Test AIFRI calculation without saving assessment (dev only)"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

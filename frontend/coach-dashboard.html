@@ -133,6 +133,10 @@
             align-items: center;
         }
 
+        .filter-group.push-right {
+            margin-left: auto;
+        }
+
         .filter-label {
             font-size: 13px;
             font-weight: 600;
@@ -190,6 +194,10 @@
             letter-spacing: 0.5px;
         }
 
+        .th-checkbox {
+            width: 40px;
+        }
+
         .td-custom {
             padding: 18px 15px;
             border-bottom: 1px solid #e0e0e0;
@@ -220,9 +228,31 @@
             font-size: 16px;
         }
 
+        .avatar-orange-magenta {
+            background: linear-gradient(135deg, #FF9500, #FF6B6B);
+        }
+
+        .avatar-purple-magenta {
+            background: linear-gradient(135deg, #9C27B0, #FF6B6B);
+        }
+
+        .avatar-green-blue {
+            background: linear-gradient(135deg, #4CAF50, #33BEF3);
+        }
+
+        .avatar-orange-green {
+            background: linear-gradient(135deg, #FF9500, #4CAF50);
+        }
+
         .athlete-name {
             font-weight: 700;
             color: var(--primary);
+        }
+
+        .athlete-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
         }
 
         .athlete-age {
@@ -237,6 +267,16 @@
             font-weight: 700;
             font-size: 13px;
             border-left: 3px solid var(--secondary);
+        }
+
+        .aifri-success {
+            border-left-color: var(--success);
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .aifri-warning {
+            border-left-color: var(--warning);
+            background: rgba(255, 149, 0, 0.1);
         }
 
         .risk-low {
@@ -267,6 +307,17 @@
             height: 100%;
             background: linear-gradient(90deg, var(--secondary), var(--primary));
         }
+
+        .progress-text {
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .w-0 { width: 0%; }
+        .w-38 { width: 38%; }
+        .w-67 { width: 67%; }
+        .w-83 { width: 83%; }
+        .w-85 { width: 85%; }
 
         .actions-cell {
             display: flex;
@@ -448,6 +499,120 @@
             color: var(--primary);
         }
 
+        .modal-subheading {
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .status-success { color: var(--success); }
+        .status-warning { color: var(--warning); }
+        .status-muted { color: #999; }
+
+        .modal-score-wrap {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .score-large {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .score-label {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--secondary);
+            margin-top: 10px;
+        }
+
+        .trend-up {
+            color: var(--success);
+            font-size: 12px;
+        }
+
+        .trend-stable {
+            color: #999;
+            font-size: 12px;
+        }
+
+        .card-muted {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .card-muted-strong {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .injury-card {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid var(--danger);
+            margin-bottom: 15px;
+        }
+
+        .injury-clear {
+            padding: 10px;
+            background: var(--success);
+            color: white;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .btn-secondary-full {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            width: 100%;
+            font-weight: 600;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        .notes-text {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .text-primary-strong {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .text-small-muted {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .mt-5px {
+            margin-top: 5px;
+        }
+
+        .mb-8px {
+            margin-bottom: 8px;
+        }
+
+        .text-center-small {
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+            margin-top: 15px;
+        }
+
         /* INSIGHTS CARD */
         .insights-card {
             background: white;
@@ -474,6 +639,25 @@
             font-size: 14px;
             font-weight: 600;
             color: #666;
+        }
+
+        .section-block {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .link-muted-centered {
+            text-align: center;
+            color: var(--secondary);
+            margin-top: 20px;
+            cursor: pointer;
+            font-weight: 600;
         }
 
         @media (max-width: 768px) {
@@ -594,7 +778,7 @@
                     <option>🔴 High</option>
                 </select>
             </div>
-            <div class="filter-group" style="margin-left: auto;">
+            <div class="filter-group push-right">
                 <span class="filter-label">Sort By:</span>
                 <select class="filter-select" aria-label="Sort athletes by criteria">
                     <option>Name</option>
@@ -610,7 +794,7 @@
             <table class="table-custom">
                 <thead class="thead-custom">
                     <tr>
-                        <th class="th-custom" style="width: 40px;">
+                        <th class="th-custom th-checkbox">
                             <input type="checkbox" class="checkbox-custom" id="selectAllTable" aria-label="Select all athletes in table" onchange="toggleSelectAll(event)">
                         </th>
                         <th class="th-custom">Athlete</th>
@@ -626,9 +810,9 @@
                 <tbody>
                     <!-- Row 1: Dinesh A -->
                     <tr class="tr-custom" onclick="openAthleteModal('dinesh')">
-                        <td class="td-custom"><input type="checkbox" class="checkbox-custom" onchange="updateBulkCount()"></td>
+                        <td class="td-custom"><input type="checkbox" class="checkbox-custom" aria-label="Select athlete Dinesh A" onchange="updateBulkCount()"></td>
                         <td class="td-custom">
-                            <div style="display: flex; gap: 12px; align-items: center;">
+                            <div class="athlete-row">
                                 <div class="athlete-avatar">D</div>
                                 <div>
                                     <div class="athlete-name">Dinesh A</div>
@@ -643,9 +827,9 @@
                         <td class="td-custom">01/27 Threshold 8km</td>
                         <td class="td-custom">
                             <div class="progress-mini">
-                                <div class="progress-fill-mini" style="width: 85%;"></div>
+                                <div class="progress-fill-mini w-85"></div>
                             </div>
-                            <div style="font-size: 12px; margin-top: 5px;">18.2/21.5 (85%)</div>
+                            <div class="progress-text">18.2/21.5 (85%)</div>
                         </td>
                         <td class="td-custom">
                             <div class="actions-cell">
@@ -658,10 +842,10 @@
 
                     <!-- Row 2: San Chan -->
                     <tr class="tr-custom" onclick="openAthleteModal('san')">
-                        <td class="td-custom"><input type="checkbox" class="checkbox-custom" onchange="updateBulkCount()"></td>
+                        <td class="td-custom"><input type="checkbox" class="checkbox-custom" aria-label="Select athlete San Chan" onchange="updateBulkCount()"></td>
                         <td class="td-custom">
-                            <div style="display: flex; gap: 12px; align-items: center;">
-                                <div class="athlete-avatar" style="background: linear-gradient(135deg, #FF9500, #FF6B6B);">S</div>
+                            <div class="athlete-row">
+                                <div class="athlete-avatar avatar-orange-magenta">S</div>
                                 <div>
                                     <div class="athlete-name">San Chan</div>
                                     <div class="athlete-age">Age 28</div>
@@ -669,15 +853,15 @@
                             </div>
                         </td>
                         <td class="td-custom">Akura St1</td>
-                        <td class="td-custom"><div class="aifri-score-badge" style="border-left-color: #4CAF50; background: rgba(76, 175, 80, 0.1);">82 🟢</div></td>
+                        <td class="td-custom"><div class="aifri-score-badge aifri-success">82 🟢</div></td>
                         <td class="td-custom">Ectomorph</td>
                         <td class="td-custom"><span class="risk-monitor">🟡 Monitor (Knee ×2)</span></td>
                         <td class="td-custom">01/26 Long 16km</td>
                         <td class="td-custom">
                             <div class="progress-mini">
-                                <div class="progress-fill-mini" style="width: 83%;"></div>
+                                <div class="progress-fill-mini w-83"></div>
                             </div>
-                            <div style="font-size: 12px; margin-top: 5px;">25/30 (83%)</div>
+                            <div class="progress-text">25/30 (83%)</div>
                         </td>
                         <td class="td-custom">
                             <div class="actions-cell">
@@ -690,10 +874,10 @@
 
                     <!-- Row 3: Karunakaran GV -->
                     <tr class="tr-custom" onclick="openAthleteModal('karun')">
-                        <td class="td-custom"><input type="checkbox" class="checkbox-custom" onchange="updateBulkCount()"></td>
+                        <td class="td-custom"><input type="checkbox" class="checkbox-custom" aria-label="Select athlete Karunakaran GV" onchange="updateBulkCount()"></td>
                         <td class="td-custom">
-                            <div style="display: flex; gap: 12px; align-items: center;">
-                                <div class="athlete-avatar" style="background: linear-gradient(135deg, #9C27B0, #FF6B6B);">K</div>
+                            <div class="athlete-row">
+                                <div class="athlete-avatar avatar-purple-magenta">K</div>
                                 <div>
                                     <div class="athlete-name">Karunakaran GV</div>
                                     <div class="athlete-age">Age 42</div>
@@ -701,15 +885,15 @@
                             </div>
                         </td>
                         <td class="td-custom">Akura St1</td>
-                        <td class="td-custom"><div class="aifri-score-badge" style="border-left-color: var(--warning); background: rgba(255, 149, 0, 0.1);">68 🟡</div></td>
+                        <td class="td-custom"><div class="aifri-score-badge aifri-warning">68 🟡</div></td>
                         <td class="td-custom">Endomorph</td>
                         <td class="td-custom"><span class="risk-high">🔴 High (Achilles)</span></td>
                         <td class="td-custom">01/25 Easy 6km</td>
                         <td class="td-custom">
                             <div class="progress-mini">
-                                <div class="progress-fill-mini" style="width: 67%;"></div>
+                                <div class="progress-fill-mini w-67"></div>
                             </div>
-                            <div style="font-size: 12px; margin-top: 5px;">12/18 (67%)</div>
+                            <div class="progress-text">12/18 (67%)</div>
                         </td>
                         <td class="td-custom">
                             <div class="actions-cell">
@@ -722,10 +906,10 @@
 
                     <!-- Row 4: Janarthanan A -->
                     <tr class="tr-custom" onclick="openAthleteModal('jan')">
-                        <td class="td-custom"><input type="checkbox" class="checkbox-custom" onchange="updateBulkCount()"></td>
+                        <td class="td-custom"><input type="checkbox" class="checkbox-custom" aria-label="Select athlete Janarthanan A" onchange="updateBulkCount()"></td>
                         <td class="td-custom">
-                            <div style="display: flex; gap: 12px; align-items: center;">
-                                <div class="athlete-avatar" style="background: linear-gradient(135deg, #4CAF50, #33BEF3);">J</div>
+                            <div class="athlete-row">
+                                <div class="athlete-avatar avatar-green-blue">J</div>
                                 <div>
                                     <div class="athlete-name">Janarthanan A</div>
                                     <div class="athlete-age">Age 35</div>
@@ -739,9 +923,9 @@
                         <td class="td-custom">01/27 Strength</td>
                         <td class="td-custom">
                             <div class="progress-mini">
-                                <div class="progress-fill-mini" style="width: 38%;"></div>
+                                <div class="progress-fill-mini w-38"></div>
                             </div>
-                            <div style="font-size: 12px; margin-top: 5px;">8.3/21.8 (38%)</div>
+                            <div class="progress-text">8.3/21.8 (38%)</div>
                         </td>
                         <td class="td-custom">
                             <div class="actions-cell">
@@ -754,10 +938,10 @@
 
                     <!-- Row 5: Vinod Kumar -->
                     <tr class="tr-custom" onclick="openAthleteModal('vinod')">
-                        <td class="td-custom"><input type="checkbox" class="checkbox-custom" onchange="updateBulkCount()"></td>
+                        <td class="td-custom"><input type="checkbox" class="checkbox-custom" aria-label="Select athlete Vinod Kumar" onchange="updateBulkCount()"></td>
                         <td class="td-custom">
-                            <div style="display: flex; gap: 12px; align-items: center;">
-                                <div class="athlete-avatar" style="background: linear-gradient(135deg, #FF9500, #4CAF50);">V</div>
+                            <div class="athlete-row">
+                                <div class="athlete-avatar avatar-orange-green">V</div>
                                 <div>
                                     <div class="athlete-name">Vinod Kumar</div>
                                     <div class="athlete-age">Age 40</div>
@@ -765,15 +949,15 @@
                             </div>
                         </td>
                         <td class="td-custom">E1</td>
-                        <td class="td-custom"><div class="aifri-score-badge" style="border-left-color: var(--warning); background: rgba(255, 149, 0, 0.1);">65 🟡</div></td>
+                        <td class="td-custom"><div class="aifri-score-badge aifri-warning">65 🟡</div></td>
                         <td class="td-custom">Endomorph</td>
                         <td class="td-custom"><span class="risk-monitor">🟡 Monitor</span></td>
                         <td class="td-custom">01/27 Easy 6km</td>
                         <td class="td-custom">
                             <div class="progress-mini">
-                                <div class="progress-fill-mini" style="width: 0%;"></div>
+                                <div class="progress-fill-mini w-0"></div>
                             </div>
-                            <div style="font-size: 12px; margin-top: 5px;">0/6.3 (0%)</div>
+                            <div class="progress-text">0/6.3 (0%)</div>
                         </td>
                         <td class="td-custom">
                             <div class="actions-cell">
@@ -788,8 +972,8 @@
         </div>
 
         <!-- COACH INSIGHTS -->
-        <div style="margin-bottom: 30px;">
-            <h3 style="font-size: 18px; font-weight: 800; color: var(--primary); margin-bottom: 20px;">Coach Insights</h3>
+        <div class="section-block">
+            <h3 class="section-title">Coach Insights</h3>
             <div class="insights-card">
                 <div class="insight-item">
                     <div class="insight-number">32</div>
@@ -808,9 +992,7 @@
                     <div class="insight-label">Avg Completion</div>
                 </div>
             </div>
-            <p style="text-align: center; color: var(--secondary); margin-top: 20px; cursor: pointer; font-weight: 600;">
-                View Full Insights Dashboard →
-            </p>
+            <p class="link-muted-centered">View Full Insights Dashboard →</p>
         </div>
     </div>
 
@@ -853,22 +1035,22 @@
                     <span class="modal-value">Mesomorph</span>
                 </div>
 
-                <h4 style="margin-top: 25px; margin-bottom: 15px; font-weight: 700; color: var(--primary);">Alignment Issues</h4>
+                <h4 class="modal-subheading">Alignment Issues</h4>
 
                 <div class="modal-info-row">
                     <span class="modal-label">Q-angle Left/Right</span>
-                    <span class="modal-value">12° / 14° <span style="color: var(--success);">🟢 Normal</span></span>
+                    <span class="modal-value">12° / 14° <span class="status-success">🟢 Normal</span></span>
                 </div>
                 <div class="modal-info-row">
                     <span class="modal-label">Foot Pronation</span>
-                    <span class="modal-value">Neutral / Over <span style="color: var(--warning);">🟡 Monitor</span></span>
+                    <span class="modal-value">Neutral / Over <span class="status-warning">🟡 Monitor</span></span>
                 </div>
                 <div class="modal-info-row">
                     <span class="modal-label">Pelvic Tilt</span>
-                    <span class="modal-value">Anterior 8° <span style="color: var(--warning);">🟡 Monitor</span></span>
+                    <span class="modal-value">Anterior 8° <span class="status-warning">🟡 Monitor</span></span>
                 </div>
 
-                <h4 style="margin-top: 25px; margin-bottom: 15px; font-weight: 700; color: var(--primary);">ROM Summary</h4>
+                <h4 class="modal-subheading">ROM Summary</h4>
 
                 <div class="modal-info-row">
                     <span class="modal-label">Hip ROM</span>
@@ -885,40 +1067,40 @@
 
                 <div class="modal-info-row">
                     <span class="modal-label">FMS Score</span>
-                    <span class="modal-value" style="color: var(--success);">18/21 🟢 Low Risk</span>
+                    <span class="modal-value status-success">18/21 🟢 Low Risk</span>
                 </div>
             </div>
 
             <!-- Tab: AIFRI Breakdown -->
             <div class="modal-tab-content" id="aifri">
-                <div style="text-align: center; margin-bottom: 30px;">
-                    <div style="font-size: 48px; font-weight: 800; color: var(--primary);">76/100</div>
-                    <div style="font-size: 18px; font-weight: 700; color: var(--secondary); margin-top: 10px;">ADVANCED</div>
+                <div class="modal-score-wrap">
+                    <div class="score-large">76/100</div>
+                    <div class="score-label">ADVANCED</div>
                 </div>
 
                 <div class="modal-info-row">
                     <span class="modal-label">🏃 Running</span>
-                    <span class="modal-value">75/100 <span style="color: var(--success); font-size: 12px;">↑ from 72</span></span>
+                    <span class="modal-value">75/100 <span class="trend-up">↑ from 72</span></span>
                 </div>
                 <div class="modal-info-row">
                     <span class="modal-label">💪 Strength</span>
-                    <span class="modal-value">80/100 <span style="color: #999; font-size: 12px;">→ stable</span></span>
+                    <span class="modal-value">80/100 <span class="trend-stable">→ stable</span></span>
                 </div>
                 <div class="modal-info-row">
                     <span class="modal-label">🔄 ROM</span>
-                    <span class="modal-value">70/100 <span style="color: var(--success); font-size: 12px;">↑ from 68</span></span>
+                    <span class="modal-value">70/100 <span class="trend-up">↑ from 68</span></span>
                 </div>
                 <div class="modal-info-row">
                     <span class="modal-label">⚖️ Balance</span>
-                    <span class="modal-value">85/100 <span style="color: var(--success); font-size: 12px;">↑ from 83</span></span>
+                    <span class="modal-value">85/100 <span class="trend-up">↑ from 83</span></span>
                 </div>
                 <div class="modal-info-row">
                     <span class="modal-label">🧘 Mobility</span>
-                    <span class="modal-value">65/100 <span style="color: #999; font-size: 12px;">→ stable</span></span>
+                    <span class="modal-value">65/100 <span class="trend-stable">→ stable</span></span>
                 </div>
                 <div class="modal-info-row">
                     <span class="modal-label">🦴 Alignment</span>
-                    <span class="modal-value">72/100 <span style="color: var(--success); font-size: 12px;">↑ from 70</span></span>
+                    <span class="modal-value">72/100 <span class="trend-up">↑ from 70</span></span>
                 </div>
             </div>
 
@@ -929,42 +1111,42 @@
                     <span class="modal-value">3/12</span>
                 </div>
 
-                <h4 style="margin-top: 25px; margin-bottom: 15px; font-weight: 700; color: var(--primary);">This Week Workouts</h4>
+                <h4 class="modal-subheading">This Week Workouts</h4>
 
-                <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; margin-bottom: 8px;">
-                    <div style="font-weight: 600; color: var(--primary);">Mon: Strength ✓</div>
-                    <div style="font-size: 12px; color: #666;">Core + Lower Body (45 min)</div>
+                <div class="card-muted">
+                    <div class="modal-label text-primary-strong">Mon: Strength ✓</div>
+                    <div class="text-small-muted">Core + Lower Body (45 min)</div>
                 </div>
 
-                <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; margin-bottom: 8px;">
-                    <div style="font-weight: 600; color: var(--primary);">Wed: Threshold 10km (upcoming)</div>
-                    <div style="font-size: 12px; color: #666;">4km @ Z4 threshold</div>
+                <div class="card-muted">
+                    <div class="modal-label text-primary-strong">Wed: Threshold 10km (upcoming)</div>
+                    <div class="text-small-muted">4km @ Z4 threshold</div>
                 </div>
 
-                <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; margin-bottom: 8px;">
-                    <div style="font-weight: 600; color: var(--primary);">Sat: Long Run 16km (upcoming)</div>
-                    <div style="font-size: 12px; color: #666;">@ Z2 aerobic base</div>
+                <div class="card-muted">
+                    <div class="modal-label text-primary-strong">Sat: Long Run 16km (upcoming)</div>
+                    <div class="text-small-muted">@ Z2 aerobic base</div>
                 </div>
 
-                <button style="background: var(--secondary); color: white; border: none; padding: 10px 20px; border-radius: 6px; width: 100%; font-weight: 600; margin-top: 20px; cursor: pointer;">
+                <button class="btn-secondary-full">
                     Modify Plan
                 </button>
             </div>
 
             <!-- Tab: Injury History -->
             <div class="modal-tab-content" id="injury">
-                <h4 style="font-weight: 700; color: var(--primary); margin-bottom: 15px;">Injury Timeline</h4>
+                <h4 class="modal-subheading">Injury Timeline</h4>
 
-                <div style="padding: 15px; background: #f8f9fa; border-radius: 6px; border-left: 4px solid var(--danger); margin-bottom: 15px;">
-                    <div style="font-weight: 700; color: var(--primary);">Aug 2024 - Knee pain</div>
-                    <div style="font-size: 12px; color: #666; margin-top: 5px;">Severity: 6/10 | Status: Recovered</div>
+                <div class="injury-card">
+                    <div class="text-primary-strong">Aug 2024 - Knee pain</div>
+                    <div class="text-small-muted mt-5px">Severity: 6/10 | Status: Recovered</div>
                 </div>
 
-                <div style="padding: 10px; background: var(--success); color: white; border-radius: 6px; margin-bottom: 20px; text-align: center; font-weight: 700;">
+                <div class="injury-clear">
                     ✓ No active injuries
                 </div>
 
-                <h4 style="font-weight: 700; color: var(--primary); margin-bottom: 15px;">Current Risk Factors</h4>
+                <h4 class="modal-subheading">Current Risk Factors</h4>
 
                 <div class="modal-info-row">
                     <span class="modal-label">Overpronation</span>
@@ -978,18 +1160,18 @@
 
             <!-- Tab: Communication -->
             <div class="modal-tab-content" id="communication">
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
-                    <div style="font-weight: 700; color: var(--primary); margin-bottom: 8px;">Private Coach Notes</div>
-                    <p style="font-size: 13px; color: #666; line-height: 1.6;">
+                <div class="card-muted-strong">
+                    <div class="text-primary-strong mb-8px">Private Coach Notes</div>
+                    <p class="notes-text">
                         Dinesh responds well to high volume. Monitor knee during long runs. Consider adding ankle mobility work given slight overpronation on right foot.
                     </p>
                 </div>
 
-                <button style="background: var(--secondary); color: white; border: none; padding: 12px 20px; border-radius: 6px; width: 100%; font-weight: 600; cursor: pointer;">
+                <button class="btn-secondary-full">
                     Send Message
                 </button>
 
-                <div style="text-align: center; color: #999; font-size: 12px; margin-top: 15px;">
+                <div class="text-center-small">
                     No scheduled calls
                 </div>
             </div>
