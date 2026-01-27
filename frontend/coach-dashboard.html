@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coach Dashboard - AKURA SafeStride</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js"></script>
+    
+    <!-- CSS Framework -->
+    <link rel="stylesheet" href="css/cards.css">
+    <link rel="stylesheet" href="css/tables.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    
+    <style>
+        :root {
+            --primary: #1e3a5f;
+            --secondary: #33BEF3;
+            --success: #4CAF50;
+            --warning: #FF9500;
+            --danger: #FF6B6B;
+            --info: #9C27B0;
+        }
+
+        body {
+            background: #f8f9fa;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .header-nav {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 800;
+            color: white;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+            margin: 0;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+
+        .search-bar {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 15px;
+            border-radius: 6px;
+            color: white;
+            min-width: 200px;
+        }
+
+        .search-bar::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-action {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-action:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* FILTERS */
+        .filters-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .filter-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            background: white;
+        }
+
+        /* ATHLETE TABLE */
+        .athletes-section {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .table-header-custom {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            display: none;
+        }
+
+        @media (min-width: 1024px) {
+            .table-header-custom {
+                display: block;
+            }
+        }
+
+        .table-custom {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .thead-custom {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .th-custom {
+            padding: 18px 15px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .td-custom {
+            padding: 18px 15px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+        }
+
+        .tr-custom:hover {
+            background: #f8f9fa;
+            cursor: pointer;
+        }
+
+        .checkbox-custom {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .athlete-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .athlete-name {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .athlete-age {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .aifri-score-badge {
+            background: linear-gradient(135deg, rgba(51, 190, 243, 0.1), rgba(30, 58, 95, 0.1));
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 13px;
+            border-left: 3px solid var(--secondary);
+        }
+
+        .risk-low {
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .risk-monitor {
+            color: var(--warning);
+            font-weight: 700;
+        }
+
+        .risk-high {
+            color: var(--danger);
+            font-weight: 700;
+        }
+
+        .progress-mini {
+            width: 100px;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .progress-fill-mini {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary), var(--primary));
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-link {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .action-link:hover {
+            background: var(--primary);
+        }
+
+        /* BULK ACTIONS TOOLBAR */
+        .bulk-actions-toolbar {
+            display: none;
+            background: var(--primary);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .bulk-actions-toolbar.active {
+            display: flex;
+        }
+
+        .bulk-count {
+            font-weight: 700;
+        }
+
+        .bulk-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .bulk-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .bulk-cancel {
+            margin-left: auto;
+        }
+
+        /* ATHLETE DETAIL MODAL */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content-coach {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .modal-header-coach {
+            padding: 30px 30px 0;
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .modal-title-coach {
+            flex: 1;
+        }
+
+        .modal-title-coach h2 {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .modal-title-coach p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .modal-tabs {
+            display: flex;
+            gap: 0;
+            background: #f8f9fa;
+            padding: 0 30px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .modal-tab-btn {
+            background: none;
+            border: none;
+            padding: 15px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .modal-tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--secondary);
+        }
+
+        .modal-tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .modal-tab-content.active {
+            display: block;
+        }
+
+        .modal-info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .modal-info-row:last-child {
+            border-bottom: none;
+        }
+
+        .modal-label {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .modal-value {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* INSIGHTS CARD */
+        .insights-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+        }
+
+        .insight-item {
+            text-align: center;
+        }
+
+        .insight-number {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--secondary);
+            margin-bottom: 8px;
+        }
+
+        .insight-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .search-bar {
+                width: 100%;
+            }
+
+            .action-buttons {
+                width: 100%;
+                flex-direction: column;
+            }
+
+            .filters-section {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .filter-group {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .filter-select {
+                width: 100%;
+            }
+
+            .th-custom, .td-custom {
+                padding: 10px;
+                font-size: 12px;
+            }
+
+            .athlete-name {
+                font-size: 13px;
+            }
+
+            .actions-cell {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .action-link {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVIGATION HEADER -->
+    <div class="header-nav">
+        <div class="nav-container">
+            <div class="logo">⚙️ SafeStride Coach</div>
+            <ul class="nav-links">
+                <li><a href="#athletes">My Athletes</a></li>
+                <li><a href="#groups">Group Training</a></li>
+                <li><a href="#templates">Templates</a></li>
+                <li><a href="#insights">Insights</a></li>
+            </ul>
+            <input type="text" class="search-bar" placeholder="Find athlete...">
+            <div class="action-buttons">
+                <button class="btn-action" onclick="inviteAthletes()">+ Invite Athletes</button>
+                <button class="btn-action" onclick="toggleBulkActions()">Bulk Edit</button>
+                <button class="btn-action" onclick="sendMessage()">Send Message</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <!-- BULK ACTIONS TOOLBAR -->
+        <div class="bulk-actions-toolbar" id="bulkToolbar">
+            <span class="bulk-count"><input type="checkbox" id="selectAll" onchange="toggleSelectAll(event)"> <span id="selectedCount">0</span> selected</span>
+            <select class="bulk-btn" onchange="bulkAction(this.value)">
+                <option value="">Assign Workout Template</option>
+                <option value="template">Template A</option>
+                <option value="template">Template B</option>
+            </select>
+            <select class="bulk-btn">
+                <option value="">Update Group</option>
+                <option value="akura-st1">Akura St1</option>
+                <option value="akura-st2">Akura St2</option>
+            </select>
+            <button class="bulk-btn" onclick="bulkAction('email')">Send Email</button>
+            <button class="bulk-btn" onclick="bulkAction('export')">Export Data (CSV)</button>
+            <button class="bulk-btn bulk-cancel" onclick="toggleBulkActions()">× Cancel</button>
+        </div>
+
+        <!-- FILTERS -->
+        <div class="filters-section">
+            <div class="filter-group">
+                <span class="filter-label">Group:</span>
+                <select class="filter-select">
+                    <option>All Groups</option>
+                    <option>Akura St1</option>
+                    <option>Akura St2</option>
+                    <option>E1</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">AIFRI:</span>
+                <select class="filter-select">
+                    <option>All Scores</option>
+                    <option>Elite (80+)</option>
+                    <option>Advanced (70-79)</option>
+                    <option>Intermediate (60-69)</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">Injury Risk:</span>
+                <select class="filter-select">
+                    <option>All</option>
+                    <option>🟢 Low</option>
+                    <option>🟡 Monitor</option>
+                    <option>🔴 High</option>
+                </select>
+            </div>
+            <div class="filter-group" style="margin-left: auto;">
+                <span class="filter-label">Sort By:</span>
+                <select class="filter-select">
+                    <option>Name</option>
+                    <option>AIFRI Score</option>
+                    <option>Last Workout</option>
+                    <option>This Week Progress</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- ATHLETES TABLE -->
+        <div class="athletes-section">
+            <table class="table-custom">
+                <thead class="thead-custom">
+                    <tr>
+                        <th class="th-custom" style="width: 40px;">
+                            <input type="checkbox" class="checkbox-custom" id="selectAll" onchange="toggleSelectAll(event)">
+                        </th>
+                        <th class="th-custom">Athlete</th>
+                        <th class="th-custom">Group</th>
+                        <th class="th-custom">AIFRI</th>
+                        <th class="th-custom">Body Type</th>
+                        <th class="th-custom">Risk</th>
+                        <th class="th-custom">Last Workout</th>
+                        <th class="th-custom">This Week</th>
+                        <th class="th-custom">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Row 1: Dinesh A -->
+                    <tr class="tr-custom" onclick="openAthleteModal('dinesh')">
+                        <td class="td-custom"><input type="checkbox" class="checkbox-custom" onchange="updateBulkCount()"></td>
+                        <td class="td-custom">
+                            <div style="display: flex; gap: 12px; align-items: center;">
+                                <div class="athlete-avatar">D</div>
+                                <div>
+                                    <div class="athlete-name">Dinesh A</div>
+                                    <div class="athlete-age">Age 35</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="td-custom">Akura St2</td>
+                        <td class="td-custom"><div class="aifri-score-badge">76 🟢</div></td>
+                        <td class="td-custom">Mesomorph</td>
+                        <td class="td-custom"><span class="risk-low">🟢 Low</span></td>
+                        <td class="td-custom">01/27 Threshold 8km</td>
+                        <td class="td-custom">
+                            <div class="progress-mini">
+                                <div class="progress-fill-mini" style="width: 85%;"></div>
+                            </div>
+                            <div style="font-size: 12px; margin-top: 5px;">18.2/21.5 (85%)</div>
+                        </td>
+                        <td class="td-custom">
+                            <div class="actions-cell">
+                                <button class="action-link" onclick="editAthlete('dinesh')">Edit</button>
+                                <button class="action-link" onclick="viewCalendar('dinesh')">Cal</button>
+                                <button class="action-link" onclick="emailAthlete('dinesh')">Email</button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Row 2: San Chan -->
+                    <tr class="tr-custom" onclick="openAthleteModal('san')">
+                        <td class="td-custom"><input type="checkbox" class="checkbox-custom" onchange="updateBulkCount()"></td>
+                        <td class="td-custom">
+                            <div style="display: flex; gap: 12px; align-items: center;">
+                                <div class="athlete-avatar" style="background: linear-gradient(135deg, #FF9500, #FF6B6B);">S</div>
+                                <div>
+                                    <div class="athlete-name">San Chan</div>
+                                    <div class="athlete-age">Age 28</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="td-custom">Akura St1</td>
+                        <td class="td-custom"><div class="aifri-score-badge" style="border-left-color: #4CAF50; background: rgba(76, 175, 80, 0.1);">82 🟢</div></td>
+                        <td class="td-custom">Ectomorph</td>
+                        <td class="td-custom"><span class="risk-monitor">🟡 Monitor (Knee ×2)</span></td>
+                        <td class="td-custom">01/26 Long 16km</td>
+                        <td class="td-custom">
+                            <div class="progress-mini">
+                                <div class="progress-fill-mini" style="width: 83%;"></div>
+                            </div>
+                            <div style="font-size: 12px; margin-top: 5px;">25/30 (83%)</div>
+                        </td>
+                        <td class="td-custom">
+                            <div class="actions-cell">
+                                <button class="action-link" onclick="editAthlete('san')">Edit</button>
+                                <button class="action-link" onclick="viewCalendar('san')">Cal</button>
+                                <button class="action-link" onclick="emailAthlete('san')">Email</button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Row 3: Karunakaran GV -->
+                    <tr class="tr-custom" onclick="openAthleteModal('karun')">
+                        <td class="td-custom"><input type="checkbox" class="checkbox-custom" onchange="updateBulkCount()"></td>
+                        <td class="td-custom">
+                            <div style="display: flex; gap: 12px; align-items: center;">
+                                <div class="athlete-avatar" style="background: linear-gradient(135deg, #9C27B0, #FF6B6B);">K</div>
+                                <div>
+                                    <div class="athlete-name">Karunakaran GV</div>
+                                    <div class="athlete-age">Age 42</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="td-custom">Akura St1</td>
+                        <td class="td-custom"><div class="aifri-score-badge" style="border-left-color: var(--warning); background: rgba(255, 149, 0, 0.1);">68 🟡</div></td>
+                        <td class="td-custom">Endomorph</td>
+                        <td class="td-custom"><span class="risk-high">🔴 High (Achilles)</span></td>
+                        <td class="td-custom">01/25 Easy 6km</td>
+                        <td class="td-custom">
+                            <div class="progress-mini">
+                                <div class="progress-fill-mini" style="width: 67%;"></div>
+                            </div>
+                            <div style="font-size: 12px; margin-top: 5px;">12/18 (67%)</div>
+                        </td>
+                        <td class="td-custom">
+                            <div class="actions-cell">
+                                <button class="action-link" onclick="editAthlete('karun')">Edit</button>
+                                <button class="action-link" onclick="viewCalendar('karun')">Cal</button>
+                                <button class="action-link" onclick="emailAthlete('karun')">Email</button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Row 4: Janarthanan A -->
+                    <tr class="tr-custom" onclick="openAthleteModal('jan')">
+                        <td class="td-custom"><input type="checkbox" class="checkbox-custom" onchange="updateBulkCount()"></td>
+                        <td class="td-custom">
+                            <div style="display: flex; gap: 12px; align-items: center;">
+                                <div class="athlete-avatar" style="background: linear-gradient(135deg, #4CAF50, #33BEF3);">J</div>
+                                <div>
+                                    <div class="athlete-name">Janarthanan A</div>
+                                    <div class="athlete-age">Age 35</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="td-custom">Akura St1</td>
+                        <td class="td-custom"><div class="aifri-score-badge">70 🟢</div></td>
+                        <td class="td-custom">Mesomorph</td>
+                        <td class="td-custom"><span class="risk-low">🟢 Low</span></td>
+                        <td class="td-custom">01/27 Strength</td>
+                        <td class="td-custom">
+                            <div class="progress-mini">
+                                <div class="progress-fill-mini" style="width: 38%;"></div>
+                            </div>
+                            <div style="font-size: 12px; margin-top: 5px;">8.3/21.8 (38%)</div>
+                        </td>
+                        <td class="td-custom">
+                            <div class="actions-cell">
+                                <button class="action-link" onclick="editAthlete('jan')">Edit</button>
+                                <button class="action-link" onclick="viewCalendar('jan')">Cal</button>
+                                <button class="action-link" onclick="emailAthlete('jan')">Email</button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Row 5: Vinod Kumar -->
+                    <tr class="tr-custom" onclick="openAthleteModal('vinod')">
+                        <td class="td-custom"><input type="checkbox" class="checkbox-custom" onchange="updateBulkCount()"></td>
+                        <td class="td-custom">
+                            <div style="display: flex; gap: 12px; align-items: center;">
+                                <div class="athlete-avatar" style="background: linear-gradient(135deg, #FF9500, #4CAF50);">V</div>
+                                <div>
+                                    <div class="athlete-name">Vinod Kumar</div>
+                                    <div class="athlete-age">Age 40</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="td-custom">E1</td>
+                        <td class="td-custom"><div class="aifri-score-badge" style="border-left-color: var(--warning); background: rgba(255, 149, 0, 0.1);">65 🟡</div></td>
+                        <td class="td-custom">Endomorph</td>
+                        <td class="td-custom"><span class="risk-monitor">🟡 Monitor</span></td>
+                        <td class="td-custom">01/27 Easy 6km</td>
+                        <td class="td-custom">
+                            <div class="progress-mini">
+                                <div class="progress-fill-mini" style="width: 0%;"></div>
+                            </div>
+                            <div style="font-size: 12px; margin-top: 5px;">0/6.3 (0%)</div>
+                        </td>
+                        <td class="td-custom">
+                            <div class="actions-cell">
+                                <button class="action-link" onclick="editAthlete('vinod')">Edit</button>
+                                <button class="action-link" onclick="viewCalendar('vinod')">Cal</button>
+                                <button class="action-link" onclick="emailAthlete('vinod')">Email</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- COACH INSIGHTS -->
+        <div style="margin-bottom: 30px;">
+            <h3 style="font-size: 18px; font-weight: 800; color: var(--primary); margin-bottom: 20px;">Coach Insights</h3>
+            <div class="insights-card">
+                <div class="insight-item">
+                    <div class="insight-number">32</div>
+                    <div class="insight-label">Total Athletes</div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-number">74</div>
+                    <div class="insight-label">Average AIFRI</div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-number">8%</div>
+                    <div class="insight-label">Injury Rate</div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-number">82%</div>
+                    <div class="insight-label">Avg Completion</div>
+                </div>
+            </div>
+            <p style="text-align: center; color: var(--secondary); margin-top: 20px; cursor: pointer; font-weight: 600;">
+                View Full Insights Dashboard →
+            </p>
+        </div>
+    </div>
+
+    <!-- ATHLETE DETAIL MODAL -->
+    <div class="modal-overlay" id="athleteModal" onclick="closeAthleteModal(event)">
+        <div class="modal-content-coach" onclick="event.stopPropagation()">
+            <button class="modal-close-btn" onclick="closeAthleteModal()">×</button>
+
+            <div class="modal-header-coach">
+                <div class="modal-title-coach">
+                    <h2 id="modalAthleteName">Dinesh A</h2>
+                    <p>Age 35, Male | Akura St2 | AIFRI: 76 ADVANCED</p>
+                </div>
+            </div>
+
+            <div class="modal-tabs">
+                <button class="modal-tab-btn active" onclick="switchModalTab(event, 'assessment')">Assessment</button>
+                <button class="modal-tab-btn" onclick="switchModalTab(event, 'aifri')">AIFRI</button>
+                <button class="modal-tab-btn" onclick="switchModalTab(event, 'training')">Training</button>
+                <button class="modal-tab-btn" onclick="switchModalTab(event, 'injury')">Injury</button>
+                <button class="modal-tab-btn" onclick="switchModalTab(event, 'communication')">Communication</button>
+            </div>
+
+            <!-- Tab: Assessment -->
+            <div class="modal-tab-content active" id="assessment">
+                <div class="modal-info-row">
+                    <span class="modal-label">Height</span>
+                    <span class="modal-value">175cm</span>
+                </div>
+                <div class="modal-info-row">
+                    <span class="modal-label">Weight</span>
+                    <span class="modal-value">72kg</span>
+                </div>
+                <div class="modal-info-row">
+                    <span class="modal-label">BMI</span>
+                    <span class="modal-value">23.5 (Normal)</span>
+                </div>
+                <div class="modal-info-row">
+                    <span class="modal-label">Body Type</span>
+                    <span class="modal-value">Mesomorph</span>
+                </div>
+
+                <h4 style="margin-top: 25px; margin-bottom: 15px; font-weight: 700; color: var(--primary);">Alignment Issues</h4>
+
+                <div class="modal-info-row">
+                    <span class="modal-label">Q-angle Left/Right</span>
+                    <span class="modal-value">12° / 14° <span style="color: var(--success);">🟢 Normal</span></span>
+                </div>
+                <div class="modal-info-row">
+                    <span class="modal-label">Foot Pronation</span>
+                    <span class="modal-value">Neutral / Over <span style="color: var(--warning);">🟡 Monitor</span></span>
+                </div>
+                <div class="modal-info-row">
+                    <span class="modal-label">Pelvic Tilt</span>
+                    <span class="modal-value">Anterior 8° <span style="color: var(--warning);">🟡 Monitor</span></span>
+                </div>
+
+                <h4 style="margin-top: 25px; margin-bottom: 15px; font-weight: 700; color: var(--primary);">ROM Summary</h4>
+
+                <div class="modal-info-row">
+                    <span class="modal-label">Hip ROM</span>
+                    <span class="modal-value">120°</span>
+                </div>
+                <div class="modal-info-row">
+                    <span class="modal-label">Knee ROM</span>
+                    <span class="modal-value">130°</span>
+                </div>
+                <div class="modal-info-row">
+                    <span class="modal-label">Ankle ROM</span>
+                    <span class="modal-value">12°</span>
+                </div>
+
+                <div class="modal-info-row">
+                    <span class="modal-label">FMS Score</span>
+                    <span class="modal-value" style="color: var(--success);">18/21 🟢 Low Risk</span>
+                </div>
+            </div>
+
+            <!-- Tab: AIFRI Breakdown -->
+            <div class="modal-tab-content" id="aifri">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <div style="font-size: 48px; font-weight: 800; color: var(--primary);">76/100</div>
+                    <div style="font-size: 18px; font-weight: 700; color: var(--secondary); margin-top: 10px;">ADVANCED</div>
+                </div>
+
+                <div class="modal-info-row">
+                    <span class="modal-label">🏃 Running</span>
+                    <span class="modal-value">75/100 <span style="color: var(--success); font-size: 12px;">↑ from 72</span></span>
+                </div>
+                <div class="modal-info-row">
+                    <span class="modal-label">💪 Strength</span>
+                    <span class="modal-value">80/100 <span style="color: #999; font-size: 12px;">→ stable</span></span>
+                </div>
+                <div class="modal-info-row">
+                    <span class="modal-label">🔄 ROM</span>
+                    <span class="modal-value">70/100 <span style="color: var(--success); font-size: 12px;">↑ from 68</span></span>
+                </div>
+                <div class="modal-info-row">
+                    <span class="modal-label">⚖️ Balance</span>
+                    <span class="modal-value">85/100 <span style="color: var(--success); font-size: 12px;">↑ from 83</span></span>
+                </div>
+                <div class="modal-info-row">
+                    <span class="modal-label">🧘 Mobility</span>
+                    <span class="modal-value">65/100 <span style="color: #999; font-size: 12px;">→ stable</span></span>
+                </div>
+                <div class="modal-info-row">
+                    <span class="modal-label">🦴 Alignment</span>
+                    <span class="modal-value">72/100 <span style="color: var(--success); font-size: 12px;">↑ from 70</span></span>
+                </div>
+            </div>
+
+            <!-- Tab: Training Plan -->
+            <div class="modal-tab-content" id="training">
+                <div class="modal-info-row">
+                    <span class="modal-label">Current Week</span>
+                    <span class="modal-value">3/12</span>
+                </div>
+
+                <h4 style="margin-top: 25px; margin-bottom: 15px; font-weight: 700; color: var(--primary);">This Week Workouts</h4>
+
+                <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; margin-bottom: 8px;">
+                    <div style="font-weight: 600; color: var(--primary);">Mon: Strength ✓</div>
+                    <div style="font-size: 12px; color: #666;">Core + Lower Body (45 min)</div>
+                </div>
+
+                <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; margin-bottom: 8px;">
+                    <div style="font-weight: 600; color: var(--primary);">Wed: Threshold 10km (upcoming)</div>
+                    <div style="font-size: 12px; color: #666;">4km @ Z4 threshold</div>
+                </div>
+
+                <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; margin-bottom: 8px;">
+                    <div style="font-weight: 600; color: var(--primary);">Sat: Long Run 16km (upcoming)</div>
+                    <div style="font-size: 12px; color: #666;">@ Z2 aerobic base</div>
+                </div>
+
+                <button style="background: var(--secondary); color: white; border: none; padding: 10px 20px; border-radius: 6px; width: 100%; font-weight: 600; margin-top: 20px; cursor: pointer;">
+                    Modify Plan
+                </button>
+            </div>
+
+            <!-- Tab: Injury History -->
+            <div class="modal-tab-content" id="injury">
+                <h4 style="font-weight: 700; color: var(--primary); margin-bottom: 15px;">Injury Timeline</h4>
+
+                <div style="padding: 15px; background: #f8f9fa; border-radius: 6px; border-left: 4px solid var(--danger); margin-bottom: 15px;">
+                    <div style="font-weight: 700; color: var(--primary);">Aug 2024 - Knee pain</div>
+                    <div style="font-size: 12px; color: #666; margin-top: 5px;">Severity: 6/10 | Status: Recovered</div>
+                </div>
+
+                <div style="padding: 10px; background: var(--success); color: white; border-radius: 6px; margin-bottom: 20px; text-align: center; font-weight: 700;">
+                    ✓ No active injuries
+                </div>
+
+                <h4 style="font-weight: 700; color: var(--primary); margin-bottom: 15px;">Current Risk Factors</h4>
+
+                <div class="modal-info-row">
+                    <span class="modal-label">Overpronation</span>
+                    <span class="modal-value">Right foot → Stability shoes</span>
+                </div>
+                <div class="modal-info-row">
+                    <span class="modal-label">Pelvic Tilt</span>
+                    <span class="modal-value">Anterior → Hip flexor stretches</span>
+                </div>
+            </div>
+
+            <!-- Tab: Communication -->
+            <div class="modal-tab-content" id="communication">
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                    <div style="font-weight: 700; color: var(--primary); margin-bottom: 8px;">Private Coach Notes</div>
+                    <p style="font-size: 13px; color: #666; line-height: 1.6;">
+                        Dinesh responds well to high volume. Monitor knee during long runs. Consider adding ankle mobility work given slight overpronation on right foot.
+                    </p>
+                </div>
+
+                <button style="background: var(--secondary); color: white; border: none; padding: 12px 20px; border-radius: 6px; width: 100%; font-weight: 600; cursor: pointer;">
+                    Send Message
+                </button>
+
+                <div style="text-align: center; color: #999; font-size: 12px; margin-top: 15px;">
+                    No scheduled calls
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Toggle bulk actions
+        function toggleBulkActions() {
+            const toolbar = document.getElementById('bulkToolbar');
+            toolbar.classList.toggle('active');
+            if (!toolbar.classList.contains('active')) {
+                document.querySelectorAll('.checkbox-custom').forEach(cb => cb.checked = false);
+                updateBulkCount();
+            }
+        }
+
+        // Update bulk count
+        function updateBulkCount() {
+            const checked = document.querySelectorAll('.checkbox-custom:checked').length - 1; // exclude header
+            document.getElementById('selectedCount').textContent = checked;
+            
+            if (checked > 0) {
+                document.getElementById('bulkToolbar').classList.add('active');
+            }
+        }
+
+        // Toggle select all
+        function toggleSelectAll(event) {
+            const isChecked = event.target.checked;
+            document.querySelectorAll('input[type="checkbox"]:not(#selectAll)').forEach(cb => {
+                cb.checked = isChecked;
+            });
+            updateBulkCount();
+        }
+
+        // Athlete modal
+        function openAthleteModal(athlete) {
+            document.getElementById('athleteModal').classList.add('active');
+        }
+
+        function closeAthleteModal(event) {
+            if (event && event.target.id !== 'athleteModal') return;
+            document.getElementById('athleteModal').classList.remove('active');
+        }
+
+        // Tab switching in modal
+        function switchModalTab(event, tabName) {
+            event.preventDefault();
+            
+            document.querySelectorAll('.modal-tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.modal-tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            document.getElementById(tabName).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        // Bulk actions
+        function bulkAction(action) {
+            alert('Bulk action: ' + action);
+        }
+
+        // Actions
+        function inviteAthletes() {
+            alert('Opening invite dialog...');
+        }
+
+        function sendMessage() {
+            alert('Opening message composer...');
+        }
+
+        function editAthlete(athlete) {
+            alert('Editing ' + athlete);
+        }
+
+        function viewCalendar(athlete) {
+            alert('Viewing calendar for ' + athlete);
+        }
+
+        function emailAthlete(athlete) {
+            alert('Sending email to ' + athlete);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard - AKURA SafeStride</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js"></script>
+    
+    <!-- CSS Framework -->
+    <link rel="stylesheet" href="css/cards.css">
+    <link rel="stylesheet" href="css/forms.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    
+    <style>
+        :root {
+            --primary: #1e3a5f;
+            --secondary: #33BEF3;
+            --success: #4CAF50;
+            --warning: #FF9500;
+            --danger: #FF6B6B;
+            --info: #9C27B0;
+        }
+
+        body {
+            background: #f8f9fa;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 40px 20px;
+            margin-bottom: 40px;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .greeting {
+            font-size: 32px;
+            font-weight: 800;
+        }
+
+        .greeting-time {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .aifri-badge-large {
+            background: white;
+            color: var(--primary);
+            padding: 15px 25px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .badge-score {
+            font-size: 36px;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .badge-grade {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--secondary);
+            margin-top: 5px;
+        }
+
+        .streak-badge {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+        }
+
+        /* TODAY'S WORKOUT CARD */
+        .todays-workout {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+            border-left: 5px solid var(--secondary);
+        }
+
+        .workout-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .workout-date {
+            font-size: 13px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .workout-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .workout-meta {
+            display: flex;
+            gap: 25px;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .workout-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, var(--success), #2e8b57);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-secondary-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 14px 30px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* QUICK STATS GRID */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card-dashboard {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+
+        .stat-card-dashboard h4 {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .stat-subtext {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .progress-ring-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 15px;
+        }
+
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring-circle {
+            stroke: #e0e0e0;
+            fill: transparent;
+        }
+
+        .progress-ring-progress {
+            stroke: var(--secondary);
+            fill: transparent;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.35s;
+            transform-origin: 50% 50%;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        /* AIFRI PROGRESS SECTION */
+        .aifri-progress-section {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 30px;
+        }
+
+        .chart-container-dashboard {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            margin-bottom: 40px;
+        }
+
+        .pillar-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .pillar-mini-card {
+            background: linear-gradient(135deg, #f5f5f5, white);
+            border-radius: 10px;
+            padding: 18px;
+            text-align: center;
+            border-top: 3px solid var(--secondary);
+        }
+
+        .pillar-name {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .pillar-score {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .pillar-change {
+            font-size: 12px;
+            margin-top: 8px;
+            font-weight: 600;
+        }
+
+        .change-positive {
+            color: var(--success);
+        }
+
+        .change-neutral {
+            color: #999;
+        }
+
+        /* RECENT WORKOUTS */
+        .workouts-section {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .workout-item-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .workout-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .workout-row:hover {
+            background: #efefef;
+        }
+
+        .workout-info-left {
+            flex: 1;
+        }
+
+        .workout-name {
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .workout-details-small {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .workout-completion {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .completion-badge {
+            background: var(--success);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* UPCOMING WORKOUTS */
+        .upcoming-section {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .mini-calendar {
+            display: grid;
+            gap: 12px;
+        }
+
+        .upcoming-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid var(--info);
+        }
+
+        .upcoming-day {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 14px;
+        }
+
+        .upcoming-workout {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* INJURY PREVENTION */
+        .prevention-section {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .prevention-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .prevention-card {
+            border-radius: 10px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #f5f5f5, white);
+            border: 1px solid #e0e0e0;
+        }
+
+        .prevention-thumbnail {
+            width: 100%;
+            height: 150px;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: white;
+        }
+
+        .prevention-content {
+            padding: 18px;
+        }
+
+        .prevention-title {
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .prevention-subtitle {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .prevention-video-btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .prevention-video-btn:hover {
+            background: var(--primary);
+        }
+
+        .body-type-card {
+            background: linear-gradient(135deg, #f5f5f5, white);
+            border-radius: 10px;
+            padding: 25px;
+            border-left: 4px solid var(--warning);
+        }
+
+        .body-type-title {
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .body-type-characteristics {
+            display: grid;
+            gap: 10px;
+        }
+
+        .characteristic {
+            font-size: 14px;
+            color: #666;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .characteristic::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        /* GPS CONNECTION */
+        .connection-section {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .connection-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .connection-item:last-child {
+            border-bottom: none;
+        }
+
+        .connection-info {
+            flex: 1;
+        }
+
+        .connection-name {
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .connection-status {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .connection-btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .connection-btn:hover {
+            background: var(--primary);
+        }
+
+        .connection-btn-inactive {
+            background: #e0e0e0;
+            color: #999;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .prevention-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <div class="dashboard-header">
+        <div class="header-content">
+            <div>
+                <div class="greeting-time" id="greetingTime">Good morning!</div>
+                <div class="greeting">Welcome back, Dinesh</div>
+            </div>
+            <div class="aifri-badge-large">
+                <div class="badge-score">76</div>
+                <div class="badge-grade">ADVANCED</div>
+            </div>
+            <div class="streak-badge">
+                🔥 12 Days<br>Streak
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- TODAY'S WORKOUT CARD -->
+        <div class="todays-workout">
+            <div class="workout-date">Monday, January 27, 2026</div>
+            <div class="workout-title">Core & Lower Body Strength</div>
+            
+            <div class="workout-meta">
+                <div class="meta-item">⏱ 45 minutes</div>
+                <div class="meta-item">📍 Gym or Home</div>
+                <div class="meta-item">🎯 RPE 6-7/10</div>
+            </div>
+
+            <div class="workout-actions">
+                <button class="btn-start" onclick="startWorkout()">START WORKOUT</button>
+                <button class="btn-secondary-outline" onclick="viewWorkoutDetails()">View Full Details</button>
+            </div>
+        </div>
+
+        <!-- QUICK STATS -->
+        <div class="stats-grid">
+            <div class="stat-card-dashboard">
+                <h4>This Week Progress</h4>
+                <div class="progress-ring-container">
+                    <svg class="progress-ring" width="120" height="120" viewBox="0 0 120 120">
+                        <circle class="progress-ring-circle" cx="60" cy="60" r="54" stroke-width="8"/>
+                        <circle class="progress-ring-progress" cx="60" cy="60" r="54" stroke-width="8" 
+                                style="stroke-dasharray: 339.29; stroke-dashoffset: 50.89;"/>
+                    </svg>
+                    <div class="progress-text">85%</div>
+                </div>
+                <div class="stat-value">18.2/21.5 km</div>
+            </div>
+
+            <div class="stat-card-dashboard">
+                <h4>Last 7 Days RPE</h4>
+                <svg class="progress-ring" width="120" height="120" viewBox="0 0 120 120" style="margin: 0 auto 15px;">
+                    <polyline points="10,100 30,60 50,75 70,40 110,80" 
+                              style="stroke: var(--secondary); fill: none; stroke-width: 2; stroke-linecap: round;"/>
+                </svg>
+                <div class="stat-value">6.8</div>
+                <div class="stat-subtext">Average RPE</div>
+            </div>
+
+            <div class="stat-card-dashboard">
+                <h4>Injury Status</h4>
+                <div style="font-size: 48px; margin: 15px 0;">🟢</div>
+                <div class="stat-value" style="color: var(--success); font-size: 18px;">All Clear</div>
+            </div>
+
+            <div class="stat-card-dashboard">
+                <h4>Next Assessment</h4>
+                <div style="font-size: 48px; margin: 15px 0;">📅</div>
+                <div class="stat-value" style="font-size: 18px;">Feb 24</div>
+                <div class="stat-subtext">28 days remaining</div>
+            </div>
+        </div>
+
+        <!-- AIFRI PROGRESS CHART -->
+        <div class="aifri-progress-section">
+            <h3 class="section-title">6-Pillar Progress (12 Weeks)</h3>
+            <div class="chart-container-dashboard">
+                <canvas id="pillarProgressChart"></canvas>
+            </div>
+
+            <div class="pillar-cards">
+                <div class="pillar-mini-card">
+                    <div class="pillar-name">🏃 Running</div>
+                    <div class="pillar-score">77</div>
+                    <div class="pillar-change change-positive">+2 ↑</div>
+                </div>
+
+                <div class="pillar-mini-card">
+                    <div class="pillar-name">💪 Strength</div>
+                    <div class="pillar-score">82</div>
+                    <div class="pillar-change change-positive">+2 ↑</div>
+                </div>
+
+                <div class="pillar-mini-card">
+                    <div class="pillar-name">🔄 ROM</div>
+                    <div class="pillar-score">71</div>
+                    <div class="pillar-change change-positive">+1 ↑</div>
+                </div>
+
+                <div class="pillar-mini-card">
+                    <div class="pillar-name">⚖️ Balance</div>
+                    <div class="pillar-score">85</div>
+                    <div class="pillar-change change-neutral">0 →</div>
+                </div>
+
+                <div class="pillar-mini-card">
+                    <div class="pillar-name">🧘 Mobility</div>
+                    <div class="pillar-score">67</div>
+                    <div class="pillar-change change-positive">+2 ↑</div>
+                </div>
+
+                <div class="pillar-mini-card">
+                    <div class="pillar-name">🦴 Alignment</div>
+                    <div class="pillar-score">73</div>
+                    <div class="pillar-change change-positive">+1 ↑</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RECENT WORKOUTS -->
+        <div class="workouts-section">
+            <h3 class="section-title">Recent Workouts</h3>
+            <div class="workout-item-list">
+                <div class="workout-row">
+                    <div class="workout-info-left">
+                        <div class="workout-name">Jan 26: Threshold Run 8km</div>
+                        <div class="workout-details-small">RPE 7/10 | Pain 0/10 | Felt strong</div>
+                    </div>
+                    <div class="workout-completion">
+                        <span class="completion-badge">✓ Completed</span>
+                    </div>
+                </div>
+
+                <div class="workout-row">
+                    <div class="workout-info-left">
+                        <div class="workout-name">Jan 24: Long Run 16km</div>
+                        <div class="workout-details-small">RPE 6/10 | Pain 2/10 (knee tightness)</div>
+                    </div>
+                    <div class="workout-completion">
+                        <span class="completion-badge">✓ Completed</span>
+                    </div>
+                </div>
+
+                <div class="workout-row">
+                    <div class="workout-info-left">
+                        <div class="workout-name">Jan 22: Easy Run 6km</div>
+                        <div class="workout-details-small">RPE 5/10 | Pain 0/10 | Recovery day</div>
+                    </div>
+                    <div class="workout-completion">
+                        <span class="completion-badge">✓ Completed</span>
+                    </div>
+                </div>
+
+                <div class="workout-row">
+                    <div class="workout-info-left">
+                        <div class="workout-name">Jan 21: Strength Training</div>
+                        <div class="workout-details-small">RPE 7/10 | Completed all sets</div>
+                    </div>
+                    <div class="workout-completion">
+                        <span class="completion-badge">✓ Completed</span>
+                    </div>
+                </div>
+            </div>
+            <p style="text-align: center; color: var(--secondary); margin-top: 20px; cursor: pointer; font-weight: 600;">
+                View Full History →
+            </p>
+        </div>
+
+        <!-- UPCOMING WORKOUTS -->
+        <div class="upcoming-section">
+            <h3 class="section-title">Upcoming This Week</h3>
+            <div class="mini-calendar">
+                <div class="upcoming-item">
+                    <div>
+                        <div class="upcoming-day">Wednesday</div>
+                        <div class="upcoming-workout">Threshold 10km</div>
+                    </div>
+                    <div style="color: var(--warning); font-weight: 600;">→</div>
+                </div>
+
+                <div class="upcoming-item">
+                    <div>
+                        <div class="upcoming-day">Friday</div>
+                        <div class="upcoming-workout">Easy 6km</div>
+                    </div>
+                    <div style="color: var(--warning); font-weight: 600;">→</div>
+                </div>
+
+                <div class="upcoming-item">
+                    <div>
+                        <div class="upcoming-day">Saturday</div>
+                        <div class="upcoming-workout">Long Run 18km</div>
+                    </div>
+                    <div style="color: var(--primary); font-weight: 600;">🎯</div>
+                </div>
+
+                <div class="upcoming-item">
+                    <div>
+                        <div class="upcoming-day">Sunday</div>
+                        <div class="upcoming-workout">Rest + Mobility work</div>
+                    </div>
+                    <div style="color: #999; font-weight: 600;">✓</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- INJURY PREVENTION -->
+        <div class="prevention-section">
+            <h3 class="section-title">Injury Prevention Routine</h3>
+
+            <div class="prevention-grid">
+                <div class="prevention-card">
+                    <div class="prevention-thumbnail">▶️</div>
+                    <div class="prevention-content">
+                        <div class="prevention-title">Daily Pre-Run Routine</div>
+                        <div class="prevention-subtitle">5 minutes • Essential warm-up</div>
+                        <button class="prevention-video-btn" onclick="playVideo('pre-run')">▶ Watch Video</button>
+                    </div>
+                </div>
+
+                <div class="prevention-card">
+                    <div class="prevention-thumbnail">▶️</div>
+                    <div class="prevention-content">
+                        <div class="prevention-title">Post-Run Stretches</div>
+                        <div class="prevention-subtitle">10 minutes • Recovery routine</div>
+                        <button class="prevention-video-btn" onclick="playVideo('post-run')">▶ Watch Video</button>
+                    </div>
+                </div>
+            </div>
+
+            <h4 style="font-weight: 700; color: var(--primary); margin-bottom: 20px; margin-top: 30px;">Your Body Type: Mesomorph</h4>
+            <div class="body-type-card">
+                <div class="body-type-title">Recommended Focus for Your Profile</div>
+                <div class="body-type-characteristics">
+                    <div class="characteristic">Maintain muscle mass during high mileage</div>
+                    <div class="characteristic">Balance endurance with strength work</div>
+                    <div class="characteristic">Monitor recovery (you respond well to volume)</div>
+                    <div class="characteristic">Include 2x weekly strength sessions</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GPS CONNECTIONS -->
+        <div class="connection-section">
+            <h3 class="section-title">Connected Devices & Apps</h3>
+
+            <div class="connection-item">
+                <div class="connection-info">
+                    <div class="connection-name">🌐 Garmin Forerunner 945</div>
+                    <div class="connection-status">✅ Connected • Last sync: 2 hours ago</div>
+                </div>
+                <button class="connection-btn" onclick="syncDevice()">Sync Now</button>
+            </div>
+
+            <div class="connection-item">
+                <div class="connection-info">
+                    <div class="connection-name">Strava</div>
+                    <div class="connection-status">Not connected</div>
+                </div>
+                <button class="connection-btn connection-btn-inactive" onclick="connectService('strava')">Connect</button>
+            </div>
+
+            <div class="connection-item">
+                <div class="connection-info">
+                    <div class="connection-name">Apple Health</div>
+                    <div class="connection-status">Not connected</div>
+                </div>
+                <button class="connection-btn connection-btn-inactive" onclick="connectService('apple')">Connect</button>
+            </div>
+
+            <div class="connection-item">
+                <div class="connection-info">
+                    <div class="connection-name">Coros</div>
+                    <div class="connection-status">Not connected</div>
+                </div>
+                <button class="connection-btn connection-btn-inactive" onclick="connectService('coros')">Connect</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js"></script>
+    <script>
+        // Greeting based on time
+        function updateGreeting() {
+            const hour = new Date().getHours();
+            let greeting = '';
+            if (hour < 12) greeting = 'Good morning!';
+            else if (hour < 17) greeting = 'Good afternoon!';
+            else greeting = 'Good evening!';
+            
+            document.getElementById('greetingTime').textContent = greeting;
+        }
+
+        window.addEventListener('load', updateGreeting);
+
+        // Pillar Progress Chart
+        function initPillarChart() {
+            const ctx = document.getElementById('pillarProgressChart');
+            if (window.pillarChart) window.pillarChart.destroy();
+
+            window.pillarChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7', 'Week 8', 'Week 9', 'Week 10', 'Week 11', 'Week 12'],
+                    datasets: [
+                        {
+                            label: 'Running',
+                            data: [75, 75, 77, 78, 79, 80, 81, 82, 82, 83, 84, 85],
+                            borderColor: '#1e3a5f',
+                            backgroundColor: 'rgba(30, 58, 95, 0.1)',
+                            tension: 0.4,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#1e3a5f'
+                        },
+                        {
+                            label: 'Strength',
+                            data: [80, 80, 82, 83, 84, 85, 86, 87, 87, 87, 88, 88],
+                            borderColor: '#FF9500',
+                            backgroundColor: 'rgba(255, 149, 0, 0.1)',
+                            tension: 0.4,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#FF9500'
+                        },
+                        {
+                            label: 'ROM',
+                            data: [70, 70, 71, 72, 73, 74, 75, 75, 76, 77, 77, 78],
+                            borderColor: '#33BEF3',
+                            backgroundColor: 'rgba(51, 190, 243, 0.1)',
+                            tension: 0.4,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#33BEF3'
+                        },
+                        {
+                            label: 'Balance',
+                            data: [85, 85, 85, 86, 86, 87, 87, 88, 88, 89, 89, 90],
+                            borderColor: '#4CAF50',
+                            backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                            tension: 0.4,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#4CAF50'
+                        },
+                        {
+                            label: 'Mobility',
+                            data: [65, 65, 67, 68, 69, 70, 71, 72, 73, 74, 75, 75],
+                            borderColor: '#9C27B0',
+                            backgroundColor: 'rgba(156, 39, 176, 0.1)',
+                            tension: 0.4,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#9C27B0'
+                        },
+                        {
+                            label: 'Alignment',
+                            data: [72, 72, 73, 74, 75, 75, 76, 77, 77, 78, 79, 80],
+                            borderColor: '#FF6B6B',
+                            backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                            tension: 0.4,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#FF6B6B'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 15,
+                                font: { size: 12, weight: 600 }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 60,
+                            max: 90,
+                            grid: { drawBorder: false }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Workout actions
+        function startWorkout() {
+            alert('🏃 Workout timer started! Let\'s go!');
+        }
+
+        function viewWorkoutDetails() {
+            alert('Opening detailed workout view...');
+        }
+
+        function playVideo(type) {
+            alert('📹 Opening ' + type + ' video...');
+        }
+
+        function syncDevice() {
+            alert('🔄 Syncing Garmin device...');
+        }
+
+        function connectService(service) {
+            alert('🔗 Connecting to ' + service + '...');
+        }
+
+        // Initialize on load
+        window.addEventListener('load', initPillarChart);
+    </script>
+</body>
+</html>
