@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Training Protocol - AKURA SafeStride</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js"></script>
+    
+    <!-- CSS Framework -->
+    <link rel="stylesheet" href="css/cards.css">
+    <link rel="stylesheet" href="css/forms.css">
+    <link rel="stylesheet" href="css/tables.css">
+    <link rel="stylesheet" href="css/charts.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    
+    <style>
+        :root {
+            --primary: #1e3a5f;
+            --secondary: #33BEF3;
+            --success: #4CAF50;
+            --warning: #FF9500;
+            --danger: #FF6B6B;
+            --info: #9C27B0;
+        }
+
+        body {
+            background: #f8f9fa;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .header-nav {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .header-nav a {
+            color: white;
+            text-decoration: none;
+            margin-right: 15px;
+            font-weight: 600;
+            transition: opacity 0.3s;
+        }
+
+        .header-nav a:hover {
+            opacity: 0.7;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .protocol-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* HEADER CARD */
+        .protocol-header {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .header-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .header-stat {
+            border-left: 4px solid var(--secondary);
+            padding-left: 15px;
+        }
+
+        .header-stat-label {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .header-stat-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .header-stat-subtext {
+            font-size: 13px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .aifri-badge {
+            display: inline-block;
+            background: var(--secondary);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+
+        .protocol-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .protocol-info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .protocol-info-left {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .progress-bar-container {
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .progress-bar-label {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .progress-bar-custom {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary), var(--primary));
+            width: 25%;
+            transition: width 0.3s ease;
+        }
+
+        .timeline-dates {
+            font-size: 13px;
+            color: #999;
+        }
+
+        /* TABS */
+        .tabs-container {
+            display: flex;
+            background: white;
+            border-radius: 12px 12px 0 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            margin-bottom: 0;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 20px;
+            border: none;
+            background: white;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .tab-button:hover {
+            background: #f8f9fa;
+        }
+
+        .tab-button.active {
+            color: var(--primary);
+            border-bottom-color: var(--secondary);
+            background: #f8f9fa;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 40px;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* TAB 1: OVERVIEW */
+        .overview-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .goal-card {
+            background: linear-gradient(135deg, rgba(51, 190, 243, 0.05), rgba(30, 58, 95, 0.05));
+            padding: 30px;
+            border-radius: 12px;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .goal-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .goal-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .goal-item:last-child {
+            border-bottom: none;
+        }
+
+        .goal-label {
+            font-size: 14px;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .goal-value {
+            font-size: 14px;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .pillar-targets {
+            background: linear-gradient(135deg, rgba(51, 190, 243, 0.05), rgba(30, 58, 95, 0.05));
+            padding: 30px;
+            border-radius: 12px;
+            border-left: 4px solid var(--warning);
+        }
+
+        .pillar-targets h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .pillar-row {
+            margin-bottom: 20px;
+        }
+
+        .pillar-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .pillar-bar {
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .pillar-bar-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+
+        .color-running { background: var(--primary); }
+        .color-strength { background: var(--warning); }
+        .color-rom { background: var(--secondary); }
+        .color-balance { background: var(--success); }
+        .color-mobility { background: var(--info); }
+        .color-alignment { background: var(--danger); }
+
+        .milestones {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .milestones h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 25px;
+        }
+
+        .milestone-item {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .milestone-week {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .milestone-content {
+            flex: 1;
+        }
+
+        .milestone-title {
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .milestone-desc {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .milestone-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .milestone-status.completed {
+            color: var(--success);
+        }
+
+        .milestone-status.upcoming {
+            color: var(--warning);
+        }
+
+        /* TAB 2: WEEKLY BREAKDOWN */
+        .accordion-item-custom {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .accordion-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 20px;
+            background: white;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+            transition: background 0.3s;
+        }
+
+        .accordion-toggle:hover {
+            background: #f8f9fa;
+        }
+
+        .accordion-toggle.active {
+            background: linear-gradient(135deg, rgba(51, 190, 243, 0.1), rgba(30, 58, 95, 0.1));
+        }
+
+        .accordion-toggle-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s;
+        }
+
+        .accordion-toggle.active .accordion-toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            display: none;
+            padding: 0 20px 20px;
+            background: #fafafa;
+        }
+
+        .accordion-content.active {
+            display: block;
+        }
+
+        .week-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .week-stat {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid var(--secondary);
+        }
+
+        .week-stat-label {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+        }
+
+        .week-stat-value {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .workouts-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .workout-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid var(--secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .workout-name {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .workout-detail {
+            font-size: 13px;
+            color: #666;
+        }
+
+        /* TAB 3: DAILY WORKOUTS */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-weight: 700;
+            color: var(--primary);
+            padding: 10px;
+            font-size: 12px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .calendar-day:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .calendar-day-empty {
+            background: #f8f9fa;
+            border: none;
+            cursor: default;
+        }
+
+        .calendar-day-empty:hover {
+            box-shadow: none;
+            transform: none;
+        }
+
+        .calendar-day.easy {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: #4CAF50;
+        }
+
+        .calendar-day.threshold {
+            background: rgba(255, 149, 0, 0.15);
+            border-color: #FF9500;
+        }
+
+        .calendar-day.long {
+            background: rgba(30, 58, 95, 0.15);
+            border-color: var(--primary);
+        }
+
+        .calendar-day.strength {
+            background: rgba(156, 39, 176, 0.15);
+            border-color: #9C27B0;
+        }
+
+        .calendar-day.rest {
+            background: white;
+            color: #999;
+        }
+
+        .calendar-day-number {
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .calendar-day-type {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* MODAL */
+        .modal-custom {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-custom.active {
+            display: flex;
+        }
+
+        .modal-content-custom {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #999;
+            cursor: pointer;
+        }
+
+        .modal-close:hover {
+            color: var(--primary);
+        }
+
+        .workout-detail-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .workout-detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .workout-detail-label {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .workout-detail-value {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .header-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .overview-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs-container {
+                flex-wrap: wrap;
+                border-radius: 12px;
+            }
+
+            .tab-button {
+                min-width: 80px;
+                padding: 15px 10px;
+                font-size: 13px;
+            }
+
+            .tab-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVIGATION HEADER -->
+    <div class="header-nav">
+        <div class="protocol-container">
+            <button class="back-button" onclick="history.back()">← Back</button>
+        </div>
+    </div>
+
+    <div class="protocol-container">
+        <!-- HEADER CARD -->
+        <div class="protocol-header">
+            <div class="header-grid">
+                <div class="header-stat">
+                    <div class="header-stat-label">Athlete</div>
+                    <div class="header-stat-value">Dinesh A</div>
+                    <div class="header-stat-subtext">ID: ATH-2024-001</div>
+                </div>
+                <div class="header-stat">
+                    <div class="header-stat-label">AIFRI Score</div>
+                    <div class="header-stat-value">76<span class="aifri-badge">ADVANCED</span></div>
+                    <div class="header-stat-subtext">6-Pillar Assessment</div>
+                </div>
+                <div class="header-stat">
+                    <div class="header-stat-label">Body Type</div>
+                    <div class="header-stat-value">Mesomorph</div>
+                    <div class="header-stat-subtext">Balanced physique</div>
+                </div>
+                <div class="header-stat">
+                    <div class="header-stat-label">Goal</div>
+                    <div class="header-stat-value">Sub-4:00</div>
+                    <div class="header-stat-subtext">Marathon 2026</div>
+                </div>
+            </div>
+
+            <div class="protocol-title">
+                90-Day Marathon Endurance Builder
+            </div>
+
+            <div class="protocol-info-row">
+                <div class="protocol-info-left">
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-label">
+                            <span>Week 3 / 12</span>
+                            <span style="color: var(--secondary);">25%</span>
+                        </div>
+                        <div class="progress-bar-custom">
+                            <div class="progress-bar-fill"></div>
+                        </div>
+                    </div>
+                    <div class="timeline-dates">
+                        Jan 27, 2026 → Apr 27, 2026<br>
+                        <strong>63 days remaining</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABS -->
+        <div class="tabs-container">
+            <button class="tab-button active" onclick="switchTab(event, 'overview')">Overview</button>
+            <button class="tab-button" onclick="switchTab(event, 'weekly')">Weekly Breakdown</button>
+            <button class="tab-button" onclick="switchTab(event, 'daily')">Daily Workouts</button>
+            <button class="tab-button" onclick="switchTab(event, 'progress')">Progress Tracking</button>
+            <button class="tab-button" onclick="switchTab(event, 'alerts')">Injury Alerts</button>
+        </div>
+
+        <!-- TAB 1: OVERVIEW -->
+        <div id="overview" class="tab-content active">
+            <div class="overview-grid">
+                <!-- GOAL SUMMARY -->
+                <div class="goal-card">
+                    <h3>Goal Summary</h3>
+                    <div class="goal-item">
+                        <span class="goal-label">Target Finish</span>
+                        <span class="goal-value">3:55:00</span>
+                    </div>
+                    <div class="goal-item">
+                        <span class="goal-label">Body Type</span>
+                        <span class="goal-value">Mesomorph</span>
+                    </div>
+                    <div class="goal-item">
+                        <span class="goal-label">Weekly Volume</span>
+                        <span class="goal-value">30-50km</span>
+                    </div>
+                    <div class="goal-item">
+                        <span class="goal-label">Key Focus</span>
+                        <span class="goal-value">Running 40%</span>
+                    </div>
+                    <div class="goal-item">
+                        <span class="goal-label">Secondary</span>
+                        <span class="goal-value">Injury Prevention</span>
+                    </div>
+                </div>
+
+                <!-- PILLAR TARGETS -->
+                <div class="pillar-targets">
+                    <h3>Pillar Progression Targets</h3>
+                    
+                    <div class="pillar-row">
+                        <div class="pillar-header">
+                            <span>🏃 Running</span>
+                            <span>75 → 85</span>
+                        </div>
+                        <div class="pillar-bar">
+                            <div class="pillar-bar-fill color-running" style="width: 30%"></div>
+                        </div>
+                    </div>
+
+                    <div class="pillar-row">
+                        <div class="pillar-header">
+                            <span>💪 Strength</span>
+                            <span>80 → 88</span>
+                        </div>
+                        <div class="pillar-bar">
+                            <div class="pillar-bar-fill color-strength" style="width: 40%"></div>
+                        </div>
+                    </div>
+
+                    <div class="pillar-row">
+                        <div class="pillar-header">
+                            <span>🔄 ROM</span>
+                            <span>70 → 78</span>
+                        </div>
+                        <div class="pillar-bar">
+                            <div class="pillar-bar-fill color-rom" style="width: 25%"></div>
+                        </div>
+                    </div>
+
+                    <div class="pillar-row">
+                        <div class="pillar-header">
+                            <span>⚖️ Balance</span>
+                            <span>85 → 90</span>
+                        </div>
+                        <div class="pillar-bar">
+                            <div class="pillar-bar-fill color-balance" style="width: 45%"></div>
+                        </div>
+                    </div>
+
+                    <div class="pillar-row">
+                        <div class="pillar-header">
+                            <span>🧘 Mobility</span>
+                            <span>65 → 75</span>
+                        </div>
+                        <div class="pillar-bar">
+                            <div class="pillar-bar-fill color-mobility" style="width: 20%"></div>
+                        </div>
+                    </div>
+
+                    <div class="pillar-row">
+                        <div class="pillar-header">
+                            <span>🦴 Alignment</span>
+                            <span>72 → 80</span>
+                        </div>
+                        <div class="pillar-bar">
+                            <div class="pillar-bar-fill color-alignment" style="width: 35%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MILESTONES TIMELINE -->
+            <div class="milestones">
+                <h3>Protocol Milestones</h3>
+                
+                <div class="milestone-item">
+                    <div class="milestone-week">W4</div>
+                    <div class="milestone-content">
+                        <div class="milestone-title">First Assessment Checkpoint</div>
+                        <div class="milestone-desc">Evaluate progress on pillar targets and adjust protocols if needed</div>
+                    </div>
+                    <div class="milestone-status completed">✓ Completed</div>
+                </div>
+
+                <div class="milestone-item">
+                    <div class="milestone-week">W8</div>
+                    <div class="milestone-content">
+                        <div class="milestone-title">Mid-Protocol Evaluation</div>
+                        <div class="milestone-desc">Full AIFRI reassessment and protocol adaptation</div>
+                    </div>
+                    <div class="milestone-status upcoming">⏳ Upcoming (Feb 24)</div>
+                </div>
+
+                <div class="milestone-item">
+                    <div class="milestone-week">W12</div>
+                    <div class="milestone-content">
+                        <div class="milestone-title">Final Assessment & Protocol Renewal</div>
+                        <div class="milestone-desc">Graduation into next 90-day phase or racing preparation</div>
+                    </div>
+                    <div class="milestone-status upcoming">📅 Scheduled (Apr 27)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: WEEKLY BREAKDOWN -->
+        <div id="weekly" class="tab-content">
+            <!-- WEEK 1 -->
+            <div class="accordion-item-custom">
+                <button class="accordion-toggle" onclick="toggleAccordion(event)">
+                    <span>Week 1 - Base Building <span style="color: #999; font-weight: 400;">32km</span></span>
+                    <span class="accordion-toggle-icon">▼</span>
+                </button>
+                <div class="accordion-content">
+                    <div class="week-stats">
+                        <div class="week-stat">
+                            <div class="week-stat-label">Total Volume</div>
+                            <div class="week-stat-value">32km</div>
+                        </div>
+                        <div class="week-stat">
+                            <div class="week-stat-label">Focus</div>
+                            <div class="week-stat-value">Base</div>
+                        </div>
+                        <div class="week-stat">
+                            <div class="week-stat-label">Intensity</div>
+                            <div class="week-stat-value">Moderate</div>
+                        </div>
+                        <div class="week-stat">
+                            <div class="week-stat-label">Status</div>
+                            <div class="week-stat-value" style="color: #4CAF50;">✓ Done</div>
+                        </div>
+                    </div>
+                    <div class="workouts-list">
+                        <div class="workout-item">
+                            <div>
+                                <div class="workout-name">Monday - Strength</div>
+                                <div class="workout-detail">Core + Lower Body (45 min)</div>
+                            </div>
+                            <div>✓</div>
+                        </div>
+                        <div class="workout-item">
+                            <div>
+                                <div class="workout-name">Tuesday - Easy Run</div>
+                                <div class="workout-detail">5km @ Z2 (Easy)</div>
+                            </div>
+                            <div>✓</div>
+                        </div>
+                        <div class="workout-item">
+                            <div>
+                                <div class="workout-name">Wednesday - Threshold</div>
+                                <div class="workout-detail">8km (3km @ Z4 Threshold)</div>
+                            </div>
+                            <div>✓</div>
+                        </div>
+                        <div class="workout-item">
+                            <div>
+                                <div class="workout-name">Thursday - Rest/Mobility</div>
+                                <div class="workout-detail">20 min stretching & foam roll</div>
+                            </div>
+                            <div>✓</div>
+                        </div>
+                        <div class="workout-item">
+                            <div>
+                                <div class="workout-name">Friday - Easy Run</div>
+                                <div class="workout-detail">5km @ Z2 (Easy)</div>
+                            </div>
+                            <div>✓</div>
+                        </div>
+                        <div class="workout-item">
+                            <div>
+                                <div class="workout-name">Saturday - Long Run</div>
+                                <div class="workout-detail">12km @ Z2 (Aerobic Base)</div>
+                            </div>
+                            <div>✓</div>
+                        </div>
+                        <div class="workout-item">
+                            <div>
+                                <div class="workout-name">Sunday - Rest</div>
+                                <div class="workout-detail">Complete rest day</div>
+                            </div>
+                            <div>✓</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WEEK 2 -->
+            <div class="accordion-item-custom">
+                <button class="accordion-toggle" onclick="toggleAccordion(event)">
+                    <span>Week 2 - Endurance Foundation <span style="color: #999; font-weight: 400;">35km</span></span>
+                    <span class="accordion-toggle-icon">▼</span>
+                </button>
+                <div class="accordion-content">
+                    <div class="week-stats">
+                        <div class="week-stat">
+                            <div class="week-stat-label">Total Volume</div>
+                            <div class="week-stat-value">35km</div>
+                        </div>
+                        <div class="week-stat">
+                            <div class="week-stat-label">Focus</div>
+                            <div class="week-stat-value">Endurance</div>
+                        </div>
+                        <div class="week-stat">
+                            <div class="week-stat-label">Intensity</div>
+                            <div class="week-stat-value">Moderate</div>
+                        </div>
+                        <div class="week-stat">
+                            <div class="week-stat-label">Status</div>
+                            <div class="week-stat-value" style="color: #4CAF50;">✓ Done</div>
+                        </div>
+                    </div>
+                    <p style="color: #666; font-size: 14px; margin-top: 15px;">Similar structure to Week 1 with increased volume on long run (14km) and threshold work (10km @ Z4).</p>
+                </div>
+            </div>
+
+            <!-- WEEK 3 (CURRENT) -->
+            <div class="accordion-item-custom">
+                <button class="accordion-toggle active" onclick="toggleAccordion(event)">
+                    <span style="color: var(--secondary); font-weight: 800;">Week 3 - Aerobic Development <span style="color: #999; font-weight: 400;">38km</span></span>
+                    <span class="accordion-toggle-icon">▼</span>
+                </button>
+                <div class="accordion-content active">
+                    <div class="week-stats">
+                        <div class="week-stat">
+                            <div class="week-stat-label">Total Volume</div>
+                            <div class="week-stat-value">38km</div>
+                        </div>
+                        <div class="week-stat">
+                            <div class="week-stat-label">Focus</div>
+                            <div class="week-stat-value">Aerobic</div>
+                        </div>
+                        <div class="week-stat">
+                            <div class="week-stat-label">Completed</div>
+                            <div class="week-stat-value">18.2km</div>
+                        </div>
+                        <div class="week-stat">
+                            <div class="week-stat-label">Remaining</div>
+                            <div class="week-stat-value" style="color: var(--warning);">19.8km</div>
+                        </div>
+                    </div>
+                    <div class="workouts-list">
+                        <div class="workout-item" style="background: #f0f0f0; opacity: 0.6;">
+                            <div>
+                                <div class="workout-name">Monday - Strength (Completed)</div>
+                                <div class="workout-detail">Core + Single-leg focus (50 min)</div>
+                            </div>
+                            <div style="color: #4CAF50;">✓</div>
+                        </div>
+                        <div class="workout-item">
+                            <div>
+                                <div class="workout-name">Wednesday - Threshold (Upcoming)</div>
+                                <div class="workout-detail">10km (4km @ Z4 Threshold)</div>
+                            </div>
+                            <div style="color: var(--warning);">→</div>
+                        </div>
+                        <div class="workout-item">
+                            <div>
+                                <div class="workout-name">Saturday - Long Run (Upcoming)</div>
+                                <div class="workout-detail">16km @ Z2 (Extended Aerobic)</div>
+                            </div>
+                            <div style="color: var(--warning);">→</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WEEKS 4-12 COLLAPSED -->
+            <div class="accordion-item-custom">
+                <button class="accordion-toggle" onclick="toggleAccordion(event)">
+                    <span>Weeks 4-12 (Future) <span style="color: #999; font-weight: 400;">Collapsed View</span></span>
+                    <span class="accordion-toggle-icon">▼</span>
+                </button>
+                <div class="accordion-content">
+                    <div style="display: grid; gap: 12px;">
+                        <div style="background: #f8f9fa; padding: 12px; border-radius: 6px;">
+                            <strong>Week 4:</strong> Threshold Focus (40km) - Increase threshold duration
+                        </div>
+                        <div style="background: #f8f9fa; padding: 12px; border-radius: 6px;">
+                            <strong>Week 5:</strong> Speed Development (39km) - Introduce VO2max intervals
+                        </div>
+                        <div style="background: #f8f9fa; padding: 12px; border-radius: 6px;">
+                            <strong>Week 6:</strong> Recovery Week (32km) - Deload for adaptation
+                        </div>
+                        <div style="background: #f8f9fa; padding: 12px; border-radius: 6px;">
+                            <strong>Week 7:</strong> Long Run Emphasis (45km) - Build marathon-specific endurance
+                        </div>
+                        <div style="background: #f8f9fa; padding: 12px; border-radius: 6px;">
+                            <strong>Weeks 8-12:</strong> Tapering & Race Prep - Protocol will be adjusted based on Week 8 assessment
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: DAILY WORKOUTS -->
+        <div id="daily" class="tab-content">
+            <h3 style="margin-bottom: 20px; color: var(--primary); font-weight: 800;">February 2026 - Week 3</h3>
+            <div class="calendar-grid">
+                <div class="calendar-day-header">Mon</div>
+                <div class="calendar-day-header">Tue</div>
+                <div class="calendar-day-header">Wed</div>
+                <div class="calendar-day-header">Thu</div>
+                <div class="calendar-day-header">Fri</div>
+                <div class="calendar-day-header">Sat</div>
+                <div class="calendar-day-header">Sun</div>
+
+                <!-- Weeks of January/February -->
+                <div class="calendar-day easy" onclick="openWorkoutModal('Monday Easy', '5km @ Z2 Easy pace')">
+                    <div class="calendar-day-number">27</div>
+                    <div class="calendar-day-type">Easy</div>
+                </div>
+                <div class="calendar-day threshold" onclick="openWorkoutModal('Tuesday Threshold', '8km with 4km @ Z4')">
+                    <div class="calendar-day-number">28</div>
+                    <div class="calendar-day-type">Threshold</div>
+                </div>
+                <div class="calendar-day long" onclick="openWorkoutModal('Wednesday Long', '12km @ Z2 Aerobic Base')">
+                    <div class="calendar-day-number">29</div>
+                    <div class="calendar-day-type">Long Run</div>
+                </div>
+                <div class="calendar-day rest">
+                    <div class="calendar-day-number">30</div>
+                    <div class="calendar-day-type">Rest</div>
+                </div>
+                <div class="calendar-day easy" onclick="openWorkoutModal('Thursday Easy', '5km @ Z2 Easy pace')">
+                    <div class="calendar-day-number">31</div>
+                    <div class="calendar-day-type">Easy</div>
+                </div>
+                <div class="calendar-day strength" onclick="openWorkoutModal('Friday Strength', 'Core + Lower Body (45 min)')">
+                    <div class="calendar-day-number">1</div>
+                    <div class="calendar-day-type">Strength</div>
+                </div>
+                <div class="calendar-day rest">
+                    <div class="calendar-day-number">2</div>
+                    <div class="calendar-day-type">Rest</div>
+                </div>
+
+                <!-- Continue week -->
+                <div class="calendar-day easy" onclick="openWorkoutModal('Monday Easy', '5km @ Z2 Easy pace')">
+                    <div class="calendar-day-number">3</div>
+                    <div class="calendar-day-type">Easy</div>
+                </div>
+                <div class="calendar-day threshold" onclick="openWorkoutModal('Tuesday Threshold', '10km with 4km @ Z4')">
+                    <div class="calendar-day-number">4</div>
+                    <div class="calendar-day-type">Threshold</div>
+                </div>
+                <div class="calendar-day long" onclick="openWorkoutModal('Wednesday Long', '14km @ Z2 Extended')">
+                    <div class="calendar-day-number">5</div>
+                    <div class="calendar-day-type">Long Run</div>
+                </div>
+                <div class="calendar-day rest">
+                    <div class="calendar-day-number">6</div>
+                    <div class="calendar-day-type">Rest</div>
+                </div>
+                <div class="calendar-day easy" onclick="openWorkoutModal('Thursday Easy', '5km @ Z2 Easy pace')">
+                    <div class="calendar-day-number">7</div>
+                    <div class="calendar-day-type">Easy</div>
+                </div>
+                <div class="calendar-day strength" onclick="openWorkoutModal('Friday Strength', 'Core + Hip Focus (45 min)')">
+                    <div class="calendar-day-number">8</div>
+                    <div class="calendar-day-type">Strength</div>
+                </div>
+                <div class="calendar-day rest">
+                    <div class="calendar-day-number">9</div>
+                    <div class="calendar-day-type">Rest</div>
+                </div>
+
+                <!-- Continue -->
+                <div class="calendar-day easy" onclick="openWorkoutModal('Monday Easy', '5km @ Z2 Easy pace')">
+                    <div class="calendar-day-number">10</div>
+                    <div class="calendar-day-type">Easy</div>
+                </div>
+                <div class="calendar-day threshold" onclick="openWorkoutModal('Tuesday Tempo', '10km with 5km @ Z4')">
+                    <div class="calendar-day-number">11</div>
+                    <div class="calendar-day-type">Threshold</div>
+                </div>
+                <div class="calendar-day long" onclick="openWorkoutModal('Wednesday Long', '16km @ Z2 Marathon Pace')">
+                    <div class="calendar-day-number">12</div>
+                    <div class="calendar-day-type">Long Run</div>
+                </div>
+                <div class="calendar-day rest">
+                    <div class="calendar-day-number">13</div>
+                    <div class="calendar-day-type">Rest</div>
+                </div>
+                <div class="calendar-day easy" onclick="openWorkoutModal('Thursday Easy', '5km @ Z2 Easy pace')">
+                    <div class="calendar-day-number">14</div>
+                    <div class="calendar-day-type">Easy</div>
+                </div>
+                <div class="calendar-day strength" onclick="openWorkoutModal('Friday Strength', 'Single-leg Focus (50 min)')">
+                    <div class="calendar-day-number">15</div>
+                    <div class="calendar-day-type">Strength</div>
+                </div>
+                <div class="calendar-day rest">
+                    <div class="calendar-day-number">16</div>
+                    <div class="calendar-day-type">Rest</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: PROGRESS TRACKING -->
+        <div id="progress" class="tab-content">
+            <h3 style="margin-bottom: 20px; color: var(--primary); font-weight: 800;">Pillar Progress vs Targets</h3>
+            <div style="position: relative; width: 100%; height: 400px; margin-bottom: 40px;">
+                <canvas id="progressChart"></canvas>
+            </div>
+            <p style="color: #666; font-size: 14px; text-align: center;">
+                Your current AIFRI 76 (ADVANCED) is trending toward protocol targets. Week 8 mid-assessment will validate progression.
+            </p>
+        </div>
+
+        <!-- TAB 5: INJURY ALERTS -->
+        <div id="alerts" class="tab-content">
+            <div style="background: #f0f8ff; border-left: 4px solid var(--secondary); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                <strong style="color: var(--primary);">✓ Low Risk Status</strong>
+                <p style="color: #666; margin-top: 8px; font-size: 14px;">No injury alerts detected. Your alignment, mobility, and balance scores indicate low injury risk for marathon training at current volume.</p>
+            </div>
+
+            <h3 style="color: var(--primary); font-weight: 800; margin-bottom: 15px;">Key Monitoring Areas</h3>
+            <div style="display: grid; gap: 15px;">
+                <div style="background: white; border: 1px solid #e0e0e0; padding: 15px; border-radius: 8px; border-left: 4px solid var(--warning);">
+                    <strong>Volume Increases</strong><br>
+                    <span style="font-size: 13px; color: #666;">Week-to-week volume capped at 10% increase to minimize overtraining risk</span>
+                </div>
+                <div style="background: white; border: 1px solid #e0e0e0; padding: 15px; border-radius: 8px; border-left: 4px solid var(--success);">
+                    <strong>Mobility Maintenance</strong><br>
+                    <span style="font-size: 13px; color: #666;">Daily 10-minute mobility routine prevents tightness in hip flexors and calves</span>
+                </div>
+                <div style="background: white; border: 1px solid #e0e0e0; padding: 15px; border-radius: 8px; border-left: 4px solid var(--info);">
+                    <strong>Strength Consistency</strong><br>
+                    <span style="font-size: 13px; color: #666;">2x weekly strength sessions maintain single-leg stability and core power</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WORKOUT DETAIL MODAL -->
+    <div id="workoutModal" class="modal-custom" onclick="closeWorkoutModal(event)">
+        <div class="modal-content-custom" onclick="event.stopPropagation()">
+            <span class="modal-close" onclick="closeWorkoutModal()">&times;</span>
+            <div class="workout-detail-title" id="modalWorkoutTitle">Workout Title</div>
+
+            <div class="workout-detail-item">
+                <span class="workout-detail-label">Type</span>
+                <span class="workout-detail-value" id="modalWorkoutType">Type</span>
+            </div>
+
+            <div class="workout-detail-item">
+                <span class="workout-detail-label">Duration</span>
+                <span class="workout-detail-value" id="modalWorkoutDuration">Duration</span>
+            </div>
+
+            <div class="workout-detail-item">
+                <span class="workout-detail-label">Intensity Zone</span>
+                <span class="workout-detail-value" id="modalWorkoutZone">Zone</span>
+            </div>
+
+            <div class="workout-detail-item">
+                <span class="workout-detail-label">Description</span>
+                <span class="workout-detail-value" id="modalWorkoutDesc">Description</span>
+            </div>
+
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                <button onclick="completeWorkout()" style="
+                    background: var(--success);
+                    color: white;
+                    border: none;
+                    padding: 12px 30px;
+                    border-radius: 6px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    width: 100%;
+                ">Mark as Complete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Tab switching
+        function switchTab(event, tabName) {
+            event.preventDefault();
+            
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Remove active state from all buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.currentTarget.classList.add('active');
+
+            // Initialize chart if progress tab
+            if (tabName === 'progress') {
+                setTimeout(initProgressChart, 100);
+            }
+        }
+
+        // Accordion toggle
+        function toggleAccordion(event) {
+            const toggle = event.currentTarget;
+            const content = toggle.nextElementSibling;
+
+            toggle.classList.toggle('active');
+            content.classList.toggle('active');
+        }
+
+        // Workout modal
+        function openWorkoutModal(title, description) {
+            const modal = document.getElementById('workoutModal');
+            document.getElementById('modalWorkoutTitle').textContent = title;
+            document.getElementById('modalWorkoutDesc').textContent = description;
+
+            // Parse type
+            let type = 'Running';
+            let zone = 'Z2';
+            if (title.includes('Strength')) type = 'Strength';
+            if (title.includes('Threshold')) zone = 'Z4';
+            if (title.includes('Long')) zone = 'Z2';
+            if (title.includes('Easy')) zone = 'Z2';
+
+            document.getElementById('modalWorkoutType').textContent = type;
+            document.getElementById('modalWorkoutZone').textContent = zone;
+            document.getElementById('modalWorkoutDuration').textContent = description.includes('min') ? 
+                description.split('(')[1].split(')')[0] : 'See description';
+
+            modal.classList.add('active');
+        }
+
+        function closeWorkoutModal(event) {
+            if (event && event.target.id !== 'workoutModal') return;
+            document.getElementById('workoutModal').classList.remove('active');
+        }
+
+        function completeWorkout() {
+            alert('Workout marked as complete! 🎉');
+            closeWorkoutModal();
+        }
+
+        // Progress chart
+        function initProgressChart() {
+            const ctx = document.getElementById('progressChart');
+            if (window.progressChart) {
+                window.progressChart.destroy();
+            }
+
+            window.progressChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Start', 'Week 3', 'Week 6', 'Week 9', 'Week 12'],
+                    datasets: [
+                        {
+                            label: 'Running',
+                            data: [75, 76, 78, 82, 85],
+                            borderColor: '#1e3a5f',
+                            backgroundColor: 'rgba(30, 58, 95, 0.1)',
+                            tension: 0.4,
+                            pointRadius: 6,
+                            pointHoverRadius: 8,
+                            pointBackgroundColor: '#1e3a5f'
+                        },
+                        {
+                            label: 'Strength',
+                            data: [80, 80, 82, 85, 88],
+                            borderColor: '#FF9500',
+                            backgroundColor: 'rgba(255, 149, 0, 0.1)',
+                            tension: 0.4,
+                            pointRadius: 6,
+                            pointBackgroundColor: '#FF9500'
+                        },
+                        {
+                            label: 'ROM',
+                            data: [70, 71, 73, 76, 78],
+                            borderColor: '#33BEF3',
+                            backgroundColor: 'rgba(51, 190, 243, 0.1)',
+                            tension: 0.4,
+                            pointRadius: 6,
+                            pointBackgroundColor: '#33BEF3'
+                        },
+                        {
+                            label: 'Balance',
+                            data: [85, 85, 87, 89, 90],
+                            borderColor: '#4CAF50',
+                            backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                            tension: 0.4,
+                            pointRadius: 6,
+                            pointBackgroundColor: '#4CAF50'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 15,
+                                font: { size: 12, weight: 600 }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 60,
+                            max: 100,
+                            grid: {
+                                drawBorder: false
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
