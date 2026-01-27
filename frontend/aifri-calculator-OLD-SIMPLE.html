@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIFRI Calculator - SafeStride by AKURA</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <style>
+        .calculator-infographics {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        .calculator-infographics h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .zone-chart,
+        .scoring-wheel,
+        .flowchart {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .zone-chart:hover,
+        .scoring-wheel:hover,
+        .flowchart:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Modern Calculator Styling - KEEP EXISTING STRUCTURE */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            line-height: 1.6;
+        }
+
+        .calculator-container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 24px;
+            padding: 50px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        }
+
+        h1, h2, h3 {
+            color: #1e3a8a;
+            font-weight: 700;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            margin-top: 40px;
+        }
+
+        input[type="number"],
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 18px 24px;
+            font-size: 1.1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            background: white;
+            font-family: inherit;
+            margin-top: 8px;
+            margin-bottom: 20px;
+        }
+
+        input[type="number"]:focus,
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        label {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #374151;
+            margin-top: 20px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 18px 50px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+            transition: all 0.3s ease;
+            margin-top: 30px;
+            margin-right: 15px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(16, 185, 129, 0.4);
+        }
+
+        button[type="button"] {
+            background: #f3f4f6;
+            color: #4b5563;
+            box-shadow: none;
+        }
+
+        button[type="button"]:hover {
+            background: #e5e7eb;
+        }
+
+        .info-box {
+            background: #f0f9ff;
+            border-left: 4px solid #3b82f6;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            color: #1e40af;
+        }
+
+        /* Infographics Section */
+        .infographics-section {
+            margin-top: 80px;
+            padding: 50px;
+            background: #f9fafb;
+            border-radius: 16px;
+        }
+
+        .infographics-section h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #1e3a8a;
+            margin-bottom: 50px;
+        }
+
+        .infographic-card {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 50px;
+        }
+
+        .infographic-card h3 {
+            font-size: 1.8rem;
+            color: #1e3a8a;
+            margin-bottom: 25px;
+        }
+
+        .infographic-card img {
+            width: 100%;
+            max-width: 1000px;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .infographic-card p {
+            margin-top: 20px;
+            color: #6b7280;
+            font-size: 1.05rem;
+            text-align: center;
+            line-height: 1.7;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <span class="brand-text">AKURA <span class="brand-subtitle">SafeStride</span></span>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="aifri-calculator.html" class="nav-link active">AIFRI Calculator</a>
+                <a href="coach-dashboard.html" class="nav-link">Coach Portal</a>
+                <a href="athlete-dashboard.html" class="nav-link">Athlete Portal</a>
+                <a href="case-study.html" class="nav-link">Case Study</a>
+            </div>
+            <div class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <section class="calculator-section">
+        <div class="container">
+            <div class="calculator-header">
+                <h1><i class="fas fa-calculator"></i> AIFRI Calculator</h1>
+                <p>Calculate your AKURA Injury-Free Running Index and personalized HR training zones</p>
+            </div>
+
+            <div class="calculator-container">
+                <!-- Step 1: Basic Info -->
+                <div class="calculator-step active" id="step1">
+                    <h2>Step 1: Basic Information</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="age">Age *</label>
+                            <input type="number" id="age" min="15" max="80" placeholder="Enter age" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="gender">Gender *</label>
+                            <select id="gender" required>
+                                <option value="">Select</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="weight">Weight (kg) *</label>
+                            <input type="number" id="weight" min="40" max="150" placeholder="Enter weight" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="height">Height (cm) *</label>
+                            <input type="number" id="height" min="140" max="220" placeholder="Enter height" required>
+                        </div>
+                    </div>
+                    <button class="btn-primary btn-large" onclick="nextStep(2)">Next: Heart Rate <i class="fas fa-arrow-right"></i></button>
+                </div>
+
+                <!-- Step 2: Heart Rate -->
+                <div class="calculator-step" id="step2">
+                    <h2>Step 2: Heart Rate Data</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="restingHR">Resting Heart Rate (bpm) *</label>
+                            <input type="number" id="restingHR" min="40" max="100" placeholder="Measure in morning" required>
+                            <small>Measure first thing in the morning before getting out of bed</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="maxHR">Max Heart Rate (bpm)</label>
+                            <input type="number" id="maxHR" min="150" max="220" placeholder="Leave blank to calculate">
+                            <small>We'll calculate using Tanaka formula: 208 - (0.7 × age)</small>
+                        </div>
+                    </div>
+                    <div class="step-buttons">
+                        <button class="btn-secondary" onclick="prevStep(1)"><i class="fas fa-arrow-left"></i> Back</button>
+                        <button class="btn-primary btn-large" onclick="nextStep(3)">Next: Running Data <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Running Performance -->
+                <div class="calculator-step" id="step3">
+                    <h2>Step 3: Running Performance</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="recent5k">Recent 5K Time (minutes) *</label>
+                            <input type="number" id="recent5k" min="15" max="60" step="0.5" placeholder="e.g., 25.5" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="weeklyKm">Weekly Running Volume (km) *</label>
+                            <input type="number" id="weeklyKm" min="0" max="200" placeholder="Current weekly mileage" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="squats">Max Unbroken Bodyweight Squats (reps)</label>
+                            <input type="number" id="squats" min="0" max="50" placeholder="e.g., 30" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="runningYears">Years of Running *</label>
+                            <input type="number" id="runningYears" min="0" max="50" placeholder="Training experience" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="injuryHistory">Injury History (past 12 months)</label>
+                            <select id="injuryHistory">
+                                <option value="0">No injuries</option>
+                                <option value="1">1 minor injury</option>
+                                <option value="2">2-3 injuries</option>
+                                <option value="3">4+ injuries or major injury</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="painLevel">Current Pain Level (0-10 scale)</label>
+                            <input type="number" id="painLevel" min="0" max="10" value="0" placeholder="0 = no pain">
+                            <small>0 = Pain-free, 10 = Severe pain preventing running</small>
+                        </div>
+                    </div>
+                    <div class="step-buttons">
+                        <button class="btn-secondary" onclick="prevStep(2)"><i class="fas fa-arrow-left"></i> Back</button>
+                        <button class="btn-primary btn-large" onclick="nextStep(4)">Next: Biomechanics <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- Step 4: Biomechanics Assessment -->
+                <div class="calculator-step" id="step4">
+                    <h2>Step 4: Biomechanics & Flexibility</h2>
+                    <div class="form-section">
+                        <div class="form-group">
+                            <label for="ankleFlexibility">Ankle Dorsiflexion (degrees)</label>
+                            <input type="number" id="ankleFlexibility" min="0" max="45" required>
+                            <small>Normal: 10-15°, Good: 15-20°, Excellent: 20°+</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="hipFlexibility">Hip Flexibility - Sit & Reach (cm)</label>
+                            <input type="number" id="hipFlexibility" min="-20" max="50" required>
+                            <small>Measure from toes: Negative = can't reach, Positive = past toes</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="singleLegBalance">Single-Leg Balance (seconds)</label>
+                            <input type="number" id="singleLegBalance" min="0" max="300" required>
+                            <small>Stand on one leg, eyes open. Average: 30s, Good: 60s, Excellent: 120s+</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="coreStrength">Plank Hold Time (seconds)</label>
+                            <input type="number" id="coreStrength" min="0" max="600" required>
+                            <small>Forearm plank, proper form. Average: 30s, Good: 60s, Excellent: 120s+</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="fmsScore">Functional Movement Screen (FMS) Score</label>
+                            <input type="number" id="fmsScore" min="0" max="21" required>
+                            <small>7 movement tests, 0-3 points each. Safe threshold: 14+</small>
+                        </div>
+                    </div>
+                    <div class="step-buttons">
+                        <button class="btn-secondary" onclick="prevStep(3)"><i class="fas fa-arrow-left"></i> Back</button>
+                        <button class="btn-primary btn-large" onclick="calculateAIFRI()">
+                            <i class="fas fa-chart-line"></i> Calculate AIFRI Score
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Results -->
+                <div class="calculator-step" id="results" style="display: none;">
+                    <h2><i class="fas fa-trophy"></i> Your AIFRI Results</h2>
+                    
+                    <!-- Overall Score -->
+                    <div class="result-card score-card">
+                        <div class="score-display">
+                            <div class="score-number" id="totalScore">0</div>
+                            <div class="score-label">AIFRI Score</div>
+                            <div class="score-category" id="scoreCategory">-</div>
+                        </div>
+                    </div>
+
+                    <!-- HR Zones -->
+                    <div class="result-card">
+                        <h3><i class="fas fa-heartbeat"></i> Your Heart Rate Training Zones</h3>
+                        <div class="hr-info">
+                            <p><strong>Max HR:</strong> <span id="displayMaxHR">-</span> bpm (Tanaka Formula)</p>
+                            <p><strong>Resting HR:</strong> <span id="displayRestingHR">-</span> bpm</p>
+                        </div>
+                        <div class="zones-result" id="hrZones"></div>
+                    </div>
+
+                    <!-- 5 Pillars Breakdown -->
+                    <div class="result-card">
+                        <h3><i class="fas fa-chart-bar"></i> 5 Pillars Breakdown</h3>
+                        <div class="pillars-breakdown" id="pillarsBreakdown"></div>
+                    </div>
+
+                    <!-- Training Recommendations -->
+                    <div class="result-card">
+                        <h3><i class="fas fa-clipboard-list"></i> Training Recommendations</h3>
+                        <div class="recommendations" id="recommendations"></div>
+                    </div>
+
+                    <!-- Infographics Reference -->
+                    <div class="result-card">
+                        <div class="calculator-infographics">
+                            <div>
+                                <h3><i class="fas fa-chart-bar"></i> Understanding Your HR Zones</h3>
+                                <img src="images/02-6-HR-Zones-Color-Bar.png" alt="6 AIFRI Training Zones" class="zone-chart">
+                                <p style="margin-top: 15px; color: #6b7280; font-size: 0.95rem; text-align: center;">
+                                    Your personalized zones are calculated using the Tanaka formula: Max HR = 208 - (0.7 × Age)
+                                </p>
+                            </div>
+                            <div>
+                                <h3><i class="fas fa-cog"></i> AIFRI Scoring System</h3>
+                                <img src="images/01-AIFRI-Scoring-Wheel.png" alt="AIFRI 5-Pillar Scoring" class="scoring-wheel">
+                                <p style="margin-top: 15px; color: #6b7280; font-size: 0.95rem; text-align: center;">
+                                    Your AIFRI score (0-100) combines Running Performance (40%), Strength (20%), ROM (15%), Balance (15%), and Mobility (10%)
+                                </p>
+                            </div>
+                            <div>
+                                <h3><i class="fas fa-stream"></i> How Workouts Are Prescribed</h3>
+                                <img src="images/03-Workout-Prescription-Flowchart.png" alt="Workout Prescription Flow" class="flowchart">
+                                <p style="margin-top: 15px; color: #6b7280; font-size: 0.95rem; text-align: center;">
+                                    SafeStride uses your AIFRI score to determine which training zones you can safely access
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="result-actions">
+                        <button class="btn-primary" onclick="saveResults()">
+                            <i class="fas fa-save"></i> Save Results
+                        </button>
+                        <button class="btn-secondary" onclick="printResults()">
+                            <i class="fas fa-print"></i> Print Report
+                        </button>
+                        <button class="btn-secondary" onclick="resetCalculator()">
+                            <i class="fas fa-redo"></i> Calculate Again
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2026 AKURA Performance Systems. All rights reserved.</p>
+                <p class="footer-tagline">Run AIFRI. Run Forever.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Infographics Section -->
+    <div class="infographics-section">
+        <h2>📊 Understanding Your Results</h2>
+        
+        <div class="infographic-card">
+            <h3>Your 6 HR Training Zones</h3>
+            <img src="images/02-6-HR-Zones-Color-Bar.png" alt="6 AIFRI Training Zones" loading="lazy">
+            <p>Your personalized zones are calculated using the Tanaka formula: Max HR = 208 - (0.7 × Age)</p>
+        </div>
+        
+        <div class="infographic-card">
+            <h3>AIFRI 5-Pillar Scoring System</h3>
+            <img src="images/01-AIFRI-Scoring-Wheel.png" alt="AIFRI 5-Pillar Scoring" loading="lazy">
+            <p>Your AIFRI score (0-100) combines Running Performance (40%), Strength (20%), ROM (15%), Balance (15%), and Mobility (10%)</p>
+        </div>
+        
+        <div class="infographic-card">
+            <h3>How Your Workouts Are Prescribed</h3>
+            <img src="images/03-Workout-Prescription-Flowchart.png" alt="Workout Prescription Flow" loading="lazy">
+            <p>SafeStride uses your AIFRI score to determine which training zones you can safely access</p>
+        </div>
+        
+        <div class="infographic-card">
+            <h3>Safety Gates Prevent Premature Intensity</h3>
+            <img src="images/04-Safety-Gates-Progressive-Gating.png" alt="Safety Gates System" loading="lazy">
+            <p>Progressive gating system unlocks higher intensity zones only when you meet readiness requirements</p>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/calculator.js"></script>
+</body>
+</html>

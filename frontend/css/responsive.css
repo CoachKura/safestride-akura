@@ -1,0 +1,673 @@
+/* =============================================================================
+   AKURA RESPONSIVE.CSS - Mobile-First Responsive Design Breakpoints
+   ============================================================================= */
+
+/* ============================================================================
+   SMALL DEVICES (Mobile)
+   ============================================================================ */
+@media (max-width: 575px) {
+  /* Typography */
+  h1 {
+    font-size: 28px;
+    line-height: 1.2;
+  }
+
+  h2 {
+    font-size: 24px;
+  }
+
+  h3 {
+    font-size: 20px;
+  }
+
+  h4 {
+    font-size: 16px;
+  }
+
+  body {
+    font-size: 14px;
+  }
+
+  /* Container */
+  .container {
+    padding: 0 16px;
+  }
+
+  /* Navigation */
+  nav {
+    flex-direction: column;
+    padding: 12px;
+  }
+
+  nav ul {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .nav-toggle {
+    display: block;
+  }
+
+  .nav-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: white;
+    border-bottom: 1px solid #e0e0e0;
+    flex-direction: column;
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .nav-menu.active {
+    display: flex;
+  }
+
+  /* Hero Section */
+  .hero {
+    min-height: 70vh;
+    padding: 40px 16px;
+  }
+
+  .hero-title {
+    font-size: 28px;
+  }
+
+  .hero-subtitle {
+    font-size: 16px;
+  }
+
+  .hero-content {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* Forms */
+  .form-container {
+    border-radius: 0;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .progress-steps {
+    flex-wrap: wrap;
+  }
+
+  .progress-step-label {
+    font-size: 10px;
+    max-width: 60px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .form-actions-left,
+  .form-actions-right {
+    flex-direction: column;
+    width: 100%;
+    gap: 12px;
+  }
+
+  .form-button {
+    width: 100%;
+  }
+
+  .input-field {
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 12px 14px;
+  }
+
+  /* Cards */
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card-athlete {
+    grid-template-columns: auto 1fr;
+  }
+
+  .card-athlete-actions {
+    grid-column: 2 / -1;
+    justify-content: flex-start;
+  }
+
+  .card-athlete-avatar {
+    width: 48px;
+    height: 48px;
+  }
+
+  .card-workout {
+    padding: 16px;
+  }
+
+  .card-feature {
+    padding: 16px;
+  }
+
+  .card-stat {
+    padding: 16px;
+  }
+
+  .card-stat-value {
+    font-size: 28px;
+  }
+
+  /* Buttons */
+  .btn-primary,
+  .btn-secondary,
+  .btn-success,
+  .btn-danger {
+    width: 100%;
+    padding: 14px 24px;
+    font-size: 14px;
+  }
+
+  .btn-lg {
+    width: 100%;
+    padding: 16px 20px;
+    font-size: 14px;
+  }
+
+  /* Tables */
+  .table-responsive thead {
+    display: none;
+  }
+
+  .table-responsive tbody,
+  .table-responsive tr,
+  .table-responsive td {
+    display: block;
+    width: 100%;
+  }
+
+  .table-responsive tr {
+    margin-bottom: 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: white;
+  }
+
+  .table-responsive td {
+    padding: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .table-responsive td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #1e3a5f;
+    min-width: 100px;
+  }
+
+  .table-responsive td:last-child {
+    border-bottom: none;
+  }
+
+  .table-controls {
+    flex-direction: column;
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .table-search {
+    max-width: 100%;
+  }
+
+  .table-filter {
+    width: 100%;
+  }
+
+  .table-filter-btn {
+    flex: 1;
+    padding: 8px 12px;
+    font-size: 12px;
+    min-width: 80px;
+  }
+
+  /* Grids */
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .grid-4 {
+    grid-template-columns: 1fr;
+  }
+
+  /* Sections */
+  section {
+    padding: 40px 16px;
+  }
+
+  .section-title {
+    font-size: 28px;
+    margin-bottom: 24px;
+  }
+
+  .section-description {
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+
+  /* Modals */
+  .modal-content {
+    width: calc(100% - 32px);
+    max-height: 80vh;
+  }
+
+  /* Utility Spacing */
+  .mt-5 { margin-top: 24px; }
+  .mb-5 { margin-bottom: 24px; }
+  .mt-4 { margin-top: 16px; }
+  .mb-4 { margin-bottom: 16px; }
+
+  /* Charts */
+  .chart-donut-canvas-wrapper {
+    width: 200px;
+    height: 200px;
+  }
+
+  .chart-container canvas {
+    max-height: 300px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Save indicator */
+  .save-indicator {
+    bottom: 10px;
+    right: 10px;
+    left: 10px;
+    max-width: calc(100% - 20px);
+  }
+}
+
+/* ============================================================================
+   MEDIUM DEVICES (Tablet)
+   ============================================================================ */
+@media (min-width: 576px) and (max-width: 767px) {
+  /* Typography */
+  h1 {
+    font-size: 36px;
+  }
+
+  h2 {
+    font-size: 28px;
+  }
+
+  h3 {
+    font-size: 22px;
+  }
+
+  /* Container */
+  .container {
+    padding: 0 24px;
+  }
+
+  /* Navigation */
+  nav {
+    padding: 16px 24px;
+  }
+
+  /* Hero Section */
+  .hero {
+    min-height: 60vh;
+    padding: 60px 24px;
+  }
+
+  .hero-title {
+    font-size: 36px;
+  }
+
+  /* Forms */
+  .form-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .form-section {
+    padding: 24px;
+  }
+
+  /* Cards */
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  /* Tables */
+  .table-sortable {
+    min-width: 100%;
+  }
+
+  .table-controls {
+    flex-wrap: wrap;
+  }
+
+  .table-filter-btn {
+    flex: 1;
+    min-width: 140px;
+  }
+
+  /* Sections */
+  section {
+    padding: 60px 24px;
+  }
+
+  /* Charts */
+  .charts-comparison {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ============================================================================
+   LARGE DEVICES (Desktop)
+   ============================================================================ */
+@media (min-width: 768px) {
+  /* Navigation */
+  .nav-toggle {
+    display: none;
+  }
+
+  .nav-menu {
+    display: flex;
+    position: static;
+    background-color: transparent;
+    border: none;
+    flex-direction: row;
+    gap: 24px;
+    padding: 0;
+  }
+
+  /* Hero Section */
+  .hero {
+    min-height: 100vh;
+    padding: 100px 40px;
+  }
+
+  .hero-title {
+    font-size: 48px;
+  }
+
+  .hero-subtitle {
+    font-size: 20px;
+  }
+
+  .hero-content {
+    flex-direction: row;
+    gap: 40px;
+  }
+
+  /* Forms */
+  .form-row {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+
+  .form-section {
+    padding: 40px 60px;
+  }
+
+  /* Cards */
+  .card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+  }
+
+  .card-athlete {
+    grid-template-columns: auto 1fr auto;
+  }
+
+  .card-athlete-actions {
+    grid-column: auto;
+  }
+
+  /* Tables */
+  .table-controls {
+    justify-content: space-between;
+    flex-wrap: nowrap;
+  }
+
+  .table-search {
+    max-width: 400px;
+  }
+
+  /* Sidebar Layout */
+  .sidebar-layout {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 24px;
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 80px;
+    height: fit-content;
+  }
+
+  /* Sections */
+  section {
+    padding: 80px 40px;
+  }
+
+  section.fullwidth {
+    padding: 100px 0;
+  }
+
+  .section-title {
+    font-size: 42px;
+    margin-bottom: 32px;
+  }
+
+  /* Charts */
+  .chart-container canvas {
+    max-height: 500px;
+  }
+
+  .charts-comparison {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  /* Multi-column Layouts */
+  .grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .grid-5 {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+/* ============================================================================
+   EXTRA LARGE DEVICES (Large Desktop/4K)
+   ============================================================================ */
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1400px;
+  }
+
+  /* Hero Section */
+  .hero {
+    min-height: 100vh;
+    padding: 120px 80px;
+  }
+
+  /* Sections */
+  section {
+    padding: 100px 80px;
+  }
+
+  section.fullwidth {
+    padding: 120px 0;
+  }
+
+  .section-title {
+    font-size: 48px;
+  }
+
+  /* Cards */
+  .card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 32px;
+  }
+
+  /* Charts */
+  .chart-donut-canvas-wrapper {
+    width: 400px;
+    height: 400px;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+/* ============================================================================
+   ORIENTATION-SPECIFIC (Landscape/Portrait)
+   ============================================================================ */
+@media (orientation: landscape) and (max-height: 600px) {
+  .hero {
+    min-height: 80vh;
+    padding: 30px 24px;
+  }
+
+  h1 {
+    font-size: 28px;
+  }
+
+  section {
+    padding: 30px 24px;
+  }
+}
+
+/* ============================================================================
+   PRINT STYLES
+   ============================================================================ */
+@media print {
+  body {
+    background-color: white;
+  }
+
+  .no-print {
+    display: none;
+  }
+
+  a[href]::after {
+    content: none;
+  }
+
+  .chart-container,
+  .card,
+  .form-container {
+    page-break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+
+  .table-responsive tr {
+    page-break-inside: avoid;
+  }
+
+  button,
+  .btn-primary,
+  .btn-secondary {
+    display: none;
+  }
+
+  .form-actions {
+    display: none;
+  }
+
+  .nav-menu {
+    display: none;
+  }
+}
+
+/* ============================================================================
+   ACCESSIBILITY: REDUCED MOTION
+   ============================================================================ */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================================
+   ACCESSIBILITY: HIGH CONTRAST
+   ============================================================================ */
+@media (prefers-contrast: more) {
+  .card,
+  .input-field {
+    border-width: 2px;
+  }
+
+  .table-header {
+    font-weight: 800;
+  }
+
+  button {
+    font-weight: 700;
+  }
+}
+
+/* ============================================================================
+   ACCESSIBILITY: DARK MODE (Future)
+   ============================================================================ */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+  }
+
+  .card,
+  .form-container,
+  .input-field {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border-color: #444;
+  }
+
+  .card-stat {
+    background-color: #2a2a2a;
+  }
+
+  .table-header {
+    background-color: #1e3a5f;
+  }
+
+  .table-row {
+    background-color: #2a2a2a;
+  }
+}
