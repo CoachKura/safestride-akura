@@ -1,26 +1,56 @@
+// AKURA SafeStride Backend - Supabase Configuration
+// Last Updated: 2026-01-27
+
 const { createClient } = require('@supabase/supabase-js');
+
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+
 let supabase;
 
 try {
-  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
-    throw new Error('Missing Supabase environment variables');
+  if (!supabaseUrl) {
+    throw new Error('Missing SUPABASE_URL environment variable');
   }
   
-  supabase = createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_KEY,
-    {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false
-      }
-    }
-  );
+  if (!supabaseServiceKey && !supabaseAnonKey) {
+    throw new Error('Missing Supabase key: Either SUPABASE_SERVICE_KEY or SUPABASE_ANON_KEY required');
+  }
   
-  console.log('✅ Supabase client initialized');
+  // Prefer service role key for admin operations, fallback to anon key
+  const supabaseKey = supabaseServiceKey || supabaseAnonKey;
+  const isServiceRole = !!supabaseServiceKey;
+  
+  // Initialize Supabase client
+  supabase = createClient(supabaseUrl, supabaseKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  });
+  
+  console.log(`✅ Supabase client initialized (${isServiceRole ? 'service role' : 'anon key'})`);
 } catch (error) {
   console.warn('⚠️  Supabase connection failed, using mock mode:', error.message);
-  supabase = require('./supabase-mock');
+  // Fallback to mock if Supabase not configured
+  try {
+    supabase = require('./supabase-mock');
+  } catch (mockError) {
+    // If mock doesn't exist, create minimal placeholder
+    supabase = {
+      from: () => ({
+        select: () => Promise.resolve({ data: [], error: null }),
+        insert: () => Promise.resolve({ data: null, error: null }),
+        update: () => Promise.resolve({ data: null, error: null }),
+        delete: () => Promise.resolve({ data: null, error: null })
+      }),
+      auth: {
+        signIn: () => Promise.resolve({ data: null, error: null }),
+        signUp: () => Promise.resolve({ data: null, error: null })
+      }
+    };
+  }
 }
 
 // Helper function to execute raw SQL queries
