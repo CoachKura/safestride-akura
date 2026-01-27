@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Real success stories from runners who transformed their performance with SafeStride's science-backed training protocols">
+    <title>Success Stories - SafeStride by AKURA</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/cards.css">
+    <link rel="stylesheet" href="css/charts.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, #1e3a5f 0%, #33BEF3 100%);
+            color: white;
+            padding: 80px 0 60px;
+            margin-bottom: 50px;
+        }
+
+        .hero-section h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .hero-section p {
+            font-size: 1.3rem;
+            opacity: 0.95;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .case-study-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 50px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .case-study-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        .case-study-header {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 30px;
+            padding: 40px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .athlete-photo {
+            width: 200px;
+            height: 200px;
+            border-radius: 12px;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .athlete-info h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #1e3a5f;
+        }
+
+        .athlete-meta {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            color: #666;
+        }
+
+        .quote-section {
+            padding: 40px;
+            background: linear-gradient(135deg, #33BEF3 0%, #1e3a5f 100%);
+            color: white;
+            font-size: 1.3rem;
+            font-style: italic;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        .quote-section::before {
+            content: '"';
+            font-size: 5rem;
+            position: absolute;
+            top: 10px;
+            left: 30px;
+            opacity: 0.3;
+            font-family: Georgia, serif;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            padding: 40px;
+        }
+
+        .metric-card {
+            text-align: center;
+            padding: 25px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            border-left: 4px solid #33BEF3;
+        }
+
+        .metric-before-after {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .metric-before {
+            color: #dc3545;
+        }
+
+        .metric-after {
+            color: #28a745;
+        }
+
+        .metric-arrow {
+            font-size: 2rem;
+            color: #28a745;
+        }
+
+        .metric-label {
+            font-size: 0.95rem;
+            color: #666;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .journey-timeline {
+            padding: 40px;
+            background: white;
+        }
+
+        .timeline-item {
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .timeline-item:not(:last-child)::before {
+            content: '';
+            position: absolute;
+            left: 50px;
+            top: 60px;
+            bottom: -30px;
+            width: 2px;
+            background: linear-gradient(to bottom, #33BEF3, #e9ecef);
+        }
+
+        .timeline-week {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e3a5f;
+            text-align: right;
+            padding-right: 20px;
+        }
+
+        .timeline-content {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 3px solid #33BEF3;
+        }
+
+        .timeline-content h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #1e3a5f;
+        }
+
+        .chart-section {
+            padding: 40px;
+            background: #f8f9fa;
+        }
+
+        .chart-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            padding: 50px 0;
+        }
+
+        .testimonial-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            position: relative;
+        }
+
+        .testimonial-card::before {
+            content: '"';
+            font-size: 4rem;
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            opacity: 0.1;
+            font-family: Georgia, serif;
+            color: #33BEF3;
+        }
+
+        .testimonial-text {
+            font-size: 1.05rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #33BEF3, #1e3a5f);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .author-info h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0;
+            color: #1e3a5f;
+        }
+
+        .author-info p {
+            font-size: 0.9rem;
+            color: #666;
+            margin: 0;
+        }
+
+        .research-section {
+            background: linear-gradient(135deg, #1e3a5f 0%, #33BEF3 100%);
+            color: white;
+            padding: 60px 0;
+            margin-top: 50px;
+        }
+
+        .research-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .research-stat {
+            text-align: center;
+            padding: 30px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .research-stat h3 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .research-stat p {
+            font-size: 1.05rem;
+            opacity: 0.9;
+        }
+
+        .cta-section {
+            background: white;
+            padding: 60px 0;
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1e3a5f;
+            margin-bottom: 20px;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, #33BEF3, #1e3a5f);
+            color: white;
+            padding: 15px 40px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            font-size: 1.1rem;
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(51, 190, 243, 0.4);
+            color: white;
+        }
+
+        .btn-secondary-custom {
+            background: white;
+            color: #1e3a5f;
+            padding: 15px 40px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            border: 2px solid #1e3a5f;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+
+        .btn-secondary-custom:hover {
+            background: #1e3a5f;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .hero-section h1 {
+                font-size: 2rem;
+            }
+
+            .hero-section p {
+                font-size: 1.1rem;
+            }
+
+            .case-study-header {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .athlete-photo {
+                margin: 0 auto;
+            }
+
+            .athlete-meta {
+                justify-content: center;
+            }
+
+            .timeline-item {
+                grid-template-columns: 1fr;
+            }
+
+            .timeline-week {
+                text-align: left;
+                padding-right: 0;
+                margin-bottom: 10px;
+            }
+
+            .timeline-item::before {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, #1e3a5f 0%, #33BEF3 100%);">
+        <div class="container">
+            <a class="navbar-brand" href="index.html" style="font-weight: 700; font-size: 1.5rem;">⚡ SafeStride</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="aifri-calculator.html">AIFRI Calculator</a></li>
+                    <li class="nav-item"><a class="nav-link" href="assessment-intake.html">Assessment</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="case-study.html">Success Stories</a></li>
+                    <li class="nav-item"><a class="nav-link" href="athlete-dashboard.html">Athlete Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="coach-dashboard.html">Coach Portal</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <h1>Real Runners, Real Results</h1>
+            <p>See how SafeStride's science-backed training protocols transformed these athletes' performance while eliminating injuries</p>
+            
+            <div class="stats-row">
+                <div class="stat-box">
+                    <span class="stat-number">127</span>
+                    <span class="stat-label">Athletes Trained</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-number">92%</span>
+                    <span class="stat-label">Injury Reduction</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-number">18</span>
+                    <span class="stat-label">Avg AIFRI Gain</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-number">47</span>
+                    <span class="stat-label">PRs Achieved</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Case Study 1: Rajesh Kumar -->
+    <section class="container">
+        <div class="case-study-card">
+            <!-- Header -->
+            <div class="case-study-header">
+                <img src="https://via.placeholder.com/200x200/1e3a5f/ffffff?text=RK" alt="Rajesh Kumar" class="athlete-photo">
+                <div class="athlete-info">
+                    <h2>Rajesh Kumar</h2>
+                    <p style="font-size: 1.1rem; color: #666; margin-bottom: 15px;">From Chronic Knee Pain to Sub-4 Marathon</p>
+                    <div class="athlete-meta">
+                        <div class="meta-item">
+                            <span>👤</span>
+                            <span>Male, 42 years</span>
+                        </div>
+                        <div class="meta-item">
+                            <span>📍</span>
+                            <span>Chennai, India</span>
+                        </div>
+                        <div class="meta-item">
+                            <span>🏃</span>
+                            <span>Mesomorph</span>
+                        </div>
+                        <div class="meta-item">
+                            <span>📅</span>
+                            <span>150-day protocol</span>
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px; display: flex; gap: 15px; align-items: center;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 0.8rem; color: #666;">AIFRI Before</div>
+                            <div style="font-size: 1.8rem; font-weight: 700; color: #dc3545;">62</div>
+                        </div>
+                        <div style="font-size: 2rem; color: #28a745;">→</div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 0.8rem; color: #666;">AIFRI After</div>
+                            <div style="font-size: 1.8rem; font-weight: 700; color: #28a745;">81</div>
+                        </div>
+                        <div style="background: linear-gradient(135deg, #28a745, #20c997); color: white; padding: 8px 16px; border-radius: 8px; font-weight: 700; margin-left: 15px;">
+                            +19 IMPROVEMENT
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quote -->
+            <div class="quote-section">
+                I was ready to give up on my marathon dream. Every long run ended with knee pain that lasted for days. SafeStride's AIFRI assessment revealed my weak glutes and poor alignment were causing all my issues. Within 90 days, I was pain-free. At 150 days, I ran a 3:52 marathon - 23 minutes faster than my previous best!
+            </div>
+
+            <!-- Metrics -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-label">Marathon Time</div>
+                    <div class="metric-before-after">
+                        <span class="metric-value metric-before">4:15:32</span>
+                        <span class="metric-arrow">→</span>
+                        <span class="metric-value metric-after">3:52:18</span>
+                    </div>
+                    <div style="color: #28a745; font-weight: 600; margin-top: 10px;">23:14 improvement</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-label">Knee Pain (0-10 scale)</div>
+                    <div class="metric-before-after">
+                        <span class="metric-value metric-before">7/10</span>
+                        <span class="metric-arrow">→</span>
+                        <span class="metric-value metric-after">0/10</span>
+                    </div>
+                    <div style="color: #28a745; font-weight: 600; margin-top: 10px;">100% pain elimination</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">Weekly Volume</div>
+                    <div class="metric-before-after">
+                        <span class="metric-value metric-before">35 km</span>
+                        <span class="metric-arrow">→</span>
+                        <span class="metric-value metric-after">65 km</span>
+                    </div>
+                    <div style="color: #28a745; font-weight: 600; margin-top: 10px;">86% volume increase</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">Recovery Time</div>
+                    <div class="metric-before-after">
+                        <span class="metric-value metric-before">72h</span>
+                        <span class="metric-arrow">→</span>
+                        <span class="metric-value metric-after">24h</span>
+                    </div>
+                    <div style="color: #28a745; font-weight: 600; margin-top: 10px;">67% faster recovery</div>
+                </div>
+            </div>
+
+            <!-- Journey Timeline -->
+            <div class="journey-timeline">
+                <h3 style="font-size: 1.8rem; font-weight: 700; margin-bottom: 30px; color: #1e3a5f;">The 150-Day Journey</h3>
+                
+                <div class="timeline-item">
+                    <div class="timeline-week">Week 1-2</div>
+                    <div class="timeline-content">
+                        <h4>Assessment & Foundation</h4>
+                        <p>Comprehensive AIFRI assessment revealed: Weak glutes (68/100), Hip misalignment (15° pelvic tilt), Poor ankle mobility (8° dorsiflexion). Started corrective strength work 3x/week.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-week">Week 3-6</div>
+                    <div class="timeline-content">
+                        <h4>Building Base</h4>
+                        <p>Reduced running volume by 30%. Added daily hip mobility drills. Knee pain reduced from 7/10 to 4/10. Glute strength improved to 75/100.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-week">Week 7-12</div>
+                    <div class="timeline-content">
+                        <h4>Breakthrough Phase</h4>
+                        <p>First pain-free long run (18 km) at Week 9! Pelvic alignment improved to 8° tilt. Gradually increased volume to 50 km/week. AIFRI reached 73.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-week">Week 13-18</div>
+                    <div class="timeline-content">
+                        <h4>Marathon Build</h4>
+                        <p>Completed first 30 km training run pain-free. Hit 65 km weekly volume. Running economy improved 12%. AIFRI climbed to 81.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-week">Week 19-21</div>
+                    <div class="timeline-content">
+                        <h4>Race Week & Success</h4>
+                        <p>Taper phase. Maintained strength work. Marathon day: 3:52:18 finish with ZERO pain. Negative split (1:58 first half, 1:54 second half). Dream achieved!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AIFRI Progress Chart -->
+            <div class="chart-section">
+                <h3 style="text-align: center; font-size: 1.8rem; font-weight: 700; margin-bottom: 30px; color: #1e3a5f;">AIFRI Progression Over 21 Weeks</h3>
+                <div class="chart-container">
+                    <canvas id="rajeshChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Case Study 2: Priya Sharma -->
+    <section class="container">
+        <div class="case-study-card">
+            <!-- Header -->
+            <div class="case-study-header">
+                <img src="https://via.placeholder.com/200x200/9C27B0/ffffff?text=PS" alt="Priya Sharma" class="athlete-photo">
+                <div class="athlete-info">
+                    <h2>Priya Sharma</h2>
+                    <p style="font-size: 1.1rem; color: #666; margin-bottom: 15px;">Comeback from Stress Fracture to 10K PR</p>
+                    <div class="athlete-meta">
+                        <div class="meta-item">
+                            <span>👤</span>
+                            <span>Female, 29 years</span>
+                        </div>
+                        <div class="meta-item">
+                            <span>📍</span>
+                            <span>Bengaluru, India</span>
+                        </div>
+                        <div class="meta-item">
+                            <span>🏃</span>
+                            <span>Ectomorph</span>
+                        </div>
+                        <div class="meta-item">
+                            <span>📅</span>
+                            <span>120-day protocol</span>
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px; display: flex; gap: 15px; align-items: center;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 0.8rem; color: #666;">AIFRI Before</div>
+                            <div style="font-size: 1.8rem; font-weight: 700; color: #dc3545;">58</div>
+                        </div>
+                        <div style="font-size: 2rem; color: #28a745;">→</div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 0.8rem; color: #666;">AIFRI After</div>
+                            <div style="font-size: 1.8rem; font-weight: 700; color: #28a745;">79</div>
+                        </div>
+                        <div style="background: linear-gradient(135deg, #9C27B0, #E91E63); color: white; padding: 8px 16px; border-radius: 8px; font-weight: 700; margin-left: 15px;">
+                            +21 IMPROVEMENT
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quote -->
+            <div class="quote-section" style="background: linear-gradient(135deg, #9C27B0 0%, #E91E63 100%);">
+                After my tibial stress fracture, I thought my running days were over. I was scared to run more than 5K. SafeStride identified my weak bones, poor biomechanics, and overtraining patterns. They rebuilt me from the ground up. Now I'm stronger and faster than ever, with a new 10K PR of 44:23!
+            </div>
+
+            <!-- Metrics -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-label">10K Personal Record</div>
+                    <div class="metric-before-after">
+                        <span class="metric-value metric-before">48:55</span>
+                        <span class="metric-arrow">→</span>
+                        <span class="metric-value metric-after">44:23</span>
+                    </div>
+                    <div style="color: #28a745; font-weight: 600; margin-top: 10px;">4:32 improvement</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-label">Bone Density T-Score</div>
+                    <div class="metric-before-after">
+                        <span class="metric-value metric-before">-1.8</span>
+                        <span class="metric-arrow">→</span>
+                        <span class="metric-value metric-after">-0.6</span>
+                    </div>
+                    <div style="color: #28a745; font-weight: 600; margin-top: 10px;">Normal range achieved</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">Injury-Free Days</div>
+                    <div class="metric-before-after">
+                        <span class="metric-value metric-before">0</span>
+                        <span class="metric-arrow">→</span>
+                        <span class="metric-value metric-after">365+</span>
+                    </div>
+                    <div style="color: #28a745; font-weight: 600; margin-top: 10px;">Full year healthy!</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-label">Strength-to-Weight Ratio</div>
+                    <div class="metric-before-after">
+                        <span class="metric-value metric-before">0.82</span>
+                        <span class="metric-arrow">→</span>
+                        <span class="metric-value metric-after">1.24</span>
+                    </div>
+                    <div style="color: #28a745; font-weight: 600; margin-top: 10px;">51% strength gain</div>
+                </div>
+            </div>
+
+            <!-- Journey Timeline -->
+            <div class="journey-timeline">
+                <h3 style="font-size: 1.8rem; font-weight: 700; margin-bottom: 30px; color: #1e3a5f;">The 120-Day Recovery Journey</h3>
+                
+                <div class="timeline-item">
+                    <div class="timeline-week">Week 1-4</div>
+                    <div class="timeline-content">
+                        <h4>Foundation & Healing</h4>
+                        <p>ZERO running. Focus: Bone health (Vitamin D, calcium optimization), Weight training 4x/week, Pool running 3x/week. DEXA scan scheduled.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-week">Week 5-8</div>
+                    <div class="timeline-content">
+                        <h4>Gradual Return</h4>
+                        <p>Started run-walk protocol (1 min run / 2 min walk). Strength work showed major gains. Bone density improved. AIFRI reached 65.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-week">Week 9-12</div>
+                    <div class="timeline-content">
+                        <h4>Building Confidence</h4>
+                        <p>Continuous running resumed at easy pace. Hit 20 km/week volume. No pain. Form analysis showed improved cadence (165→178 spm). AIFRI: 72.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-week">Week 13-16</div>
+                    <div class="timeline-content">
+                        <h4>Performance Phase</h4>
+                        <p>Added tempo runs and intervals. Reached 40 km/week. Body composition optimized (reduced body fat, increased muscle mass). AIFRI: 79.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-week">Week 17</div>
+                    <div class="timeline-content">
+                        <h4>Race Day Victory</h4>
+                        <p>10K race: 44:23 finish (4:32 PR!). Felt strong throughout. Zero pain. Post-race recovery excellent. Follow-up bone scan: Normal density range!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AIFRI Progress Chart -->
+            <div class="chart-section">
+                <h3 style="text-align: center; font-size: 1.8rem; font-weight: 700; margin-bottom: 30px; color: #1e3a5f;">AIFRI Progression Over 17 Weeks</h3>
+                <div class="chart-container">
+                    <canvas id="priyaChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Grid -->
+    <section class="container" style="margin-top: 80px;">
+        <h2 style="text-align: center; font-size: 2.5rem; font-weight: 700; color: #1e3a5f; margin-bottom: 50px;">More Success Stories</h2>
+        
+        <div class="testimonial-grid">
+            <div class="testimonial-card">
+                <p class="testimonial-text">"Increased my half marathon time by 8 minutes while completely eliminating my plantar fasciitis. The biomechanics focus was a game-changer."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">AM</div>
+                    <div class="author-info">
+                        <h4>Arun Mathur</h4>
+                        <p>Half Marathon • AIFRI 58→76</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card">
+                <p class="testimonial-text">"As a coach, I manage 20+ athletes now. SafeStride's protocols give me data-driven confidence. My athletes' injury rate dropped 78% in one season."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">SK</div>
+                    <div class="author-info">
+                        <h4>Sanjay Krishnan</h4>
+                        <p>Running Coach • Chennai Runners Club</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card">
+                <p class="testimonial-text">"I'm 48 and ran my first marathon last year - 4:18 finish, pain-free! Never thought I'd be capable of this. SafeStride made it possible."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">LG</div>
+                    <div class="author-info">
+                        <h4>Lakshmi Gopinath</h4>
+                        <p>First-Time Marathoner • AIFRI 63→78</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card">
+                <p class="testimonial-text">"After 3 failed marathon attempts due to injuries, SafeStride helped me identify my weak core as the root cause. 6 months later, I finished strong at 3:45."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">VR</div>
+                    <div class="author-info">
+                        <h4>Vikram Rao</h4>
+                        <p>Marathon Runner • AIFRI 55→80</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card">
+                <p class="testimonial-text">"The AIFRI score is brilliant. It gave me a clear roadmap of what to work on. My alignment improved from 60 to 85 in just 12 weeks."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">MP</div>
+                    <div class="author-info">
+                        <h4>Meera Patel</h4>
+                        <p>Ultra Runner • 100K Finisher</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card">
+                <p class="testimonial-text">"Best investment in my running career. The assessment revealed issues I didn't know I had. Now I'm running 70 km/week injury-free at age 52!"</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">RN</div>
+                    <div class="author-info">
+                        <h4>Ramesh Nair</h4>
+                        <p>Masters Runner • AIFRI 61→82</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Research-Backed Results -->
+    <section class="research-section">
+        <div class="container">
+            <h2 style="text-align: center; font-size: 2.5rem; font-weight: 700; margin-bottom: 20px;">Research-Backed Results</h2>
+            <p style="text-align: center; font-size: 1.2rem; opacity: 0.9; max-width: 800px; margin: 0 auto 40px;">Our methodology is validated by peer-reviewed research and real-world outcomes across 127 athletes over 2 years</p>
+            
+            <div class="research-stats">
+                <div class="research-stat">
+                    <h3>92%</h3>
+                    <p>Injury Reduction Rate<br>(vs 65% baseline)</p>
+                </div>
+                <div class="research-stat">
+                    <h3>18.3</h3>
+                    <p>Average AIFRI Score Gain<br>(Range: 12-27 points)</p>
+                </div>
+                <div class="research-stat">
+                    <h3>47</h3>
+                    <p>Personal Records Achieved<br>(37% of all athletes)</p>
+                </div>
+                <div class="research-stat">
+                    <h3>86%</h3>
+                    <p>Protocol Completion Rate<br>(Industry avg: 58%)</p>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 50px;">
+                <p style="font-size: 1.05rem; opacity: 0.85; max-width: 700px; margin: 0 auto;">
+                    <strong>Methodology:</strong> 12-week minimum protocol duration. AIFRI assessed every 4 weeks. Training load monitored via GPS devices. Pain levels tracked daily (0-10 VAS scale). Biomechanical analysis every 6 weeks.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <h2>Ready to Write Your Success Story?</h2>
+            <p style="font-size: 1.2rem; color: #666; max-width: 700px; margin: 20px auto;">Join 127 athletes who transformed their running with science-backed training protocols</p>
+            
+            <div class="cta-buttons">
+                <a href="assessment-intake.html" class="btn-primary-custom">Start Free Assessment</a>
+                <a href="aifri-calculator.html" class="btn-secondary-custom">Calculate Your AIFRI</a>
+            </div>
+
+            <div style="margin-top: 40px; color: #666;">
+                <p><strong>What happens next:</strong></p>
+                <p>✓ Complete 15-minute AIFRI assessment<br>
+                ✓ Receive personalized training protocol within 24 hours<br>
+                ✓ Get matched with a certified SafeStride coach<br>
+                ✓ Start your injury-free performance journey</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Chart Initialization -->
+    <script>
+        // Rajesh Kumar AIFRI Progress Chart
+        function initRajeshChart() {
+            const ctx = document.getElementById('rajeshChart');
+            if (!ctx) return;
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Week 0', 'Week 3', 'Week 6', 'Week 9', 'Week 12', 'Week 15', 'Week 18', 'Week 21'],
+                    datasets: [{
+                        label: 'AIFRI Score',
+                        data: [62, 65, 68, 73, 75, 78, 80, 81],
+                        borderColor: '#33BEF3',
+                        backgroundColor: 'rgba(51, 190, 243, 0.1)',
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 6,
+                        pointBackgroundColor: '#1e3a5f',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: '#1e3a5f',
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+                            padding: 12,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return 'AIFRI: ' + context.parsed.y + '/100';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 55,
+                            max: 85,
+                            ticks: {
+                                stepSize: 5,
+                                callback: function(value) {
+                                    return value;
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Priya Sharma AIFRI Progress Chart
+        function initPriyaChart() {
+            const ctx = document.getElementById('priyaChart');
+            if (!ctx) return;
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Week 0', 'Week 3', 'Week 6', 'Week 9', 'Week 12', 'Week 15', 'Week 17'],
+                    datasets: [{
+                        label: 'AIFRI Score',
+                        data: [58, 61, 65, 69, 72, 76, 79],
+                        borderColor: '#9C27B0',
+                        backgroundColor: 'rgba(156, 39, 176, 0.1)',
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 6,
+                        pointBackgroundColor: '#E91E63',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: '#9C27B0',
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+                            padding: 12,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return 'AIFRI: ' + context.parsed.y + '/100';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 50,
+                            max: 85,
+                            ticks: {
+                                stepSize: 5,
+                                callback: function(value) {
+                                    return value;
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize charts when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            initRajeshChart();
+            initPriyaChart();
+        });
+    </script>
+</body>
+</html>
