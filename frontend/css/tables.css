@@ -36,6 +36,9 @@
   letter-spacing: 0.5px;
   font-size: var(--font-size-small);
   cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
   user-select: none;
   white-space: nowrap;
   transition: background-color var(--transition-fast);

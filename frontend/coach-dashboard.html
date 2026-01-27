@@ -549,13 +549,13 @@
     <div class="main-container">
         <!-- BULK ACTIONS TOOLBAR -->
         <div class="bulk-actions-toolbar" id="bulkToolbar">
-            <span class="bulk-count"><input type="checkbox" id="selectAll" onchange="toggleSelectAll(event)"> <span id="selectedCount">0</span> selected</span>
+            <span class="bulk-count"><input type="checkbox" id="selectAllBulkToolbar" aria-label="Select all athletes for bulk actions" onchange="toggleSelectAll(event)"> <span id="selectedCount">0</span> selected</span>
             <select class="bulk-btn" onchange="bulkAction(this.value)">
                 <option value="">Assign Workout Template</option>
                 <option value="template">Template A</option>
                 <option value="template">Template B</option>
             </select>
-            <select class="bulk-btn">
+            <select class="bulk-btn" aria-label="Update group for selected athletes">
                 <option value="">Update Group</option>
                 <option value="akura-st1">Akura St1</option>
                 <option value="akura-st2">Akura St2</option>
@@ -569,7 +569,7 @@
         <div class="filters-section">
             <div class="filter-group">
                 <span class="filter-label">Group:</span>
-                <select class="filter-select">
+                <select class="filter-select" aria-label="Filter athletes by group">
                     <option>All Groups</option>
                     <option>Akura St1</option>
                     <option>Akura St2</option>
@@ -578,7 +578,7 @@
             </div>
             <div class="filter-group">
                 <span class="filter-label">AIFRI:</span>
-                <select class="filter-select">
+                <select class="filter-select" aria-label="Filter athletes by AIFRI score">
                     <option>All Scores</option>
                     <option>Elite (80+)</option>
                     <option>Advanced (70-79)</option>
@@ -587,7 +587,7 @@
             </div>
             <div class="filter-group">
                 <span class="filter-label">Injury Risk:</span>
-                <select class="filter-select">
+                <select class="filter-select" aria-label="Filter athletes by injury risk level">
                     <option>All</option>
                     <option>🟢 Low</option>
                     <option>🟡 Monitor</option>
@@ -596,7 +596,7 @@
             </div>
             <div class="filter-group" style="margin-left: auto;">
                 <span class="filter-label">Sort By:</span>
-                <select class="filter-select">
+                <select class="filter-select" aria-label="Sort athletes by criteria">
                     <option>Name</option>
                     <option>AIFRI Score</option>
                     <option>Last Workout</option>
@@ -611,7 +611,7 @@
                 <thead class="thead-custom">
                     <tr>
                         <th class="th-custom" style="width: 40px;">
-                            <input type="checkbox" class="checkbox-custom" id="selectAll" onchange="toggleSelectAll(event)">
+                            <input type="checkbox" class="checkbox-custom" id="selectAllTable" aria-label="Select all athletes in table" onchange="toggleSelectAll(event)">
                         </th>
                         <th class="th-custom">Athlete</th>
                         <th class="th-custom">Group</th>
