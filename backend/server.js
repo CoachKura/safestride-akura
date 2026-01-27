@@ -1,149 +1,129 @@
 // AKURA SafeStride Backend API
-// Version: 1.0.0
-// Last Updated: 2026-01-27
-
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
+const morgan = require('morgan');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 
-// Security middleware
+// Middleware
 app.use(helmet());
-
-// CORS configuration (support multiple origins)
-const allowedOrigins = [
-  'https://akura.in',
-  'https://www.akura.in',
-  'https://safestride-akura.netlify.app',
-  'http://localhost:3000',
-  'http://localhost:5500',
-  'http://127.0.0.1:5500'
-];
-
 app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV === 'development') {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Authorization', 'Content-Type', 'X-Request-Id', 'X-Client-Id', 'Idempotency-Key']
+  origin: [
+    process.env.FRONTEND_URL,
+    'https://akura.in',
+    'https://www.akura.in',
+    'https://safeastride.netlify.app',
+    'http://localhost:5500',
+    'http://localhost:8080'
+  ],
+  credentials: true
 }));
-
-// Body parsing
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(morgan('combined'));
 
-// Request ID middleware
-app.use((req, res, next) => {
-  req.id = req.headers['x-request-id'] || `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  res.setHeader('X-Request-Id', req.id);
-  next();
-});
+// Initialize Supabase (before routes)
+const { supabase } = require('./config/supabase');
 
-// Request logging
-app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path} [${req.id}]`);
-  next();
-});
+// ============================================================================
+// HEALTH CHECK & TEST ROUTES
+// ============================================================================
 
-// Health check handler (shared for all health endpoints)
-const healthHandler = (req, res) => {
-  res.json({
+// Health check endpoint
+app.get('/healthz', (req, res) => {
+  res.json({ 
     status: 'ok',
     service: 'SafeStride by AKURA Backend',
     version: '1.0.0',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
   });
-};
+});
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: {
-    error: {
-      code: 'RATE_LIMIT_EXCEEDED',
-      message: 'Too many requests, please try again later'
+// Test Supabase database connection
+app.get('/api/test/db', async (req, res) => {
+  try {
+    // Simple query to test connection
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id')
+      .limit(1);
+    
+    if (error) {
+      console.error('Database test error:', error);
+      throw error;
     }
+    
+    res.json({ 
+      status: 'ok', 
+      message: 'Database connection successful',
+      supabase: 'connected',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Database connection failed:', error);
+    res.status(500).json({ 
+      status: 'error', 
+      message: 'Database connection failed',
+      error: error.message 
+    });
   }
 });
-app.use('/api', limiter);
 
-app.get('/health', healthHandler);
-app.get('/healthz', healthHandler);
-app.get('/api/health', healthHandler);
+// ============================================================================
+// API ROUTES
+// ============================================================================
 
-// Import routes
-let authRoutes, assessmentRoutes, protocolRoutes, workoutRoutes;
+// Mount route handlers
 try {
-  authRoutes = require('./routes/auth');
-  assessmentRoutes = require('./routes/assessments');
-  protocolRoutes = require('./routes/protocols');
-  workoutRoutes = require('./routes/workouts');
-} catch (err) {
-  console.error('❌ Failed to load routes:', err.message);
-  // Create placeholder routes if files don't exist
-  authRoutes = express.Router();
-  authRoutes.get('/login', (req, res) => res.json({ message: 'Auth route placeholder' }));
-  assessmentRoutes = express.Router();
-  assessmentRoutes.post('/', (req, res) => res.json({ message: 'Assessment route placeholder' }));
-  protocolRoutes = express.Router();
-  protocolRoutes.get('/:id', (req, res) => res.json({ message: 'Protocol route placeholder' }));
-  workoutRoutes = express.Router();
-  workoutRoutes.post('/:id/feedback', (req, res) => res.json({ message: 'Workout route placeholder' }));
+  app.use('/api/auth', require('./routes/auth'));
+  app.use('/api/assessments', require('./routes/assessments'));
+  app.use('/api/protocols', require('./routes/protocols'));
+  app.use('/api/workouts', require('./routes/workouts'));
+  console.log('✅ All routes loaded successfully');
+} catch (error) {
+  console.error('❌ Failed to load routes:', error.message);
 }
 
-// API Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/assessments', assessmentRoutes);
-app.use('/api/protocols', protocolRoutes);
-app.use('/api/workouts', workoutRoutes);
+// ============================================================================
+// ERROR HANDLING
+// ============================================================================
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(`❌ Error [${req.id}]:`, err.stack);
-  res.status(err.status || 500).json({
-    error: {
-      code: err.code || 'INTERNAL_ERROR',
-      message: err.message || 'Something went wrong',
-      requestId: req.id,
-      ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
-    }
-  });
-});
-
-// 404 handler
+// 404 handler (must be after all routes)
 app.use((req, res) => {
   res.status(404).json({
     error: {
       code: 'NOT_FOUND',
       message: 'Route not found',
       path: req.path,
-      requestId: req.id
+      requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     }
   });
 });
 
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('\n🛑 SIGTERM received, shutting down gracefully...');
-  process.exit(0);
+// Global error handler (must be last)
+app.use((err, req, res, next) => {
+  console.error('Error:', err.stack);
+  res.status(err.status || 500).json({
+    error: {
+      code: err.code || 'INTERNAL_ERROR',
+      message: err.message || 'Something went wrong',
+      requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    }
+  });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`\n🚀 SafeStride Backend Server`);
+// ============================================================================
+// START SERVER
+// ============================================================================
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log('🚀 SafeStride Backend Server');
   console.log(`📍 Running on http://localhost:${PORT}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`⏰ Started at: ${new Date().toISOString()}\n`);
+  console.log(`⏰ Started at: ${new Date().toISOString()}`);
 });
 
 module.exports = app;
