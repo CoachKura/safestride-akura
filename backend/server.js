@@ -39,16 +39,15 @@ app.use((req, res, next) => {
   next();
 });
 
-// Health check (both /health and /api/health for convenience)
+// Health check handler (shared for all health endpoints)
 const healthHandler = (req, res) => {
   res.json({
     status: 'ok',
-    timestamp: new Date().toISOString(),
     service: 'SafeStride by AKURA Backend',
-    version: '1.0.0'
+    version: '1.0.0',
+    timestamp: new Date().toISOString()
   });
-  next();
-});
+};
 
 // Rate limiting
 const limiter = rateLimit({
@@ -62,16 +61,6 @@ const limiter = rateLimit({
   }
 });
 app.use('/api', limiter);
-
-// Health check endpoints
-const healthHandler = (req, res) => {
-  res.json({
-    status: 'ok',
-    service: 'SafeStride by AKURA Backend',
-    version: '1.0.0',
-    timestamp: new Date().toISOString()
-  });
-};
 
 app.get('/health', healthHandler);
 app.get('/healthz', healthHandler);

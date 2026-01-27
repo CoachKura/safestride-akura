@@ -7,7 +7,7 @@ class AkuraAPI {
     // Resolve env vars from Vite (import.meta.env) or window.__AKURA_ENV__ or process.env
     const getEnv = (key, fallback = undefined) => {
       try {
-        const vite = (typeof import !== 'undefined' && typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env[key] : undefined;
+        const vite = (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env[key] : undefined;
         const win = (typeof window !== 'undefined' && window.__AKURA_ENV__) ? window.__AKURA_ENV__[key] : undefined;
         const node = (typeof process !== 'undefined' && process.env) ? process.env[key] : undefined;
         return vite ?? win ?? node ?? fallback;
