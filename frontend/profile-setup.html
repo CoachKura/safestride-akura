@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Your Profile - AKURA SafeStride</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card profile-setup">
+            <div class="auth-header">
+                <div class="logo">
+                    <h1>AKURA SafeStride</h1>
+                    <p class="tagline">Where Injury-Free Running Meets Science</p>
+                </div>
+            </div>
+
+            <div class="auth-content">
+                <h2>Welcome! Let's Complete Your Profile</h2>
+                <p class="subtitle">Tell us a bit more about yourself to personalize your experience</p>
+
+                <!-- Alert Messages -->
+                <div id="alert-container"></div>
+
+                <!-- Profile Setup Form -->
+                <form id="profileSetupForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="age">Age</label>
+                        <input 
+                            type="number" 
+                            id="age" 
+                            name="age" 
+                            placeholder="25"
+                            min="13"
+                            max="120"
+                        >
+                        <span class="error-message" id="age-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="gender">Gender</label>
+                        <select id="gender" name="gender">
+                            <option value="">Select gender (optional)</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                            <option value="prefer-not-to-say">Prefer not to say</option>
+                        </select>
+                        <span class="error-message" id="gender-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fitnessLevel">Fitness Level</label>
+                        <select id="fitnessLevel" name="fitnessLevel">
+                            <option value="">Select fitness level (optional)</option>
+                            <option value="beginner">Beginner</option>
+                            <option value="intermediate">Intermediate</option>
+                            <option value="advanced">Advanced</option>
+                            <option value="elite">Elite</option>
+                        </select>
+                        <span class="error-message" id="fitnessLevel-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="weeklyMileage">Weekly Mileage (km)</label>
+                        <input 
+                            type="number" 
+                            id="weeklyMileage" 
+                            name="weeklyMileage" 
+                            placeholder="20"
+                            min="0"
+                            step="0.1"
+                        >
+                        <span class="error-message" id="weeklyMileage-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="goals">Primary Running Goal</label>
+                        <select id="goals" name="goals">
+                            <option value="">Select your goal (optional)</option>
+                            <option value="injury-prevention">Injury Prevention</option>
+                            <option value="5k">5K Training</option>
+                            <option value="10k">10K Training</option>
+                            <option value="half-marathon">Half Marathon</option>
+                            <option value="marathon">Marathon</option>
+                            <option value="ultra">Ultra Marathon</option>
+                            <option value="general-fitness">General Fitness</option>
+                            <option value="weight-loss">Weight Loss</option>
+                        </select>
+                        <span class="error-message" id="goals-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="injuries">Any Current or Past Injuries?</label>
+                        <textarea 
+                            id="injuries" 
+                            name="injuries" 
+                            placeholder="Describe any injuries you'd like us to know about (optional)"
+                            rows="3"
+                        ></textarea>
+                        <span class="error-message" id="injuries-error"></span>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="skipBtn">
+                            Skip for Now
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="saveBtn">
+                            <span class="btn-text">Save & Continue</span>
+                            <span class="btn-loader" style="display: none;">
+                                <span class="spinner"></span>
+                                Saving...
+                            </span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="auth-bg">
+            <div class="bg-pattern"></div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        // Initialize profile setup page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if user is authenticated
+            if (!isAuthenticated()) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Skip button
+            document.getElementById('skipBtn').addEventListener('click', () => {
+                redirectToDashboard();
+            });
+
+            // Form submission
+            const profileSetupForm = document.getElementById('profileSetupForm');
+            profileSetupForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const profileData = {
+                    age: document.getElementById('age').value ? parseInt(document.getElementById('age').value) : null,
+                    gender: document.getElementById('gender').value || null,
+                    fitnessLevel: document.getElementById('fitnessLevel').value || null,
+                    weeklyMileage: document.getElementById('weeklyMileage').value ? parseFloat(document.getElementById('weeklyMileage').value) : null,
+                    goals: document.getElementById('goals').value || null,
+                    injuries: document.getElementById('injuries').value.trim() || null
+                };
+
+                // Clear previous errors
+                clearErrors();
+
+                // Validate age if provided
+                if (profileData.age && (profileData.age < 13 || profileData.age > 120)) {
+                    showError('age', 'Please enter a valid age between 13 and 120');
+                    return;
+                }
+
+                // Validate weekly mileage if provided
+                if (profileData.weeklyMileage && profileData.weeklyMileage < 0) {
+                    showError('weeklyMileage', 'Weekly mileage cannot be negative');
+                    return;
+                }
+
+                // Show loading state
+                setLoading(true);
+
+                // Save profile
+                const result = await updateUserProfile(profileData);
+
+                // Hide loading state
+                setLoading(false);
+
+                if (result.success) {
+                    showAlert('success', 'Profile updated successfully! Redirecting...');
+                    
+                    // Redirect to dashboard after 1 second
+                    setTimeout(() => {
+                        redirectToDashboard();
+                    }, 1000);
+                } else {
+                    showAlert('error', result.error || 'Failed to update profile. You can update it later from your dashboard.');
+                    
+                    // Still redirect to dashboard after 3 seconds even on error
+                    setTimeout(() => {
+                        redirectToDashboard();
+                    }, 3000);
+                }
+            });
+        });
+
+        // Helper functions
+        function setLoading(isLoading) {
+            const btn = document.getElementById('saveBtn');
+            const btnText = btn.querySelector('.btn-text');
+            const btnLoader = btn.querySelector('.btn-loader');
+            
+            btn.disabled = isLoading;
+            btnText.style.display = isLoading ? 'none' : 'inline';
+            btnLoader.style.display = isLoading ? 'inline-flex' : 'none';
+            
+            // Also disable skip button during save
+            document.getElementById('skipBtn').disabled = isLoading;
+        }
+
+        function showError(field, message) {
+            const errorElement = document.getElementById(`${field}-error`);
+            const inputElement = document.getElementById(field);
+            
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+            }
+            
+            if (inputElement) {
+                inputElement.classList.add('error');
+            }
+        }
+
+        function clearError(field) {
+            const errorElement = document.getElementById(`${field}-error`);
+            const inputElement = document.getElementById(field);
+            
+            if (errorElement) {
+                errorElement.textContent = '';
+                errorElement.style.display = 'none';
+            }
+            
+            if (inputElement) {
+                inputElement.classList.remove('error');
+            }
+        }
+
+        function clearErrors() {
+            ['age', 'gender', 'fitnessLevel', 'weeklyMileage', 'goals', 'injuries'].forEach(field => clearError(field));
+            document.getElementById('alert-container').innerHTML = '';
+        }
+
+        function showAlert(type, message) {
+            const container = document.getElementById('alert-container');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = `
+                <span class="alert-icon">${type === 'success' ? '✓' : '✕'}</span>
+                <span class="alert-message">${message}</span>
+            `;
+            container.innerHTML = '';
+            container.appendChild(alert);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - AKURA SafeStride</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="logo">
+                    <h1>AKURA SafeStride</h1>
+                    <p class="tagline">Where Injury-Free Running Meets Science</p>
+                </div>
+            </div>
+
+            <div class="auth-content">
+                <h2>Create Your Account</h2>
+                <p class="subtitle">Start your injury-free running journey today</p>
+
+                <!-- Alert Messages -->
+                <div id="alert-container"></div>
+
+                <!-- Registration Form -->
+                <form id="registerForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="fullName">Full Name</label>
+                        <input 
+                            type="text" 
+                            id="fullName" 
+                            name="fullName" 
+                            placeholder="John Doe"
+                            required
+                            autocomplete="name"
+                        >
+                        <span class="error-message" id="fullName-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            placeholder="you@example.com"
+                            required
+                            autocomplete="email"
+                        >
+                        <span class="error-message" id="email-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="password-input-wrapper">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                placeholder="At least 6 characters"
+                                required
+                                autocomplete="new-password"
+                            >
+                            <button type="button" class="password-toggle" id="togglePassword">
+                                <span class="eye-icon" id="eyeIcon">👁️</span>
+                            </button>
+                        </div>
+                        <span class="error-message" id="password-error"></span>
+                        
+                        <!-- Password Strength Indicator -->
+                        <div class="password-strength" id="passwordStrength" style="display: none;">
+                            <div class="strength-bar">
+                                <div class="strength-bar-fill" id="strengthBarFill"></div>
+                            </div>
+                            <span class="strength-text" id="strengthText"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <div class="password-input-wrapper">
+                            <input 
+                                type="password" 
+                                id="confirmPassword" 
+                                name="confirmPassword" 
+                                placeholder="Re-enter your password"
+                                required
+                                autocomplete="new-password"
+                            >
+                            <button type="button" class="password-toggle" id="toggleConfirmPassword">
+                                <span class="eye-icon" id="eyeIconConfirm">👁️</span>
+                            </button>
+                        </div>
+                        <span class="error-message" id="confirmPassword-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="role">I am a...</label>
+                        <select id="role" name="role" required>
+                            <option value="">Select your role</option>
+                            <option value="athlete">Athlete / Runner</option>
+                            <option value="coach">Coach / Trainer</option>
+                        </select>
+                        <span class="error-message" id="role-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="terms" name="terms" required>
+                            <span>I agree to the <a href="#" class="link">Terms of Service</a> and <a href="#" class="link">Privacy Policy</a></span>
+                        </label>
+                        <span class="error-message" id="terms-error"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="registerBtn">
+                        <span class="btn-text">Create Account</span>
+                        <span class="btn-loader" style="display: none;">
+                            <span class="spinner"></span>
+                            Creating account...
+                        </span>
+                    </button>
+                </form>
+
+                <div class="auth-footer">
+                    <p>Already have an account? <a href="login.html" class="link">Sign in</a></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="auth-bg">
+            <div class="bg-pattern"></div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        // Initialize registration page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if already logged in
+            if (isAuthenticated()) {
+                redirectToDashboard();
+            }
+
+            // Password toggles
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+
+            togglePassword.addEventListener('click', () => {
+                const type = passwordInput.type === 'password' ? 'text' : 'password';
+                passwordInput.type = type;
+                eyeIcon.textContent = type === 'password' ? '👁️' : '🙈';
+            });
+
+            const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            const eyeIconConfirm = document.getElementById('eyeIconConfirm');
+
+            toggleConfirmPassword.addEventListener('click', () => {
+                const type = confirmPasswordInput.type === 'password' ? 'text' : 'password';
+                confirmPasswordInput.type = type;
+                eyeIconConfirm.textContent = type === 'password' ? '👁️' : '🙈';
+            });
+
+            // Password strength indicator
+            passwordInput.addEventListener('input', (e) => {
+                const password = e.target.value;
+                updatePasswordStrength(password);
+            });
+
+            // Form submission
+            const registerForm = document.getElementById('registerForm');
+            registerForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const fullName = document.getElementById('fullName').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                const role = document.getElementById('role').value;
+                const terms = document.getElementById('terms').checked;
+
+                // Clear previous errors
+                clearErrors();
+
+                // Validate inputs
+                let hasError = false;
+
+                if (fullName.length < 2) {
+                    showError('fullName', 'Please enter your full name (at least 2 characters)');
+                    hasError = true;
+                }
+
+                if (!validateEmail(email)) {
+                    showError('email', 'Please enter a valid email address');
+                    hasError = true;
+                }
+
+                if (password.length < 6) {
+                    showError('password', 'Password must be at least 6 characters');
+                    hasError = true;
+                }
+
+                if (password !== confirmPassword) {
+                    showError('confirmPassword', 'Passwords do not match');
+                    hasError = true;
+                }
+
+                if (!role) {
+                    showError('role', 'Please select your role');
+                    hasError = true;
+                }
+
+                if (!terms) {
+                    showError('terms', 'You must agree to the Terms of Service and Privacy Policy');
+                    hasError = true;
+                }
+
+                if (hasError) {
+                    return;
+                }
+
+                // Show loading state
+                setLoading(true);
+
+                // Attempt registration
+                const result = await register(email, password, fullName, role);
+
+                // Hide loading state
+                setLoading(false);
+
+                if (result.success) {
+                    showAlert('success', 'Account created successfully! Please check your email to verify your account.');
+                    
+                    // Clear form
+                    registerForm.reset();
+                    
+                    // Redirect to login after 3 seconds
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 3000);
+                } else {
+                    showAlert('error', result.error || 'Registration failed. Please try again.');
+                }
+            });
+
+            // Real-time validation
+            document.getElementById('fullName').addEventListener('blur', (e) => {
+                const name = e.target.value.trim();
+                if (name && name.length < 2) {
+                    showError('fullName', 'Name must be at least 2 characters');
+                } else {
+                    clearError('fullName');
+                }
+            });
+
+            document.getElementById('email').addEventListener('blur', (e) => {
+                const email = e.target.value.trim();
+                if (email && !validateEmail(email)) {
+                    showError('email', 'Please enter a valid email address');
+                } else {
+                    clearError('email');
+                }
+            });
+
+            confirmPasswordInput.addEventListener('blur', () => {
+                const password = passwordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+                
+                if (confirmPassword && password !== confirmPassword) {
+                    showError('confirmPassword', 'Passwords do not match');
+                } else {
+                    clearError('confirmPassword');
+                }
+            });
+        });
+
+        // Helper functions
+        function updatePasswordStrength(password) {
+            const strengthIndicator = document.getElementById('passwordStrength');
+            const strengthBarFill = document.getElementById('strengthBarFill');
+            const strengthText = document.getElementById('strengthText');
+
+            if (password.length === 0) {
+                strengthIndicator.style.display = 'none';
+                return;
+            }
+
+            strengthIndicator.style.display = 'block';
+
+            let strength = 0;
+            let text = '';
+            let color = '';
+
+            // Calculate strength
+            if (password.length >= 6) strength++;
+            if (password.length >= 8) strength++;
+            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+            if (/\d/.test(password)) strength++;
+            if (/[^a-zA-Z0-9]/.test(password)) strength++;
+
+            // Determine text and color
+            if (strength <= 1) {
+                text = 'Weak';
+                color = '#EF4444';
+            } else if (strength <= 3) {
+                text = 'Fair';
+                color = '#F59E0B';
+            } else if (strength <= 4) {
+                text = 'Good';
+                color = '#10B981';
+            } else {
+                text = 'Strong';
+                color = '#059669';
+            }
+
+            // Update UI
+            const percentage = (strength / 5) * 100;
+            strengthBarFill.style.width = percentage + '%';
+            strengthBarFill.style.backgroundColor = color;
+            strengthText.textContent = text;
+            strengthText.style.color = color;
+        }
+
+        function setLoading(isLoading) {
+            const btn = document.getElementById('registerBtn');
+            const btnText = btn.querySelector('.btn-text');
+            const btnLoader = btn.querySelector('.btn-loader');
+            
+            btn.disabled = isLoading;
+            btnText.style.display = isLoading ? 'none' : 'inline';
+            btnLoader.style.display = isLoading ? 'inline-flex' : 'none';
+        }
+
+        function showError(field, message) {
+            const errorElement = document.getElementById(`${field}-error`);
+            const inputElement = document.getElementById(field);
+            
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+            }
+            
+            if (inputElement) {
+                inputElement.classList.add('error');
+            }
+        }
+
+        function clearError(field) {
+            const errorElement = document.getElementById(`${field}-error`);
+            const inputElement = document.getElementById(field);
+            
+            if (errorElement) {
+                errorElement.textContent = '';
+                errorElement.style.display = 'none';
+            }
+            
+            if (inputElement) {
+                inputElement.classList.remove('error');
+            }
+        }
+
+        function clearErrors() {
+            ['fullName', 'email', 'password', 'confirmPassword', 'role', 'terms'].forEach(field => clearError(field));
+            document.getElementById('alert-container').innerHTML = '';
+        }
+
+        function showAlert(type, message) {
+            const container = document.getElementById('alert-container');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = `
+                <span class="alert-icon">${type === 'success' ? '✓' : '✕'}</span>
+                <span class="alert-message">${message}</span>
+            `;
+            container.innerHTML = '';
+            container.appendChild(alert);
+        }
+
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+    </script>
+</body>
+</html>
