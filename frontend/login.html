@@ -148,12 +148,13 @@
             // Wait for Supabase to initialize
             await new Promise(resolve => setTimeout(resolve, 500));
             
-            // Check if already authenticated
-            if (Auth && Auth.isAuthenticated && Auth.isAuthenticated()) {
-                console.log('✅ Already authenticated, redirecting...');
-                window.location.href = Auth.getRedirectPath();
+            if (!window.akuraAuth || !window.akuraAuth.supabase) {
+                console.error('❌ Supabase not initialized properly');
+                showAlert('error', 'System error. Please refresh the page.');
                 return;
             }
+            
+            console.log('✅ Supabase ready');
             
             // Get form elements
             const loginForm = document.getElementById('loginForm');
@@ -162,6 +163,7 @@
             const rememberMeCheckbox = document.getElementById('rememberMe');
             const loginBtn = document.getElementById('loginBtn');
             const passwordToggle = document.getElementById('passwordToggle');
+            const alertContainer = document.getElementById('alertContainer');
 
             // Password toggle
             if (passwordToggle) {
@@ -257,47 +259,83 @@
                 try {
                     console.log('🔐 Attempting to login:', email);
                     
-                    // Use the Auth.login function from auth.js
-                    const result = await Auth.login(email, password);
-
-                    if (result.success) {
-                        console.log('✅ Login successful');
-                        showAlert('success', 'Login successful! Redirecting...');
-                        
-                        // Handle remember me
-                        if (rememberMe) {
-                            localStorage.setItem('akura_remember_me', 'true');
-                        } else {
-                            localStorage.removeItem('akura_remember_me');
-                        }
-
-                        // Small delay before redirect
-                        setTimeout(() => {
-                            // Redirect will be handled by auth.js based on user status
-                            window.location.href = Auth.getRedirectPath();
-                        }, 1000);
-                    } else {
-                        console.error('❌ Login failed:', result.error);
-                        
-                        // Handle specific errors
-                        let errorMsg = result.error || 'Login failed. Please check your credentials.';
-                        
-                        if (errorMsg.includes('Invalid login credentials')) {
-                            errorMsg = 'Invalid email or password. Please try again.';
-                        } else if (errorMsg.includes('Email not confirmed')) {
-                            errorMsg = 'Please verify your email before logging in.';
-                        }
-                        
-                        showAlert('error', errorMsg);
-                        
-                        // Reset button
-                        loginBtn.disabled = false;
-                        loginBtn.querySelector('.btn-text').style.display = 'inline';
-                        loginBtn.querySelector('.btn-loader').style.display = 'none';
+                    // Sign in with Supabase
+                    const { user, session, error } = await window.akuraAuth.signIn(email, password);
+                    
+                    if (error) {
+                        throw error;
                     }
+                    
+                    console.log('✅ Login successful for user:', user.id);
+                    
+                    // Handle remember me
+                    if (rememberMe) {
+                        localStorage.setItem('akura_remember_me', 'true');
+                    } else {
+                        localStorage.removeItem('akura_remember_me');
+                    }
+                    
+                    // Get user profile for smart redirect
+                    try {
+                        const { data: profile, error: profileError } = await window.akuraAuth.supabase
+                            .from('profiles')
+                            .select('role, access_level, assessment_completed')
+                            .eq('user_id', user.id)
+                            .single();
+                        
+                        let redirectUrl = 'athlete-dashboard.html';
+                        
+                        if (profile) {
+                            console.log('📊 User profile:', profile);
+                            
+                            if (!profile.assessment_completed) {
+                                // New user - go to assessment
+                                redirectUrl = 'assessment-intake.html';
+                                console.log('📋 User is new, redirecting to assessment');
+                            } else if (profile.access_level === 'demo') {
+                                // Demo user - go to demo dashboard
+                                redirectUrl = 'demo-dashboard.html';
+                                console.log('🎯 Demo user, redirecting to demo dashboard');
+                            } else if (profile.role === 'coach') {
+                                // Coach - go to coach dashboard
+                                redirectUrl = 'coach-dashboard.html';
+                                console.log('🏆 Coach user, redirecting to coach dashboard');
+                            } else {
+                                // Full access athlete
+                                redirectUrl = 'athlete-dashboard.html';
+                                console.log('🏃 Athlete user, redirecting to athlete dashboard');
+                            }
+                        }
+                        
+                        showAlert('success', 'Login successful! Redirecting...');
+                        setTimeout(() => {
+                            window.location.href = redirectUrl;
+                        }, 1500);
+                    } catch (profileError) {
+                        console.error('⚠️ Could not fetch profile, using default redirect:', profileError);
+                        showAlert('success', 'Login successful! Redirecting...');
+                        setTimeout(() => {
+                            window.location.href = 'athlete-dashboard.html';
+                        }, 1500);
+                    }
+                    
                 } catch (error) {
                     console.error('❌ Login error:', error);
-                    showAlert('error', 'An unexpected error occurred. Please try again.');
+                    
+                    // Handle specific errors
+                    let errorMsg = 'Login failed. Please try again.';
+                    
+                    if (error.message.includes('Invalid login credentials')) {
+                        errorMsg = 'Invalid email or password. Please try again.';
+                    } else if (error.message.includes('Email not confirmed')) {
+                        errorMsg = 'Please verify your email before logging in.';
+                    } else if (error.message.includes('too many requests')) {
+                        errorMsg = 'Too many login attempts. Please try again later.';
+                    } else if (error.message) {
+                        errorMsg = error.message;
+                    }
+                    
+                    showAlert('error', errorMsg);
                     
                     // Reset button
                     loginBtn.disabled = false;
@@ -308,7 +346,6 @@
 
             // Alert function
             function showAlert(type, message) {
-                const alertContainer = document.getElementById('alertContainer');
                 const alert = document.createElement('div');
                 alert.className = `alert alert-${type}`;
                 alert.innerHTML = `
