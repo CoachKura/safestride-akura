@@ -1,766 +1,402 @@
 <!DOCTYPE html>
 <html lang="en">
-<!DOCTYPE html>
-<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SafeStride by AKURA - Injury-Free Running System</title>
-    <meta name="description" content="World's first injury prevention system with HR-based training zones, biomechanics assessment, and progressive safety gates. AIFRI 0-100 score.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            line-height: 1.6;
-            color: #1f2937;
-            overflow-x: hidden;
-        }
-
-        /* Navigation */
-        .nav {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.98);
-            -webkit-backdrop-filter: blur(10px);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        .nav-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: #1e3a8a;
-            text-decoration: none;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 35px;
-            list-style: none;
-        }
-
-        .nav-links a {
-            color: #4b5563;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1rem;
-            transition: color 0.3s ease;
-        }
-
-        .nav-links a:hover {
-            color: #1e3a8a;
-        }
-
-        .cta-button {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            padding: 12px 30px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 700;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-            transition: all 0.3s ease;
-        }
-
-        .cta-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
-        }
-
-        /* Hero Section */
-        .hero {
-            background: linear-gradient(135deg, rgba(30, 58, 138, 0.95), rgba(59, 130, 246, 0.9)), 
-                        url('https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=1600') center/cover;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            text-align: center;
-            padding: 100px 20px 60px;
-            position: relative;
-        }
-
-        .hero-content {
-            max-width: 900px;
-            z-index: 10;
-        }
-
-        .hero h1 {
-            font-size: 4rem;
-            font-weight: 800;
-            margin-bottom: 30px;
-            line-height: 1.1;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        }
-
-        .hero p {
-            font-size: 1.5rem;
-            margin-bottom: 50px;
-            font-weight: 300;
-            line-height: 1.6;
-            opacity: 0.95;
-        }
-
-        .hero-buttons {
-            display: flex;
-            gap: 25px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .btn-primary {
-            background: #10b981;
-            padding: 20px 50px;
-            border-radius: 50px;
-            color: white;
-            text-decoration: none;
-            font-size: 1.3rem;
-            font-weight: 700;
-            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
-            transition: all 0.3s ease;
-            display: inline-block;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 35px rgba(16, 185, 129, 0.5);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            padding: 20px 50px;
-            border-radius: 50px;
-            color: white;
-            text-decoration: none;
-            font-size: 1.3rem;
-            font-weight: 700;
-            border: 2px solid white;
-            transition: all 0.3s ease;
-            display: inline-block;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255,255,255,0.15);
-        }
-
-        .hero-features {
-            margin-top: 50px;
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-
-        /* Stats Section */
-        .stats {
-            background: #1e3a8a;
-            color: white;
-            padding: 80px 20px;
-        }
-
-        .stats-grid {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 50px;
-            text-align: center;
-        }
-
-        .stat-item {
-            padding: 20px;
-        }
-
-        .stat-number {
-            font-size: 4rem;
-            font-weight: 800;
-            color: #10b981;
-            margin-bottom: 15px;
-        }
-
-        .stat-label {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        .stat-detail {
-            font-size: 0.95rem;
-            opacity: 0.8;
-        }
-
-        /* Features Section */
-        .features {
-            padding: 100px 20px;
-            background: #f9fafb;
-        }
-
-        .section-title {
-            text-align: center;
-            font-size: 3rem;
-            color: #1e3a8a;
-            margin-bottom: 20px;
-            font-weight: 800;
-        }
-
-        .section-subtitle {
-            text-align: center;
-            font-size: 1.3rem;
-            color: #6b7280;
-            margin-bottom: 70px;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .features-grid {
-            max-width: 1300px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 40px;
-        }
-
-        .feature-card {
-            background: white;
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
-            transition: all 0.4s ease;
-            border: 2px solid transparent;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.12);
-            border-color: #3b82f6;
-        }
-
-        .feature-icon {
-            font-size: 3rem;
-            margin-bottom: 25px;
-        }
-
-        .feature-card h3 {
-            font-size: 1.5rem;
-            color: #1e3a8a;
-            margin-bottom: 15px;
-            font-weight: 700;
-        }
-
-        .feature-card p {
-            color: #6b7280;
-            line-height: 1.7;
-            font-size: 1.05rem;
-        }
-
-        /* Comparison Table */
-        .comparison {
-            padding: 100px 20px;
-            background: white;
-        }
-
-        .comparison-table {
-            max-width: 1100px;
-            margin: 50px auto 0;
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-
-        thead {
-            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
-        }
-
-        th {
-            padding: 25px;
-            color: white;
-            font-size: 1.2rem;
-            font-weight: 700;
-            text-align: left;
-        }
-
-        th:nth-child(2), th:nth-child(3) {
-            text-align: center;
-        }
-
-        td {
-            padding: 25px;
-            border-bottom: 1px solid #e5e7eb;
-            font-size: 1.05rem;
-        }
-
-        td:first-child {
-            font-weight: 600;
-            color: #1f2937;
-        }
-
-        td:nth-child(2), td:nth-child(3) {
-            text-align: center;
-        }
-
-        .check {
-            color: #10b981;
-            font-size: 2rem;
-        }
-
-        .cross {
-            color: #ef4444;
-            font-size: 2rem;
-        }
-
-        /* CTA Section */
-        .cta-section {
-            background: linear-gradient(135deg, #10b981, #059669);
-            padding: 100px 20px;
-            text-align: center;
-            color: white;
-        }
-
-        .cta-section h2 {
-            font-size: 3rem;
-            margin-bottom: 30px;
-            font-weight: 800;
-        }
-
-        .cta-section p {
-            font-size: 1.4rem;
-            margin-bottom: 50px;
-            opacity: 0.95;
-        }
-
-        /* Footer */
-        .footer {
-            background: #111827;
-            color: white;
-            padding: 60px 20px 30px;
-        }
-
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 50px;
-            margin-bottom: 40px;
-        }
-
-        .footer h4 {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            color: #10b981;
-        }
-
-        .footer ul {
-            list-style: none;
-        }
-
-        .footer ul li {
-            margin-bottom: 12px;
-        }
-
-        .footer a {
-            color: #9ca3af;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .footer a:hover {
-            color: white;
-        }
-
-        .footer-bottom {
-            text-align: center;
-            padding-top: 30px;
-            border-top: 1px solid #374151;
-            color: #9ca3af;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-
-            .hero p {
-                font-size: 1.2rem;
-            }
-
-            .nav-links {
-                display: none;
-            }
-
-            .stat-number {
-                font-size: 3rem;
-            }
-
-            .section-title {
-                font-size: 2.2rem;
-            }
-
-            .btn-primary, .btn-secondary {
-                padding: 16px 35px;
-                font-size: 1.1rem;
-            }
-        }
-
-        /* Utility Classes */
-        .hero-section {
-            background: linear-gradient(135deg, rgba(30, 58, 138, 0.95), rgba(59, 130, 246, 0.9)), 
-                        url('https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=1600') center/cover;
-            min-height: 90vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            text-align: center;
-            padding: 80px 20px;
-        }
-
-        .hero-content {
-            max-width: 900px;
-        }
-
-        .hero-title {
-            font-size: 4rem;
-            font-weight: 800;
-            margin-bottom: 30px;
-            line-height: 1.1;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        }
-
-        .hero-subtitle {
-            font-size: 1.5rem;
-            margin-bottom: 50px;
-            font-weight: 300;
-            opacity: 0.95;
-        }
-
-        .hero-cta-buttons {
-            display: flex;
-            gap: 25px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .btn-cta-primary {
-            background: #10b981;
-            padding: 20px 50px;
-            border-radius: 50px;
-            color: white;
-            text-decoration: none;
-            font-size: 1.3rem;
-            font-weight: 700;
-            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
-        }
-
-        .btn-cta-secondary {
-            background: transparent;
-            padding: 20px 50px;
-            border-radius: 50px;
-            color: white;
-            text-decoration: none;
-            font-size: 1.3rem;
-            font-weight: 700;
-            border: 2px solid white;
-        }
-
-        .stats-section {
-            background: #1e3a8a;
-            color: white;
-            padding: 80px 20px;
-        }
-
-        .stats-grid {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 50px;
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 4rem;
-            font-weight: 800;
-            color: #10b981;
-        }
-
-        .stat-title {
-            font-size: 1.2rem;
-            margin: 15px 0;
-        }
-
-        .stat-subtitle {
-            font-size: 0.95rem;
-            opacity: 0.8;
-        }
-
-        .price-success {
-            color: #10b981;
-            font-weight: 700;
-        }
-
-        .price-muted {
-            color: #6b7280;
-        }
-
-        .hr-success {
-            color: #10b981;
-            font-weight: 600;
-        }
-
-        .hr-muted {
-            color: #6b7280;
-        }
-
-        .centered-cta {
-            text-align: center;
-            margin-top: 60px;
-        }
-
-        .btn-white-cta {
-            background: white;
-            color: #10b981;
-        }
-
-        .footer-description {
-            color: #9ca3af;
-            line-height: 1.7;
-        }
-    </style>
+    <title>AKURA SafeStride - Run Smarter, Run Safer, Run Longer</title>
+    <meta name="description" content="Science-backed injury prevention and performance optimization for runners. Transform your running with AIFRI methodology.">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Animate On Scroll -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/homepage.css">
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="nav">
-        <div class="nav-container">
-            <a href="index.html" class="logo">SafeStride by AKURA</a>
-            <ul class="nav-links">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="aifri-calculator.html">AIFRI Calculator</a></li>
-                <li><a href="coach-dashboard.html">For Coaches</a></li>
-                <li><a href="athlete-dashboard.html">For Athletes</a></li>
-                <li><a href="case-study.html">Case Study</a></li>
-            </ul>
-            <a href="aifri-calculator.html" class="cta-button">Calculate AIFRI</a>
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <div class="logo">
+                    <div class="logo-icon">🏃</div>
+                    <span class="logo-text">AKURA SafeStride</span>
+                </div>
+            </div>
+            <div class="nav-menu">
+                <a href="#about" class="nav-link">How It Works</a>
+                <a href="#success" class="nav-link">Success Stories</a>
+                <a href="#science" class="nav-link">The Science</a>
+                <a href="login.html" class="btn btn-outline">Login</a>
+                <a href="register.html" class="btn btn-primary">Start Free</a>
+            </div>
+            <div class="mobile-menu-toggle" id="mobileMenuToggle">
+                <i class="fas fa-bars"></i>
+            </div>
         </div>
     </nav>
 
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-close" id="mobileMenuClose">
+            <i class="fas fa-times"></i>
+        </div>
+        <a href="#about" class="mobile-nav-link">How It Works</a>
+        <a href="#success" class="mobile-nav-link">Success Stories</a>
+        <a href="#science" class="mobile-nav-link">The Science</a>
+        <a href="login.html" class="mobile-nav-link">Login</a>
+        <a href="register.html" class="btn btn-primary btn-block">Start Free</a>
+    </div>
+
     <!-- Hero Section -->
-    <section class="hero hero-section">
-        <div class="hero-content">
-            <h1 class="hero-title">
-                Where Injury-Free Running Meets Science
-            </h1>
-            <p class="hero-subtitle">
-                AKURA AIFRI: The world's first injury prevention system with HR-based training zones
-            </p>
-            <div class="hero-cta-buttons">
-                <a href="aifri-calculator.html" class="btn-cta-primary">Calculate My AIFRI Score →</a>
-                <a href="case-study.html" class="btn-cta-secondary">See Real Results</a>
+    <section class="hero">
+        <div class="hero-background">
+            <div class="hero-overlay"></div>
+            <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1920&q=80" alt="Runner" class="hero-image">
+        </div>
+        <div class="container">
+            <div class="hero-content" data-aos="fade-up">
+                <h1 class="hero-title">Run Smarter.<br>Run Safer.<br>Run <span class="gradient-text">Longer.</span></h1>
+                <p class="hero-subtitle">Science-backed injury prevention and performance optimization for runners of all levels</p>
+                <div class="hero-cta">
+                    <a href="register.html" class="btn btn-primary btn-large">
+                        Start Your Free Assessment
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <a href="#about" class="btn btn-outline btn-large">
+                        Learn More
+                        <i class="fas fa-play-circle"></i>
+                    </a>
+                </div>
+                <div class="hero-stats" data-aos="fade-up" data-aos-delay="200">
+                    <div class="stat">
+                        <div class="stat-number">127+</div>
+                        <div class="stat-label">Athletes Trained</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">92%</div>
+                        <div class="stat-label">Injury Reduction</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">15%</div>
+                        <div class="stat-label">Performance Gain</div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Stats Section -->
-    <section class="stats-section">
-        <div class="stats-grid">
-            <div>
-                <div class="stat-number">4.9★</div>
-                <div class="stat-title">User Rating</div>
-                <div class="stat-subtitle">Based on 500+ athletes</div>
-            </div>
-            <div>
-                <div class="stat-number">0</div>
-                <div class="stat-title">Injuries Reported</div>
-                <div class="stat-subtitle">With AIFRI system</div>
-            </div>
-            <div>
-                <div class="stat-number">62%</div>
-                <div class="stat-title">Avg Performance Gain</div>
-                <div class="stat-subtitle">18-month case study</div>
-            </div>
-            <div>
-                <div class="stat-number">10+</div>
-                <div class="stat-title">Device Integrations</div>
-                <div class="stat-subtitle">Garmin, Strava, Apple</div>
+    <!-- Social Proof Bar -->
+    <section class="social-proof">
+        <div class="container">
+            <div class="proof-items">
+                <div class="proof-item" data-aos="fade-up" data-aos-delay="100">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Science-Backed</span>
+                </div>
+                <div class="proof-item" data-aos="fade-up" data-aos-delay="200">
+                    <i class="fas fa-user-md"></i>
+                    <span>Expert Approved</span>
+                </div>
+                <div class="proof-item" data-aos="fade-up" data-aos-delay="300">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Proven Results</span>
+                </div>
+                <div class="proof-item" data-aos="fade-up" data-aos-delay="400">
+                    <i class="fas fa-mobile-alt"></i>
+                    <span>Easy to Use</span>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section class="features">
-        <h2 class="section-title">Why SafeStride Stands Out</h2>
-        <p class="section-subtitle">The only system that combines injury prevention, performance optimization, and progressive training gates</p>
-        
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">🎯</div>
-                <h3>AIFRI 0-100 Score</h3>
-                <p>6-Pillar assessment combining Running (40%), Strength (15%), ROM (12%), Balance (13%), Mobility (10%), and Alignment (10%) for a complete injury-free profile with medical validation</p>
+    <!-- About Section -->
+    <section class="about" id="about">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <h2 class="section-title">The AKURA System</h2>
+                <p class="section-subtitle">A comprehensive, science-backed approach to injury-free running</p>
             </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">❤️</div>
-                <h3>6 HR Training Zones</h3>
-                <p>Tanaka formula (208-0.7×Age) powers AR, F, EN, TH, P, SP zones with precise heart rate guidance for optimal training effect</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">🔒</div>
-                <h3>Safety Gates System</h3>
-                <p>Progressive intensity unlock system prevents premature high-intensity work until your body is ready, eliminating injury risk</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">🦴</div>
-                <h3>Biomechanics Assessment</h3>
-                <p>Track vertical oscillation, ground contact time, cadence, and stride length to identify issues before they cause injury</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">🗺️</div>
-                <h3>0-5000 KM Roadmap</h3>
-                <p>6-phase progression (Base→Aerobic→Threshold→Speed Endurance→Race Prep→Peak/Taper) with 7 AKURA protocols integrated</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">🌡️</div>
-                <h3>Tamil Nadu Heat Advantage</h3>
-                <p>Train in Chennai's 35°C heat, race anywhere in the world. Natural heat adaptation gives you a competitive edge</p>
+            <div class="about-grid">
+                <div class="about-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="card-icon">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <h3>AIFRI Score</h3>
+                    <p>Our proprietary AI-Functional Running Index evaluates your injury risk across 6 critical pillars</p>
+                </div>
+                <div class="about-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="card-icon">
+                        <i class="fas fa-dumbbell"></i>
+                    </div>
+                    <h3>Personalized Plans</h3>
+                    <p>Dynamic training protocols that adapt to your progress and biomechanics</p>
+                </div>
+                <div class="about-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="card-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Real-Time Tracking</h3>
+                    <p>Monitor your progress and adjust workouts based on daily readiness</p>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Comparison Section -->
-    <section class="comparison">
-        <h2 class="section-title">SafeStride vs VDOT O2</h2>
-        <p class="section-subtitle">See why elite runners choose SafeStride for injury-free performance gains</p>
-
-        <div class="comparison-table">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Feature</th>
-                        <th>SafeStride</th>
-                        <th>VDOT O2</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Injury Prevention System</td>
-                        <td><span class="check">✓</span></td>
-                        <td><span class="cross">✗</span></td>
-                    </tr>
-                    <tr>
-                        <td>Biomechanics Assessment</td>
-                        <td><span class="check">✓</span></td>
-                        <td><span class="cross">✗</span></td>
-                    </tr>
-                    <tr>
-                        <td>Safety Gates System</td>
-                        <td><span class="check">✓</span></td>
-                        <td><span class="cross">✗</span></td>
-                    </tr>
-                    <tr>
-                        <td>Tamil Nadu Heat Adaptation</td>
-                        <td><span class="check">✓</span></td>
-                        <td><span class="cross">✗</span></td>
-                    </tr>
-                    <tr>
-                        <td>Unlimited Athletes (Coach)</td>
-                        <td class="price-success">FREE</td>
-                        <td class="price-muted">$49.99/mo</td>
-                    </tr>
-                    <tr>
-                        <td>6-Pillar Performance Score</td>
-                        <td><span class="check">✓</span></td>
-                        <td><span class="cross">✗</span></td>
-                    </tr>
-                    <tr>
-                        <td>HR Formula</td>
-                        <td class="hr-success">Tanaka (208-0.7×Age)</td>
-                        <td class="hr-muted">220-Age</td>
-                    </tr>
-                </tbody>
-            </table>
+    <!-- 6 Pillars Section -->
+    <section class="pillars">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <h2 class="section-title">The 6 Pillars of Injury Prevention</h2>
+                <p class="section-subtitle">Our comprehensive assessment evaluates every aspect of your running biomechanics</p>
+            </div>
+            <div class="pillars-grid">
+                <div class="pillar-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="pillar-number">01</div>
+                    <h3>Alignment</h3>
+                    <p>Q-angle, foot pronation, pelvic drop, and postural assessment</p>
+                </div>
+                <div class="pillar-card" data-aos="fade-up" data-aos-delay="150">
+                    <div class="pillar-number">02</div>
+                    <h3>Running Capacity</h3>
+                    <p>VO2 max, 5K performance, weekly mileage, and endurance metrics</p>
+                </div>
+                <div class="pillar-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="pillar-number">03</div>
+                    <h3>Strength</h3>
+                    <p>Lower body, core stability, and functional strength testing</p>
+                </div>
+                <div class="pillar-card" data-aos="fade-up" data-aos-delay="250">
+                    <div class="pillar-number">04</div>
+                    <h3>Balance</h3>
+                    <p>Single-leg stance, dynamic stability, and proprioception</p>
+                </div>
+                <div class="pillar-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="pillar-number">05</div>
+                    <h3>Mobility</h3>
+                    <p>Hip, ankle, and hamstring flexibility and range of motion</p>
+                </div>
+                <div class="pillar-card" data-aos="fade-up" data-aos-delay="350">
+                    <div class="pillar-number">06</div>
+                    <h3>Recovery</h3>
+                    <p>Sleep quality, stress levels, and injury history analysis</p>
+                </div>
+            </div>
         </div>
+    </section>
 
-        <div class="centered-cta">
-            <a href="aifri-calculator.html" class="btn-primary">Try SafeStride for FREE →</a>
+    <!-- Success Stories Section -->
+    <section class="success-stories" id="success">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <h2 class="section-title">Real Runners, Real Results</h2>
+                <p class="section-subtitle">Join hundreds of athletes who've transformed their running</p>
+            </div>
+            <div class="stories-grid">
+                <!-- Story 1 -->
+                <div class="story-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="story-image">
+                        <img src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=600&q=80" alt="Rajesh Kumar">
+                        <div class="story-badge">
+                            <span>+19 AIFRI</span>
+                        </div>
+                    </div>
+                    <div class="story-content">
+                        <h3>Rajesh Kumar</h3>
+                        <p class="story-location"><i class="fas fa-map-marker-alt"></i> Chennai, India</p>
+                        <p class="story-text">"From chronic knee pain to completing my first sub-4 hour marathon. AKURA's systematic approach transformed my running completely."</p>
+                        <div class="story-stats">
+                            <div class="story-stat">
+                                <div class="stat-label">AIFRI Before</div>
+                                <div class="stat-value">62</div>
+                            </div>
+                            <div class="story-stat">
+                                <div class="stat-label">AIFRI After</div>
+                                <div class="stat-value gradient-text">81</div>
+                            </div>
+                            <div class="story-stat">
+                                <div class="stat-label">Duration</div>
+                                <div class="stat-value">150 days</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Story 2 -->
+                <div class="story-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="story-image">
+                        <img src="https://images.unsplash.com/photo-1594737626072-90dc274bc2bd?w=600&q=80" alt="Sarah Mitchell">
+                        <div class="story-badge">
+                            <span>+26 AIFRI</span>
+                        </div>
+                    </div>
+                    <div class="story-content">
+                        <h3>Sarah Mitchell</h3>
+                        <p class="story-location"><i class="fas fa-map-marker-alt"></i> London, UK</p>
+                        <p class="story-text">"After years of recurring injuries, I was ready to quit running. AKURA helped me rebuild my foundation and I haven't had an injury in 6 months."</p>
+                        <div class="story-stats">
+                            <div class="story-stat">
+                                <div class="stat-label">AIFRI Before</div>
+                                <div class="stat-value">58</div>
+                            </div>
+                            <div class="story-stat">
+                                <div class="stat-label">AIFRI After</div>
+                                <div class="stat-value gradient-text">84</div>
+                            </div>
+                            <div class="story-stat">
+                                <div class="stat-label">Duration</div>
+                                <div class="stat-value">120 days</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Story 3 -->
+                <div class="story-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="story-image">
+                        <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&q=80" alt="David Chen">
+                        <div class="story-badge">
+                            <span>+27 AIFRI</span>
+                        </div>
+                    </div>
+                    <div class="story-content">
+                        <h3>David Chen</h3>
+                        <p class="story-location"><i class="fas fa-map-marker-alt"></i> Singapore</p>
+                        <p class="story-text">"As a complete beginner, I was worried about getting injured. AKURA's progressive approach got me to my first half-marathon injury-free!"</p>
+                        <div class="story-stats">
+                            <div class="story-stat">
+                                <div class="stat-label">AIFRI Before</div>
+                                <div class="stat-value">45</div>
+                            </div>
+                            <div class="story-stat">
+                                <div class="stat-label">AIFRI After</div>
+                                <div class="stat-value gradient-text">72</div>
+                            </div>
+                            <div class="story-stat">
+                                <div class="stat-label">Duration</div>
+                                <div class="stat-value">90 days</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Science Section -->
+    <section class="science" id="science">
+        <div class="container">
+            <div class="science-content">
+                <div class="science-text" data-aos="fade-right">
+                    <h2 class="section-title">Built on Science,<br>Proven by Results</h2>
+                    <p>Our AIFRI methodology is based on decades of biomechanics research and refined through work with over 127 athletes.</p>
+                    <ul class="science-list">
+                        <li><i class="fas fa-check-circle"></i> Evidence-based assessment protocols</li>
+                        <li><i class="fas fa-check-circle"></i> Validated against injury data</li>
+                        <li><i class="fas fa-check-circle"></i> Continuous algorithm refinement</li>
+                        <li><i class="fas fa-check-circle"></i> Expert physiotherapist consultation</li>
+                    </ul>
+                    <a href="register.html" class="btn btn-primary btn-large">
+                        Get Your AIFRI Score
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="science-visual" data-aos="fade-left">
+                    <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&q=80" alt="Biomechanics Analysis">
+                </div>
+            </div>
         </div>
     </section>
 
     <!-- CTA Section -->
     <section class="cta-section">
-        <h2>Ready to Transform Your Running?</h2>
-        <p>Join 500+ athletes who train injury-free with SafeStride</p>
-        <a href="aifri-calculator.html" class="btn-primary btn-white-cta">Calculate My AIFRI Score Now</a>
+        <div class="container">
+            <div class="cta-content" data-aos="zoom-in">
+                <h2>Ready to Transform Your Running?</h2>
+                <p>Join 127+ athletes who've reduced their injury risk and improved performance</p>
+                <a href="register.html" class="btn btn-primary btn-large">
+                    Start Your Free Assessment
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+                <p class="cta-note">✓ No credit card required &nbsp;&nbsp;•&nbsp;&nbsp; ✓ Takes 10 minutes &nbsp;&nbsp;•&nbsp;&nbsp; ✓ Instant results</p>
+            </div>
+        </div>
     </section>
 
     <!-- Footer -->
     <footer class="footer">
-        <div class="footer-content">
-            <div>
-                <h4>SafeStride by AKURA</h4>
-                <p class="footer-description">The world's first injury-free running system powered by AIFRI scoring, biomechanics assessment, and progressive safety gates.</p>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="logo">
+                        <div class="logo-icon">🏃</div>
+                        <span class="logo-text">AKURA SafeStride</span>
+                    </div>
+                    <p>Science-backed injury prevention and performance optimization for runners.</p>
+                    <div class="social-links">
+                        <a href="https://instagram.com/akurasafestride" target="_blank" class="social-link" aria-label="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="https://facebook.com/akurasafestride" target="_blank" class="social-link" aria-label="Facebook">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="https://twitter.com/akurasafestride" target="_blank" class="social-link" aria-label="Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="https://youtube.com/@akurasafestride" target="_blank" class="social-link" aria-label="YouTube">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                        <a href="https://linkedin.com/company/akura-safestride" target="_blank" class="social-link" aria-label="LinkedIn">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="#about">How It Works</a></li>
+                        <li><a href="#science">The Science</a></li>
+                        <li><a href="#success">Success Stories</a></li>
+                        <li><a href="register.html">Start Free</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                        <li><a href="#privacy">Privacy Policy</a></li>
+                        <li><a href="#terms">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#faq">FAQ</a></li>
+                        <li><a href="mailto:support@akura.in">support@akura.in</a></li>
+                        <li><a href="#help">Help Center</a></li>
+                        <li><a href="#community">Community</a></li>
+                    </ul>
+                </div>
             </div>
-            <div>
-                <h4>Platform</h4>
-                <ul>
-                    <li><a href="aifri-calculator.html">AIFRI Calculator</a></li>
-                    <li><a href="coach-dashboard.html">Coach Dashboard</a></li>
-                    <li><a href="athlete-dashboard.html">Athlete Portal</a></li>
-                    <li><a href="case-study.html">Case Studies</a></li>
-                </ul>
+            <div class="footer-bottom">
+                <p>&copy; 2026 AKURA SafeStride. All rights reserved.</p>
+                <p>🏃 Run smarter. Run safer. Run longer.</p>
             </div>
-            <div>
-                <h4>Resources</h4>
-                <ul>
-                    <li><a href="#">Training Zones Guide</a></li>
-                    <li><a href="#">Biomechanics 101</a></li>
-                    <li><a href="#">Safety Gates Explained</a></li>
-                    <li><a href="#">API Documentation</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4>Company</h4>
-                <ul>
-                    <li><a href="#">About AKURA</a></li>
-                    <li><a href="#">Chennai Advantage</a></li>
-                    <li><a href="#">Contact Us</a></li>
-                    <li><a href="#">Privacy Policy</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 AKURA Performance Systems. All rights reserved. Run AIFRI. Run Forever.</p>
         </div>
     </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="js/homepage.js"></script>
+    
+    <!-- Authentication -->
+    <script src="js/auth.js"></script>
+    <script src="js/auth-guard.js"></script>
 </body>
 </html>
