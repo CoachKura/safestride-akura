@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://akura-backend-5pyz.onrender.com/:path*"
+      "destination": "https://akura-backend-5pyz.onrender.com/api/:path*"
     }
   ]
 }
