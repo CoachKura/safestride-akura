@@ -4,222 +4,300 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - AKURA SafeStride</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Styles -->
     <link rel="stylesheet" href="css/auth.css">
 </head>
 <body>
     <div class="auth-container">
-        <div class="auth-card">
-            <div class="auth-header">
-                <div class="logo">
-                    <h1>AKURA SafeStride</h1>
-                    <p class="tagline">Where Injury-Free Running Meets Science</p>
+        <!-- Left Side: Runner Image -->
+        <div class="auth-visual">
+            <div class="visual-overlay"></div>
+            <img src="https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=1200&q=80" alt="Runner" class="visual-image">
+            <div class="visual-content">
+                <div class="visual-logo">
+                    <div class="logo-icon">🏃</div>
+                    <span class="logo-text">AKURA SafeStride</span>
+                </div>
+                <h2 class="visual-title">Welcome Back</h2>
+                <p class="visual-subtitle">Continue your journey to injury-free running</p>
+                <div class="visual-stats">
+                    <div class="visual-stat">
+                        <i class="fas fa-users"></i>
+                        <span>127+ Athletes</span>
+                    </div>
+                    <div class="visual-stat">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>92% Injury Reduction</span>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <div class="auth-content">
-                <h2>Welcome Back</h2>
-                <p class="subtitle">Sign in to your account to continue</p>
+        <!-- Right Side: Login Form -->
+        <div class="auth-form-container">
+            <div class="auth-form-wrapper">
+                <!-- Back to Home -->
+                <a href="index.html" class="back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Home
+                </a>
 
-                <!-- Alert Messages -->
-                <div id="alert-container"></div>
+                <!-- Form Header -->
+                <div class="form-header">
+                    <h1>Sign In</h1>
+                    <p>Access your personalized training dashboard</p>
+                </div>
+
+                <!-- Alert Container -->
+                <div id="alertContainer"></div>
 
                 <!-- Login Form -->
                 <form id="loginForm" class="auth-form">
+                    <!-- Email -->
                     <div class="form-group">
                         <label for="email">Email Address</label>
-                        <input 
-                            type="email" 
-                            id="email" 
-                            name="email" 
-                            placeholder="you@example.com"
-                            required
-                            autocomplete="email"
-                        >
-                        <span class="error-message" id="email-error"></span>
+                        <div class="input-with-icon">
+                            <i class="fas fa-envelope"></i>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                required 
+                                autocomplete="email"
+                                placeholder="your.email@example.com"
+                            >
+                        </div>
+                        <span class="error-message"></span>
                     </div>
 
+                    <!-- Password -->
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <div class="password-input-wrapper">
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock"></i>
                             <input 
                                 type="password" 
                                 id="password" 
                                 name="password" 
-                                placeholder="Enter your password"
-                                required
+                                required 
                                 autocomplete="current-password"
+                                placeholder="Enter your password"
                             >
-                            <button type="button" class="password-toggle" id="togglePassword">
-                                <span class="eye-icon" id="eyeIcon">👁️</span>
+                            <button type="button" class="password-toggle" id="passwordToggle">
+                                <i class="fas fa-eye"></i>
                             </button>
                         </div>
-                        <span class="error-message" id="password-error"></span>
+                        <span class="error-message"></span>
                     </div>
 
-                    <div class="form-options">
+                    <!-- Remember Me & Forgot Password -->
+                    <div class="form-row">
                         <label class="checkbox-label">
-                            <input type="checkbox" id="remember" name="remember">
+                            <input type="checkbox" id="rememberMe" name="rememberMe">
                             <span>Remember me</span>
                         </label>
-                        <a href="forgot-password.html" class="link">Forgot password?</a>
+                        <a href="forgot-password.html" class="link-text">Forgot password?</a>
                     </div>
 
-                    <button type="submit" class="btn btn-primary" id="loginBtn">
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-primary btn-block" id="loginBtn">
                         <span class="btn-text">Sign In</span>
                         <span class="btn-loader" style="display: none;">
-                            <span class="spinner"></span>
+                            <i class="fas fa-spinner fa-spin"></i>
                             Signing in...
                         </span>
                     </button>
                 </form>
 
-                <div class="auth-footer">
-                    <p>Don't have an account? <a href="register.html" class="link">Sign up</a></p>
+                <!-- Divider -->
+                <div class="divider">
+                    <span>or</span>
+                </div>
+
+                <!-- Social Login (Optional - can be enabled later) -->
+                <div class="social-login">
+                    <button class="btn btn-social" disabled>
+                        <i class="fab fa-google"></i>
+                        Continue with Google
+                    </button>
+                </div>
+
+                <!-- Sign Up Link -->
+                <div class="form-footer">
+                    <p>Don't have an account? <a href="register.html" class="link-primary">Sign up free</a></p>
                 </div>
             </div>
         </div>
-
-        <div class="auth-bg">
-            <div class="bg-pattern"></div>
-        </div>
     </div>
 
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/auth.js"></script>
     <script>
-        // Initialize login page
-        document.addEventListener('DOMContentLoaded', () => {
-            // Check if already logged in
-            if (isAuthenticated()) {
-                redirectToDashboard();
-            }
+        // Login form handler
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('loginForm');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const rememberMeCheckbox = document.getElementById('rememberMe');
+            const loginBtn = document.getElementById('loginBtn');
+            const passwordToggle = document.getElementById('passwordToggle');
 
             // Password toggle
-            const togglePassword = document.getElementById('togglePassword');
-            const passwordInput = document.getElementById('password');
-            const eyeIcon = document.getElementById('eyeIcon');
-
-            togglePassword.addEventListener('click', () => {
+            passwordToggle.addEventListener('click', function() {
                 const type = passwordInput.type === 'password' ? 'text' : 'password';
                 passwordInput.type = type;
-                eyeIcon.textContent = type === 'password' ? '👁️' : '🙈';
+                this.querySelector('i').classList.toggle('fa-eye');
+                this.querySelector('i').classList.toggle('fa-eye-slash');
+            });
+
+            // Form validation
+            function validateEmail(email) {
+                const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return re.test(email);
+            }
+
+            function showFieldError(input, message) {
+                const formGroup = input.closest('.form-group');
+                const errorMessage = formGroup.querySelector('.error-message');
+                formGroup.classList.add('error');
+                errorMessage.textContent = message;
+            }
+
+            function clearFieldError(input) {
+                const formGroup = input.closest('.form-group');
+                const errorMessage = formGroup.querySelector('.error-message');
+                formGroup.classList.remove('error');
+                errorMessage.textContent = '';
+            }
+
+            // Real-time validation
+            emailInput.addEventListener('blur', function() {
+                if (this.value && !validateEmail(this.value)) {
+                    showFieldError(this, 'Please enter a valid email address');
+                } else {
+                    clearFieldError(this);
+                }
+            });
+
+            emailInput.addEventListener('input', function() {
+                if (this.closest('.form-group').classList.contains('error')) {
+                    clearFieldError(this);
+                }
+            });
+
+            passwordInput.addEventListener('input', function() {
+                if (this.closest('.form-group').classList.contains('error')) {
+                    clearFieldError(this);
+                }
             });
 
             // Form submission
-            const loginForm = document.getElementById('loginForm');
-            loginForm.addEventListener('submit', async (e) => {
+            loginForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
-                
-                const email = document.getElementById('email').value.trim();
-                const password = document.getElementById('password').value;
-                const remember = document.getElementById('remember').checked;
 
                 // Clear previous errors
-                clearErrors();
+                clearFieldError(emailInput);
+                clearFieldError(passwordInput);
 
-                // Validate inputs
-                if (!validateEmail(email)) {
-                    showError('email', 'Please enter a valid email address');
-                    return;
+                const email = emailInput.value.trim();
+                const password = passwordInput.value;
+                const rememberMe = rememberMeCheckbox.checked;
+
+                // Validation
+                let hasError = false;
+
+                if (!email) {
+                    showFieldError(emailInput, 'Email is required');
+                    hasError = true;
+                } else if (!validateEmail(email)) {
+                    showFieldError(emailInput, 'Please enter a valid email address');
+                    hasError = true;
                 }
 
-                if (password.length < 6) {
-                    showError('password', 'Password must be at least 6 characters');
+                if (!password) {
+                    showFieldError(passwordInput, 'Password is required');
+                    hasError = true;
+                } else if (password.length < 6) {
+                    showFieldError(passwordInput, 'Password must be at least 6 characters');
+                    hasError = true;
+                }
+
+                if (hasError) {
                     return;
                 }
 
                 // Show loading state
-                setLoading(true);
+                loginBtn.disabled = true;
+                loginBtn.querySelector('.btn-text').style.display = 'none';
+                loginBtn.querySelector('.btn-loader').style.display = 'flex';
 
-                // Attempt login
-                const result = await login(email, password);
+                try {
+                    // Use the Auth.login function from auth.js
+                    const result = await Auth.login(email, password);
 
-                // Hide loading state
-                setLoading(false);
+                    if (result.success) {
+                        showAlert('success', 'Login successful! Redirecting...');
+                        
+                        // Handle remember me
+                        if (rememberMe) {
+                            localStorage.setItem('akura_remember_me', 'true');
+                        } else {
+                            localStorage.removeItem('akura_remember_me');
+                        }
 
-                if (result.success) {
-                    showAlert('success', 'Welcome back! Redirecting...');
+                        // Redirect will be handled by auth.js based on user status
+                    } else {
+                        showAlert('error', result.error || 'Login failed. Please check your credentials.');
+                        
+                        // Reset button
+                        loginBtn.disabled = false;
+                        loginBtn.querySelector('.btn-text').style.display = 'inline';
+                        loginBtn.querySelector('.btn-loader').style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error('Login error:', error);
+                    showAlert('error', 'An unexpected error occurred. Please try again.');
+                    
+                    // Reset button
+                    loginBtn.disabled = false;
+                    loginBtn.querySelector('.btn-text').style.display = 'inline';
+                    loginBtn.querySelector('.btn-loader').style.display = 'none';
+                }
+            });
+
+            // Alert function
+            function showAlert(type, message) {
+                const alertContainer = document.getElementById('alertContainer');
+                const alert = document.createElement('div');
+                alert.className = `alert alert-${type}`;
+                alert.innerHTML = `
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                    <span>${message}</span>
+                `;
+                alertContainer.innerHTML = '';
+                alertContainer.appendChild(alert);
+
+                // Auto-hide success messages
+                if (type === 'success') {
                     setTimeout(() => {
-                        redirectToDashboard();
-                    }, 1000);
-                } else {
-                    showAlert('error', result.error || 'Login failed. Please try again.');
+                        alert.remove();
+                    }, 3000);
                 }
-            });
+            }
 
-            // Real-time validation
-            document.getElementById('email').addEventListener('blur', (e) => {
-                const email = e.target.value.trim();
-                if (email && !validateEmail(email)) {
-                    showError('email', 'Please enter a valid email address');
-                } else {
-                    clearError('email');
-                }
-            });
+            // Check if user is already logged in
+            if (Auth.isAuthenticated()) {
+                window.location.href = Auth.getRedirectPath();
+            }
         });
-
-        // Helper functions
-        function setLoading(isLoading) {
-            const btn = document.getElementById('loginBtn');
-            const btnText = btn.querySelector('.btn-text');
-            const btnLoader = btn.querySelector('.btn-loader');
-            
-            btn.disabled = isLoading;
-            btnText.style.display = isLoading ? 'none' : 'inline';
-            btnLoader.style.display = isLoading ? 'inline-flex' : 'none';
-        }
-
-        function showError(field, message) {
-            const errorElement = document.getElementById(`${field}-error`);
-            const inputElement = document.getElementById(field);
-            
-            if (errorElement) {
-                errorElement.textContent = message;
-                errorElement.style.display = 'block';
-            }
-            
-            if (inputElement) {
-                inputElement.classList.add('error');
-            }
-        }
-
-        function clearError(field) {
-            const errorElement = document.getElementById(`${field}-error`);
-            const inputElement = document.getElementById(field);
-            
-            if (errorElement) {
-                errorElement.textContent = '';
-                errorElement.style.display = 'none';
-            }
-            
-            if (inputElement) {
-                inputElement.classList.remove('error');
-            }
-        }
-
-        function clearErrors() {
-            ['email', 'password'].forEach(field => clearError(field));
-            document.getElementById('alert-container').innerHTML = '';
-        }
-
-        function showAlert(type, message) {
-            const container = document.getElementById('alert-container');
-            const alert = document.createElement('div');
-            alert.className = `alert alert-${type}`;
-            alert.innerHTML = `
-                <span class="alert-icon">${type === 'success' ? '✓' : '✕'}</span>
-                <span class="alert-message">${message}</span>
-            `;
-            container.innerHTML = '';
-            container.appendChild(alert);
-        }
-
-        function validateEmail(email) {
-            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return re.test(email);
-        }
     </script>
 </body>
 </html>

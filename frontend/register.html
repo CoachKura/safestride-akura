@@ -3,220 +3,373 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up - AKURA SafeStride</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <title>Create Account - AKURA SafeStride</title>
+    
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Styles -->
     <link rel="stylesheet" href="css/auth.css">
 </head>
 <body>
     <div class="auth-container">
-        <div class="auth-card">
-            <div class="auth-header">
-                <div class="logo">
-                    <h1>AKURA SafeStride</h1>
-                    <p class="tagline">Where Injury-Free Running Meets Science</p>
+        <!-- Left Side: Runner Image -->
+        <div class="auth-visual">
+            <div class="visual-overlay"></div>
+            <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1200&q=80" alt="Runner" class="visual-image">
+            <div class="visual-content">
+                <div class="visual-logo">
+                    <div class="logo-icon">🏃</div>
+                    <span class="logo-text">AKURA SafeStride</span>
+                </div>
+                <h2 class="visual-title">Start Your Journey</h2>
+                <p class="visual-subtitle">Join 127+ athletes running smarter, safer, and longer</p>
+                <div class="visual-features">
+                    <div class="feature-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Personalized training plans</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Real-time progress tracking</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>92% injury reduction rate</span>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <div class="auth-content">
-                <h2>Create Your Account</h2>
-                <p class="subtitle">Start your injury-free running journey today</p>
+        <!-- Right Side: Register Form -->
+        <div class="auth-form-container">
+            <div class="auth-form-wrapper">
+                <!-- Back to Home -->
+                <a href="index.html" class="back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Home
+                </a>
 
-                <!-- Alert Messages -->
-                <div id="alert-container"></div>
+                <!-- Form Header -->
+                <div class="form-header">
+                    <h1>Create Your Account</h1>
+                    <p>Start your free assessment in minutes</p>
+                </div>
 
-                <!-- Registration Form -->
+                <!-- Alert Container -->
+                <div id="alertContainer"></div>
+
+                <!-- Register Form -->
                 <form id="registerForm" class="auth-form">
+                    <!-- Full Name -->
                     <div class="form-group">
                         <label for="fullName">Full Name</label>
-                        <input 
-                            type="text" 
-                            id="fullName" 
-                            name="fullName" 
-                            placeholder="John Doe"
-                            required
-                            autocomplete="name"
-                        >
-                        <span class="error-message" id="fullName-error"></span>
+                        <div class="input-with-icon">
+                            <i class="fas fa-user"></i>
+                            <input 
+                                type="text" 
+                                id="fullName" 
+                                name="fullName" 
+                                required 
+                                autocomplete="name"
+                                placeholder="John Doe"
+                            >
+                        </div>
+                        <span class="error-message"></span>
                     </div>
 
+                    <!-- Email -->
                     <div class="form-group">
                         <label for="email">Email Address</label>
-                        <input 
-                            type="email" 
-                            id="email" 
-                            name="email" 
-                            placeholder="you@example.com"
-                            required
-                            autocomplete="email"
-                        >
-                        <span class="error-message" id="email-error"></span>
+                        <div class="input-with-icon">
+                            <i class="fas fa-envelope"></i>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                required 
+                                autocomplete="email"
+                                placeholder="your.email@example.com"
+                            >
+                        </div>
+                        <span class="error-message"></span>
                     </div>
 
+                    <!-- Password -->
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <div class="password-input-wrapper">
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock"></i>
                             <input 
                                 type="password" 
                                 id="password" 
                                 name="password" 
-                                placeholder="At least 6 characters"
-                                required
+                                required 
                                 autocomplete="new-password"
+                                placeholder="Create a strong password"
                             >
-                            <button type="button" class="password-toggle" id="togglePassword">
-                                <span class="eye-icon" id="eyeIcon">👁️</span>
+                            <button type="button" class="password-toggle" id="passwordToggle">
+                                <i class="fas fa-eye"></i>
                             </button>
                         </div>
-                        <span class="error-message" id="password-error"></span>
-                        
                         <!-- Password Strength Indicator -->
-                        <div class="password-strength" id="passwordStrength" style="display: none;">
+                        <div class="password-strength" id="passwordStrength">
                             <div class="strength-bar">
-                                <div class="strength-bar-fill" id="strengthBarFill"></div>
+                                <div class="strength-fill"></div>
                             </div>
-                            <span class="strength-text" id="strengthText"></span>
+                            <span class="strength-text"></span>
                         </div>
+                        <span class="error-message"></span>
                     </div>
 
+                    <!-- Confirm Password -->
                     <div class="form-group">
                         <label for="confirmPassword">Confirm Password</label>
-                        <div class="password-input-wrapper">
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock"></i>
                             <input 
                                 type="password" 
                                 id="confirmPassword" 
                                 name="confirmPassword" 
-                                placeholder="Re-enter your password"
-                                required
+                                required 
                                 autocomplete="new-password"
+                                placeholder="Re-enter your password"
                             >
-                            <button type="button" class="password-toggle" id="toggleConfirmPassword">
-                                <span class="eye-icon" id="eyeIconConfirm">👁️</span>
+                            <button type="button" class="password-toggle" id="confirmPasswordToggle">
+                                <i class="fas fa-eye"></i>
                             </button>
                         </div>
-                        <span class="error-message" id="confirmPassword-error"></span>
+                        <span class="error-message"></span>
                     </div>
 
+                    <!-- Role Selection -->
                     <div class="form-group">
-                        <label for="role">I am a...</label>
-                        <select id="role" name="role" required>
-                            <option value="">Select your role</option>
-                            <option value="athlete">Athlete / Runner</option>
-                            <option value="coach">Coach / Trainer</option>
-                        </select>
-                        <span class="error-message" id="role-error"></span>
+                        <label>I am a...</label>
+                        <div class="role-selection">
+                            <label class="role-card">
+                                <input type="radio" name="role" value="athlete" checked>
+                                <div class="role-content">
+                                    <i class="fas fa-running"></i>
+                                    <h4>Athlete</h4>
+                                    <p>Get personalized training</p>
+                                </div>
+                            </label>
+                            <label class="role-card">
+                                <input type="radio" name="role" value="coach">
+                                <div class="role-content">
+                                    <i class="fas fa-clipboard-list"></i>
+                                    <h4>Coach</h4>
+                                    <p>Manage your athletes</p>
+                                </div>
+                            </label>
+                        </div>
                     </div>
 
+                    <!-- Terms & Conditions -->
                     <div class="form-group">
                         <label class="checkbox-label">
-                            <input type="checkbox" id="terms" name="terms" required>
-                            <span>I agree to the <a href="#" class="link">Terms of Service</a> and <a href="#" class="link">Privacy Policy</a></span>
+                            <input type="checkbox" id="termsAccepted" name="termsAccepted" required>
+                            <span>I agree to the <a href="#terms" class="link-text">Terms of Service</a> and <a href="#privacy" class="link-text">Privacy Policy</a></span>
                         </label>
-                        <span class="error-message" id="terms-error"></span>
+                        <span class="error-message"></span>
                     </div>
 
-                    <button type="submit" class="btn btn-primary" id="registerBtn">
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-primary btn-block" id="registerBtn">
                         <span class="btn-text">Create Account</span>
                         <span class="btn-loader" style="display: none;">
-                            <span class="spinner"></span>
+                            <i class="fas fa-spinner fa-spin"></i>
                             Creating account...
                         </span>
                     </button>
                 </form>
 
-                <div class="auth-footer">
-                    <p>Already have an account? <a href="login.html" class="link">Sign in</a></p>
+                <!-- Divider -->
+                <div class="divider">
+                    <span>or</span>
+                </div>
+
+                <!-- Social Register (Optional - can be enabled later) -->
+                <div class="social-login">
+                    <button class="btn btn-social" disabled>
+                        <i class="fab fa-google"></i>
+                        Sign up with Google
+                    </button>
+                </div>
+
+                <!-- Sign In Link -->
+                <div class="form-footer">
+                    <p>Already have an account? <a href="login.html" class="link-primary">Sign in</a></p>
                 </div>
             </div>
         </div>
-
-        <div class="auth-bg">
-            <div class="bg-pattern"></div>
-        </div>
     </div>
 
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/auth.js"></script>
     <script>
-        // Initialize registration page
-        document.addEventListener('DOMContentLoaded', () => {
-            // Check if already logged in
-            if (isAuthenticated()) {
-                redirectToDashboard();
-            }
+        document.addEventListener('DOMContentLoaded', function() {
+            const registerForm = document.getElementById('registerForm');
+            const fullNameInput = document.getElementById('fullName');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            const termsCheckbox = document.getElementById('termsAccepted');
+            const registerBtn = document.getElementById('registerBtn');
+            const passwordToggle = document.getElementById('passwordToggle');
+            const confirmPasswordToggle = document.getElementById('confirmPasswordToggle');
 
             // Password toggles
-            const togglePassword = document.getElementById('togglePassword');
-            const passwordInput = document.getElementById('password');
-            const eyeIcon = document.getElementById('eyeIcon');
-
-            togglePassword.addEventListener('click', () => {
+            passwordToggle.addEventListener('click', function() {
                 const type = passwordInput.type === 'password' ? 'text' : 'password';
                 passwordInput.type = type;
-                eyeIcon.textContent = type === 'password' ? '👁️' : '🙈';
+                this.querySelector('i').classList.toggle('fa-eye');
+                this.querySelector('i').classList.toggle('fa-eye-slash');
             });
 
-            const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
-            const confirmPasswordInput = document.getElementById('confirmPassword');
-            const eyeIconConfirm = document.getElementById('eyeIconConfirm');
-
-            toggleConfirmPassword.addEventListener('click', () => {
+            confirmPasswordToggle.addEventListener('click', function() {
                 const type = confirmPasswordInput.type === 'password' ? 'text' : 'password';
                 confirmPasswordInput.type = type;
-                eyeIconConfirm.textContent = type === 'password' ? '👁️' : '🙈';
+                this.querySelector('i').classList.toggle('fa-eye');
+                this.querySelector('i').classList.toggle('fa-eye-slash');
             });
 
-            // Password strength indicator
-            passwordInput.addEventListener('input', (e) => {
-                const password = e.target.value;
-                updatePasswordStrength(password);
+            // Password strength checker
+            passwordInput.addEventListener('input', function() {
+                const password = this.value;
+                const strength = calculatePasswordStrength(password);
+                updatePasswordStrength(strength);
+            });
+
+            function calculatePasswordStrength(password) {
+                let strength = 0;
+                if (password.length >= 8) strength++;
+                if (password.length >= 12) strength++;
+                if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+                if (/\d/.test(password)) strength++;
+                if (/[^A-Za-z0-9]/.test(password)) strength++;
+                return Math.min(strength, 4);
+            }
+
+            function updatePasswordStrength(strength) {
+                const strengthElement = document.getElementById('passwordStrength');
+                const fill = strengthElement.querySelector('.strength-fill');
+                const text = strengthElement.querySelector('.strength-text');
+                
+                const levels = ['Weak', 'Fair', 'Good', 'Strong', 'Very Strong'];
+                const colors = ['#EF4444', '#F59E0B', '#EAB308', '#10B981', '#059669'];
+                
+                if (passwordInput.value.length === 0) {
+                    fill.style.width = '0%';
+                    text.textContent = '';
+                    strengthElement.style.display = 'none';
+                    return;
+                }
+                
+                strengthElement.style.display = 'block';
+                fill.style.width = `${(strength / 4) * 100}%`;
+                fill.style.backgroundColor = colors[strength];
+                text.textContent = levels[strength];
+                text.style.color = colors[strength];
+            }
+
+            // Form validation functions
+            function validateEmail(email) {
+                const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return re.test(email);
+            }
+
+            function showFieldError(input, message) {
+                const formGroup = input.closest('.form-group');
+                const errorMessage = formGroup.querySelector('.error-message');
+                formGroup.classList.add('error');
+                errorMessage.textContent = message;
+            }
+
+            function clearFieldError(input) {
+                const formGroup = input.closest('.form-group');
+                const errorMessage = formGroup.querySelector('.error-message');
+                formGroup.classList.remove('error');
+                errorMessage.textContent = '';
+            }
+
+            // Real-time validation
+            fullNameInput.addEventListener('blur', function() {
+                if (this.value.trim().length < 2) {
+                    showFieldError(this, 'Please enter your full name');
+                } else {
+                    clearFieldError(this);
+                }
+            });
+
+            emailInput.addEventListener('blur', function() {
+                if (this.value && !validateEmail(this.value)) {
+                    showFieldError(this, 'Please enter a valid email address');
+                } else {
+                    clearFieldError(this);
+                }
+            });
+
+            confirmPasswordInput.addEventListener('blur', function() {
+                if (this.value && this.value !== passwordInput.value) {
+                    showFieldError(this, 'Passwords do not match');
+                } else {
+                    clearFieldError(this);
+                }
+            });
+
+            // Clear errors on input
+            [fullNameInput, emailInput, passwordInput, confirmPasswordInput].forEach(input => {
+                input.addEventListener('input', function() {
+                    if (this.closest('.form-group').classList.contains('error')) {
+                        clearFieldError(this);
+                    }
+                });
             });
 
             // Form submission
-            const registerForm = document.getElementById('registerForm');
-            registerForm.addEventListener('submit', async (e) => {
+            registerForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
-                
-                const fullName = document.getElementById('fullName').value.trim();
-                const email = document.getElementById('email').value.trim();
-                const password = document.getElementById('password').value;
-                const confirmPassword = document.getElementById('confirmPassword').value;
-                const role = document.getElementById('role').value;
-                const terms = document.getElementById('terms').checked;
 
                 // Clear previous errors
-                clearErrors();
+                [fullNameInput, emailInput, passwordInput, confirmPasswordInput, termsCheckbox].forEach(clearFieldError);
 
-                // Validate inputs
+                const fullName = fullNameInput.value.trim();
+                const email = emailInput.value.trim();
+                const password = passwordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+                const role = document.querySelector('input[name="role"]:checked').value;
+                const termsAccepted = termsCheckbox.checked;
+
+                // Validation
                 let hasError = false;
 
                 if (fullName.length < 2) {
-                    showError('fullName', 'Please enter your full name (at least 2 characters)');
+                    showFieldError(fullNameInput, 'Please enter your full name');
                     hasError = true;
                 }
 
                 if (!validateEmail(email)) {
-                    showError('email', 'Please enter a valid email address');
+                    showFieldError(emailInput, 'Please enter a valid email address');
                     hasError = true;
                 }
 
                 if (password.length < 6) {
-                    showError('password', 'Password must be at least 6 characters');
+                    showFieldError(passwordInput, 'Password must be at least 6 characters');
                     hasError = true;
                 }
 
                 if (password !== confirmPassword) {
-                    showError('confirmPassword', 'Passwords do not match');
+                    showFieldError(confirmPasswordInput, 'Passwords do not match');
                     hasError = true;
                 }
 
-                if (!role) {
-                    showError('role', 'Please select your role');
-                    hasError = true;
-                }
-
-                if (!terms) {
-                    showError('terms', 'You must agree to the Terms of Service and Privacy Policy');
+                if (!termsAccepted) {
+                    showFieldError(termsCheckbox, 'You must accept the terms and conditions');
                     hasError = true;
                 }
 
@@ -225,166 +378,58 @@
                 }
 
                 // Show loading state
-                setLoading(true);
+                registerBtn.disabled = true;
+                registerBtn.querySelector('.btn-text').style.display = 'none';
+                registerBtn.querySelector('.btn-loader').style.display = 'flex';
 
-                // Attempt registration
-                const result = await register(email, password, fullName, role);
+                try {
+                    // Use the Auth.register function from auth.js
+                    const result = await Auth.register(email, password, fullName, role);
 
-                // Hide loading state
-                setLoading(false);
-
-                if (result.success) {
-                    showAlert('success', 'Account created successfully! Please check your email to verify your account.');
+                    if (result.success) {
+                        showAlert('success', 'Account created! Please check your email to verify your account.');
+                        
+                        // Redirect to login after a short delay
+                        setTimeout(() => {
+                            window.location.href = 'login.html';
+                        }, 3000);
+                    } else {
+                        showAlert('error', result.error || 'Registration failed. Please try again.');
+                        
+                        // Reset button
+                        registerBtn.disabled = false;
+                        registerBtn.querySelector('.btn-text').style.display = 'inline';
+                        registerBtn.querySelector('.btn-loader').style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error('Registration error:', error);
+                    showAlert('error', 'An unexpected error occurred. Please try again.');
                     
-                    // Clear form
-                    registerForm.reset();
-                    
-                    // Redirect to login after 3 seconds
-                    setTimeout(() => {
-                        window.location.href = 'login.html';
-                    }, 3000);
-                } else {
-                    showAlert('error', result.error || 'Registration failed. Please try again.');
+                    // Reset button
+                    registerBtn.disabled = false;
+                    registerBtn.querySelector('.btn-text').style.display = 'inline';
+                    registerBtn.querySelector('.btn-loader').style.display = 'none';
                 }
             });
 
-            // Real-time validation
-            document.getElementById('fullName').addEventListener('blur', (e) => {
-                const name = e.target.value.trim();
-                if (name && name.length < 2) {
-                    showError('fullName', 'Name must be at least 2 characters');
-                } else {
-                    clearError('fullName');
-                }
-            });
+            // Alert function
+            function showAlert(type, message) {
+                const alertContainer = document.getElementById('alertContainer');
+                const alert = document.createElement('div');
+                alert.className = `alert alert-${type}`;
+                alert.innerHTML = `
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                    <span>${message}</span>
+                `;
+                alertContainer.innerHTML = '';
+                alertContainer.appendChild(alert);
+            }
 
-            document.getElementById('email').addEventListener('blur', (e) => {
-                const email = e.target.value.trim();
-                if (email && !validateEmail(email)) {
-                    showError('email', 'Please enter a valid email address');
-                } else {
-                    clearError('email');
-                }
-            });
-
-            confirmPasswordInput.addEventListener('blur', () => {
-                const password = passwordInput.value;
-                const confirmPassword = confirmPasswordInput.value;
-                
-                if (confirmPassword && password !== confirmPassword) {
-                    showError('confirmPassword', 'Passwords do not match');
-                } else {
-                    clearError('confirmPassword');
-                }
-            });
+            // Check if user is already logged in
+            if (Auth.isAuthenticated()) {
+                window.location.href = Auth.getRedirectPath();
+            }
         });
-
-        // Helper functions
-        function updatePasswordStrength(password) {
-            const strengthIndicator = document.getElementById('passwordStrength');
-            const strengthBarFill = document.getElementById('strengthBarFill');
-            const strengthText = document.getElementById('strengthText');
-
-            if (password.length === 0) {
-                strengthIndicator.style.display = 'none';
-                return;
-            }
-
-            strengthIndicator.style.display = 'block';
-
-            let strength = 0;
-            let text = '';
-            let color = '';
-
-            // Calculate strength
-            if (password.length >= 6) strength++;
-            if (password.length >= 8) strength++;
-            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
-            if (/\d/.test(password)) strength++;
-            if (/[^a-zA-Z0-9]/.test(password)) strength++;
-
-            // Determine text and color
-            if (strength <= 1) {
-                text = 'Weak';
-                color = '#EF4444';
-            } else if (strength <= 3) {
-                text = 'Fair';
-                color = '#F59E0B';
-            } else if (strength <= 4) {
-                text = 'Good';
-                color = '#10B981';
-            } else {
-                text = 'Strong';
-                color = '#059669';
-            }
-
-            // Update UI
-            const percentage = (strength / 5) * 100;
-            strengthBarFill.style.width = percentage + '%';
-            strengthBarFill.style.backgroundColor = color;
-            strengthText.textContent = text;
-            strengthText.style.color = color;
-        }
-
-        function setLoading(isLoading) {
-            const btn = document.getElementById('registerBtn');
-            const btnText = btn.querySelector('.btn-text');
-            const btnLoader = btn.querySelector('.btn-loader');
-            
-            btn.disabled = isLoading;
-            btnText.style.display = isLoading ? 'none' : 'inline';
-            btnLoader.style.display = isLoading ? 'inline-flex' : 'none';
-        }
-
-        function showError(field, message) {
-            const errorElement = document.getElementById(`${field}-error`);
-            const inputElement = document.getElementById(field);
-            
-            if (errorElement) {
-                errorElement.textContent = message;
-                errorElement.style.display = 'block';
-            }
-            
-            if (inputElement) {
-                inputElement.classList.add('error');
-            }
-        }
-
-        function clearError(field) {
-            const errorElement = document.getElementById(`${field}-error`);
-            const inputElement = document.getElementById(field);
-            
-            if (errorElement) {
-                errorElement.textContent = '';
-                errorElement.style.display = 'none';
-            }
-            
-            if (inputElement) {
-                inputElement.classList.remove('error');
-            }
-        }
-
-        function clearErrors() {
-            ['fullName', 'email', 'password', 'confirmPassword', 'role', 'terms'].forEach(field => clearError(field));
-            document.getElementById('alert-container').innerHTML = '';
-        }
-
-        function showAlert(type, message) {
-            const container = document.getElementById('alert-container');
-            const alert = document.createElement('div');
-            alert.className = `alert alert-${type}`;
-            alert.innerHTML = `
-                <span class="alert-icon">${type === 'success' ? '✓' : '✕'}</span>
-                <span class="alert-message">${message}</span>
-            `;
-            container.innerHTML = '';
-            container.appendChild(alert);
-        }
-
-        function validateEmail(email) {
-            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return re.test(email);
-        }
     </script>
 </body>
 </html>

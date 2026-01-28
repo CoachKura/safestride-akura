@@ -1,427 +1,471 @@
-/**
- * AKURA SafeStride Authentication System
- * Supabase Integration
- * 
- * IMPORTANT: Replace SUPABASE_URL and SUPABASE_ANON_KEY with your actual credentials
- * Find them in: Supabase Dashboard > Settings > API
- */
-
 // ===================================
-// SUPABASE CONFIGURATION
+// AKURA SafeStride Enhanced Authentication
+// With role-based access and redirect logic
 // ===================================
-const SUPABASE_URL = 'YOUR_SUPABASE_URL'; // e.g., 'https://xxxxx.supabase.co'
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'; // Your anon/public key
 
-// Import Supabase client from CDN
-let supabase = null;
+// Supabase Configuration
+const SUPABASE_URL = "https://yawxlwcniqfspcgefuro.supabase.co"; // Replace with your actual Supabase URL
+const SUPABASE_ANON_KEY = 'sb_publishable_tV8atbFQeBZgLzJ8mRD6kw_yl8yL-kj'; // Replace with your actual Supabase anon key
 
 // Initialize Supabase client
-(function initSupabase() {
-    if (typeof window !== 'undefined') {
-        // Load Supabase from CDN if not already loaded
-        if (!window.supabase) {
-            const script = document.createElement('script');
-            script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
-            script.onload = () => {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                console.log('✓ Supabase initialized');
-            };
-            document.head.appendChild(script);
-        } else {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            console.log('✓ Supabase initialized');
-        }
-    }
-})();
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// ===================================
-// AUTHENTICATION FUNCTIONS
-// ===================================
+// Authentication object
+const Auth = {
+    // ===================================
+    // AUTHENTICATION METHODS
+    // ===================================
 
-/**
- * Register new user with email and password
- * @param {string} email - User email
- * @param {string} password - User password
- * @param {string} fullName - User full name
- * @param {string} role - User role (athlete or coach)
- * @returns {Promise<{success: boolean, error?: string, user?: object}>}
- */
-async function register(email, password, fullName, role) {
-    try {
-        if (!supabase) {
-            return { success: false, error: 'Authentication system is initializing. Please wait a moment and try again.' };
-        }
+    /**
+     * Register a new user
+     * @param {string} email - User's email
+     * @param {string} password - User's password
+     * @param {string} fullName - User's full name
+     * @param {string} role - User's role (athlete/coach)
+     * @returns {Promise<Object>} - Result object
+     */
+    async register(email, password, fullName, role = 'athlete') {
+        try {
+            // Create user account
+            const { data, error } = await supabase.auth.signUp({
+                email: email,
+                password: password,
+                options: {
+                    data: {
+                        full_name: fullName,
+                        role: role,
+                        access_level: 'demo', // New users start with demo access
+                        assessment_completed: false,
+                        first_login: new Date().toISOString()
+                    }
+                }
+            });
 
-        const { data, error } = await supabase.auth.signUp({
-            email: email,
-            password: password,
-            options: {
-                data: {
+            if (error) {
+                console.error('Registration error:', error);
+                return {
+                    success: false,
+                    error: error.message || 'Registration failed'
+                };
+            }
+
+            if (data.user) {
+                console.log('User registered successfully:', data.user.id);
+                
+                // Store user metadata
+                await this.updateUserMetadata({
                     full_name: fullName,
                     role: role,
-                    display_name: fullName
-                },
-                emailRedirectTo: `${window.location.origin}/profile-setup.html`
-            }
-        });
+                    access_level: 'demo',
+                    assessment_completed: false
+                });
 
-        if (error) {
+                return {
+                    success: true,
+                    user: data.user
+                };
+            }
+
+            return {
+                success: false,
+                error: 'Registration failed - no user data returned'
+            };
+        } catch (error) {
             console.error('Registration error:', error);
-            return { success: false, error: error.message };
+            return {
+                success: false,
+                error: error.message || 'An unexpected error occurred'
+            };
         }
+    },
 
-        // Store user info in localStorage for profile setup
-        if (data.user) {
-            localStorage.setItem('akura_user_role', role);
-            localStorage.setItem('akura_user_name', fullName);
-        }
+    /**
+     * Login user
+     * @param {string} email - User's email
+     * @param {string} password - User's password
+     * @returns {Promise<Object>} - Result object
+     */
+    async login(email, password) {
+        try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
 
-        return { success: true, user: data.user };
-    } catch (error) {
-        console.error('Registration exception:', error);
-        return { success: false, error: 'An unexpected error occurred. Please try again.' };
-    }
-}
+            if (error) {
+                console.error('Login error:', error);
+                return {
+                    success: false,
+                    error: error.message || 'Invalid email or password'
+                };
+            }
 
-/**
- * Login user with email and password
- * @param {string} email - User email
- * @param {string} password - User password
- * @returns {Promise<{success: boolean, error?: string, session?: object}>}
- */
-async function login(email, password) {
-    try {
-        if (!supabase) {
-            return { success: false, error: 'Authentication system is initializing. Please wait a moment and try again.' };
-        }
+            if (data.user) {
+                console.log('User logged in successfully:', data.user.id);
+                
+                // Store session data
+                this.storeSession(data.session);
+                
+                // Get redirect path based on user status
+                const redirectPath = await this.getRedirectPath();
+                
+                // Redirect user
+                setTimeout(() => {
+                    window.location.href = redirectPath;
+                }, 500);
 
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email: email,
-            password: password
-        });
+                return {
+                    success: true,
+                    user: data.user,
+                    redirectPath: redirectPath
+                };
+            }
 
-        if (error) {
+            return {
+                success: false,
+                error: 'Login failed - no user data returned'
+            };
+        } catch (error) {
             console.error('Login error:', error);
-            
-            // Provide user-friendly error messages
-            if (error.message.includes('Invalid login credentials')) {
-                return { success: false, error: 'Invalid email or password. Please try again.' };
-            } else if (error.message.includes('Email not confirmed')) {
-                return { success: false, error: 'Please check your email to confirm your account before signing in.' };
-            }
-            
-            return { success: false, error: error.message };
+            return {
+                success: false,
+                error: error.message || 'An unexpected error occurred'
+            };
         }
+    },
 
-        // Store session info
-        if (data.session) {
-            localStorage.setItem('akura_session', JSON.stringify(data.session));
+    /**
+     * Logout user
+     * @returns {Promise<Object>} - Result object
+     */
+    async logout() {
+        try {
+            const { error } = await supabase.auth.signOut();
             
-            // Store user role if available
-            if (data.user?.user_metadata?.role) {
-                localStorage.setItem('akura_user_role', data.user.user_metadata.role);
+            if (error) {
+                console.error('Logout error:', error);
+                return {
+                    success: false,
+                    error: error.message
+                };
             }
-            
-            // Store user name if available
-            if (data.user?.user_metadata?.full_name) {
-                localStorage.setItem('akura_user_name', data.user.user_metadata.full_name);
-            }
-        }
 
-        return { success: true, session: data.session, user: data.user };
-    } catch (error) {
-        console.error('Login exception:', error);
-        return { success: false, error: 'An unexpected error occurred. Please try again.' };
-    }
-}
+            // Clear local storage
+            this.clearSession();
 
-/**
- * Logout current user
- * @returns {Promise<{success: boolean, error?: string}>}
- */
-async function logout() {
-    try {
-        if (!supabase) {
-            return { success: false, error: 'Authentication system is initializing.' };
-        }
+            // Redirect to homepage
+            window.location.href = 'index.html';
 
-        const { error } = await supabase.auth.signOut();
-
-        if (error) {
+            return { success: true };
+        } catch (error) {
             console.error('Logout error:', error);
+            return {
+                success: false,
+                error: error.message || 'Logout failed'
+            };
+        }
+    },
+
+    /**
+     * Get current user
+     * @returns {Promise<Object|null>} - User object or null
+     */
+    async getCurrentUser() {
+        try {
+            const { data: { user }, error } = await supabase.auth.getUser();
+            
+            if (error) {
+                console.error('Get user error:', error);
+                return null;
+            }
+
+            return user;
+        } catch (error) {
+            console.error('Get user error:', error);
+            return null;
+        }
+    },
+
+    /**
+     * Check if user is authenticated
+     * @returns {boolean} - True if authenticated
+     */
+    isAuthenticated() {
+        const session = localStorage.getItem('akura_session');
+        return session !== null;
+    },
+
+    /**
+     * Get user metadata
+     * @returns {Promise<Object>} - User metadata
+     */
+    async getUserMetadata() {
+        const user = await this.getCurrentUser();
+        if (!user) return null;
+
+        return user.user_metadata || {};
+    },
+
+    /**
+     * Update user metadata
+     * @param {Object} metadata - Metadata to update
+     * @returns {Promise<Object>} - Result object
+     */
+    async updateUserMetadata(metadata) {
+        try {
+            const { data, error } = await supabase.auth.updateUser({
+                data: metadata
+            });
+
+            if (error) {
+                console.error('Update metadata error:', error);
+                return { success: false, error: error.message };
+            }
+
+            return { success: true, user: data.user };
+        } catch (error) {
+            console.error('Update metadata error:', error);
             return { success: false, error: error.message };
         }
+    },
 
-        // Clear local storage
-        localStorage.removeItem('akura_session');
-        localStorage.removeItem('akura_user_role');
-        localStorage.removeItem('akura_user_name');
+    // ===================================
+    // ACCESS CONTROL & REDIRECT LOGIC
+    // ===================================
 
-        return { success: true };
-    } catch (error) {
-        console.error('Logout exception:', error);
-        return { success: false, error: 'An unexpected error occurred.' };
-    }
-}
+    /**
+     * Get redirect path based on user status
+     * @returns {Promise<string>} - Redirect path
+     */
+    async getRedirectPath() {
+        const user = await this.getCurrentUser();
+        if (!user) return 'login.html';
 
-/**
- * Send password reset email
- * @param {string} email - User email
- * @returns {Promise<{success: boolean, error?: string}>}
- */
-async function resetPassword(email) {
-    try {
-        if (!supabase) {
-            return { success: false, error: 'Authentication system is initializing. Please wait a moment and try again.' };
+        const metadata = user.user_metadata || {};
+        const role = metadata.role || 'athlete';
+        const accessLevel = metadata.access_level || 'demo';
+        const assessmentCompleted = metadata.assessment_completed || false;
+
+        console.log('User metadata:', metadata);
+        console.log('Redirect logic - Role:', role, 'Access:', accessLevel, 'Assessment:', assessmentCompleted);
+
+        // NEW USER FLOW: First time user → AIFRI Assessment
+        if (!assessmentCompleted) {
+            return 'aifri-assessment.html';
         }
 
-        const { error } = await supabase.auth.resetPasswordForEmail(email, {
-            redirectTo: `${window.location.origin}/reset-password.html`
-        });
+        // DEMO ACCESS FLOW: Assessment completed but demo access → Demo Dashboard
+        if (accessLevel === 'demo') {
+            return 'demo-dashboard.html';
+        }
 
-        if (error) {
+        // FULL ACCESS FLOW: Role-based redirect
+        if (role === 'coach') {
+            return 'coach-dashboard.html';
+        } else {
+            return 'athlete-dashboard.html';
+        }
+    },
+
+    /**
+     * Check user access level
+     * @param {string} requiredLevel - Required access level (demo, full, premium)
+     * @returns {Promise<boolean>} - True if user has required access
+     */
+    async checkAccessLevel(requiredLevel) {
+        const metadata = await this.getUserMetadata();
+        if (!metadata) return false;
+
+        const userAccessLevel = metadata.access_level || 'demo';
+        
+        const accessHierarchy = ['demo', 'full', 'premium'];
+        const userLevel = accessHierarchy.indexOf(userAccessLevel);
+        const requiredLevelIndex = accessHierarchy.indexOf(requiredLevel);
+
+        return userLevel >= requiredLevelIndex;
+    },
+
+    /**
+     * Check if user completed assessment
+     * @returns {Promise<boolean>} - True if assessment completed
+     */
+    async isAssessmentCompleted() {
+        const metadata = await this.getUserMetadata();
+        return metadata?.assessment_completed || false;
+    },
+
+    /**
+     * Mark assessment as completed
+     * @returns {Promise<Object>} - Result object
+     */
+    async markAssessmentCompleted() {
+        return await this.updateUserMetadata({
+            assessment_completed: true
+        });
+    },
+
+    /**
+     * Upgrade user access level
+     * @param {string} newLevel - New access level (full, premium)
+     * @returns {Promise<Object>} - Result object
+     */
+    async upgradeAccessLevel(newLevel) {
+        return await this.updateUserMetadata({
+            access_level: newLevel
+        });
+    },
+
+    // ===================================
+    // SESSION MANAGEMENT
+    // ===================================
+
+    /**
+     * Store session data
+     * @param {Object} session - Session object
+     */
+    storeSession(session) {
+        if (session) {
+            localStorage.setItem('akura_session', JSON.stringify(session));
+            localStorage.setItem('akura_access_token', session.access_token);
+            localStorage.setItem('akura_refresh_token', session.refresh_token);
+        }
+    },
+
+    /**
+     * Clear session data
+     */
+    clearSession() {
+        localStorage.removeItem('akura_session');
+        localStorage.removeItem('akura_access_token');
+        localStorage.removeItem('akura_refresh_token');
+        localStorage.removeItem('akura_remember_me');
+    },
+
+    /**
+     * Refresh session
+     * @returns {Promise<Object>} - Result object
+     */
+    async refreshSession() {
+        try {
+            const { data, error } = await supabase.auth.refreshSession();
+            
+            if (error) {
+                console.error('Refresh session error:', error);
+                return { success: false, error: error.message };
+            }
+
+            if (data.session) {
+                this.storeSession(data.session);
+                return { success: true, session: data.session };
+            }
+
+            return { success: false, error: 'No session data' };
+        } catch (error) {
+            console.error('Refresh session error:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    // ===================================
+    // PASSWORD RESET
+    // ===================================
+
+    /**
+     * Request password reset
+     * @param {string} email - User's email
+     * @returns {Promise<Object>} - Result object
+     */
+    async resetPassword(email) {
+        try {
+            const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: `${window.location.origin}/reset-password.html`
+            });
+
+            if (error) {
+                console.error('Password reset error:', error);
+                return { success: false, error: error.message };
+            }
+
+            return { success: true };
+        } catch (error) {
             console.error('Password reset error:', error);
             return { success: false, error: error.message };
         }
+    },
 
-        return { success: true };
-    } catch (error) {
-        console.error('Password reset exception:', error);
-        return { success: false, error: 'An unexpected error occurred. Please try again.' };
-    }
-}
+    /**
+     * Update password
+     * @param {string} newPassword - New password
+     * @returns {Promise<Object>} - Result object
+     */
+    async updatePassword(newPassword) {
+        try {
+            const { data, error } = await supabase.auth.updateUser({
+                password: newPassword
+            });
 
-/**
- * Update user password (after reset)
- * @param {string} newPassword - New password
- * @returns {Promise<{success: boolean, error?: string}>}
- */
-async function updatePassword(newPassword) {
-    try {
-        if (!supabase) {
-            return { success: false, error: 'Authentication system is initializing. Please wait a moment and try again.' };
-        }
+            if (error) {
+                console.error('Update password error:', error);
+                return { success: false, error: error.message };
+            }
 
-        const { error } = await supabase.auth.updateUser({
-            password: newPassword
-        });
-
-        if (error) {
-            console.error('Password update error:', error);
+            return { success: true };
+        } catch (error) {
+            console.error('Update password error:', error);
             return { success: false, error: error.message };
         }
+    },
 
-        return { success: true };
-    } catch (error) {
-        console.error('Password update exception:', error);
-        return { success: false, error: 'An unexpected error occurred. Please try again.' };
+    // ===================================
+    // UTILITY METHODS
+    // ===================================
+
+    /**
+     * Get user role
+     * @returns {Promise<string>} - User role
+     */
+    async getUserRole() {
+        const metadata = await this.getUserMetadata();
+        return metadata?.role || 'athlete';
+    },
+
+    /**
+     * Get user access level
+     * @returns {Promise<string>} - User access level
+     */
+    async getUserAccessLevel() {
+        const metadata = await this.getUserMetadata();
+        return metadata?.access_level || 'demo';
+    },
+
+    /**
+     * Get user display name
+     * @returns {Promise<string>} - User's full name
+     */
+    async getUserDisplayName() {
+        const metadata = await this.getUserMetadata();
+        return metadata?.full_name || 'User';
     }
-}
-
-/**
- * Update user profile metadata
- * @param {object} profileData - Profile data (age, gender, fitnessLevel, etc.)
- * @returns {Promise<{success: boolean, error?: string}>}
- */
-async function updateUserProfile(profileData) {
-    try {
-        if (!supabase) {
-            return { success: false, error: 'Authentication system is initializing.' };
-        }
-
-        const { error } = await supabase.auth.updateUser({
-            data: profileData
-        });
-
-        if (error) {
-            console.error('Profile update error:', error);
-            return { success: false, error: error.message };
-        }
-
-        return { success: true };
-    } catch (error) {
-        console.error('Profile update exception:', error);
-        return { success: false, error: 'An unexpected error occurred.' };
-    }
-}
-
-/**
- * Get current user
- * @returns {Promise<{user: object | null}>}
- */
-async function getCurrentUser() {
-    try {
-        if (!supabase) {
-            return { user: null };
-        }
-
-        const { data: { user }, error } = await supabase.auth.getUser();
-
-        if (error) {
-            console.error('Get user error:', error);
-            return { user: null };
-        }
-
-        return { user };
-    } catch (error) {
-        console.error('Get user exception:', error);
-        return { user: null };
-    }
-}
-
-/**
- * Get current session
- * @returns {Promise<{session: object | null}>}
- */
-async function getSession() {
-    try {
-        if (!supabase) {
-            return { session: null };
-        }
-
-        const { data: { session }, error } = await supabase.auth.getSession();
-
-        if (error) {
-            console.error('Get session error:', error);
-            return { session: null };
-        }
-
-        return { session };
-    } catch (error) {
-        console.error('Get session exception:', error);
-        return { session: null };
-    }
-}
+};
 
 // ===================================
-// UTILITY FUNCTIONS
+// AUTO-REFRESH SESSION
 // ===================================
 
-/**
- * Check if user is authenticated
- * @returns {boolean}
- */
-function isAuthenticated() {
-    const session = localStorage.getItem('akura_session');
-    return session !== null;
-}
-
-/**
- * Get user role from localStorage
- * @returns {string | null} - 'athlete' or 'coach'
- */
-function getUserRole() {
-    return localStorage.getItem('akura_user_role');
-}
-
-/**
- * Get user name from localStorage
- * @returns {string | null}
- */
-function getUserName() {
-    return localStorage.getItem('akura_user_name');
-}
-
-/**
- * Redirect to appropriate dashboard based on user role
- */
-function redirectToDashboard() {
-    const role = getUserRole();
-    
-    if (role === 'coach') {
-        window.location.href = 'coach-dashboard.html';
-    } else {
-        // Default to athlete dashboard
-        window.location.href = 'athlete-dashboard.html';
+// Check and refresh session every 30 minutes
+setInterval(async () => {
+    if (Auth.isAuthenticated()) {
+        await Auth.refreshSession();
     }
-}
-
-/**
- * Redirect to login page
- */
-function redirectToLogin() {
-    const currentPath = window.location.pathname;
-    window.location.href = `login.html?redirect=${encodeURIComponent(currentPath)}`;
-}
-
-/**
- * Get redirect URL from query parameter
- * @returns {string | null}
- */
-function getRedirectUrl() {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('redirect');
-}
+}, 30 * 60 * 1000);
 
 // ===================================
-// SESSION MANAGEMENT
+// CONSOLE LOG
 // ===================================
 
-/**
- * Initialize auth state listener
- * Automatically updates localStorage when auth state changes
- */
-function initAuthStateListener() {
-    if (!supabase) {
-        console.warn('Supabase not initialized for auth state listener');
-        return;
-    }
+console.log('🏃 AKURA Auth initialized');
 
-    supabase.auth.onAuthStateChange((event, session) => {
-        console.log('Auth state changed:', event);
-
-        if (event === 'SIGNED_IN' && session) {
-            // Update localStorage
-            localStorage.setItem('akura_session', JSON.stringify(session));
-            
-            if (session.user?.user_metadata?.role) {
-                localStorage.setItem('akura_user_role', session.user.user_metadata.role);
-            }
-            
-            if (session.user?.user_metadata?.full_name) {
-                localStorage.setItem('akura_user_name', session.user.user_metadata.full_name);
-            }
-        } else if (event === 'SIGNED_OUT') {
-            // Clear localStorage
-            localStorage.removeItem('akura_session');
-            localStorage.removeItem('akura_user_role');
-            localStorage.removeItem('akura_user_name');
-        } else if (event === 'TOKEN_REFRESHED' && session) {
-            // Update session in localStorage
-            localStorage.setItem('akura_session', JSON.stringify(session));
-        }
-    });
-}
-
-// Initialize auth state listener when DOM is ready
-if (typeof document !== 'undefined') {
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(initAuthStateListener, 500); // Wait for Supabase to load
-        });
-    } else {
-        setTimeout(initAuthStateListener, 500);
-    }
-}
-
-// ===================================
-// EXPORTS (for module systems)
-// ===================================
+// Export for use in other scripts
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        register,
-        login,
-        logout,
-        resetPassword,
-        updatePassword,
-        updateUserProfile,
-        getCurrentUser,
-        getSession,
-        isAuthenticated,
-        getUserRole,
-        getUserName,
-        redirectToDashboard,
-        redirectToLogin,
-        getRedirectUrl
-    };
+    module.exports = Auth;
 }
