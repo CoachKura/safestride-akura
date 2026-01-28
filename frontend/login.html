@@ -141,8 +141,21 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/auth.js"></script>
     <script>
-        // Login form handler
-        document.addEventListener('DOMContentLoaded', function() {
+        // Wait for DOM and Supabase to be ready
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🚀 Login page loaded');
+            
+            // Wait for Supabase to initialize
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // Check if already authenticated
+            if (Auth && Auth.isAuthenticated && Auth.isAuthenticated()) {
+                console.log('✅ Already authenticated, redirecting...');
+                window.location.href = Auth.getRedirectPath();
+                return;
+            }
+            
+            // Get form elements
             const loginForm = document.getElementById('loginForm');
             const emailInput = document.getElementById('email');
             const passwordInput = document.getElementById('password');
@@ -151,12 +164,14 @@
             const passwordToggle = document.getElementById('passwordToggle');
 
             // Password toggle
-            passwordToggle.addEventListener('click', function() {
-                const type = passwordInput.type === 'password' ? 'text' : 'password';
-                passwordInput.type = type;
-                this.querySelector('i').classList.toggle('fa-eye');
-                this.querySelector('i').classList.toggle('fa-eye-slash');
-            });
+            if (passwordToggle) {
+                passwordToggle.addEventListener('click', function() {
+                    const type = passwordInput.type === 'password' ? 'text' : 'password';
+                    passwordInput.type = type;
+                    this.querySelector('i').classList.toggle('fa-eye');
+                    this.querySelector('i').classList.toggle('fa-eye-slash');
+                });
+            }
 
             // Form validation
             function validateEmail(email) {
@@ -209,7 +224,7 @@
 
                 const email = emailInput.value.trim();
                 const password = passwordInput.value;
-                const rememberMe = rememberMeCheckbox.checked;
+                const rememberMe = rememberMeCheckbox ? rememberMeCheckbox.checked : false;
 
                 // Validation
                 let hasError = false;
@@ -240,10 +255,13 @@
                 loginBtn.querySelector('.btn-loader').style.display = 'flex';
 
                 try {
+                    console.log('🔐 Attempting to login:', email);
+                    
                     // Use the Auth.login function from auth.js
                     const result = await Auth.login(email, password);
 
                     if (result.success) {
+                        console.log('✅ Login successful');
                         showAlert('success', 'Login successful! Redirecting...');
                         
                         // Handle remember me
@@ -253,9 +271,24 @@
                             localStorage.removeItem('akura_remember_me');
                         }
 
-                        // Redirect will be handled by auth.js based on user status
+                        // Small delay before redirect
+                        setTimeout(() => {
+                            // Redirect will be handled by auth.js based on user status
+                            window.location.href = Auth.getRedirectPath();
+                        }, 1000);
                     } else {
-                        showAlert('error', result.error || 'Login failed. Please check your credentials.');
+                        console.error('❌ Login failed:', result.error);
+                        
+                        // Handle specific errors
+                        let errorMsg = result.error || 'Login failed. Please check your credentials.';
+                        
+                        if (errorMsg.includes('Invalid login credentials')) {
+                            errorMsg = 'Invalid email or password. Please try again.';
+                        } else if (errorMsg.includes('Email not confirmed')) {
+                            errorMsg = 'Please verify your email before logging in.';
+                        }
+                        
+                        showAlert('error', errorMsg);
                         
                         // Reset button
                         loginBtn.disabled = false;
@@ -263,7 +296,7 @@
                         loginBtn.querySelector('.btn-loader').style.display = 'none';
                     }
                 } catch (error) {
-                    console.error('Login error:', error);
+                    console.error('❌ Login error:', error);
                     showAlert('error', 'An unexpected error occurred. Please try again.');
                     
                     // Reset button
@@ -291,11 +324,6 @@
                         alert.remove();
                     }, 3000);
                 }
-            }
-
-            // Check if user is already logged in
-            if (Auth.isAuthenticated()) {
-                window.location.href = Auth.getRedirectPath();
             }
         });
     </script>
