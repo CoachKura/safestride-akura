@@ -333,6 +333,12 @@
             form.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 console.log('📝 Form submitted');
+                // Wait for AkuraAuth
+                if (!window.AkuraAuth || !window.AkuraAuth.isReady()) {
+                    console.error('❌ AkuraAuth not ready');
+                    showError('System not ready. Please refresh.');
+                    return;
+                }
                 
                 // Clear messages
                 hideError();
@@ -344,6 +350,7 @@
                 const password = passwordInput.value;
                 const confirmPassword = confirmPasswordInput.value;
                 const role = roleSelect.value;
+                console.log('📝 Form data:', { email, full_name: fullName, role });
                 
                 // Validate
                 if (!fullName || fullName.length < 2) {
@@ -376,14 +383,13 @@
                 submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
                 
                 try {
-                    console.log('📤 Sending registration request...');
+                    console.log('🚀 Calling AkuraAuth.signUp...');
                     
-                    // Call AkuraAuth.signUp (now returns {data, error})
+                    // Call AkuraAuth.signUp (returns {data, error})
                     const { data, error } = await window.AkuraAuth.signUp(email, password, {
                         full_name: fullName,
                         role: role,
-                        access_level: 'demo',
-                        assessment_completed: false
+                        access_level: 'demo'
                     });
                     
                     if (error) {
@@ -413,16 +419,19 @@
                     console.error('❌ Registration error:', error);
                     
                     let errorMsg = 'Registration failed. Please try again.';
+                    const msg = (error && error.message) ? error.message : '';
                     
-                    if (error.message) {
-                        if (error.message.includes('already registered') || error.message.includes('already exists')) {
-                            errorMsg = 'This email is already registered. Try logging in instead.';
-                        } else if (error.message.includes('Invalid email')) {
+                    if (msg) {
+                        if (msg.toLowerCase().includes('already registered') || msg.toLowerCase().includes('already exists')) {
+                            errorMsg = 'Email already exists. Try logging in.';
+                        } else if (msg.toLowerCase().includes('invalid email')) {
                             errorMsg = 'Please enter a valid email address.';
-                        } else if (error.message.includes('weak password') || error.message.includes('password')) {
-                            errorMsg = 'Password is too weak. Please use a stronger password.';
+                        } else if (msg.toLowerCase().includes('weak password') || msg.toLowerCase().includes('password')) {
+                            errorMsg = 'Password must be at least 6 characters.';
+                        } else if (msg.toLowerCase().includes('network') || msg.toLowerCase().includes('fetch')) {
+                            errorMsg = 'Connection failed. Check internet and retry.';
                         } else {
-                            errorMsg = error.message;
+                            errorMsg = msg;
                         }
                     }
                     

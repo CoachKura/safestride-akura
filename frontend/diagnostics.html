@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AKURA SafeStride - Connection Diagnostics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --akura-blue: #3B82F6;
+      --bg: #F8FAFC;
+      --text: #0F172A;
+      --muted: #64748B;
+      --card: #FFFFFF;
+      --success: #10B981;
+      --error: #EF4444;
+      --warning: #F59E0B;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .container {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    .title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      font-weight: 800;
+      font-size: 28px;
+      color: var(--text);
+    }
+    .subtitle { color: var(--muted); margin-bottom: 24px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--card);
+      border: 1px solid #E2E8F0;
+      border-radius: 14px;
+      box-shadow: 0 10px 20px rgba(59, 130, 246, 0.05);
+      padding: 18px 20px;
+    }
+    .card h3 { margin: 0 0 8px 0; font-size: 18px; }
+    .card p { margin: 0; color: var(--muted); }
+    .status {
+      margin-top: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-weight: 600;
+      border: 1px solid #E2E8F0;
+      background: #F1F5F9;
+      color: var(--muted);
+    }
+    .status.testing { color: var(--warning); border-color: var(--warning); background: #FEF3C7; }
+    .status.passed  { color: var(--success); border-color: var(--success); background: #ECFDF5; }
+    .status.failed  { color: var(--error);   border-color: var(--error);   background: #FEE2E2; }
+    .actions { margin-top: 24px; display: flex; gap: 10px; }
+    .btn {
+      background: var(--akura-blue);
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 6px 12px rgba(59, 130, 246, 0.2);
+    }
+    .btn.secondary { background: #0EA5E9; }
+    .note { margin-top: 16px; color: var(--muted); font-size: 13px; }
+    .fix {
+      margin-top: 12px; padding: 10px 12px; border-radius: 8px;
+      border: 1px dashed #CBD5E1; background: #F8FAFC; color: var(--text);
+    }
+    .header {
+      background: linear-gradient(135deg, #0EA5E9, var(--akura-blue));
+      color: white; border-radius: 16px; padding: 20px; margin-bottom: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="title">🧪 AKURA SafeStride - Connection Diagnostics</div>
+      <div class="subtitle">Verify Supabase and AkuraAuth connectivity. Use Retest after fixes.</div>
+      <div class="actions">
+        <button id="retestBtn" class="btn">↻ Retest</button>
+        <button id="copyLogsBtn" class="btn secondary">📋 Copy Console Hints</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card" id="test1">
+        <h3>Test 1: Supabase library loaded?</h3>
+        <p>Checks if the Supabase CDN is available on this page.</p>
+        <div class="status testing"><span>🔄</span><span id="status1">Testing...</span></div>
+        <div class="fix" id="fix1" style="display:none;">
+          Add in the page head: <code>&lt;script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"&gt;&lt;/script&gt;</code>
+        </div>
+      </div>
+
+      <div class="card" id="test2">
+        <h3>Test 2: AkuraAuth module initialized?</h3>
+        <p>Verifies that <code>window.AkuraAuth</code> is present and ready.</p>
+        <div class="status testing"><span>🔄</span><span id="status2">Testing...</span></div>
+        <div class="fix" id="fix2" style="display:none;">Ensure <code>js/auth.js</code> is loaded after Supabase.</div>
+      </div>
+
+      <div class="card" id="test3">
+        <h3>Test 3: Credentials configured?</h3>
+        <p>Checks if Supabase credentials in <code>js/auth.js</code> are set (not placeholders).</p>
+        <div class="status testing"><span>🔄</span><span id="status3">Testing...</span></div>
+        <div class="fix" id="fix3" style="display:none;">
+          Update <strong>js/auth.js</strong> lines 8-15 with Supabase credentials.
+          <div class="note">Path: <strong>frontend/js/auth.js</strong><br/>Settings → API → copy Project URL and anon public key.</div>
+        </div>
+      </div>
+
+      <div class="card" id="test4">
+        <h3>Test 4: Connection to Supabase successful?</h3>
+        <p>Performs a lightweight query to confirm connectivity.</p>
+        <div class="status testing"><span>🔄</span><span id="status4">Testing...</span></div>
+        <div class="fix" id="fix4" style="display:none;">Check network and CORS settings.</div>
+      </div>
+
+      <div class="card" id="test5">
+        <h3>Test 5: Auth API responding?</h3>
+        <p>Attempts a safe sign-in with fake credentials; expects a handled error from Supabase.</p>
+        <div class="status testing"><span>🔄</span><span id="status5">Testing...</span></div>
+        <div class="fix" id="fix5" style="display:none;">If network error persists, verify Supabase region and status page.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- AkuraAuth module -->
+  <script src="js/auth.js"></script>
+  <script>
+    function setStatus(n, ok, msg) {
+      const el = document.getElementById('status' + n);
+      const card = document.querySelector('#test' + n + ' .status');
+      const fix = document.getElementById('fix' + n);
+      if (!el || !card) return;
+      if (ok === null) {
+        card.classList.remove('passed','failed'); card.classList.add('testing');
+        el.textContent = 'Testing...'; fix && (fix.style.display = 'none');
+      } else if (ok) {
+        card.classList.remove('testing','failed'); card.classList.add('passed');
+        el.textContent = '✅ ' + (msg || 'Passed'); fix && (fix.style.display = 'none');
+      } else {
+        card.classList.remove('testing','passed'); card.classList.add('failed');
+        el.textContent = '❌ ' + (msg || 'Failed'); fix && (fix.style.display = 'block');
+      }
+    }
+
+    async function runTests() {
+      // Reset statuses
+      for (let i=1;i<=5;i++) setStatus(i, null);
+      console.log('🔄 Running diagnostics...');
+
+      // Test 1: Supabase loaded
+      try {
+        const supLoaded = typeof window.supabase !== 'undefined';
+        console.log('Test 1 - Supabase loaded:', supLoaded);
+        setStatus(1, supLoaded, supLoaded ? 'Supabase library present' : 'Supabase CDN missing');
+        if (!supLoaded) return;
+      } catch (e) { setStatus(1, false, 'Error checking Supabase'); return; }
+
+      // Test 2: AkuraAuth initialized
+      try {
+        const ready = !!(window.AkuraAuth && window.AkuraAuth.isReady());
+        console.log('Test 2 - AkuraAuth ready:', ready);
+        setStatus(2, ready, ready ? 'AkuraAuth is ready' : 'AkuraAuth not initialized');
+        if (!ready) return;
+      } catch (e) { setStatus(2, false, 'Error checking AkuraAuth'); return; }
+
+      // Test 3: Credentials configured (heuristic)
+      try {
+        // Heuristic: if AkuraAuth is ready, init guard passed (no YOUR_ placeholders)
+        const credsOk = !!(window.AkuraAuth && window.AkuraAuth.isReady());
+        console.log('Test 3 - Credentials configured (heuristic):', credsOk);
+        setStatus(3, credsOk, credsOk ? 'Credentials found' : 'Credentials not configured');
+        if (!credsOk) return;
+      } catch (e) { setStatus(3, false, 'Error reading credentials'); return; }
+
+      // Test 4: Connectivity - lightweight query
+      try {
+        const client = window.AkuraAuth.getClient();
+        const { error } = await client.from('schema_version').select('id', { count: 'exact' }).limit(1);
+        const ok = !error || (error && error.message);
+        console.log('Test 4 - Connectivity check:', ok, error || 'no error');
+        setStatus(4, ok, ok ? 'Request reached Supabase' : 'Connectivity issue');
+        if (!ok) return;
+      } catch (e) { console.error('Test 4 error:', e); setStatus(4, false, 'Connection error'); return; }
+
+      // Test 5: Auth API responding (expect error for fake login)
+      try {
+        const { error } = await window.AkuraAuth.signIn('diagnostic@example.com', 'wrong-pass-123');
+        const ok = !!error; // receiving an auth error means API responded
+        console.log('Test 5 - Auth API responded:', ok, error && error.message);
+        setStatus(5, ok, ok ? 'Auth API responding (received error as expected)' : 'No response');
+      } catch (e) { console.error('Test 5 exception:', e); setStatus(5, false, 'Auth API unreachable'); }
+    }
+
+    document.getElementById('retestBtn').addEventListener('click', runTests);
+    document.getElementById('copyLogsBtn').addEventListener('click', () => {
+      const tips = [
+        'Fix Test 1: Add Supabase CDN script to this page.',
+        'Fix Test 2: Ensure js/auth.js is loaded after Supabase.',
+        'Fix Test 3: Update frontend/js/auth.js (lines 8-15) with Project URL and anon key.',
+        'Fix Test 4: Check network/CORS. Try schema_version select to verify connectivity.',
+        'Fix Test 5: If network error, check Supabase status page.'
+      ].join('\n');
+      navigator.clipboard.writeText(tips);
+      alert('Copied troubleshooting tips to clipboard.');
+    });
+
+    // Run on load
+    window.addEventListener('DOMContentLoaded', runTests);
+  </script>
+</body>
+</html>
