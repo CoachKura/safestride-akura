@@ -129,16 +129,33 @@
     <script src="js/auth.js"></script>
     <script>
         // Initialize profile setup page
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Wait for AkuraAuth to load
+            let attempts = 0;
+            const maxAttempts = 10;
+            
+            while (!window.AkuraAuth && attempts < maxAttempts) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                attempts++;
+            }
+            
+            if (!window.AkuraAuth || !window.AkuraAuth.isReady()) {
+                console.error('❌ AkuraAuth not initialized');
+                window.location.href = 'login.html';
+                return;
+            }
+            
             // Check if user is authenticated
-            if (!isAuthenticated()) {
+            const currentUser = await window.AkuraAuth.getCurrentUser();
+            if (!currentUser) {
+                console.log('👤 No authenticated user, redirecting to login');
                 window.location.href = 'login.html';
                 return;
             }
 
             // Skip button
-            document.getElementById('skipBtn').addEventListener('click', () => {
-                redirectToDashboard();
+            document.getElementById('skipBtn').addEventListener('click', async () => {
+                await redirectToDashboard(currentUser);
             });
 
             // Form submission
@@ -173,29 +190,37 @@
                 // Show loading state
                 setLoading(true);
 
-                // Save profile
-                const result = await updateUserProfile(profileData);
+                // Save profile using Supabase
+                try {
+                    const { error } = await window.AkuraAuth.supabase
+                        .from('profiles')
+                        .upsert({
+                            user_id: currentUser.id,
+                            ...profileData,
+                            updated_at: new Date().toISOString()
+                        });
+                    
+                    if (error) {
+                        throw error;
+                    }
 
-                // Hide loading state
-                setLoading(false);
-
-                if (result.success) {
                     showAlert('success', 'Profile updated successfully! Redirecting...');
                     
                     // Redirect to dashboard after 1 second
-                    setTimeout(() => {
-                        redirectToDashboard();
+                    setTimeout(async () => {
+                        await redirectToDashboard(currentUser);
                     }, 1000);
-                } else {
-                    showAlert('error', result.error || 'Failed to update profile. You can update it later from your dashboard.');
+                } catch (error) {
+                    console.error('❌ Profile update error:', error);
+                    showAlert('error', error.message || 'Failed to update profile. You can update it later from your dashboard.');
                     
                     // Still redirect to dashboard after 3 seconds even on error
-                    setTimeout(() => {
-                        redirectToDashboard();
+                    setTimeout(async () => {
+                        await redirectToDashboard(currentUser);
                     }, 3000);
+                } finally {
+                    setLoading(false);
                 }
-            });
-        });
 
         // Helper functions
         function setLoading(isLoading) {
@@ -254,6 +279,40 @@
             `;
             container.innerHTML = '';
             container.appendChild(alert);
+        }
+        
+        // Redirect based on user profile
+        async function redirectToDashboard(currentUser) {
+            try {
+                const { data: profile } = await window.AkuraAuth.supabase
+                    .from('profiles')
+                    .select('role, access_level, assessment_completed')
+                    .eq('user_id', currentUser.id)
+                    .single();
+                
+                let redirectUrl = 'athlete-dashboard.html';
+                
+                if (profile) {
+                    // NEW USER FLOW: First time user → AIFRI Assessment
+                    if (!profile.assessment_completed) {
+                        redirectUrl = 'aifri-assessment.html';
+                    }
+                    // DEMO ACCESS FLOW: Assessment completed but demo access → Demo Dashboard
+                    else if (profile.access_level === 'demo') {
+                        redirectUrl = 'demo-dashboard.html';
+                    }
+                    // FULL ACCESS FLOW: Role-based redirect
+                    else if (profile.role === 'coach') {
+                        redirectUrl = 'coach-dashboard.html';
+                    }
+                }
+                
+                console.log('📊 Redirecting to:', redirectUrl);
+                window.location.href = redirectUrl;
+            } catch (error) {
+                console.error('❌ Redirect error:', error);
+                window.location.href = 'athlete-dashboard.html';
+            }
         }
     </script>
 
