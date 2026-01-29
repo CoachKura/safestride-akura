@@ -1259,6 +1259,8 @@
         // Update dashboard UI with real data
         function updateDashboardUI() {
             console.log('🎨 Updating UI with real data...');
+            console.log('📊 userProfile:', userProfile);
+            console.log('📊 userAssessment:', userAssessment);
             
             // Check assessment status and show banner if needed
             checkAssessmentStatus();
@@ -1266,23 +1268,35 @@
             // Update greeting with real name
             if (userProfile && userProfile.full_name) {
                 document.getElementById('userGreeting').textContent = `Welcome back, ${userProfile.full_name}`;
+                console.log('✅ Updated greeting with:', userProfile.full_name);
+            } else {
+                console.log('⚠️ No full_name in userProfile, keeping default greeting');
             }
             
             // Update AIFRI score and grade
             if (userAssessment && userAssessment.aifri_score) {
                 const scoreEl = document.getElementById('aifriScore');
                 const gradeEl = document.getElementById('aifriGrade');
-                if (scoreEl) scoreEl.textContent = Math.round(userAssessment.aifri_score);
+                if (scoreEl) {
+                    const score = Math.round(userAssessment.aifri_score);
+                    scoreEl.textContent = score;
+                    console.log('✅ Updated AIFRI Score element to:', score);
+                }
                 if (gradeEl) {
                     const score = userAssessment.aifri_score;
                     let grade = 'BASIC';
                     if (score >= 80) grade = 'ADVANCED';
                     else if (score >= 60) grade = 'INTERMEDIATE';
                     gradeEl.textContent = grade;
+                    console.log('✅ Updated Grade element to:', grade);
                 }
-                console.log('✅ Updated AIFRI Score:', Math.round(userAssessment.aifri_score), 'Grade:', grade);
             } else {
-                console.log('⚠️ No AIFRI assessment data found');
+                console.log('⚠️ NO AIFRI assessment data found - user needs to complete assessment');
+                // Show message to user
+                const scoreEl = document.getElementById('aifriScore');
+                const gradeEl = document.getElementById('aifriGrade');
+                if (scoreEl) scoreEl.textContent = '--';
+                if (gradeEl) gradeEl.textContent = 'NOT ASSESSED';
             }
             
             // Update workout streak (placeholder - will calculate from workout history)
