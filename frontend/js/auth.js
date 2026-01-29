@@ -102,31 +102,39 @@ window.AkuraAuth = {
                 return { data: null, error: error };
             }
             
-            console.log('✅ User created!');
-            console.log('User ID:', data.user?.id);
+            const user = data.user || null;
+            if (user && user.id) {
+                console.log('✅ User created in auth:', user.id);
+            } else {
+                console.log('✅ User created!');
+            }
             
-            // Create profile record in database
-            if (data.user) {
+            // Create profile record in database AFTER auth user creation
+            let profile = null;
+            if (user) {
                 try {
                     console.log('📝 Creating profile record...');
-                    const { error: profileError } = await akuraSupabaseClient
+                    const insertPayload = {
+                        id: user.id,
+                        full_name: metadata.full_name || '',
+                        email: email,
+                        role: metadata.role || 'athlete',
+                        access_level: (metadata.access_level || 'demo'),
+                        assessment_completed: false,
+                        created_at: new Date().toISOString()
+                    };
+
+                    const { data: profileRows, error: profileError } = await akuraSupabaseClient
                         .from('profiles')
-                        .insert({
-                            user_id: data.user.id,
-                            email: email,
-                            full_name: metadata.full_name || '',
-                            role: metadata.role || 'athlete',
-                            access_level: metadata.access_level || 'demo',
-                            assessment_completed: metadata.assessment_completed || false,
-                            created_at: new Date().toISOString(),
-                            updated_at: new Date().toISOString()
-                        });
-                    
+                        .insert(insertPayload)
+                        .select('*')
+                        .single();
+
                     if (profileError) {
                         console.error('⚠️ Profile creation error:', profileError);
-                        // Continue anyway - profile can be created later
                     } else {
-                        console.log('✅ Profile record created');
+                        profile = profileRows;
+                        console.log('✅ Profile created successfully');
                     }
                 } catch (profileError) {
                     console.error('⚠️ Profile creation failed:', profileError);
@@ -134,7 +142,7 @@ window.AkuraAuth = {
                 }
             }
             
-            return { data: data, error: null };
+            return { data: { user, profile }, error: null };
         } catch (error) {
             console.error('❌ Signup failed with exception:', error);
             return { data: null, error: error };
