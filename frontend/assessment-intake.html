@@ -69,7 +69,7 @@
       background: #ffffff;
       border-radius: 12px;
       box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
-      padding: 24px;
+      padding: 32px;
       transition: height 0.3s ease;
     }
 
@@ -278,33 +278,33 @@
     .form-section {
       background: #ffffff;
       border-radius: 12px;
-      padding: 24px;
+      padding: 32px;
       box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
       border: 1px solid #f1f5f9;
     }
 
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
     .form-group {
-      position: relative;
+      margin-bottom: 24px;
     }
 
     .form-group-label {
-      position: absolute;
-      top: 12px;
-      left: 16px;
-      padding: 0 6px;
-      background: white;
-      color: #9ca3af;
+      display: block;
       font-size: 14px;
-      font-weight: 500;
-      transition: all 0.2s ease;
-      pointer-events: none;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 8px;
     }
 
-    .form-group:focus-within .form-group-label,
-    .form-group.has-value .form-group-label {
-      transform: translateY(-12px);
-      font-size: 12px;
-      color: #3b82f6;
+    .form-group.required .form-group-label::after {
+      content: ' *';
+      color: #ef4444;
     }
 
     .input-field,
@@ -318,21 +318,36 @@
       background: #ffffff;
       font-size: 16px;
       color: #111827;
+      font-family: 'Inter', sans-serif;
       transition: all 0.2s ease;
+    }
+
+    select.input-field {
+      appearance: none;
+      background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%236b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%3e%3cpolyline points="6 9 12 15 18 9"%3e%3c/polyline%3e%3c/svg%3e');
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 20px;
+      padding-right: 44px;
+      cursor: pointer;
     }
 
     textarea.input-field {
       min-height: 120px;
       height: auto;
+      resize: vertical;
+      padding: 12px 16px;
     }
 
     .input-field::placeholder {
       color: #9ca3af;
     }
 
-    .input-field:focus {
+    .input-field:focus,
+    select.input-field:focus,
+    textarea.input-field:focus {
       border-color: #3b82f6;
-      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
       outline: none;
     }
 
@@ -351,11 +366,12 @@
 
     .validation-message {
       margin-top: 6px;
-      font-size: 12px;
+      font-size: 13px;
       color: #ef4444;
       display: flex;
       align-items: center;
       gap: 6px;
+      min-height: 20px;
     }
 
     .validation-message .error-icon {
@@ -365,9 +381,11 @@
 
     .helper-text,
     .form-group-hint {
+      display: block;
       margin-top: 6px;
-      font-size: 12px;
+      font-size: 13px;
       color: #6b7280;
+      line-height: 1.5;
     }
 
     .char-counter {
@@ -377,18 +395,8 @@
       text-align: right;
     }
 
-    .form-group.is-validating::after {
-      content: '';
-      position: absolute;
-      right: 14px;
-      top: 14px;
-      width: 16px;
-      height: 16px;
-      border: 2px solid #e5e7eb;
-      border-top-color: #3b82f6;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
+    .form-group.is-validating .input-field {
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"10\" stroke=\"%233b82f6\" stroke-width=\"3\" fill=\"none\" stroke-dasharray=\"31.4 31.4\" stroke-linecap=\"round\"><animateTransform attributeName=\"transform\" type=\"rotate\" from=\"0 12 12\" to=\"360 12 12\" dur=\"0.8s\" repeatCount=\"indefinite\"/></circle></svg>');\n      background-repeat: no-repeat;\n      background-position: right 14px center;\n      background-size: 16px 16px;\n      padding-right: 44px;\n    }
 
     .confetti-piece {
       position: fixed;
@@ -834,18 +842,23 @@
       }
 
       .form-section {
-        padding: 16px;
+        padding: 20px;
       }
 
       .form-row {
-        flex-direction: column;
-        gap: 16px;
+        grid-template-columns: 1fr;
+        gap: 0;
+        margin-bottom: 0;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
       }
 
       .input-field,
       select.input-field,
       textarea.input-field {
-        height: 44px;
+        height: 48px;
         font-size: 16px;
       }
 
@@ -874,7 +887,7 @@
       .btn-success {
         width: 100%;
         justify-content: center;
-        height: 44px;
+        height: 48px;
         font-size: 15px;
       }
 
@@ -893,13 +906,17 @@
       }
 
       .form-container {
-        padding: 24px;
+        padding: 28px;
+      }
+
+      .form-section {
+        padding: 28px;
       }
 
       .form-row {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 16px;
+        gap: 20px;
       }
 
       .form-row .form-group:only-child {
