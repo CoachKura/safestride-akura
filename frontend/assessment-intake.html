@@ -1300,37 +1300,76 @@
     // SKIP ASSESSMENT FUNCTION
     // ============================================
     window.skipAssessment = async function() {
-      const confirmed = confirm('Are you sure you want to skip the assessment? You can complete it later from your dashboard.');
-      if (!confirmed) return;
+      console.log('⏭️ Skip button clicked');
+      
+      const confirmed = confirm('Skip assessment? You can complete it later from your dashboard.');
+      if (!confirmed) {
+        console.log('❌ Skip cancelled by user');
+        return;
+      }
+      
+      console.log('⏭️ Assessment skipped');
       
       try {
-        // Update profile to mark assessment as skipped (not completed)
+        // Get current user
         const user = await window.AkuraAuth.getCurrentUser();
-        if (user) {
-          await window.AkuraAuth.supabase
-            .from('profiles')
-            .update({
-              assessment_completed: false,
-              updated_at: new Date().toISOString()
-            })
-            .eq('user_id', user.id);
+        if (!user) {
+          throw new Error('No user logged in');
         }
-        
-        // Redirect to dashboard
-        const { data: profile } = await window.AkuraAuth.supabase
+        console.log('✅ User authenticated:', user.id);
+
+        // Update profile with skip flags
+        console.log('📝 Updating profile with skip flags...');
+        const { data: updatedProfile, error: profileError } = await window.AkuraAuth.supabase
+          .from('profiles')
+          .update({
+            assessment_completed: false,
+            assessment_skipped: true,
+            skipped_date: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', user.id)
+          .select()
+          .single();
+
+        if (profileError) {
+          console.error('⚠️ Profile update error:', profileError);
+        } else {
+          console.log('✅ Profile updated with skip flags:', updatedProfile);
+        }
+
+        // Store in localStorage
+        localStorage.setItem('assessmentSkipped', 'true');
+        localStorage.setItem('assessmentSkippedDate', new Date().toISOString());
+        console.log('💾 Skip flags stored locally');
+
+        // Fetch user role and redirect to appropriate dashboard
+        console.log('📍 Fetching user role for dashboard redirect...');
+        const { data: profile, error: roleError } = await window.AkuraAuth.supabase
           .from('profiles')
           .select('role')
-          .eq('user_id', user.id)
+          .eq('id', user.id)
           .single();
+
+        if (roleError) {
+          console.error('⚠️ Role fetch error:', roleError);
+        }
+
+        const role = profile?.role || 'athlete';
+        console.log('✅ User role:', role);
         
-        if (profile && profile.role === 'coach') {
-          window.location.href = 'coach-dashboard.html';
+        // Redirect to appropriate dashboard
+        if (role === 'coach') {
+          console.log('🚀 Redirecting to coach dashboard...');
+          window.location.href = '/coach-dashboard.html';
         } else {
-          window.location.href = 'athlete-dashboard.html';
+          console.log('🚀 Redirecting to athlete dashboard...');
+          window.location.href = '/athlete-dashboard.html';
         }
       } catch (error) {
-        console.error('Error skipping assessment:', error);
-        window.location.href = 'athlete-dashboard.html';
+        console.error('❌ Error skipping assessment:', error);
+        // Still redirect to dashboard even if error occurs
+        window.location.href = '/athlete-dashboard.html';
       }
     };
   </script>

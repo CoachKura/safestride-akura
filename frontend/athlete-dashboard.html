@@ -674,6 +674,73 @@
             width: 3rem;
             height: 3rem;
         }
+
+        /* ASSESSMENT SKIP BANNER */
+        .assessment-skip-banner {
+            background: linear-gradient(135deg, #FF9500, #FF6B6B);
+            color: white;
+            padding: 25px 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+            display: none;
+        }
+
+        .assessment-skip-banner.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .assessment-skip-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .assessment-skip-message {
+            flex: 1;
+        }
+
+        .assessment-skip-message h3 {
+            margin: 0 0 8px 0;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .assessment-skip-message p {
+            margin: 0;
+            font-size: 14px;
+            opacity: 0.95;
+        }
+
+        .assessment-skip-cta {
+            background: white;
+            color: #FF6B6B;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .assessment-skip-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
     </style>
 </head>
 <body>
@@ -698,6 +765,17 @@
     </div>
 
     <div class="dashboard-container">
+        <!-- ASSESSMENT SKIP BANNER -->
+        <div id="assessmentSkipBanner" class="assessment-skip-banner">
+            <div class="assessment-skip-content">
+                <div class="assessment-skip-message">
+                    <h3>📋 Complete Your Assessment</h3>
+                    <p>Get personalized training recommendations by completing your fitness assessment. Takes about 15-20 minutes.</p>
+                </div>
+                <button class="assessment-skip-cta" onclick="goToAssessment()">Take Assessment →</button>
+            </div>
+        </div>
+
         <!-- TODAY'S WORKOUT CARD -->
         <div class="todays-workout">
             <div class="workout-date">Monday, January 27, 2026</div>
@@ -1111,6 +1189,9 @@
         function updateDashboardUI() {
             console.log('🎨 Updating UI with real data...');
             
+            // Check assessment status and show banner if needed
+            checkAssessmentStatus();
+            
             // Update greeting with real name
             if (userProfile && userProfile.full_name) {
                 document.getElementById('userGreeting').textContent = `Welcome back, ${userProfile.full_name}`;
@@ -1210,6 +1291,30 @@
             banner.textContent = message;
             document.body.appendChild(banner);
             setTimeout(() => banner.remove(), 5000);
+        }
+
+        // Check if assessment was skipped and show banner
+        function checkAssessmentStatus() {
+            console.log('🔍 Checking assessment status...');
+            if (userProfile && userProfile.assessment_skipped && !userProfile.assessment_completed) {
+                console.log('⚠️ Assessment was skipped - showing banner');
+                const banner = document.getElementById('assessmentSkipBanner');
+                if (banner) {
+                    banner.classList.add('show');
+                }
+            } else {
+                console.log('✅ Assessment completed or not skipped');
+                const banner = document.getElementById('assessmentSkipBanner');
+                if (banner) {
+                    banner.classList.remove('show');
+                }
+            }
+        }
+
+        // Navigate to assessment
+        window.goToAssessment = function() {
+            console.log('🚀 Redirecting to assessment form...');
+            window.location.href = '/assessment-intake.html';
         }
 
         window.addEventListener('load', updateGreeting);
