@@ -1882,37 +1882,46 @@
     async function handleAssessmentSubmission(event) {
       event.preventDefault();
 
-      // FIX: Temporarily disable HTML5 validation for hidden fields
+      // Step 1: Handle HTML5 validation for hidden fields
       console.log('🔧 Disabling validation for hidden required fields...');
       
-      // Remove 'required' attribute from all hidden fields
+      // 1. Select all step containers that do NOT have the 'active' class
       const allSteps = document.querySelectorAll('.step-container');
-      const hiddenFields = [];
+      const hiddenRequiredFields = [];
       
+      // 2. Within inactive steps, find input, select, and textarea with 'required' attribute
       allSteps.forEach(step => {
         if (!step.classList.contains('active')) {
-          const requiredFields = step.querySelectorAll('[required]');
+          // Query only input, select, and textarea elements
+          const requiredFields = step.querySelectorAll('input[required], select[required], textarea[required]');
+          
+          // 3. Store elements and 4. Temporarily remove 'required' attribute
           requiredFields.forEach(field => {
-            if (field.hasAttribute('required')) {
-              field.removeAttribute('required');
-              hiddenFields.push({ field, wasRequired: true });
-            }
+            hiddenRequiredFields.push(field);
+            field.removeAttribute('required');
           });
         }
       });
       
-      console.log('✅ Temporarily removed "required" from', hiddenFields.length, 'hidden fields');
+      console.log('✅ Temporarily removed "required" from', hiddenRequiredFields.length, 'hidden fields');
 
+      // 5. Perform form validation (privacy consent check)
       if (!document.getElementById('privacyConsent').checked) {
         alert('Please accept the privacy terms to submit.');
         
-        // Restore 'required' attributes
-        hiddenFields.forEach(({ field }) => {
+        // Restore 'required' attributes if validation fails
+        hiddenRequiredFields.forEach(field => {
           field.setAttribute('required', '');
         });
         
         return;
       }
+      
+      // After validation succeeds, restore the 'required' attribute
+      hiddenRequiredFields.forEach(field => {
+        field.setAttribute('required', '');
+      });
+      console.log('✅ Restored "required" attribute to hidden fields for future navigation');
 
       console.log('� Starting assessment submission process...');
       showLoadingSpinner('Saving your assessment...');
