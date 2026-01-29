@@ -42,8 +42,8 @@
             max-width: 1200px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: 1fr auto auto;
-            gap: 30px;
+            grid-template-columns: 1fr auto auto auto;
+            gap: 20px;
             align-items: center;
         }
 
@@ -87,6 +87,24 @@
             border-radius: 8px;
             font-weight: 700;
             font-size: 16px;
+        }
+        
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .logout-btn:hover {
+            background: white;
+            color: var(--primary);
         }
 
         .dashboard-container {
@@ -664,7 +682,7 @@
         <div class="header-content">
             <div>
                 <div class="greeting-time" id="greetingTime">Good morning!</div>
-                <div class="greeting">Welcome back, Dinesh</div>
+                <div class="greeting" id="userGreeting">Welcome back, Dinesh</div>
             </div>
             <div class="aifri-badge-large">
                 <div class="badge-score">76</div>
@@ -673,6 +691,9 @@
             <div class="streak-badge">
                 🔥 12 Days<br>Streak
             </div>
+            <button class="logout-btn" id="logoutBtn" onclick="handleLogout()">
+                🚪 Logout
+            </button>
         </div>
     </div>
 
@@ -1386,6 +1407,45 @@
                     </div>`;
             }
         </script>
+        
+    <!-- Logout Function -->
+    <script>
+        async function handleLogout() {
+            console.log('👋 Logging out...');
+            try {
+                await window.AkuraAuth.signOut();
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error('❌ Logout error:', error);
+                alert('Error logging out. Please try again.');
+            }
+        }
+        
+        // Load user name dynamically
+        async function loadUserName() {
+            try {
+                const user = await window.AkuraAuth.getCurrentUser();
+                if (user && user.user_metadata && user.user_metadata.full_name) {
+                    document.getElementById('userGreeting').textContent = `Welcome back, ${user.user_metadata.full_name}`;
+                }
+            } catch (error) {
+                console.error('Error loading user:', error);
+            }
+        }
+        
+        // Load user name on page load
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Wait for AkuraAuth to be ready
+            let attempts = 0;
+            while (!window.AkuraAuth && attempts < 10) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                attempts++;
+            }
+            if (window.AkuraAuth && window.AkuraAuth.isReady()) {
+                loadUserName();
+            }
+        });
+    </script>
 
     <!-- Authentication Protection -->
     <script src="js/auth.js"></script>
