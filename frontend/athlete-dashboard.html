@@ -961,10 +961,24 @@
         </div>
     </div>
 
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Auth Module -->
+    <script src="js/auth.js"></script>
+    
     <!-- JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js"></script>
     <script src="js/api-client.js"></script>
     <script>
+        // ============================================
+        // REAL USER DATA LOADING
+        // ============================================
+        let currentUser = null;
+        let userProfile = null;
+        let userAssessment = null;
+        let userWorkouts = [];
+
         // Greeting based on time
         function updateGreeting() {
             const hour = new Date().getHours();
@@ -976,12 +990,261 @@
             document.getElementById('greetingTime').textContent = greeting;
         }
 
+        // Initialize dashboard with real user data
+        async function initializeDashboard() {
+            console.log('🚀 Initializing athlete dashboard with real data...');
+            
+            try {
+                // Step 1: Check if user is logged in
+                const user = await window.AkuraAuth.getCurrentUser();
+                if (!user) {
+                    console.error('❌ No user logged in');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                currentUser = user;
+                console.log('✅ User authenticated:', user.id);
+                
+                // Step 2: Fetch profile from profiles table
+                await fetchUserProfile();
+                
+                // Step 3: Fetch assessment data
+                await fetchUserAssessment();
+                
+                // Step 4: Fetch recent workouts
+                await fetchUserWorkouts();
+                
+                // Step 5: Update UI with real data
+                updateDashboardUI();
+                
+                // Step 6: Initialize chart with real data
+                initPillarChart();
+                
+                console.log('✅ Dashboard initialized successfully');
+            } catch (error) {
+                console.error('❌ Error initializing dashboard:', error);
+                showErrorBanner('Failed to load dashboard data. Please refresh.');
+            }
+        }
+
+        // Fetch user profile
+        async function fetchUserProfile() {
+            console.log('📝 Fetching user profile...');
+            try {
+                const supabase = window.AkuraAuth.getClient();
+                const { data: profile, error } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', currentUser.id)
+                    .single();
+                
+                if (error) {
+                    console.warn('⚠️ Profile fetch error:', error);
+                    userProfile = null;
+                    return;
+                }
+                
+                userProfile = profile;
+                console.log('✅ Profile fetched:', profile);
+            } catch (error) {
+                console.error('❌ Error fetching profile:', error);
+            }
+        }
+
+        // Fetch user's latest assessment
+        async function fetchUserAssessment() {
+            console.log('📊 Fetching user assessment...');
+            try {
+                const supabase = window.AkuraAuth.getClient();
+                const { data: assessments, error } = await supabase
+                    .from('assessments')
+                    .select('*')
+                    .eq('athlete_id', currentUser.id)
+                    .order('created_at', { ascending: false })
+                    .limit(1);
+                
+                if (error) {
+                    console.warn('⚠️ Assessment fetch error:', error);
+                    userAssessment = null;
+                    return;
+                }
+                
+                if (assessments && assessments.length > 0) {
+                    userAssessment = assessments[0];
+                    console.log('✅ Assessment fetched:', userAssessment);
+                } else {
+                    console.log('ℹ️ No assessment found for user');
+                    userAssessment = null;
+                }
+            } catch (error) {
+                console.error('❌ Error fetching assessment:', error);
+            }
+        }
+
+        // Fetch user's recent workouts
+        async function fetchUserWorkouts() {
+            console.log('🏃 Fetching user workouts...');
+            try {
+                const supabase = window.AkuraAuth.getClient();
+                const { data: workouts, error } = await supabase
+                    .from('workouts')
+                    .select('*')
+                    .eq('athlete_id', currentUser.id)
+                    .order('scheduled_date', { ascending: false })
+                    .limit(10);
+                
+                if (error) {
+                    console.warn('⚠️ Workouts fetch error:', error);
+                    userWorkouts = [];
+                    return;
+                }
+                
+                userWorkouts = workouts || [];
+                console.log('✅ Workouts fetched:', userWorkouts.length);
+            } catch (error) {
+                console.error('❌ Error fetching workouts:', error);
+            }
+        }
+
+        // Update dashboard UI with real data
+        function updateDashboardUI() {
+            console.log('🎨 Updating UI with real data...');
+            
+            // Update greeting with real name
+            if (userProfile && userProfile.full_name) {
+                document.getElementById('userGreeting').textContent = `Welcome back, ${userProfile.full_name}`;
+            }
+            
+            // Update AIFRI score and grade
+            if (userAssessment && userAssessment.aifri_score) {
+                const scoreEl = document.querySelector('.badge-score');
+                const gradeEl = document.querySelector('.badge-grade');
+                if (scoreEl) scoreEl.textContent = Math.round(userAssessment.aifri_score);
+                if (gradeEl) {
+                    const score = userAssessment.aifri_score;
+                    let grade = 'BASIC';
+                    if (score >= 80) grade = 'ADVANCED';
+                    else if (score >= 60) grade = 'INTERMEDIATE';
+                    gradeEl.textContent = grade;
+                }
+            }
+            
+            // Update workout streak (placeholder - will calculate from workout history)
+            const streakBadge = document.querySelector('.streak-badge');
+            if (streakBadge && userWorkouts.length > 0) {
+                const streakDays = calculateStreak(userWorkouts);
+                streakBadge.innerHTML = `🔥 ${streakDays} Days<br>Streak`;
+            }
+            
+            // Update profile badge
+            if (userProfile && userProfile.role) {
+                // Role badge already in UI, but can update if needed
+                console.log('✅ Role:', userProfile.role);
+            }
+            
+            // Update weekly progress (placeholder)
+            const progressText = document.querySelector('.stat-value');
+            if (progressText && userWorkouts.length > 0) {
+                const weeklyDist = calculateWeeklyDistance(userWorkouts);
+                if (progressText.textContent.includes('km')) {
+                    progressText.textContent = weeklyDist;
+                }
+            }
+            
+            console.log('✅ UI updated with real data');
+        }
+
+        // Calculate workout streak
+        function calculateStreak(workouts) {
+            if (!workouts || workouts.length === 0) return 0;
+            
+            let streak = 0;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            // Sort by date
+            const sorted = [...workouts].sort((a, b) => 
+                new Date(b.scheduled_date) - new Date(a.scheduled_date)
+            );
+            
+            for (let i = 0; i < sorted.length; i++) {
+                const workoutDate = new Date(sorted[i].scheduled_date);
+                workoutDate.setHours(0, 0, 0, 0);
+                
+                const expectedDate = new Date(today);
+                expectedDate.setDate(expectedDate.getDate() - i);
+                
+                if (workoutDate.getTime() === expectedDate.getTime() && sorted[i].completed) {
+                    streak++;
+                } else {
+                    break;
+                }
+            }
+            
+            return streak;
+        }
+
+        // Calculate weekly distance
+        function calculateWeeklyDistance(workouts) {
+            if (!workouts || workouts.length === 0) return '0/21.5 km';
+            
+            const today = new Date();
+            const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+            
+            let totalDistance = 0;
+            workouts.forEach(w => {
+                const workoutDate = new Date(w.scheduled_date);
+                if (workoutDate >= weekAgo && workoutDate <= today && w.completed) {
+                    totalDistance += (w.distance_km || 0);
+                }
+            });
+            
+            return `${totalDistance.toFixed(1)}/21.5 km`;
+        }
+
+        // Show error banner
+        function showErrorBanner(message) {
+            const banner = document.createElement('div');
+            banner.style.cssText = 'position:fixed;top:20px;right:20px;background:#f8d7da;color:#721c24;padding:15px 20px;border-radius:8px;z-index:9999;border:1px solid #f5c6cb;';
+            banner.textContent = message;
+            document.body.appendChild(banner);
+            setTimeout(() => banner.remove(), 5000);
+        }
+
         window.addEventListener('load', updateGreeting);
 
         // Pillar Progress Chart
         function initPillarChart() {
             const ctx = document.getElementById('pillarProgressChart');
+            if (!ctx) {
+                console.warn('⚠️ Chart canvas not found');
+                return;
+            }
+            
             if (window.pillarChart) window.pillarChart.destroy();
+
+            // Use real assessment data if available
+            let pillarData = {
+                running: [75, 75, 77, 78, 79, 80, 81, 82, 82, 83, 84, 85],
+                strength: [80, 80, 82, 83, 84, 85, 86, 87, 87, 87, 88, 88],
+                rom: [70, 70, 71, 72, 73, 74, 75, 75, 76, 77, 77, 78],
+                balance: [85, 85, 85, 86, 86, 87, 87, 88, 88, 89, 89, 90],
+                mobility: [65, 65, 67, 68, 69, 70, 71, 72, 73, 74, 75, 75],
+                alignment: [72, 72, 73, 74, 75, 75, 76, 77, 77, 78, 79, 80]
+            };
+            
+            // Override with real assessment data if available
+            if (userAssessment && userAssessment.scores) {
+                console.log('📊 Using real assessment scores:', userAssessment.scores);
+                // Update the last week's data with real scores
+                if (userAssessment.scores.running) pillarData.running[11] = userAssessment.scores.running;
+                if (userAssessment.scores.strength) pillarData.strength[11] = userAssessment.scores.strength;
+                if (userAssessment.scores.rom) pillarData.rom[11] = userAssessment.scores.rom;
+                if (userAssessment.scores.balance) pillarData.balance[11] = userAssessment.scores.balance;
+                if (userAssessment.scores.mobility) pillarData.mobility[11] = userAssessment.scores.mobility;
+                if (userAssessment.scores.alignment) pillarData.alignment[11] = userAssessment.scores.alignment;
+            }
 
             window.pillarChart = new Chart(ctx, {
                 type: 'line',
@@ -990,7 +1253,7 @@
                     datasets: [
                         {
                             label: 'Running',
-                            data: [75, 75, 77, 78, 79, 80, 81, 82, 82, 83, 84, 85],
+                            data: pillarData.running,
                             borderColor: '#1e3a5f',
                             backgroundColor: 'rgba(30, 58, 95, 0.1)',
                             tension: 0.4,
@@ -999,7 +1262,7 @@
                         },
                         {
                             label: 'Strength',
-                            data: [80, 80, 82, 83, 84, 85, 86, 87, 87, 87, 88, 88],
+                            data: pillarData.strength,
                             borderColor: '#FF9500',
                             backgroundColor: 'rgba(255, 149, 0, 0.1)',
                             tension: 0.4,
@@ -1008,7 +1271,7 @@
                         },
                         {
                             label: 'ROM',
-                            data: [70, 70, 71, 72, 73, 74, 75, 75, 76, 77, 77, 78],
+                            data: pillarData.rom,
                             borderColor: '#33BEF3',
                             backgroundColor: 'rgba(51, 190, 243, 0.1)',
                             tension: 0.4,
@@ -1017,7 +1280,7 @@
                         },
                         {
                             label: 'Balance',
-                            data: [85, 85, 85, 86, 86, 87, 87, 88, 88, 89, 89, 90],
+                            data: pillarData.balance,
                             borderColor: '#4CAF50',
                             backgroundColor: 'rgba(76, 175, 80, 0.1)',
                             tension: 0.4,
@@ -1026,7 +1289,7 @@
                         },
                         {
                             label: 'Mobility',
-                            data: [65, 65, 67, 68, 69, 70, 71, 72, 73, 74, 75, 75],
+                            data: pillarData.mobility,
                             borderColor: '#9C27B0',
                             backgroundColor: 'rgba(156, 39, 176, 0.1)',
                             tension: 0.4,
@@ -1035,7 +1298,7 @@
                         },
                         {
                             label: 'Alignment',
-                            data: [72, 72, 73, 74, 75, 75, 76, 77, 77, 78, 79, 80],
+                            data: pillarData.alignment,
                             borderColor: '#FF6B6B',
                             backgroundColor: 'rgba(255, 107, 107, 0.1)',
                             tension: 0.4,
@@ -1421,29 +1684,25 @@
             }
         }
         
-        // Load user name dynamically
-        async function loadUserName() {
-            try {
-                const user = await window.AkuraAuth.getCurrentUser();
-                if (user && user.user_metadata && user.user_metadata.full_name) {
-                    document.getElementById('userGreeting').textContent = `Welcome back, ${user.user_metadata.full_name}`;
-                }
-            } catch (error) {
-                console.error('Error loading user:', error);
-            }
-        }
-        
-        // Load user name on page load
+        // Initialize dashboard on page load
         window.addEventListener('DOMContentLoaded', async () => {
+            console.log('🔄 Waiting for AkuraAuth to initialize...');
+            
             // Wait for AkuraAuth to be ready
             let attempts = 0;
-            while (!window.AkuraAuth && attempts < 10) {
+            while (!window.AkuraAuth || !window.AkuraAuth.isReady()) {
+                if (attempts > 20) {
+                    console.error('❌ AkuraAuth failed to initialize');
+                    showErrorBanner('Authentication system not ready. Please refresh.');
+                    return;
+                }
                 await new Promise(resolve => setTimeout(resolve, 100));
                 attempts++;
             }
-            if (window.AkuraAuth && window.AkuraAuth.isReady()) {
-                loadUserName();
-            }
+            
+            console.log('✅ AkuraAuth ready, initializing dashboard...');
+            updateGreeting();
+            await initializeDashboard();
         });
     </script>
 
