@@ -50,6 +50,11 @@ window.AkuraAuth = {
         return akuraSupabaseClient;
     },
     
+    // Provide direct access to Supabase client (for database queries)
+    get supabase() {
+        return akuraSupabaseClient;
+    },
+    
     // Sign Up
     signUp: async function(email, password, metadata = {}) {
         console.log('📝 Attempting signup for:', email);
@@ -91,7 +96,7 @@ window.AkuraAuth = {
         console.log('🔐 Attempting login for:', email);
         
         if (!akuraSupabaseClient) {
-            throw new Error('Supabase client not initialized');
+            return { error: new Error('Supabase client not initialized') };
         }
         
         try {
@@ -101,15 +106,19 @@ window.AkuraAuth = {
             });
             
             if (error) {
-                console.error('❌ Login error:', error);
-                throw error;
+                console.error('❌ Login error:', error.message);
+                return { error: error };
             }
             
             console.log('✅ Login successful');
-            return data;
+            return {
+                user: data.user,
+                session: data.session,
+                error: null
+            };
         } catch (error) {
             console.error('❌ Login failed:', error);
-            throw error;
+            return { error: error };
         }
     },
     

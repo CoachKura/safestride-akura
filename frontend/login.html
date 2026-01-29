@@ -148,13 +148,13 @@
             // Wait for Supabase to initialize
             await new Promise(resolve => setTimeout(resolve, 500));
             
-            if (!window.akuraAuth || !window.akuraAuth.supabase) {
-                console.error('❌ Supabase not initialized properly');
+            if (!window.AkuraAuth || !window.AkuraAuth.isReady()) {
+                console.error('❌ AkuraAuth not initialized properly');
                 showAlert('error', 'System error. Please refresh the page.');
                 return;
             }
             
-            console.log('✅ Supabase ready');
+            console.log('✅ AkuraAuth ready');
             
             // Get form elements
             const loginForm = document.getElementById('loginForm');
@@ -260,7 +260,7 @@
                     console.log('🔐 Attempting to login:', email);
                     
                     // Sign in with Supabase
-                    const { user, session, error } = await window.akuraAuth.signIn(email, password);
+                    const { user, session, error } = await window.AkuraAuth.signIn(email, password);
                     
                     if (error) {
                         throw error;
@@ -277,7 +277,7 @@
                     
                     // Get user profile for smart redirect
                     try {
-                        const { data: profile, error: profileError } = await window.akuraAuth.supabase
+                        const { data: profile, error: profileError } = await window.AkuraAuth.supabase
                             .from('profiles')
                             .select('role, access_level, assessment_completed')
                             .eq('user_id', user.id)
