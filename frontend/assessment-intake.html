@@ -1081,188 +1081,153 @@
         return;
       }
 
-      console.log('📋 Collecting assessment data...');
-
-      // Build assessment data mapped to existing fields
-      const firstName = document.getElementById('firstName')?.value || '';
-      const lastName = document.getElementById('lastName')?.value || '';
-
-      const assessmentData = {
-        personal: {
-          name: `${firstName} ${lastName}`.trim(),
-          age: parseInt(document.getElementById('age')?.value || '0'),
-          gender: document.getElementById('gender')?.value || '',
-          height: parseFloat(document.getElementById('height')?.value || '0'),
-          weight: parseFloat(document.getElementById('weight')?.value || '0'),
-          email: document.getElementById('email')?.value || '',
-          phone: '',
-          primarySport: document.getElementById('primarySport')?.value || '',
-          goals: document.getElementById('fitnessGoals')?.value || ''
-        },
-
-        medical: {
-          injuries: Array.from(document.querySelectorAll('input[name="injuries"]:checked')).map(el => el.value),
-          conditions: (document.getElementById('medicalConditions')?.value || '').split(',').map(s => s.trim()).filter(Boolean),
-          medications: document.getElementById('medications')?.value || '',
-          surgeries: document.getElementById('surgeries')?.value || ''
-        },
-
-        alignment: {
-          bodyType: document.getElementById('bodyType')?.value || 'mesomorph',
-          qAngle: (() => {
-            const l = parseFloat(document.getElementById('qAngleLeft')?.value || '0');
-            const r = parseFloat(document.getElementById('qAngleRight')?.value || '0');
-            const avg = (isNaN(l) ? null : l) !== null && (isNaN(r) ? null : r) !== null && l && r ? (l + r) / 2
-              : (!isNaN(l) && l ? l : (!isNaN(r) && r ? r : 0));
-            const num = parseFloat(avg);
-            if (isNaN(num)) return 0;
-            return Math.max(0, Math.min(45, num));
-          })(),
-          footPronation: (() => {
-            const nd = parseFloat(document.getElementById('navicularDrop')?.value || '0');
-            if (!nd) return 'neutral';
-            if (nd >= 10) return 'overpronation';
-            if (nd >= 5) return 'moderate';
-            return 'neutral';
-          })(),
-          pelvicTilt: document.getElementById('pelvisTilt')?.value || 'neutral',
-          forwardHead: document.getElementById('forwardHeadPosture')?.value || 'neutral'
-        },
-
-        rom: {
-          cervical: parseFloat(document.getElementById('cervicalRom')?.value || '75'),
-          shoulder: parseFloat(document.getElementById('shoulderRom')?.value || '85'),
-          hip: parseFloat(document.getElementById('hipRom')?.value || '90'),
-          knee: parseFloat(document.getElementById('kneeRom')?.value || '92'),
-          ankle: parseFloat(document.getElementById('ankleFlexibility')?.value || '85')
-        },
-
-        fms: {
-          deepSquat: parseInt(document.getElementById('fmsDeepSquat')?.value || '2'),
-          hurdleStep: parseInt(document.getElementById('fmsHurdleStep')?.value || '2'),
-          inlineLunge: parseInt(document.getElementById('fmsLunge')?.value || '2'),
-          shoulderMobility: parseInt(document.getElementById('fmsShoulderMobility')?.value || '2'),
-          legRaise: parseInt(document.getElementById('fmsActiveLegRaise')?.value || '2'),
-          pushUp: parseInt(document.getElementById('fmsPushup')?.value || '2'),
-          rotaryStability: parseInt(document.getElementById('fmsRotaryStability')?.value || '2'),
-          totalScore: 0
-        },
-
-        strength: {
-          plankHold: parseFloat(document.getElementById('plankTime')?.value || '60'),
-          singleLegBalance: parseFloat(document.getElementById('singleLegBalance')?.value || '20'),
-          calfRaises: null,
-          singleLegSquat: ''
-        },
-
-        mobility: {
-          sitReach: parseFloat(document.getElementById('hipFlexibility')?.value || '10'),
-          ankleDorsiflex: parseFloat(document.getElementById('ankleFlexibility')?.value || '10'),
-          hipFlexor: ''
-        },
-
-        running: {
-          weeklyMileage: parseFloat(document.getElementById('weeklyKm')?.value || '25'),
-          longRun: null,
-          easyPace: '',
-          tempoPace: '',
-          vdot: 40,
-          recentRace: document.getElementById('raceTime5K')?.value || ''
-        },
-
-        goals: {
-          primary: document.getElementById('fitnessGoals')?.value || 'injury-prevention',
-          targetRace: '',
-          targetDate: '',
-          experience: (() => {
-            const yrs = parseInt(document.getElementById('runningYears')?.value || '0');
-            if (yrs >= 5) return 'advanced';
-            if (yrs >= 2) return 'intermediate';
-            return 'beginner';
-          })()
-        }
-      };
-
-      // Balance aggregation
-      const balance = {
-        singleLegEyesOpen: assessmentData.strength.singleLegBalance,
-        singleLegEyesClosed: parseFloat(document.getElementById('singleLegBalanceEyesClosed')?.value || '10'),
-        fmsTotal: (
-          assessmentData.fms.deepSquat +
-          assessmentData.fms.hurdleStep +
-          assessmentData.fms.inlineLunge +
-          assessmentData.fms.shoulderMobility +
-          assessmentData.fms.legRaise +
-          assessmentData.fms.pushUp +
-          assessmentData.fms.rotaryStability
-        )
-      };
-      assessmentData.fms.totalScore = balance.fmsTotal;
-      assessmentData.balance = balance;
-
-      // AIFRI score (client-side)
-      const aifriScore = calculateAIFRIScore(assessmentData);
-      assessmentData.aifriScore = aifriScore;
-
-      console.log('📊 AIFRI Score calculated:', aifriScore);
-      console.log('📦 Complete assessment data:', assessmentData);
-
-      // Save local backup
-      const formData = validator.getFormData();
-      storage.saveAssessmentDraft(0, { ...formData, aifriResult: JSON.parse(sessionStorage.getItem('aifriResult') || 'null'), status: 'submitted' });
-
-      // Show loading
-      showLoadingSpinner('Analyzing your assessment and generating personalized protocol...');
+      console.log('� Starting assessment submission process...');
+      showLoadingSpinner('Saving your assessment...');
 
       try {
-        const result = await submitAssessment(assessmentData);
+        // Step 1: Get current user
+        console.log('📍 Step 1: Getting current user...');
+        const user = await window.AkuraAuth.getCurrentUser();
+        if (!user) {
+          throw new Error('No user logged in');
+        }
+        console.log('✅ User authenticated:', user.id);
 
-        localStorage.setItem('assessment', JSON.stringify(assessmentData));
-        localStorage.setItem('aifriScore', String(result.aifriScore || aifriScore));
-        if (result.protocolId) localStorage.setItem('protocolId', result.protocolId);
-        if (result.assessmentId) localStorage.setItem('assessmentId', result.assessmentId);
+        // Step 2: Collect form data from all 9 steps
+        console.log('📍 Step 2: Collecting assessment data from 9 steps...');
+        const firstName = document.getElementById('firstName')?.value || '';
+        const lastName = document.getElementById('lastName')?.value || '';
+        const age = parseInt(document.getElementById('age')?.value || '0');
+        const weight = parseFloat(document.getElementById('weight')?.value || '0');
+        const height = parseFloat(document.getElementById('height')?.value || '0');
+        const gender = document.getElementById('gender')?.value || '';
+        const runningExperience = (() => {
+          const yrs = parseInt(document.getElementById('runningYears')?.value || '0');
+          if (yrs >= 5) return 'advanced';
+          if (yrs >= 2) return 'intermediate';
+          return 'beginner';
+        })();
+        const weeklyDistance = parseFloat(document.getElementById('weeklyKm')?.value || '0');
+        const injuries = Array.from(document.querySelectorAll('input[name="injuries"]:checked')).map(el => el.value);
+        const goals = document.getElementById('fitnessGoals')?.value || '';
+        
+        console.log('✅ Personal data collected:', { age, weight, height, gender, runningExperience, weeklyDistance });
 
-        console.log('✅ Assessment submitted successfully:', result);
+        // Step 3: Calculate AIFRI Score (6 pillars)
+        console.log('📍 Step 3: Calculating AIFRI score...');
+        const fmsDeepSquat = parseInt(document.getElementById('fmsDeepSquat')?.value || '2');
+        const fmsHurdleStep = parseInt(document.getElementById('fmsHurdleStep')?.value || '2');
+        const fmsLunge = parseInt(document.getElementById('fmsLunge')?.value || '2');
+        const fmsShoulderMobility = parseInt(document.getElementById('fmsShoulderMobility')?.value || '2');
+        const fmsActiveLegRaise = parseInt(document.getElementById('fmsActiveLegRaise')?.value || '2');
+        const fmsPushup = parseInt(document.getElementById('fmsPushup')?.value || '2');
+        const fmsRotaryStability = parseInt(document.getElementById('fmsRotaryStability')?.value || '2');
+        
+        const fmsTotal = fmsDeepSquat + fmsHurdleStep + fmsLunge + fmsShoulderMobility + fmsActiveLegRaise + fmsPushup + fmsRotaryStability;
+        
+        // Pillar scores (6 pillars: Running, Strength, ROM, Balance, Mobility, Alignment)
+        const pillarScores = {
+          running: Math.round(40 + (fmsTotal / 21) * 30 + (weeklyDistance / 50) * 20),
+          strength: Math.round(fmsDeepSquat * 10 + fmsPushup * 10 + (fmsTotal / 21) * 10),
+          rom: Math.round((parseFloat(document.getElementById('hipFlexibility')?.value || '10') / 30) * 100),
+          balance: Math.round((parseFloat(document.getElementById('singleLegBalance')?.value || '20') / 60) * 100),
+          mobility: Math.round((parseFloat(document.getElementById('ankleFlexibility')?.value || '10') / 30) * 100),
+          alignment: Math.round(75 + (gender === 'female' ? -5 : 0))
+        };
+        
+        const aifriScore = Math.round((pillarScores.running + pillarScores.strength + pillarScores.rom + pillarScores.balance + pillarScores.mobility + pillarScores.alignment) / 6);
+        console.log('📊 AIFRI Score calculated:', aifriScore, 'Pillars:', pillarScores);
 
-        hideLoadingSpinner();
-        showSuccessMessage('Assessment complete! Generating your personalized 90-day protocol...');
-
-        setTimeout(async () => {
-          // Update profile to mark assessment as completed
-          try {
-            const user = await window.AkuraAuth.getCurrentUser();
-            if (user) {
-              await window.AkuraAuth.supabase
-                .from('profiles')
-                .update({
-                  assessment_completed: true,
-                  updated_at: new Date().toISOString()
-                })
-                .eq('user_id', user.id);
-            }
-          } catch (error) {
-            console.error('Error updating profile:', error);
+        // Step 4: Build assessment object for database
+        console.log('📍 Step 4: Building assessment data for database...');
+        const assessmentData = {
+          athlete_id: user.id,
+          age,
+          weight,
+          height,
+          gender,
+          running_experience: runningExperience,
+          weekly_distance: weeklyDistance,
+          injury_history: injuries.join(', '),
+          goals,
+          assessment_date: new Date().toISOString(),
+          assessment_completed: true,
+          aifri_score: aifriScore,
+          scores: pillarScores,
+          risk_level: aifriScore >= 80 ? 'Low' : aifriScore >= 60 ? 'Moderate' : 'High',
+          assessment_data: {
+            personal: { firstName, lastName, primarySport: document.getElementById('primarySport')?.value || '' },
+            medical: { injuries, injuryDetails: document.getElementById('injuryDetails')?.value || '' },
+            fms: { deepSquat: fmsDeepSquat, hurdleStep: fmsHurdleStep, lunge: fmsLunge, shoulderMobility: fmsShoulderMobility, legRaise: fmsActiveLegRaise, pushup: fmsPushup, rotaryStability: fmsRotaryStability, total: fmsTotal }
           }
-          
-          const pid = result.protocolId || localStorage.getItem('protocolId') || '';
-          window.location.href = pid ? `training-plans.html?protocolId=${pid}` : 'training-plans.html';
-        }, 2000);
-      } catch (error) {
-        console.error('❌ Assessment submission failed:', error);
-        hideLoadingSpinner();
-        showErrorMessage(`Unable to connect to server: ${error.message}\n\nYour assessment has been saved locally. You can continue in offline mode.`);
+        };
+        console.log('✅ Assessment data built:', assessmentData);
 
+        // Step 5: Save to assessments table
+        console.log('📍 Step 5: Saving to assessments table...');
+        const supabase = window.AkuraAuth.getClient();
+        const { data: savedAssessment, error: assessmentError } = await supabase
+          .from('assessments')
+          .insert(assessmentData)
+          .select()
+          .single();
+
+        if (assessmentError) {
+          console.error('⚠️ Assessment insert error:', assessmentError);
+          throw new Error(`Failed to save assessment: ${assessmentError.message}`);
+        }
+        console.log('✅ Assessment saved to database:', savedAssessment.id);
+
+        // Step 6: Update profiles table
+        console.log('📍 Step 6: Updating profiles table...');
+        const { data: updatedProfile, error: profileError } = await supabase
+          .from('profiles')
+          .update({
+            assessment_completed: true,
+            assessment_date: new Date().toISOString()
+          })
+          .eq('id', user.id)
+          .select()
+          .single();
+
+        if (profileError) {
+          console.warn('⚠️ Profile update warning:', profileError);
+        } else {
+          console.log('✅ Profile updated:', updatedProfile);
+        }
+
+        // Step 7: Store in localStorage for offline access
+        console.log('📍 Step 7: Storing data in localStorage...');
         localStorage.setItem('assessment', JSON.stringify(assessmentData));
         localStorage.setItem('aifriScore', String(aifriScore));
-        const tempProtocolId = `temp_${Date.now()}`;
-        localStorage.setItem('protocolId', tempProtocolId);
+        localStorage.setItem('assessmentId', savedAssessment.id);
+        console.log('✅ Data stored locally');
 
-        setTimeout(() => {
-          const proceed = confirm('Continue to training plan in offline mode?');
-          if (proceed) {
-            window.location.href = `training-plans.html?protocolId=${tempProtocolId}`;
+        // Step 8: Show success and redirect
+        console.log('📍 Step 8: Redirecting to dashboard...');
+        hideLoadingSpinner();
+        
+        // Show success message overlay
+        const successDiv = document.getElementById('submitSuccess');
+        if (successDiv) {
+          successDiv.classList.remove('hidden');
+          const successMsg = document.getElementById('successMessage');
+          if (successMsg) {
+            successMsg.textContent = 'Assessment complete! Your personalized training plan is being generated...';
           }
+        }
+
+        console.log('🎉 Assessment submission complete!');
+        
+        // Wait 3 seconds then redirect to dashboard
+        setTimeout(() => {
+          window.location.href = '/athlete-dashboard.html';
         }, 3000);
+
+      } catch (error) {
+        console.error('❌ Assessment submission error:', error);
+        hideLoadingSpinner();
+        alert(`Error saving assessment: ${error.message}\n\nPlease check your connection and try again.`);
       }
     }
 
