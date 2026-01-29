@@ -1098,18 +1098,25 @@
         // Initialize dashboard with real user data
         async function initializeDashboard() {
             console.log('🚀 Initializing athlete dashboard with real data...');
+            console.log('📋 Current state - userProfile:', userProfile, 'userAssessment:', userAssessment);
             
             try {
                 // Step 1: Check if user is logged in
+                if (!window.AkuraAuth) {
+                    console.error('❌ AkuraAuth not available');
+                    throw new Error('AkuraAuth module not initialized');
+                }
+                
                 const user = await window.AkuraAuth.getCurrentUser();
                 if (!user) {
                     console.error('❌ No user logged in');
-                    window.location.href = 'login.html';
+                    showErrorBanner('Please log in to access the dashboard');
+                    setTimeout(() => window.location.href = 'login.html', 2000);
                     return;
                 }
                 
                 currentUser = user;
-                console.log('✅ User authenticated:', user.id);
+                console.log('✅ User authenticated:', user.id, 'Email:', user.email);
                 
                 // Step 2: Fetch profile from profiles table
                 await fetchUserProfile();
@@ -1129,15 +1136,25 @@
                 console.log('✅ Dashboard initialized successfully');
             } catch (error) {
                 console.error('❌ Error initializing dashboard:', error);
+                console.error('Stack:', error.stack);
+                console.error('currentUser:', currentUser);
+                console.error('userProfile:', userProfile);
+                console.error('userAssessment:', userAssessment);
                 showErrorBanner('Failed to load dashboard data. Please refresh.');
             }
         }
 
         // Fetch user profile
         async function fetchUserProfile() {
-            console.log('📝 Fetching user profile...');
+            console.log('📝 Fetching user profile for ID:', currentUser?.id);
             try {
+                if (!currentUser || !currentUser.id) {
+                    console.error('❌ No currentUser.id available');
+                    throw new Error('currentUser.id is not set');
+                }
+                
                 const supabase = window.AkuraAuth.getClient();
+                console.log('📡 Querying profiles table...');
                 const { data: profile, error } = await supabase
                     .from('profiles')
                     .select('*')
@@ -1145,7 +1162,7 @@
                     .single();
                 
                 if (error) {
-                    console.warn('⚠️ Profile fetch error:', error);
+                    console.warn('⚠️ Profile fetch error:', error.message, error.details);
                     userProfile = null;
                     return;
                 }
@@ -1158,15 +1175,22 @@
                     role: profile?.role
                 });
             } catch (error) {
-                console.error('❌ Error fetching profile:', error);
+                console.error('❌ Error fetching profile:', error.message);
+                throw error;
             }
         }
 
         // Fetch user's latest assessment
         async function fetchUserAssessment() {
-            console.log('📊 Fetching user assessment...');
+            console.log('📊 Fetching user assessment for ID:', currentUser?.id);
             try {
+                if (!currentUser || !currentUser.id) {
+                    console.error('❌ No currentUser.id available for assessment');
+                    throw new Error('currentUser.id is not set');
+                }
+                
                 const supabase = window.AkuraAuth.getClient();
+                console.log('📡 Querying assessments table...');
                 const { data: assessments, error } = await supabase
                     .from('assessments')
                     .select('*')
@@ -1175,7 +1199,7 @@
                     .limit(1);
                 
                 if (error) {
-                    console.warn('⚠️ Assessment fetch error:', error);
+                    console.warn('⚠️ Assessment fetch error:', error.message, error.details);
                     userAssessment = null;
                     return;
                 }
@@ -1192,15 +1216,22 @@
                     userAssessment = null;
                 }
             } catch (error) {
-                console.error('❌ Error fetching assessment:', error);
+                console.error('❌ Error fetching assessment:', error.message);
+                throw error;
             }
         }
 
         // Fetch user's recent workouts
         async function fetchUserWorkouts() {
-            console.log('🏃 Fetching user workouts...');
+            console.log('🏃 Fetching user workouts for ID:', currentUser?.id);
             try {
+                if (!currentUser || !currentUser.id) {
+                    console.error('❌ No currentUser.id available for workouts');
+                    throw new Error('currentUser.id is not set');
+                }
+                
                 const supabase = window.AkuraAuth.getClient();
+                console.log('📡 Querying workouts table...');
                 const { data: workouts, error } = await supabase
                     .from('workouts')
                     .select('*')
@@ -1209,15 +1240,16 @@
                     .limit(10);
                 
                 if (error) {
-                    console.warn('⚠️ Workouts fetch error:', error);
+                    console.warn('⚠️ Workouts fetch error:', error.message, error.details);
                     userWorkouts = [];
                     return;
                 }
                 
                 userWorkouts = workouts || [];
-                console.log('✅ Workouts fetched:', userWorkouts.length);
+                console.log('✅ Workouts fetched:', userWorkouts.length, 'workouts');
             } catch (error) {
-                console.error('❌ Error fetching workouts:', error);
+                console.error('❌ Error fetching workouts:', error.message);
+                throw error;
             }
         }
 
@@ -1633,37 +1665,41 @@
         </div>
 
         <script>
-            // Email Verification Check
+            // Email Verification Check (moved inside initialization)
             const checkEmailVerification = async () => {
                 try {
                     const user = await window.AkuraAuth.getCurrentUser();
                     if (!user) {
-                        window.location.href = '/login.html';
+                        console.log('No user - skipping email verification check');
                         return;
                     }
 
-                    const { data: { user: authUser } } = await window.AkuraAuth.getSession();
-
-                    // Check if email is verified
-                    if (authUser && !authUser.email_confirmed_at) {
-                        // Show verification banner
-                        const banner = document.createElement('div');
-                        banner.id = 'verification-banner';
-                        banner.style.cssText = 'background: #fff3cd; border-left: 4px solid #ffc107; padding: 16px 20px; margin: 16px; border-radius: 8px; position: relative; z-index: 1050;';
-                        banner.innerHTML = `
-                            <div style="max-width: 1200px; margin: 0 auto;">
-                                <strong style="font-size: 15px; display: block; margin-bottom: 8px;">⚠️ Email Verification Required</strong>
-                                <p style="margin: 8px 0; color: #666; font-size: 14px;">Please verify your email address to access all features and unlock your personalized training plan.</p>
-                                <p style="margin: 8px 0 0 0; color: #666; font-size: 14px;">Check your inbox at <strong>${authUser.email}</strong> and click the verification link.</p>
-                                <button onclick="window.resendVerificationEmail()" style="margin-top: 12px; padding: 8px 16px; background: #ffc107; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; color: #333; font-size: 14px; transition: all 0.3s;">
-                                    📧 Resend Verification Email
-                                </button>
-                            </div>
-                        `;
-                        document.body.insertBefore(banner, document.body.firstChild);
-                        console.log('⚠️ Email not verified - showing verification banner');
-                    } else {
-                        console.log('✅ Email verified');
+                    try {
+                        const { data: { user: authUser } } = await window.AkuraAuth.getSession();
+                        
+                        // Check if email is verified
+                        if (authUser && !authUser.email_confirmed_at) {
+                            // Show verification banner
+                            const banner = document.createElement('div');
+                            banner.id = 'verification-banner';
+                            banner.style.cssText = 'background: #fff3cd; border-left: 4px solid #ffc107; padding: 16px 20px; margin: 16px; border-radius: 8px; position: relative; z-index: 1050;';
+                            banner.innerHTML = `
+                                <div style="max-width: 1200px; margin: 0 auto;">
+                                    <strong style="font-size: 15px; display: block; margin-bottom: 8px;">⚠️ Email Verification Required</strong>
+                                    <p style="margin: 8px 0; color: #666; font-size: 14px;">Please verify your email address to access all features and unlock your personalized training plan.</p>
+                                    <p style="margin: 8px 0 0 0; color: #666; font-size: 14px;">Check your inbox at <strong>${authUser.email}</strong> and click the verification link.</p>
+                                    <button onclick="window.resendVerificationEmail()" style="margin-top: 12px; padding: 8px 16px; background: #ffc107; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; color: #333; font-size: 14px; transition: all 0.3s;">
+                                        📧 Resend Verification Email
+                                    </button>
+                                </div>
+                            `;
+                            document.body.insertBefore(banner, document.body.firstChild);
+                            console.log('⚠️ Email not verified - showing verification banner');
+                        } else {
+                            console.log('✅ Email verified');
+                        }
+                    } catch (sessionError) {
+                        console.log('ℹ️ Email verification not available at this time');
                     }
                 } catch (error) {
                     console.error('Error checking email verification:', error);
@@ -1683,9 +1719,6 @@
                     alert('Unable to resend verification email. Please try again.');
                 }
             };
-
-            // Call email verification check first
-            checkEmailVerification();
 
             document.addEventListener('DOMContentLoaded', () => {
                 console.log('🎯 Athlete Dashboard - Feedback module loading...');
@@ -1924,8 +1957,7 @@
         });
     </script>
 
-    <!-- Authentication Protection -->
-    <script src="js/auth.js"></script>
+    <!-- Authentication Protection (auth-guard loads but waits for DOMContentLoaded) -->
     <script src="js/auth-guard.js"></script>
 </body>
 </html>
