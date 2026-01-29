@@ -6,7 +6,7 @@
   <title>AKURA Initial Assessment - SafeStride</title>
   
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -21,23 +21,201 @@
   
   <style>
     /* Assessment-Specific Styles */
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f8fafc;
+      color: #111827;
+    }
+
     .assessment-nav {
-      background: linear-gradient(135deg, #1e3a5f 0%, #2d5588 100%);
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
       color: white;
-      padding: var(--spacing-lg);
-      box-shadow: var(--shadow-md);
+      padding: 24px 0;
+      box-shadow: 0 12px 28px rgba(30, 58, 138, 0.25);
     }
 
     .assessment-nav-title {
-      font-size: var(--font-size-h2);
-      font-weight: var(--font-weight-bold);
+      font-size: 24px;
+      font-weight: 800;
       margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .akura-logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.15);
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    .assessment-title-text {
+      font-weight: 600;
+      opacity: 0.95;
     }
 
     .assessment-container {
       max-width: 900px;
-      margin: var(--spacing-xl) auto;
-      padding: var(--spacing-md);
+      margin: 32px auto;
+      padding: 0 16px 32px;
+    }
+
+    .form-container {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      padding: 24px;
+      transition: height 0.3s ease;
+    }
+
+    .progress-container {
+      margin-bottom: 24px;
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .progress-header {
+      margin-bottom: 24px;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #3b82f6, #2563eb);
+      border-radius: 999px;
+      transition: width 0.5s ease;
+    }
+
+    .step-circles {
+      display: grid;
+      grid-template-columns: repeat(9, 1fr);
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .step-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid #e5e7eb;
+      background: #f9fafb;
+      color: #6b7280;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .step-circle.active {
+      background: #3b82f6;
+      color: #ffffff;
+      border-color: #3b82f6;
+      transform: scale(1.05);
+      box-shadow: 0 6px 12px rgba(59, 130, 246, 0.25);
+    }
+
+    .step-circle.completed {
+      background: #10b981;
+      border-color: #10b981;
+      color: transparent;
+      animation: completedPulse 0.4s ease;
+    }
+
+    @keyframes completedPulse {
+      0% { transform: scale(0.95); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .step-circle.completed::after {
+      content: '✓';
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 16px;
+      animation: checkFadeIn 0.4s ease;
+      position: absolute;
+    }
+
+    @keyframes checkFadeIn {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .step-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 600;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .step-labels span.active {
+      color: #3b82f6;
+    }
+
+    .progress-bar {
+      height: 10px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #2563eb);
+      transition: width 0.4s ease;
+      border-radius: 999px;
+    }
+
+    .progress-steps {
+      margin-top: 12px;
+    }
+
+    .progress-step-circle {
+      background: #e5e7eb;
+      color: #6b7280;
+      border: none;
+    }
+
+    .progress-step.active .progress-step-circle {
+      background: #3b82f6;
+      color: #ffffff;
+    }
+
+    .progress-step.completed .progress-step-circle {
+      background: #10b981;
+      color: #ffffff;
+    }
+
+    .progress-step-label {
+      color: #6b7280;
+      font-weight: 500;
     }
 
     .step-container {
@@ -46,40 +224,197 @@
 
     .step-container.active {
       display: block;
-      animation: fadeIn 0.3s ease;
+      animation-duration: 0.3s;
+      animation-fill-mode: both;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    .step-container.active.step-forward {
+      animation-name: fadeSlideInForward;
+    }
+
+    .step-container.active.step-back {
+      animation-name: fadeSlideInBack;
+    }
+
+    @keyframes fadeSlideInForward {
+      from { opacity: 0; transform: translateX(16px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes fadeSlideInBack {
+      from { opacity: 0; transform: translateX(-16px); }
+      to { opacity: 1; transform: translateX(0); }
     }
 
     .step-header {
       display: flex;
       align-items: center;
       gap: var(--spacing-md);
-      margin-bottom: var(--spacing-lg);
-      padding-bottom: var(--spacing-lg);
-      border-bottom: 2px solid #e0e0e0;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #e5e7eb;
     }
 
     .step-icon {
       font-size: 36px;
-      color: var(--primary-teal);
+      color: #3b82f6;
       min-width: 50px;
       text-align: center;
     }
 
     .step-title-group h2 {
       margin: 0 0 4px 0;
-      font-size: var(--font-size-h3);
-      color: var(--primary-navy);
+      font-size: 24px;
+      color: #1e3a8a;
+      font-weight: 700;
     }
 
     .step-description {
-      font-size: var(--font-size-small);
-      color: #666;
+      font-size: 14px;
+      color: #6b7280;
       margin: 0;
+    }
+
+    .form-section {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+      border: 1px solid #f1f5f9;
+    }
+
+    .form-group {
+      position: relative;
+    }
+
+    .form-group-label {
+      position: absolute;
+      top: 12px;
+      left: 16px;
+      padding: 0 6px;
+      background: white;
+      color: #9ca3af;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      pointer-events: none;
+    }
+
+    .form-group:focus-within .form-group-label,
+    .form-group.has-value .form-group-label {
+      transform: translateY(-12px);
+      font-size: 12px;
+      color: #3b82f6;
+    }
+
+    .input-field,
+    select.input-field,
+    textarea.input-field {
+      width: 100%;
+      height: 48px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      background: #ffffff;
+      font-size: 16px;
+      color: #111827;
+      transition: all 0.2s ease;
+    }
+
+    textarea.input-field {
+      min-height: 120px;
+      height: auto;
+    }
+
+    .input-field::placeholder {
+      color: #9ca3af;
+    }
+
+    .input-field:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+      outline: none;
+    }
+
+    .input-field.invalid {
+      border-color: #ef4444;
+      box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.12);
+    }
+
+    .input-field.valid {
+      border-color: #10b981;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="%2310b981"><path d="M7.75 13.4 4.6 10.25l-1.2 1.2 4.35 4.35L16.6 6.95l-1.2-1.2z"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 44px;
+    }
+
+    .validation-message {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #ef4444;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .validation-message .error-icon {
+      font-size: 12px;
+      line-height: 1;
+    }
+
+    .helper-text,
+    .form-group-hint {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .char-counter {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #9ca3af;
+      text-align: right;
+    }
+
+    .form-group.is-validating::after {
+      content: '';
+      position: absolute;
+      right: 14px;
+      top: 14px;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #e5e7eb;
+      border-top-color: #3b82f6;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .confetti-piece {
+      position: fixed;
+      top: -10px;
+      width: 8px;
+      height: 14px;
+      opacity: 0.9;
+      z-index: 9999;
+      animation: confettiFall 1.8s ease-in forwards;
+    }
+
+    @keyframes confettiFall {
+      0% { transform: translateY(0) rotate(0deg); }
+      100% { transform: translateY(110vh) rotate(360deg); }
+    }
+
+    .shake {
+      animation: shake 0.35s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-6px); }
+      40% { transform: translateX(6px); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
     }
 
     .visual-guide {
@@ -273,7 +608,7 @@
     .assessment-subtitle {
       margin: 8px 0 0 0;
       color: rgba(255, 255, 255, 0.9);
-      font-size: 14px;
+      font-size: 16px;
     }
 
     .progress-initial {
@@ -325,18 +660,305 @@
       display: none;
     }
 
-    .form-actions-center {
-      text-align: center;
-      flex: 1;
+    .form-navigation {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--spacing-md);
+      margin-top: var(--spacing-xl);
+      padding-top: var(--spacing-lg);
+      border-top: 1px solid #e9ecef;
+      flex-wrap: wrap;
     }
 
-    .step-counter {
+    .step-indicator {
       font-size: 14px;
       color: #666;
+      font-weight: 600;
+    }
+
+    .btn-primary,
+    .btn-secondary,
+    .btn-success {
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 48px;
+    }
+
+    .btn-primary,
+    .btn-success {
+      background: linear-gradient(90deg, #3b82f6, #2563eb);
+      color: white;
+    }
+
+    .btn-success {
+      background: linear-gradient(90deg, #10b981, #059669);
+    }
+
+    .btn-primary:hover,
+    .btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-secondary {
+      background: #e9ecef;
+      color: #495057;
+      border: 1px solid #d1d5db;
+    }
+
+    .btn-secondary:hover {
+      background: #dee2e6;
+    }
+
+    .btn-link {
+      margin-top: var(--spacing-md);
+      background: transparent;
+      border: none;
+      color: #6c757d;
+      text-decoration: underline;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .btn-link:hover {
+      color: #374151;
+    }
+
+    .btn-primary:disabled,
+    .btn-secondary:disabled,
+    .btn-success:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
     }
 
     @keyframes spin {
       to { transform: rotate(360deg); }
+    }
+
+    /* Mobile Styles (< 640px) */
+    @media (max-width: 639px) {
+      body {
+        font-size: 14px;
+      }
+
+      .assessment-nav {
+        padding: 16px 0;
+      }
+
+      .assessment-nav-title {
+        font-size: 20px;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .assessment-subtitle {
+        font-size: 14px;
+      }
+
+      .assessment-container {
+        margin: 16px auto;
+        padding: 0 16px 24px;
+      }
+
+      .form-container {
+        padding: 16px;
+        border-radius: 8px;
+      }
+
+      .progress-header {
+        margin-bottom: 16px;
+      }
+
+      .progress-bar-container {
+        height: 12px;
+      }
+
+      .step-circles {
+        gap: 6px;
+        overflow-x: auto;
+        padding-bottom: 8px;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .step-circle {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+        flex-shrink: 0;
+      }
+
+      .step-circle:not(.active):not(.completed) {
+        display: none;
+      }
+
+      .step-circle.active {
+        order: 0;
+      }
+
+      .step-circle.completed:last-of-type {
+        display: flex;
+      }
+
+      .step-labels {
+        font-size: 10px;
+      }
+
+      .step-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+      }
+
+      .step-icon {
+        font-size: 28px;
+      }
+
+      .step-title-group h2 {
+        font-size: 20px;
+      }
+
+      .step-description {
+        font-size: 13px;
+      }
+
+      .form-section {
+        padding: 16px;
+      }
+
+      .form-row {
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .input-field,
+      select.input-field,
+      textarea.input-field {
+        height: 44px;
+        font-size: 16px;
+      }
+
+      .form-navigation {
+        position: sticky;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #ffffff;
+        padding: 12px 16px;
+        margin: 0 -16px -16px;
+        border-top: 1px solid #e5e7eb;
+        box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
+        z-index: 100;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .step-indicator {
+        order: -1;
+        text-align: center;
+      }
+
+      .btn-primary,
+      .btn-secondary,
+      .btn-success {
+        width: 100%;
+        justify-content: center;
+        height: 44px;
+        font-size: 15px;
+      }
+
+      .btn-link {
+        text-align: center;
+        margin-top: 8px;
+      }
+    }
+
+    /* Tablet Styles (640px - 1024px) */
+    @media (min-width: 640px) and (max-width: 1024px) {
+      .assessment-container {
+        max-width: 700px;
+        width: 90%;
+        margin: 28px auto;
+      }
+
+      .form-container {
+        padding: 24px;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+
+      .form-row .form-group:only-child {
+        grid-column: 1 / -1;
+      }
+
+      .form-navigation {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 16px;
+        align-items: center;
+      }
+
+      .step-indicator {
+        text-align: center;
+      }
+    }
+
+    /* Touch Optimization */
+    @media (hover: none) and (pointer: coarse) {
+      .btn-primary,
+      .btn-secondary,
+      .btn-success,
+      .btn-link {
+        min-height: 44px;
+        padding: 14px 24px;
+      }
+
+      .input-field,
+      select.input-field {
+        min-height: 44px;
+      }
+
+      .step-circle {
+        min-width: 44px;
+        min-height: 44px;
+      }
+    }
+
+    /* Landscape Orientation */
+    @media (max-width: 768px) and (orientation: landscape) {
+      .assessment-nav {
+        padding: 12px 0;
+      }
+
+      .assessment-subtitle {
+        display: none;
+      }
+
+      .step-header {
+        flex-direction: row;
+        align-items: center;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
     }
   </style>
 </head>
@@ -345,7 +967,8 @@
   <div class="assessment-nav">
     <div class="container">
       <h1 class="assessment-nav-title">
-        <i class="fas fa-heartbeat"></i> AKURA Initial Assessment
+        <span class="akura-logo">AKURA</span>
+        <span class="assessment-title-text">Initial Assessment</span>
       </h1>
       <p class="assessment-subtitle">
         Complete your personal fitness assessment in 9 steps. Takes approximately 15-20 minutes.
@@ -357,13 +980,28 @@
   <div class="assessment-container">
     <!-- Form -->
     <form id="assessmentForm" class="form-container">
-      <!-- Progress Bar -->
-      <div class="progress-container">
-        <div class="progress-bar">
-          <div class="progress-bar-fill progress-initial" id="progressBarFill"></div>
+      <!-- Progress Header -->
+      <div class="progress-header">
+        <div class="progress-bar-container">
+          <div class="progress-bar" id="progressBar" style="width: 11%;"></div>
         </div>
-        <div class="progress-steps" id="progressSteps">
-          <!-- Dynamically populated -->
+
+        <div class="step-circles">
+          <div class="step-circle active" data-step="1">1</div>
+          <div class="step-circle" data-step="2">2</div>
+          <div class="step-circle" data-step="3">3</div>
+          <div class="step-circle" data-step="4">4</div>
+          <div class="step-circle" data-step="5">5</div>
+          <div class="step-circle" data-step="6">6</div>
+          <div class="step-circle" data-step="7">7</div>
+          <div class="step-circle" data-step="8">8</div>
+          <div class="step-circle" data-step="9">9</div>
+        </div>
+
+        <div class="step-labels">
+          <span class="label-personal active">Personal</span>
+          <span class="label-fitness">Fitness</span>
+          <span class="label-goals">Goals</span>
         </div>
       </div>
 
@@ -383,12 +1021,12 @@
           <div class="form-row">
             <div class="form-group required">
               <label class="form-group-label">First Name</label>
-              <input type="text" name="firstName" id="firstName" class="input-field" placeholder="John" required>
+              <input type="text" name="firstName" id="firstName" class="input-field" placeholder="John" required data-hint="Your given name">
               <div class="validation-message"></div>
             </div>
             <div class="form-group required">
               <label class="form-group-label">Last Name</label>
-              <input type="text" name="lastName" id="lastName" class="input-field" placeholder="Smith" required>
+              <input type="text" name="lastName" id="lastName" class="input-field" placeholder="Smith" required data-hint="Your family name">
               <div class="validation-message"></div>
             </div>
           </div>
@@ -396,12 +1034,12 @@
           <div class="form-row">
             <div class="form-group required">
               <label class="form-group-label">Email</label>
-              <input type="email" name="email" id="email" class="input-field" placeholder="john@example.com" required>
+              <input type="email" name="email" id="email" class="input-field" placeholder="john@example.com" required data-hint="We'll send your results here">
               <div class="validation-message"></div>
             </div>
             <div class="form-group required">
               <label class="form-group-label">Age</label>
-              <input type="number" name="age" id="age" class="input-field" min="18" max="120" placeholder="30" required>
+              <input type="number" name="age" id="age" class="input-field" inputmode="numeric" min="18" max="100" placeholder="30" required data-hint="Age in years (18-100)">
               <div class="validation-message"></div>
             </div>
           </div>
@@ -419,7 +1057,7 @@
             </div>
             <div class="form-group required">
               <label class="form-group-label">Primary Sport/Activity</label>
-              <input type="text" name="primarySport" id="primarySport" class="input-field" placeholder="Running, Cycling, etc." required>
+              <input type="text" name="primarySport" id="primarySport" class="input-field" placeholder="Running, Cycling, etc." required data-hint="Please select your primary sport">
               <div class="validation-message"></div>
             </div>
           </div>
@@ -427,12 +1065,12 @@
           <div class="form-row">
             <div class="form-group required">
               <label class="form-group-label">Height (cm)</label>
-              <input type="number" name="height" id="height" class="input-field" min="100" max="250" placeholder="180" required>
+              <input type="number" name="height" id="height" class="input-field" inputmode="numeric" min="120" max="250" placeholder="180" required data-hint="Height in cm (120-250)">
               <div class="validation-message"></div>
             </div>
             <div class="form-group required">
               <label class="form-group-label">Weight (kg)</label>
-              <input type="number" name="weight" id="weight" class="input-field" min="30" max="200" placeholder="75" required>
+              <input type="number" name="weight" id="weight" class="input-field" inputmode="numeric" min="30" max="200" placeholder="75" required data-hint="Weight in kg (30-200)">
               <div class="validation-message"></div>
             </div>
           </div>
@@ -560,13 +1198,13 @@
           <div class="form-row">
             <div class="form-group">
               <label class="form-group-label">Q-Angle Left Knee (degrees)</label>
-              <input type="number" name="qAngleLeft" id="qAngleLeft" class="input-field" min="0" max="40" placeholder="0-40°" step="0.5">
+              <input type="number" name="qAngleLeft" id="qAngleLeft" class="input-field" inputmode="decimal" min="0" max="40" placeholder="0-40°" step="0.5">
               <p class="form-group-hint">Ideal: 10-15°</p>
               <div class="validation-message"></div>
             </div>
             <div class="form-group">
               <label class="form-group-label">Q-Angle Right Knee (degrees)</label>
-              <input type="number" name="qAngleRight" id="qAngleRight" class="input-field" min="0" max="40" placeholder="0-40°" step="0.5">
+              <input type="number" name="qAngleRight" id="qAngleRight" class="input-field" inputmode="decimal" min="0" max="40" placeholder="0-40°" step="0.5">
               <p class="form-group-hint">Ideal: 10-15°</p>
               <div class="validation-message"></div>
             </div>
@@ -575,7 +1213,7 @@
           <div class="form-row">
             <div class="form-group">
               <label class="form-group-label">Navicular Drop (mm)</label>
-              <input type="number" name="navicularDrop" id="navicularDrop" class="input-field" min="0" max="30" placeholder="0-30mm" step="0.5">
+              <input type="number" name="navicularDrop" id="navicularDrop" class="input-field" inputmode="decimal" min="0" max="30" placeholder="0-30mm" step="0.5">
               <p class="form-group-hint">Foot pronation: 0-5 normal, 5-10 moderate, 10+ severe</p>
               <div class="validation-message"></div>
             </div>
@@ -622,7 +1260,7 @@
           <div class="measurements-grid">
             <div class="form-group">
               <label class="form-group-label">Ankle Dorsiflexion (degrees)</label>
-              <input type="number" name="ankleFlexibility" id="ankleFlexibility" class="input-field" min="0" max="45" placeholder="0-45°" step="0.5" required>
+              <input type="number" name="ankleFlexibility" id="ankleFlexibility" class="input-field" inputmode="decimal" min="0" max="45" placeholder="0-45°" step="0.5" required>
               <div class="visual-guide">
                 <img src="https://www.genspark.ai/api/files/s/miOAuJZv" alt="Ankle Dorsiflexion" class="visual-guide-image visual-guide-image-sm" onclick="showModal(this.src, this.alt)">
               </div>
@@ -631,7 +1269,7 @@
 
             <div class="form-group">
               <label class="form-group-label">Hip Flexibility Sit & Reach (cm)</label>
-              <input type="number" name="hipFlexibility" id="hipFlexibility" class="input-field" min="-20" max="50" placeholder="-20 to +50" step="0.5" required>
+              <input type="number" name="hipFlexibility" id="hipFlexibility" class="input-field" inputmode="decimal" min="-20" max="50" placeholder="-20 to +50" step="0.5" required>
               <div class="visual-guide">
                 <img src="https://www.genspark.ai/api/files/s/YEHmWZgi" alt="Sit and Reach" class="visual-guide-image visual-guide-image-sm" onclick="showModal(this.src, this.alt)">
               </div>
@@ -640,7 +1278,7 @@
 
             <div class="form-group">
               <label class="form-group-label">Cervical ROM (degrees)</label>
-              <input type="number" name="cervicalRom" id="cervicalRom" class="input-field" min="0" max="90" placeholder="0-90°" step="0.5">
+              <input type="number" name="cervicalRom" id="cervicalRom" class="input-field" inputmode="decimal" min="0" max="90" placeholder="0-90°" step="0.5">
               <div class="visual-guide">
                 <img src="https://www.genspark.ai/api/files/s/RjjFnyxK" alt="Cervical ROM" class="visual-guide-image visual-guide-image-sm" onclick="showModal(this.src, this.alt)">
               </div>
@@ -649,7 +1287,7 @@
 
             <div class="form-group">
               <label class="form-group-label">Shoulder ROM (degrees)</label>
-              <input type="number" name="shoulderRom" id="shoulderRom" class="input-field" min="0" max="180" placeholder="0-180°" step="0.5">
+              <input type="number" name="shoulderRom" id="shoulderRom" class="input-field" inputmode="decimal" min="0" max="180" placeholder="0-180°" step="0.5">
               <div class="visual-guide">
                 <img src="https://www.genspark.ai/api/files/s/sDu7IRKk" alt="Shoulder ROM" class="visual-guide-image visual-guide-image-sm" onclick="showModal(this.src, this.alt)">
               </div>
@@ -658,7 +1296,7 @@
 
             <div class="form-group">
               <label class="form-group-label">Hip ROM (degrees)</label>
-              <input type="number" name="hipRom" id="hipRom" class="input-field" min="0" max="180" placeholder="0-180°" step="0.5">
+              <input type="number" name="hipRom" id="hipRom" class="input-field" inputmode="decimal" min="0" max="180" placeholder="0-180°" step="0.5">
               <div class="visual-guide">
                 <img src="https://www.genspark.ai/api/files/s/YF9kaORC" alt="Hip ROM" class="visual-guide-image visual-guide-image-sm" onclick="showModal(this.src, this.alt)">
               </div>
@@ -667,7 +1305,7 @@
 
             <div class="form-group">
               <label class="form-group-label">Knee ROM (degrees)</label>
-              <input type="number" name="kneeRom" id="kneeRom" class="input-field" min="0" max="150" placeholder="0-150°" step="0.5">
+              <input type="number" name="kneeRom" id="kneeRom" class="input-field" inputmode="decimal" min="0" max="150" placeholder="0-150°" step="0.5">
               <div class="visual-guide">
                 <img src="https://www.genspark.ai/api/files/s/DWdI5vkv" alt="Knee ROM" class="visual-guide-image visual-guide-image-sm" onclick="showModal(this.src, this.alt)">
               </div>
@@ -698,31 +1336,31 @@
           <div class="fms-score-display">
             <div class="fms-item">
               <div class="fms-item-label">Deep Squat</div>
-              <input type="number" name="fmsDeepSquat" id="fmsDeepSquat" class="input-field" min="0" max="3" placeholder="0-3" step="1">
+              <input type="number" name="fmsDeepSquat" id="fmsDeepSquat" class="input-field" inputmode="numeric" min="0" max="3" placeholder="0-3" step="1">
             </div>
             <div class="fms-item">
               <div class="fms-item-label">Hurdle Step</div>
-              <input type="number" name="fmsHurdleStep" id="fmsHurdleStep" class="input-field" min="0" max="3" placeholder="0-3" step="1">
+              <input type="number" name="fmsHurdleStep" id="fmsHurdleStep" class="input-field" inputmode="numeric" min="0" max="3" placeholder="0-3" step="1">
             </div>
             <div class="fms-item">
               <div class="fms-item-label">Shoulder Mobility</div>
-              <input type="number" name="fmsShoulderMobility" id="fmsShoulderMobility" class="input-field" min="0" max="3" placeholder="0-3" step="1">
+              <input type="number" name="fmsShoulderMobility" id="fmsShoulderMobility" class="input-field" inputmode="numeric" min="0" max="3" placeholder="0-3" step="1">
             </div>
             <div class="fms-item">
               <div class="fms-item-label">Active Leg Raise</div>
-              <input type="number" name="fmsActiveLegRaise" id="fmsActiveLegRaise" class="input-field" min="0" max="3" placeholder="0-3" step="1">
+              <input type="number" name="fmsActiveLegRaise" id="fmsActiveLegRaise" class="input-field" inputmode="numeric" min="0" max="3" placeholder="0-3" step="1">
             </div>
             <div class="fms-item">
               <div class="fms-item-label">Pushup</div>
-              <input type="number" name="fmsPushup" id="fmsPushup" class="input-field" min="0" max="3" placeholder="0-3" step="1">
+              <input type="number" name="fmsPushup" id="fmsPushup" class="input-field" inputmode="numeric" min="0" max="3" placeholder="0-3" step="1">
             </div>
             <div class="fms-item">
               <div class="fms-item-label">Rotary Stability</div>
-              <input type="number" name="fmsRotaryStability" id="fmsRotaryStability" class="input-field" min="0" max="3" placeholder="0-3" step="1">
+              <input type="number" name="fmsRotaryStability" id="fmsRotaryStability" class="input-field" inputmode="numeric" min="0" max="3" placeholder="0-3" step="1">
             </div>
             <div class="fms-item">
               <div class="fms-item-label">Lunge</div>
-              <input type="number" name="fmsLunge" id="fmsLunge" class="input-field" min="0" max="3" placeholder="0-3" step="1">
+              <input type="number" name="fmsLunge" id="fmsLunge" class="input-field" inputmode="numeric" min="0" max="3" placeholder="0-3" step="1">
             </div>
           </div>
 
@@ -755,7 +1393,7 @@
           <div class="measurements-grid">
             <div class="form-group">
               <label class="form-group-label">Plank Hold Time (seconds)</label>
-              <input type="number" name="plankTime" id="plankTime" class="input-field" min="0" max="300" placeholder="0-300 sec" step="1" required>
+              <input type="number" name="plankTime" id="plankTime" class="input-field" inputmode="numeric" min="0" max="300" placeholder="0-300 sec" step="1" required>
               <div class="visual-guide">
                 <img src="https://www.genspark.ai/api/files/s/RbgNQk0p" alt="Plank Hold Test" class="visual-guide-image visual-guide-image-sm" onclick="showModal(this.src, this.alt)">
               </div>
@@ -810,8 +1448,8 @@
             </div>
             <div class="form-group required">
               <label class="form-group-label">Weekly Mileage (km)</label>
-              <input type="number" name="weeklyKm" id="weeklyKm" class="input-field" min="0" max="150" placeholder="0-150" step="1" required>
-              <p class="form-group-hint">Average km run per week</p>
+              <input type="number" name="weeklyKm" id="weeklyKm" class="input-field" inputmode="numeric" min="0" max="150" placeholder="0-150" step="1" required>
+              <p class="form-group-hint">Your current training volume per week</p>
               <div class="validation-message"></div>
             </div>
           </div>
@@ -819,7 +1457,7 @@
           <div class="form-row">
             <div class="form-group required">
               <label class="form-group-label">Years Running</label>
-              <input type="number" name="runningYears" id="runningYears" class="input-field" min="0" max="60" placeholder="0-60" step="1" required>
+              <input type="number" name="runningYears" id="runningYears" class="input-field" inputmode="numeric" min="0" max="60" placeholder="0-60" step="1" required>
               <p class="form-group-hint">Total years of running experience</p>
               <div class="validation-message"></div>
             </div>
@@ -940,27 +1578,27 @@
       </div>
 
       <!-- Form Actions -->
-      <div class="form-actions">
-        <div class="form-actions-left">
-          <button type="button" class="form-button form-button-secondary hidden" id="prevBtn" onclick="changeStep(-1)">
-            <i class="fas fa-arrow-left"></i> Previous
-          </button>
-          <button type="button" class="form-button form-button-secondary" id="skipBtn" onclick="skipAssessment()" style="background: #6c757d;">
-            <i class="fas fa-forward"></i> Skip for Now
-          </button>
+      <div class="form-navigation">
+        <button type="button" id="prevBtn" class="btn-secondary" onclick="changeStep(-1)">
+          <i class="icon-arrow-left"></i> Previous
+        </button>
+        
+        <div class="step-indicator">
+          <span id="currentStep">1</span> of 9
         </div>
-        <div class="form-actions-center">
-          <span id="stepCounter" class="step-counter">Step <span id="currentStep">1</span> of 9</span>
-        </div>
-        <div class="form-actions-right">
-          <button type="button" class="form-button form-button-primary" id="nextBtn" onclick="changeStep(1)">
-            Next <i class="fas fa-arrow-right"></i>
-          </button>
-          <button type="submit" class="form-button form-button-primary hidden" id="submitBtn">
-            Submit Assessment <i class="fas fa-check"></i>
-          </button>
-        </div>
+        
+        <button type="button" id="nextBtn" class="btn-primary" onclick="changeStep(1)">
+          Next <i class="icon-arrow-right"></i>
+        </button>
+        
+        <button type="submit" id="submitBtn" class="btn-success" style="display:none;">
+          Submit Assessment
+        </button>
       </div>
+      
+      <button type="button" id="skipBtn" class="btn-link" onclick="skipAssessment()">
+        Skip for Now
+      </button>
     </form>
   </div>
 
@@ -984,42 +1622,171 @@
     const validator = new FormValidator(form);
     const storage = new StorageManager();
     let currentStep = 1;
+    let lastDirection = 1;
     const totalSteps = 9;
 
-    // Initialize progress steps
-    function initProgressSteps() {
-      const container = document.getElementById('progressSteps');
-      for (let i = 1; i <= totalSteps; i++) {
-        const step = document.createElement('div');
-        step.className = `progress-step ${i === 1 ? 'active' : ''}`;
-        step.innerHTML = `
-          <div class="progress-step-circle">${i}</div>
-          <div class="progress-step-label">Step ${i}</div>
-        `;
-        container.appendChild(step);
-      }
+    function updateStepVisibility() {
+      document.querySelectorAll('.step-container').forEach(step => {
+        const stepNumber = parseInt(step.getAttribute('data-step'), 10);
+        step.classList.remove('step-forward', 'step-back');
+        if (stepNumber === currentStep) {
+          step.classList.add('active');
+          step.classList.add(lastDirection > 0 ? 'step-forward' : 'step-back');
+        } else {
+          step.classList.remove('active');
+        }
+      });
     }
+
+    function updateNavigationButtons() {
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const submitBtn = document.getElementById('submitBtn');
+
+      if (prevBtn) prevBtn.style.display = currentStep === 1 ? 'none' : 'inline-flex';
+      if (nextBtn) nextBtn.style.display = currentStep === totalSteps ? 'none' : 'inline-flex';
+      if (submitBtn) submitBtn.style.display = currentStep === totalSteps ? 'inline-flex' : 'none';
+    }
+
+    function updateNextButtonState() {
+      const nextBtn = document.getElementById('nextBtn');
+      if (!nextBtn || currentStep === totalSteps) return;
+
+      const stepElement = document.querySelector(`[data-step="${currentStep}"]`);
+      if (!stepElement) {
+        nextBtn.disabled = false;
+        return;
+      }
+
+      const requiredFields = stepElement.querySelectorAll('[required]');
+      const allFilled = Array.from(requiredFields).every(field => {
+        if (field.type === 'checkbox' || field.type === 'radio') {
+          return field.checked;
+        }
+        return Boolean(field.value && field.value.trim());
+      });
+
+      nextBtn.disabled = !allFilled;
+      nextBtn.title = nextBtn.disabled ? 'Please complete required fields' : '';
+    }
+
+    function updateFloatingLabels() {
+      document.querySelectorAll('.form-group').forEach(group => {
+        const field = group.querySelector('input, select, textarea');
+        if (!field) return;
+        const hasValue = field.type === 'checkbox' ? field.checked : Boolean(field.value);
+        group.classList.toggle('has-value', hasValue);
+      });
+    }
+
+    function initHelperText() {
+      document.querySelectorAll('.form-group').forEach(group => {
+        const field = group.querySelector('input, select, textarea');
+        if (!field) return;
+        const hint = field.getAttribute('data-hint');
+        if (!hint) return;
+
+        const existingHint = group.querySelector('.helper-text, .form-group-hint');
+        if (!existingHint) {
+          const hintEl = document.createElement('div');
+          hintEl.className = 'helper-text';
+          hintEl.textContent = hint;
+          group.appendChild(hintEl);
+        }
+      });
+    }
+
+    function initTextAreaCounters() {
+      document.querySelectorAll('textarea').forEach(textarea => {
+        const counter = document.createElement('div');
+        counter.className = 'char-counter';
+        counter.textContent = '0 characters';
+        textarea.parentNode.appendChild(counter);
+
+        const updateCount = () => {
+          const count = textarea.value.length;
+          counter.textContent = `${count} characters`;
+        };
+
+        textarea.addEventListener('input', updateCount);
+        updateCount();
+      });
+    }
+
+    function showFieldSpinner(field) {
+      const group = field.closest('.form-group');
+      if (!group) return;
+      group.classList.add('is-validating');
+      setTimeout(() => group.classList.remove('is-validating'), 300);
+    }
+
+    // Enter key navigation: focus next field
+    function initEnterKeyNavigation() {
+      const formFields = Array.from(document.querySelectorAll('input:not([type="checkbox"]):not([readonly]), select, textarea'));
+      
+      formFields.forEach((field, index) => {
+        field.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' && field.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+            
+            // Trigger validation on current field
+            validator.validateField(field);
+            
+            // Find next focusable field
+            let nextIndex = index + 1;
+            while (nextIndex < formFields.length) {
+              const nextField = formFields[nextIndex];
+              const isVisible = nextField.offsetParent !== null;
+              const isEnabled = !nextField.disabled && !nextField.readOnly;
+              
+              if (isVisible && isEnabled) {
+                nextField.focus();
+                break;
+              }
+              nextIndex++;
+            }
+          }
+        });
+      });
+    }
+
+    // Initialize progress steps (handled by static markup)
+    function initProgressSteps() {}
 
     // Update progress bar
     function updateProgress() {
-      const percentage = (currentStep / totalSteps) * 100;
-      document.getElementById('progressBarFill').style.width = percentage + '%';
+      const percentage = Math.round((currentStep / totalSteps) * 100);
+      const progressBar = document.getElementById('progressBar');
+      if (progressBar) progressBar.style.width = `${percentage}%`;
       document.getElementById('currentStep').textContent = currentStep;
 
-      // Update step indicators
-      document.querySelectorAll('.progress-step').forEach((step, index) => {
-        step.classList.remove('active', 'completed');
-        if (index + 1 === currentStep) {
-          step.classList.add('active');
-        } else if (index + 1 < currentStep) {
-          step.classList.add('completed');
+      document.querySelectorAll('.step-circle').forEach(circle => {
+        const stepNumber = parseInt(circle.getAttribute('data-step'), 10);
+        circle.classList.remove('active', 'completed');
+        if (stepNumber < currentStep) {
+          circle.classList.add('completed');
+        } else if (stepNumber === currentStep) {
+          circle.classList.add('active');
         }
       });
 
-      // Update button visibility
-      document.getElementById('prevBtn').style.display = currentStep === 1 ? 'none' : 'block';
-      document.getElementById('nextBtn').style.display = currentStep === totalSteps ? 'none' : 'block';
-      document.getElementById('submitBtn').style.display = currentStep === totalSteps ? 'block' : 'none';
+      const labelPersonal = document.querySelector('.label-personal');
+      const labelFitness = document.querySelector('.label-fitness');
+      const labelGoals = document.querySelector('.label-goals');
+
+      [labelPersonal, labelFitness, labelGoals].forEach(label => label?.classList.remove('active'));
+
+      if (currentStep <= 3) {
+        labelPersonal?.classList.add('active');
+      } else if (currentStep <= 6) {
+        labelFitness?.classList.add('active');
+      } else {
+        labelGoals?.classList.add('active');
+      }
+
+      updateStepVisibility();
+      updateNavigationButtons();
+      updateNextButtonState();
     }
 
     // Change step
@@ -1031,14 +1798,29 @@
       if (direction > 0 && currentStep !== totalSteps) {
         const stepElement = document.querySelector(`[data-step="${currentStep}"]`);
         const validation = validator.validateStep(stepElement);
-        if (!validation.valid) {
-          alert('Please complete required fields on this step.');
+        if (!validation.allValid) {
+          const formContainer = document.querySelector('.form-container');
+          if (formContainer) {
+            formContainer.classList.remove('shake');
+            void formContainer.offsetWidth;
+            formContainer.classList.add('shake');
+          }
+
+          const firstInvalid = stepElement.querySelector('.invalid');
+          if (firstInvalid) {
+            firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+
           return;
         }
       }
 
+      lastDirection = direction;
       currentStep = newStep;
       updateProgress();
+      
+      // Scroll to top of form on mobile
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     // ============================================
@@ -1063,6 +1845,21 @@
 
     function showSuccessMessage(message) { alert(message); }
     function showErrorMessage(message) { alert(message); }
+
+    function triggerConfetti() {
+      const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
+      const confettiCount = 40;
+      for (let i = 0; i < confettiCount; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti-piece';
+        confetti.style.background = colors[i % colors.length];
+        confetti.style.left = Math.random() * 100 + 'vw';
+        confetti.style.animationDelay = Math.random() * 0.4 + 's';
+        confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+        document.body.appendChild(confetti);
+        setTimeout(() => confetti.remove(), 2000);
+      }
+    }
 
     function calculateAIFRIScore(assessmentData) {
       const res = JSON.parse(sessionStorage.getItem('aifriResult') || 'null');
@@ -1217,6 +2014,7 @@
           }
         }
 
+        triggerConfetti();
         console.log('🎉 Assessment submission complete!');
         
         // Wait 3 seconds then redirect to dashboard
@@ -1295,6 +2093,25 @@
     // Initialize
     initProgressSteps();
     updateProgress();
+    initEnterKeyNavigation();
+    document.querySelectorAll('.step-container input, .step-container select, .step-container textarea').forEach(field => {
+      field.addEventListener('input', () => {
+        updateNextButtonState();
+        updateFloatingLabels();
+      });
+      field.addEventListener('change', () => {
+        updateNextButtonState();
+        updateFloatingLabels();
+      });
+      field.addEventListener('blur', () => {
+        showFieldSpinner(field);
+        updateNextButtonState();
+        updateFloatingLabels();
+      });
+    });
+    updateFloatingLabels();
+    initHelperText();
+    initTextAreaCounters();
     
     // ============================================
     // SKIP ASSESSMENT FUNCTION
