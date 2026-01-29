@@ -388,16 +388,44 @@
                     
                     console.log('✅ Registration successful:', result);
                     
+                    // Create profile record in database
+                    if (result.user) {
+                        console.log('📝 Creating profile record...');
+                        try {
+                            const { error: profileError } = await window.AkuraAuth.supabase
+                                .from('profiles')
+                                .insert({
+                                    user_id: result.user.id,
+                                    full_name: fullName,
+                                    role: role,
+                                    access_level: 'demo',
+                                    assessment_completed: false,
+                                    created_at: new Date().toISOString(),
+                                    updated_at: new Date().toISOString()
+                                });
+                            
+                            if (profileError) {
+                                console.error('⚠️ Profile creation error:', profileError);
+                                // Continue anyway - profile can be created later
+                            } else {
+                                console.log('✅ Profile record created');
+                            }
+                        } catch (profileError) {
+                            console.error('⚠️ Profile creation failed:', profileError);
+                            // Continue anyway
+                        }
+                    }
+                    
                     // Show success
-                    showSuccess('Account created successfully! Please check your email to verify your account.');
+                    showSuccess('Account created successfully! Redirecting to login...');
                     
                     // Clear form
                     form.reset();
                     
-                    // Redirect after 3 seconds
+                    // Redirect after 2 seconds
                     setTimeout(() => {
                         window.location.href = 'login.html';
-                    }, 3000);
+                    }, 2000);
                     
                 } catch (error) {
                     console.error('❌ Registration error:', error);
