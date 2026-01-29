@@ -1150,7 +1150,8 @@
             try {
                 if (!currentUser || !currentUser.id) {
                     console.error('❌ No currentUser.id available');
-                    throw new Error('currentUser.id is not set');
+                    userProfile = null;
+                    return;
                 }
                 
                 const supabase = window.AkuraAuth.getClient();
@@ -1176,7 +1177,7 @@
                 });
             } catch (error) {
                 console.error('❌ Error fetching profile:', error.message);
-                throw error;
+                userProfile = null;
             }
         }
 
@@ -1186,7 +1187,8 @@
             try {
                 if (!currentUser || !currentUser.id) {
                     console.error('❌ No currentUser.id available for assessment');
-                    throw new Error('currentUser.id is not set');
+                    userAssessment = null;
+                    return;
                 }
                 
                 const supabase = window.AkuraAuth.getClient();
@@ -1217,7 +1219,7 @@
                 }
             } catch (error) {
                 console.error('❌ Error fetching assessment:', error.message);
-                throw error;
+                userAssessment = null;
             }
         }
 
@@ -1227,7 +1229,8 @@
             try {
                 if (!currentUser || !currentUser.id) {
                     console.error('❌ No currentUser.id available for workouts');
-                    throw new Error('currentUser.id is not set');
+                    userWorkouts = [];
+                    return;
                 }
                 
                 const supabase = window.AkuraAuth.getClient();
@@ -1249,7 +1252,7 @@
                 console.log('✅ Workouts fetched:', userWorkouts.length, 'workouts');
             } catch (error) {
                 console.error('❌ Error fetching workouts:', error.message);
-                throw error;
+                userWorkouts = [];
             }
         }
 
