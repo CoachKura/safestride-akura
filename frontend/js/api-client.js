@@ -7,11 +7,26 @@ class AkuraAPI {
     // Resolve env vars from Vite (import.meta.env) or window.__AKURA_ENV__ or process.env
     const getEnv = (key, fallback = undefined) => {
       try {
-        const vite = (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env[key] : undefined;
+        // Check if import.meta is available (only in ES modules)
+        if (typeof import !== 'undefined') {
+          const vite = (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env[key] : undefined;
+          if (vite) return vite;
+        }
+      } catch (e) {
+        // Silently fail if import.meta is not available
+      }
+      
+      try {
         const win = (typeof window !== 'undefined' && window.__AKURA_ENV__) ? window.__AKURA_ENV__[key] : undefined;
+        if (win) return win;
+      } catch (e) {}
+      
+      try {
         const node = (typeof process !== 'undefined' && process.env) ? process.env[key] : undefined;
-        return vite ?? win ?? node ?? fallback;
-      } catch { return fallback; }
+        if (node) return node;
+      } catch (e) {}
+      
+      return fallback;
     };
 
     // Auto-detect environment: use /api proxy in production (Netlify), localhost:3000 in dev
