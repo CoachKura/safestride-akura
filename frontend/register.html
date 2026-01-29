@@ -378,43 +378,19 @@
                 try {
                     console.log('📤 Sending registration request...');
                     
-                    // Call AkuraAuth.signUp
-                    const result = await window.AkuraAuth.signUp(email, password, {
+                    // Call AkuraAuth.signUp (now returns {data, error})
+                    const { data, error } = await window.AkuraAuth.signUp(email, password, {
                         full_name: fullName,
                         role: role,
                         access_level: 'demo',
                         assessment_completed: false
                     });
                     
-                    console.log('✅ Registration successful:', result);
-                    
-                    // Create profile record in database
-                    if (result.user) {
-                        console.log('📝 Creating profile record...');
-                        try {
-                            const { error: profileError } = await window.AkuraAuth.supabase
-                                .from('profiles')
-                                .insert({
-                                    user_id: result.user.id,
-                                    full_name: fullName,
-                                    role: role,
-                                    access_level: 'demo',
-                                    assessment_completed: false,
-                                    created_at: new Date().toISOString(),
-                                    updated_at: new Date().toISOString()
-                                });
-                            
-                            if (profileError) {
-                                console.error('⚠️ Profile creation error:', profileError);
-                                // Continue anyway - profile can be created later
-                            } else {
-                                console.log('✅ Profile record created');
-                            }
-                        } catch (profileError) {
-                            console.error('⚠️ Profile creation failed:', profileError);
-                            // Continue anyway
-                        }
+                    if (error) {
+                        throw error;
                     }
+                    
+                    console.log('✅ Registration successful:', data);
                     
                     // Show success
                     showSuccess('Account created successfully! Redirecting to assessment...');
@@ -423,10 +399,10 @@
                     form.reset();
                     
                     // Redirect to assessment directly (not login)
-                    setTimeout(() => {
+                    setTimeout(async () => {
                         // Auto-login the user
-                        const { user, session, error: loginError } = await window.AkuraAuth.signIn(email, password);
-                        if (!loginError && user) {
+                        const loginResult = await window.AkuraAuth.signIn(email, password);
+                        if (!loginResult.error && loginResult.user) {
                             window.location.href = 'assessment-intake.html';
                         } else {
                             window.location.href = 'login.html';
