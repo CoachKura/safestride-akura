@@ -463,9 +463,10 @@
                     
                     console.log('✅ Registration successful:', data);
                     const user = data.user || data.data?.user;
+                    const userEmail = email || user?.email || '';
                     
-                    // Show success message
-                    showSuccess('Account created! Let\'s set up your profile.');
+                    // Show success message with email verification reminder
+                    showSuccess('Account created! Please verify your email.', userEmail);
                     console.log('🎉 Signup complete! Redirecting to assessment...');
                     
                     // Store flags in sessionStorage
@@ -549,9 +550,25 @@
             }
         }
         
-        function showSuccess(message) {
+        function showSuccess(message, userEmail = '') {
             if (successMessage) {
-                successMessage.textContent = message;
+                successMessage.innerHTML = `
+                    <div style="text-align: center;">
+                        <h3 style="color: #10b981; margin-bottom: 16px; margin-top: 0;">✅ Account Created Successfully!</h3>
+                        <p style="margin-bottom: 16px; color: #374151;">A confirmation email has been sent to <strong>${userEmail}</strong></p>
+                        <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 16px; border-radius: 8px; margin: 16px 0; text-align: left;">
+                            <strong style="font-size: 15px;">📧 Next Steps:</strong>
+                            <ul style="margin: 12px 0 0 0; padding-left: 20px; color: #374151;">
+                                <li>Check your email inbox</li>
+                                <li>Click the verification link in the email</li>
+                                <li>Complete your fitness assessment</li>
+                                <li>Access your personalized dashboard</li>
+                            </ul>
+                            <p style="margin: 12px 0 0 0; font-size: 13px; color: #666;">💡 Tip: Check your spam folder if you don't see the email within 2 minutes</p>
+                        </div>
+                        <p style="color: #6b7280; font-size: 14px; margin-top: 16px;">Redirecting to assessment in 3 seconds...</p>
+                    </div>
+                `;
                 successMessage.style.display = 'block';
                 successMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }

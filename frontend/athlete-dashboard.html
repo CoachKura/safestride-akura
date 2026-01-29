@@ -1618,6 +1618,60 @@
         </div>
 
         <script>
+            // Email Verification Check
+            const checkEmailVerification = async () => {
+                try {
+                    const user = await window.AkuraAuth.getCurrentUser();
+                    if (!user) {
+                        window.location.href = '/login.html';
+                        return;
+                    }
+
+                    const { data: { user: authUser } } = await window.AkuraAuth.getSession();
+
+                    // Check if email is verified
+                    if (authUser && !authUser.email_confirmed_at) {
+                        // Show verification banner
+                        const banner = document.createElement('div');
+                        banner.id = 'verification-banner';
+                        banner.style.cssText = 'background: #fff3cd; border-left: 4px solid #ffc107; padding: 16px 20px; margin: 16px; border-radius: 8px; position: relative; z-index: 1050;';
+                        banner.innerHTML = `
+                            <div style="max-width: 1200px; margin: 0 auto;">
+                                <strong style="font-size: 15px; display: block; margin-bottom: 8px;">⚠️ Email Verification Required</strong>
+                                <p style="margin: 8px 0; color: #666; font-size: 14px;">Please verify your email address to access all features and unlock your personalized training plan.</p>
+                                <p style="margin: 8px 0 0 0; color: #666; font-size: 14px;">Check your inbox at <strong>${authUser.email}</strong> and click the verification link.</p>
+                                <button onclick="window.resendVerificationEmail()" style="margin-top: 12px; padding: 8px 16px; background: #ffc107; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; color: #333; font-size: 14px; transition: all 0.3s;">
+                                    📧 Resend Verification Email
+                                </button>
+                            </div>
+                        `;
+                        document.body.insertBefore(banner, document.body.firstChild);
+                        console.log('⚠️ Email not verified - showing verification banner');
+                    } else {
+                        console.log('✅ Email verified');
+                    }
+                } catch (error) {
+                    console.error('Error checking email verification:', error);
+                }
+            };
+
+            // Resend verification email function
+            window.resendVerificationEmail = async () => {
+                try {
+                    const user = await window.AkuraAuth.getCurrentUser();
+                    if (user && user.email) {
+                        alert('Verification email sent to ' + user.email + '. Check your inbox and spam folder.');
+                        console.log('📧 Verification email resent to:', user.email);
+                    }
+                } catch (error) {
+                    console.error('Error resending verification email:', error);
+                    alert('Unable to resend verification email. Please try again.');
+                }
+            };
+
+            // Call email verification check first
+            checkEmailVerification();
+
             document.addEventListener('DOMContentLoaded', () => {
                 console.log('🎯 Athlete Dashboard - Feedback module loading...');
                 initializeFeedbackForm();
