@@ -2019,17 +2019,29 @@
           successDiv.classList.remove('hidden');
           const successMsg = document.getElementById('successMessage');
           if (successMsg) {
-            successMsg.textContent = 'Assessment complete! Your personalized training plan is being generated...';
+            successMsg.innerHTML = `
+              <div style="text-align: center;">
+                <h3 style="color: #10b981; margin-bottom: 16px;">✅ Assessment Complete!</h3>
+                <p style="margin-bottom: 12px;">Your fitness assessment has been saved successfully.</p>
+                <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 16px; border-radius: 8px; margin: 16px 0; text-align: left;">
+                  <strong>📧 Important: Verify Your Email</strong>
+                  <p style="margin: 8px 0 0 0;">A confirmation email has been sent to <strong>${user.email}</strong></p>
+                  <p style="margin: 8px 0 0 0;">Please check your inbox and click the verification link to activate your account.</p>
+                </div>
+                <p style="color: #6b7280; font-size: 14px;">Your dashboard and training plans will be available after email verification.</p>
+                <p style="color: #6b7280; font-size: 14px; margin-top: 12px;">Redirecting to dashboard in 5 seconds...</p>
+              </div>
+            `;
           }
         }
 
         triggerConfetti();
         console.log('🎉 Assessment submission complete!');
         
-        // Wait 3 seconds then redirect to dashboard
+        // Wait 5 seconds then redirect to dashboard
         setTimeout(() => {
           window.location.href = '/athlete-dashboard.html';
-        }, 3000);
+        }, 5000);
 
       } catch (error) {
         console.error('❌ Assessment submission error:', error);
