@@ -776,10 +776,10 @@
                 <div class="greeting" id="userGreeting">Welcome back, Dinesh</div>
             </div>
             <div class="aifri-badge-large">
-                <div class="badge-score">76</div>
-                <div class="badge-grade">ADVANCED</div>
+                <div class="badge-score" id="aifriScore">76</div>
+                <div class="badge-grade" id="aifriGrade">ADVANCED</div>
             </div>
-            <div class="streak-badge">
+            <div class="streak-badge" id="streakBadge">
                 🔥 12 Days<br>Streak
             </div>
             <button class="logout-btn" id="logoutBtn" onclick="handleLogout()">
@@ -1151,7 +1151,12 @@
                 }
                 
                 userProfile = profile;
-                console.log('✅ Profile fetched:', profile);
+                console.log('✅ Profile fetched:', {
+                    id: profile?.id,
+                    full_name: profile?.full_name,
+                    email: profile?.email,
+                    role: profile?.role
+                });
             } catch (error) {
                 console.error('❌ Error fetching profile:', error);
             }
@@ -1177,9 +1182,13 @@
                 
                 if (assessments && assessments.length > 0) {
                     userAssessment = assessments[0];
-                    console.log('✅ Assessment fetched:', userAssessment);
+                    console.log('✅ Assessment fetched:', {
+                        aifri_score: userAssessment.aifri_score,
+                        risk_level: userAssessment.risk_level,
+                        assessment_date: userAssessment.assessment_date
+                    });
                 } else {
-                    console.log('ℹ️ No assessment found for user');
+                    console.log('ℹ️ No assessment found for user - will show default values');
                     userAssessment = null;
                 }
             } catch (error) {
@@ -1226,8 +1235,8 @@
             
             // Update AIFRI score and grade
             if (userAssessment && userAssessment.aifri_score) {
-                const scoreEl = document.querySelector('.badge-score');
-                const gradeEl = document.querySelector('.badge-grade');
+                const scoreEl = document.getElementById('aifriScore');
+                const gradeEl = document.getElementById('aifriGrade');
                 if (scoreEl) scoreEl.textContent = Math.round(userAssessment.aifri_score);
                 if (gradeEl) {
                     const score = userAssessment.aifri_score;
@@ -1236,13 +1245,19 @@
                     else if (score >= 60) grade = 'INTERMEDIATE';
                     gradeEl.textContent = grade;
                 }
+                console.log('✅ Updated AIFRI Score:', Math.round(userAssessment.aifri_score), 'Grade:', grade);
+            } else {
+                console.log('⚠️ No AIFRI assessment data found');
             }
             
             // Update workout streak (placeholder - will calculate from workout history)
-            const streakBadge = document.querySelector('.streak-badge');
+            const streakBadge = document.getElementById('streakBadge');
             if (streakBadge && userWorkouts.length > 0) {
                 const streakDays = calculateStreak(userWorkouts);
                 streakBadge.innerHTML = `🔥 ${streakDays} Days<br>Streak`;
+                console.log('✅ Updated Streak:', streakDays, 'days');
+            } else {
+                console.log('⚠️ No workout data found for streak calculation');
             }
             
             // Update profile badge
