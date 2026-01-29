@@ -741,6 +741,30 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
+
+        .assessment-skip-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn-secondary-assessment {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 18px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .btn-secondary-assessment:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
     </style>
 </head>
 <body>
@@ -765,14 +789,17 @@
     </div>
 
     <div class="dashboard-container">
-        <!-- ASSESSMENT SKIP BANNER -->
+        <!-- ASSESSMENT INCOMPLETE BANNER -->
         <div id="assessmentSkipBanner" class="assessment-skip-banner">
             <div class="assessment-skip-content">
                 <div class="assessment-skip-message">
-                    <h3>📋 Complete Your Assessment</h3>
-                    <p>Get personalized training recommendations by completing your fitness assessment. Takes about 15-20 minutes.</p>
+                    <h3>⚠️ Complete Your Assessment</h3>
+                    <p>Unlock personalized training plans by completing your fitness assessment. Takes about 15-20 minutes.</p>
                 </div>
-                <button class="assessment-skip-cta" onclick="goToAssessment()">Take Assessment →</button>
+                <div class="assessment-skip-actions">
+                    <button class="assessment-skip-cta" onclick="goToAssessment()">Take Assessment Now →</button>
+                    <button class="btn-secondary-assessment" onclick="dismissReminder()">Remind Me Later</button>
+                </div>
             </div>
         </div>
 
@@ -1296,15 +1323,21 @@
         // Check if assessment was skipped and show banner
         function checkAssessmentStatus() {
             console.log('🔍 Checking assessment status...');
-            if (userProfile && userProfile.assessment_skipped && !userProfile.assessment_completed) {
-                console.log('⚠️ Assessment was skipped - showing banner');
-                const banner = document.getElementById('assessmentSkipBanner');
+            const banner = document.getElementById('assessmentSkipBanner');
+            
+            // Check if user has dismissed banner in current session
+            const bannerDismissed = sessionStorage.getItem('assessmentBannerDismissed');
+            
+            // Show banner if:
+            // 1. Assessment is not completed
+            // 2. Banner not dismissed in this session
+            if (userProfile && !userProfile.assessment_completed && !bannerDismissed) {
+                console.log('⚠️ Assessment incomplete - showing banner');
                 if (banner) {
                     banner.classList.add('show');
                 }
             } else {
-                console.log('✅ Assessment completed or not skipped');
-                const banner = document.getElementById('assessmentSkipBanner');
+                console.log('✅ Assessment completed or banner dismissed');
                 if (banner) {
                     banner.classList.remove('show');
                 }
@@ -1315,6 +1348,17 @@
         window.goToAssessment = function() {
             console.log('🚀 Redirecting to assessment form...');
             window.location.href = '/assessment-intake.html';
+        }
+
+        // Dismiss reminder banner temporarily (until next login)
+        window.dismissReminder = function() {
+            console.log('⏭️ User dismissed assessment reminder');
+            sessionStorage.setItem('assessmentBannerDismissed', 'true');
+            const banner = document.getElementById('assessmentSkipBanner');
+            if (banner) {
+                banner.classList.remove('show');
+            }
+            console.log('✅ Banner hidden until next login');
         }
 
         window.addEventListener('load', updateGreeting);
