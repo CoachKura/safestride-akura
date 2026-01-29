@@ -945,6 +945,9 @@
           <button type="button" class="form-button form-button-secondary hidden" id="prevBtn" onclick="changeStep(-1)">
             <i class="fas fa-arrow-left"></i> Previous
           </button>
+          <button type="button" class="form-button form-button-secondary" id="skipBtn" onclick="skipAssessment()" style="background: #6c757d;">
+            <i class="fas fa-forward"></i> Skip for Now
+          </button>
         </div>
         <div class="form-actions-center">
           <span id="stepCounter" class="step-counter">Step <span id="currentStep">1</span> of 9</span>
@@ -1224,7 +1227,23 @@
         hideLoadingSpinner();
         showSuccessMessage('Assessment complete! Generating your personalized 90-day protocol...');
 
-        setTimeout(() => {
+        setTimeout(async () => {
+          // Update profile to mark assessment as completed
+          try {
+            const user = await window.AkuraAuth.getCurrentUser();
+            if (user) {
+              await window.AkuraAuth.supabase
+                .from('profiles')
+                .update({
+                  assessment_completed: true,
+                  updated_at: new Date().toISOString()
+                })
+                .eq('user_id', user.id);
+            }
+          } catch (error) {
+            console.error('Error updating profile:', error);
+          }
+          
           const pid = result.protocolId || localStorage.getItem('protocolId') || '';
           window.location.href = pid ? `training-plans.html?protocolId=${pid}` : 'training-plans.html';
         }, 2000);
@@ -1311,6 +1330,50 @@
     // Initialize
     initProgressSteps();
     updateProgress();
+    
+    // ============================================
+    // SKIP ASSESSMENT FUNCTION
+    // ============================================
+    window.skipAssessment = async function() {
+      const confirmed = confirm('Are you sure you want to skip the assessment? You can complete it later from your dashboard.');
+      if (!confirmed) return;
+      
+      try {
+        // Update profile to mark assessment as skipped (not completed)
+        const user = await window.AkuraAuth.getCurrentUser();
+        if (user) {
+          await window.AkuraAuth.supabase
+            .from('profiles')
+            .update({
+              assessment_completed: false,
+              updated_at: new Date().toISOString()
+            })
+            .eq('user_id', user.id);
+        }
+        
+        // Redirect to dashboard
+        const { data: profile } = await window.AkuraAuth.supabase
+          .from('profiles')
+          .select('role')
+          .eq('user_id', user.id)
+          .single();
+        
+        if (profile && profile.role === 'coach') {
+          window.location.href = 'coach-dashboard.html';
+        } else {
+          window.location.href = 'athlete-dashboard.html';
+        }
+      } catch (error) {
+        console.error('Error skipping assessment:', error);
+        window.location.href = 'athlete-dashboard.html';
+      }
+    };
   </script>
+  
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Authentication Script -->
+  <script src="js/auth.js"></script>
 </body>
 </html>

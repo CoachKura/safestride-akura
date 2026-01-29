@@ -417,15 +417,21 @@
                     }
                     
                     // Show success
-                    showSuccess('Account created successfully! Redirecting to login...');
+                    showSuccess('Account created successfully! Redirecting to assessment...');
                     
                     // Clear form
                     form.reset();
                     
-                    // Redirect after 2 seconds
+                    // Redirect to assessment directly (not login)
                     setTimeout(() => {
-                        window.location.href = 'login.html';
-                    }, 2000);
+                        // Auto-login the user
+                        const { user, session, error: loginError } = await window.AkuraAuth.signIn(email, password);
+                        if (!loginError && user) {
+                            window.location.href = 'assessment-intake.html';
+                        } else {
+                            window.location.href = 'login.html';
+                        }
+                    }, 1500);
                     
                 } catch (error) {
                     console.error('❌ Registration error:', error);
