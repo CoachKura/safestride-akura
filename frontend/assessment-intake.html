@@ -1620,7 +1620,7 @@
   </div>
 
   <!-- Scripts -->
-  <script src="js/api-client.js"></script>
+  <script type="module" src="js/api-client.js"></script>
   <script src="js/aifri-engine.js"></script>
   <script src="js/form-validator.js"></script>
   <script src="js/storage-manager.js"></script>
@@ -1977,7 +1977,8 @@
           injury_history: injuries.join(', '),
           goals,
           assessment_date: new Date().toISOString(),
-          assessment_completed: true,
+          // NOTE: Do NOT set assessment_completed on the assessment row.
+          // The profile's assessment_completed flag is updated separately below.
           aifri_score: aifriScore,
           scores: pillarScores,
           risk_level: aifriScore >= 80 ? 'Low' : aifriScore >= 60 ? 'Moderate' : 'High',
@@ -2004,22 +2005,27 @@
         }
         console.log('✅ Assessment saved to database:', savedAssessment.id);
 
-        // Step 6: Update profiles table
-        console.log('📍 Step 6: Updating profiles table...');
-        const { data: updatedProfile, error: profileError } = await supabase
+        // Step 6: Upsert profiles table with full name and assessment flag
+        console.log('📍 Step 6: Upserting profile with full name and assessment flag...');
+        const fullName = `${firstName} ${lastName}`.trim();
+        const { data: profileUpsert, error: profileError } = await supabase
           .from('profiles')
-          .update({
+          .upsert({
+            id: user.id,
+            email: user.email,
+            full_name: fullName,
+            role: 'athlete',
             assessment_completed: true,
-            assessment_date: new Date().toISOString()
+            assessment_date: new Date().toISOString(),
+            updated_at: new Date().toISOString()
           })
-          .eq('id', user.id)
           .select()
           .single();
 
         if (profileError) {
-          console.warn('⚠️ Profile update warning:', profileError);
+          console.warn('⚠️ Profile upsert warning:', profileError);
         } else {
-          console.log('✅ Profile updated:', updatedProfile);
+          console.log('✅ Profile upserted:', profileUpsert);
         }
 
         // Step 7: Store in localStorage for offline access
