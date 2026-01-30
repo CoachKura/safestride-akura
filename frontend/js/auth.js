@@ -113,28 +113,28 @@ window.AkuraAuth = {
             let profile = null;
             if (user) {
                 try {
-                    console.log('📝 Creating profile record...');
-                    const insertPayload = {
+                    console.log('📝 Upserting profile record...');
+                    const upsertPayload = {
                         id: user.id,
                         full_name: metadata.full_name || '',
                         email: email,
                         role: metadata.role || 'athlete',
                         access_level: (metadata.access_level || 'demo'),
                         assessment_completed: false,
-                        created_at: new Date().toISOString()
+                        updated_at: new Date().toISOString()
                     };
 
                     const { data: profileRows, error: profileError } = await akuraSupabaseClient
                         .from('profiles')
-                        .insert(insertPayload)
+                        .upsert(upsertPayload, { onConflict: 'id' })
                         .select('*')
                         .single();
 
                     if (profileError) {
-                        console.error('⚠️ Profile creation error:', profileError);
+                        console.error('⚠️ Profile upsert error:', profileError);
                     } else {
                         profile = profileRows;
-                        console.log('✅ Profile created successfully');
+                        console.log('✅ Profile upserted successfully');
                     }
                 } catch (profileError) {
                     console.error('⚠️ Profile creation failed:', profileError);
