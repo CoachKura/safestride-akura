@@ -2101,7 +2101,8 @@
           gender,
           running_experience: runningExperience,
           weekly_distance: weeklyDistance,
-          injury_history: injuries.join(', '),
+          // injury_history moved into `assessment_data.medical` (avoid inserting unknown top-level columns)
+          // injury_history: injuries.join(', '),
           goals,
           assessment_date: new Date().toISOString(),
           // NOTE: Do NOT set assessment_completed on the assessment row.

@@ -6,26 +6,18 @@ class AkuraAPI {
   constructor(baseURL = undefined, authToken = null) {
     // Resolve env vars from Vite (import.meta.env) or window.__AKURA_ENV__ or process.env
     const getEnv = (key, fallback = undefined) => {
-      try {
-        // Check if import.meta is available (only in ES modules)
-        if (typeof import !== 'undefined') {
-          const vite = (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env[key] : undefined;
-          if (vite) return vite;
-        }
-      } catch (e) {
-        // Silently fail if import.meta is not available
-      }
-      
+      // Avoid referencing `import`/`import.meta` directly because that causes
+      // a parse error in non-module environments. Prefer explicit globals.
       try {
         const win = (typeof window !== 'undefined' && window.__AKURA_ENV__) ? window.__AKURA_ENV__[key] : undefined;
         if (win) return win;
       } catch (e) {}
-      
+
       try {
         const node = (typeof process !== 'undefined' && process.env) ? process.env[key] : undefined;
         if (node) return node;
       } catch (e) {}
-      
+
       return fallback;
     };
 
