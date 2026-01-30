@@ -2108,12 +2108,12 @@
           // NOTE: Do NOT set assessment_completed on the assessment row.
           // The profile's assessment_completed flag is updated separately below.
           aifri_score: aifriScore,
-          scores: pillarScores,
           risk_level: aifriScore >= 80 ? 'Low' : aifriScore >= 60 ? 'Moderate' : 'High',
           assessment_data: {
             personal: { firstName, lastName, primarySport: document.getElementById('primarySport')?.value || '' },
             medical: { injuries, injuryDetails: document.getElementById('injuryDetails')?.value || '' },
-            fms: { deepSquat: fmsDeepSquat, hurdleStep: fmsHurdleStep, lunge: fmsLunge, shoulderMobility: fmsShoulderMobility, legRaise: fmsActiveLegRaise, pushup: fmsPushup, rotaryStability: fmsRotaryStability, total: fmsTotal }
+            fms: { deepSquat: fmsDeepSquat, hurdleStep: fmsHurdleStep, lunge: fmsLunge, shoulderMobility: fmsShoulderMobility, legRaise: fmsActiveLegRaise, pushup: fmsPushup, rotaryStability: fmsRotaryStability, total: fmsTotal },
+            pillar_scores: pillarScores
           }
         };
         console.log('✅ Assessment data built:', assessmentData);
