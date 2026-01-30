@@ -596,3 +596,5 @@ For licensing inquiries: license@akura.in
 **v0.5.0** (January 10, 2026)
 - Landing page design
 - Quick calculator MVP
+#   C a c h e   b u s t  
+ 

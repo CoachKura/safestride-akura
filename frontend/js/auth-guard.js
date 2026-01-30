@@ -381,6 +381,18 @@ const AuthGuard = {
 // ===================================
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // Ensure the auth library is initialized. Prefer AkuraAuth if available.
+    if (typeof AkuraAuth !== 'undefined' && typeof AkuraAuth.isReady === 'function') {
+        // Wait for AkuraAuth to be ready (poll briefly)
+        let attempts = 0;
+        while (!AkuraAuth.isReady() && attempts < 50) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
+        }
+    } else if (typeof Auth !== 'undefined' && typeof Auth.init === 'function') {
+        Auth.init();
+    }
+
     await AuthGuard.init();
 });
 

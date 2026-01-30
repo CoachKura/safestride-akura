@@ -6,6 +6,7 @@ class FormValidator {
   constructor(formElement) {
     this.form = formElement;
     this.validationRules = this.getValidationRules();
+    this.customMessages = this.getCustomMessages();
     this.errors = new Map();
     this.attachEventListeners();
   }
@@ -16,13 +17,14 @@ class FormValidator {
   getValidationRules() {
     return {
       // Personal Profile
-      firstName: { required: true, minLength: 2, maxLength: 50 },
-      lastName: { required: true, minLength: 2, maxLength: 50 },
+      firstName: { required: true, minLength: 2, maxLength: 50, pattern: /^[A-Za-z\s'-]+$/ },
+      lastName: { required: true, minLength: 2, maxLength: 50, pattern: /^[A-Za-z\s'-]+$/ },
       email: { required: true, pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ },
-      age: { required: true, min: 18, max: 120, type: 'number' },
+      age: { required: true, min: 18, max: 100, type: 'number' },
       gender: { required: true },
       weight: { required: true, min: 30, max: 200, type: 'number' },
-      height: { required: true, min: 100, max: 250, type: 'number' },
+      height: { required: true, min: 120, max: 250, type: 'number' },
+      primarySport: { required: true, minLength: 2, maxLength: 50 },
 
       // Medical History
       injuries: { required: false },
@@ -70,6 +72,43 @@ class FormValidator {
   }
 
   /**
+   * Custom messages for key fields
+   */
+  getCustomMessages() {
+    return {
+      firstName: {
+        required: 'Please enter your first name',
+        pattern: 'Please enter your first name'
+      },
+      lastName: {
+        required: 'Please enter your last name',
+        pattern: 'Please enter your last name'
+      },
+      age: {
+        required: 'Age must be between 18 and 100',
+        range: 'Age must be between 18 and 100',
+        type: 'Age must be between 18 and 100'
+      },
+      weight: {
+        required: 'Please enter a valid weight',
+        range: 'Please enter a valid weight',
+        type: 'Please enter a valid weight'
+      },
+      height: {
+        required: 'Height is required',
+        range: 'Height is required',
+        type: 'Height is required'
+      },
+      primarySport: {
+        required: 'Please select your primary sport'
+      },
+      email: {
+        pattern: 'Please enter a valid email address'
+      }
+    };
+  }
+
+  /**
    * Attach event listeners to all form fields
    */
   attachEventListeners() {
@@ -103,16 +142,16 @@ class FormValidator {
     // Run validation rules
     let error = this.checkRequired(fieldName, value, rules);
     if (!error && value) {
-      error = this.checkType(value, rules);
+      error = this.checkType(fieldName, value, rules);
     }
     if (!error && value) {
-      error = this.checkMinMax(value, rules);
+      error = this.checkMinMax(fieldName, value, rules);
     }
     if (!error && value) {
-      error = this.checkPattern(value, rules);
+      error = this.checkPattern(fieldName, value, rules);
     }
     if (!error && value) {
-      error = this.checkMinMaxLength(value, rules);
+      error = this.checkMinMaxLength(fieldName, value, rules);
     }
 
     if (error) {
@@ -128,13 +167,17 @@ class FormValidator {
    * Check if field is required
    */
   checkRequired(fieldName, value, rules) {
-    if (rules.required && !value) {
-      return `${this.formatFieldName(fieldName)} is required`;
+    const isEmpty = !value || value === 'select' || value === 'Select' || value === 'default';
+
+    if (rules.required && isEmpty) {
+      const customMessage = this.customMessages[fieldName]?.required;
+      return customMessage || `${this.formatFieldName(fieldName)} is required`;
     }
 
     if (rules.conditionalRequired && rules.conditionalRequired()) {
-      if (!value) {
-        return `${this.formatFieldName(fieldName)} is required`;
+      if (isEmpty) {
+        const customMessage = this.customMessages[fieldName]?.required;
+        return customMessage || `${this.formatFieldName(fieldName)} is required`;
       }
     }
 
@@ -144,12 +187,14 @@ class FormValidator {
   /**
    * Check field type (number, email, etc.)
    */
-  checkType(value, rules) {
+  checkType(fieldName, value, rules) {
     if (rules.type === 'number' && isNaN(parseFloat(value))) {
-      return 'Must be a valid number';
+      const customMessage = this.customMessages[fieldName]?.type;
+      return customMessage || 'Must be a valid number';
     }
     if (rules.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-      return 'Must be a valid email address';
+      const customMessage = this.customMessages[fieldName]?.type;
+      return customMessage || 'Must be a valid email address';
     }
     return null;
   }
@@ -157,14 +202,16 @@ class FormValidator {
   /**
    * Check min/max constraints
    */
-  checkMinMax(value, rules) {
+  checkMinMax(fieldName, value, rules) {
     const numValue = parseFloat(value);
 
     if (rules.min !== undefined && numValue < rules.min) {
-      return `Must be at least ${rules.min}`;
+      const customMessage = this.customMessages[fieldName]?.range;
+      return customMessage || `Must be at least ${rules.min}`;
     }
     if (rules.max !== undefined && numValue > rules.max) {
-      return `Cannot exceed ${rules.max}`;
+      const customMessage = this.customMessages[fieldName]?.range;
+      return customMessage || `Cannot exceed ${rules.max}`;
     }
 
     return null;
@@ -173,9 +220,10 @@ class FormValidator {
   /**
    * Check regex pattern
    */
-  checkPattern(value, rules) {
+  checkPattern(fieldName, value, rules) {
     if (rules.pattern && !rules.pattern.test(value)) {
-      return 'Invalid format';
+      const customMessage = this.customMessages[fieldName]?.pattern;
+      return customMessage || 'Invalid format';
     }
     return null;
   }
@@ -183,12 +231,14 @@ class FormValidator {
   /**
    * Check min/max length for strings
    */
-  checkMinMaxLength(value, rules) {
+  checkMinMaxLength(fieldName, value, rules) {
     if (rules.minLength && value.length < rules.minLength) {
-      return `Must be at least ${rules.minLength} characters`;
+      const customMessage = this.customMessages[fieldName]?.minLength;
+      return customMessage || `Must be at least ${rules.minLength} characters`;
     }
     if (rules.maxLength && value.length > rules.maxLength) {
-      return `Cannot exceed ${rules.maxLength} characters`;
+      const customMessage = this.customMessages[fieldName]?.maxLength;
+      return customMessage || `Cannot exceed ${rules.maxLength} characters`;
     }
     return null;
   }
@@ -208,7 +258,7 @@ class FormValidator {
       fieldElement.parentNode.insertBefore(errorContainer, fieldElement.nextSibling);
     }
 
-    errorContainer.textContent = message;
+    errorContainer.innerHTML = `<span class="error-icon">⚠️</span><span>${message}</span>`;
     errorContainer.classList.remove('success', 'warning');
 
     this.errors.set(fieldElement.name || fieldElement.id, message);
