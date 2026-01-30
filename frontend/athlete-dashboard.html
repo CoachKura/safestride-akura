@@ -2080,7 +2080,146 @@
                     </div>`;
             }
         </script>
-        
+
+                        <!-- Injected: robust dashboard loaders and debug helpers -->
+                        <script>
+                        // If earlier definitions exist, these will override them when loaded
+                        async function loadDashboardData(userId, profile) {
+                            console.log('========================================');
+                            console.log('📊 LOADING DASHBOARD DATA');
+                            console.log('User ID:', userId);
+                            console.log('Profile:', profile);
+                            console.log('========================================');
+
+                            try {
+                                const supabase = window.AkuraAuth?.getClient();
+                                profile = profile || {};
+                                updateUserInfo(profile);
+                                await loadAIFRIScore(userId);
+                                await calculateStreak(userId);
+                                await loadWeeklyProgress(userId);
+                                await loadRPEData(userId);
+                                if (typeof fetchUserWorkouts === 'function') await fetchUserWorkouts();
+                                if (typeof initPillarChart === 'function') initPillarChart();
+                                if (typeof checkAssessmentStatus === 'function') checkAssessmentStatus();
+                            } catch (err) {
+                                console.error('❌ Error in loadDashboardData:', err);
+                            }
+                        }
+
+                        function updateUserInfo(profile) {
+                            console.log('📝 Updating user info:', profile);
+                            const userName = profile?.full_name || (profile?.email || '').split('@')[0] || 'Athlete';
+                            const nameSelectors = ['.user-name', '#userName', '[data-user-name]', '.greeting', '#userGreeting'];
+                            let nameUpdated = false;
+                            for (const sel of nameSelectors) {
+                                const el = document.querySelector(sel);
+                                if (el) {
+                                    if (el.tagName === 'H1' || el.tagName === 'H2') el.textContent = `Welcome back, ${userName}`;
+                                    else el.textContent = userName;
+                                    console.log('✅ Name updated:', sel);
+                                    nameUpdated = true;
+                                    break;
+                                }
+                            }
+                            if (!nameUpdated) {
+                                const headers = document.querySelectorAll('h1, h2, .welcome-text, .greeting');
+                                for (const h of headers) {
+                                    if (h.textContent && h.textContent.includes('Welcome back')) {
+                                        h.textContent = `Welcome back, ${userName}`;
+                                        console.log('✅ Name updated via fallback');
+                                        break;
+                                    }
+                                }
+                            }
+                            const streakBadge = document.getElementById('streakBadge');
+                            if (streakBadge && profile?.streak != null) {
+                                streakBadge.innerText = `🔥 ${profile.streak} Days\nStreak`;
+                            }
+                        }
+
+                        async function loadAIFRIScore(userId) {
+                            try {
+                                if (!userId) return;
+                                const supabase = window.AkuraAuth?.getClient();
+                                if (!supabase) return;
+                                const { data: assessment, error } = await supabase
+                                    .from('assessments')
+                                    .select('aifri_score, risk_level')
+                                    .eq('athlete_id', userId)
+                                    .order('created_at', { ascending: false })
+                                    .limit(1)
+                                    .single();
+                                if (error) { console.warn('⚠️ loadAIFRIScore supabase error:', error.message || error); return; }
+                                if (!assessment) return;
+                                const score = Math.round(assessment.aifri_score || 0);
+                                const level = (assessment.risk_level || 'MODERATE').toUpperCase();
+                                const scoreSelectors = ['.aifri-score', '#aifriScore', '.badge-score', '[data-aifri-score]'];
+                                for (const sel of scoreSelectors) { const el = document.querySelector(sel); if (el) { el.textContent = score; console.log('✅ AIFRI score updated:', sel, score); break; }}
+                                const levelSelectors = ['.badge-grade', '#aifriGrade', '.risk-level', '[data-risk-level]'];
+                                for (const sel of levelSelectors) { const el = document.querySelector(sel); if (el) { el.textContent = level; console.log('✅ Risk level updated:', sel, level); break; }}
+                                if (!document.querySelector('.aifri-score') && !document.querySelector('#aifriScore')) {
+                                    const all = document.querySelectorAll('div, span, p');
+                                    for (const node of all) {
+                                        const text = node.textContent && node.textContent.trim();
+                                        if (text === 'ADVANCED' || /\b47\b/.test(text)) { node.textContent = `${score} ${level}`; console.log('✅ Score updated via fallback'); break; }
+                                    }
+                                }
+                            } catch (err) { console.error('❌ Error in loadAIFRIScore:', err); }
+                        }
+
+                        async function calculateStreak(userId) {
+                            try {
+                                if (!userId) return;
+                                const supabase = window.AkuraAuth?.getClient(); if (!supabase) return;
+                                const { data: logs, error } = await supabase.from('activity_logs').select('activity_date, completed').eq('athlete_id', userId).order('activity_date', { ascending: false });
+                                if (error) { console.warn('⚠️ calculateStreak supabase error:', error.message || error); return; }
+                                let streak = 0;
+                                if (logs && logs.length > 0) {
+                                    let currentDate = new Date(); currentDate.setHours(0,0,0,0);
+                                    for (const log of logs) {
+                                        const logDate = new Date(log.activity_date); logDate.setHours(0,0,0,0);
+                                        const diffDays = Math.floor((currentDate - logDate) / (1000*60*60*24));
+                                        if (diffDays === streak && (log.completed === true || log.completed === 't' || log.completed === 1)) { streak++; currentDate.setDate(currentDate.getDate() - 1); } else { break; }
+                                    }
+                                }
+                                const streakSelectors = ['.streak-badge', '#streakBadge', '.streak-count', '[data-streak]'];
+                                for (const sel of streakSelectors) { const el = document.querySelector(sel); if (el) { if (sel === '.streak-badge' || sel === '#streakBadge') el.innerText = `🔥 ${streak} Days\nStreak`; else el.textContent = streak; console.log('✅ Streak updated:', sel, streak); break; }}
+                            } catch (err) { console.error('❌ Error in calculateStreak:', err); }
+                        }
+
+                        async function loadWeeklyProgress(userId) {
+                            try {
+                                if (!userId) return;
+                                const supabase = window.AkuraAuth?.getClient(); if (!supabase) return;
+                                const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7); const weekAgoStr = weekAgo.toISOString().split('T')[0];
+                                const { data: activities, error } = await supabase.from('activity_logs').select('distance_km').eq('athlete_id', userId).gte('activity_date', weekAgoStr);
+                                if (error) { console.warn('⚠️ loadWeeklyProgress supabase error:', error.message || error); return; }
+                                const totalDistance = (activities || []).reduce((s, a) => s + (a.distance_km || 0), 0);
+                                const { data: plan } = await supabase.from('training_plans').select('weekly_distance_goal').eq('athlete_id', userId).eq('status', 'active').limit(1).single();
+                                const goal = plan?.weekly_distance_goal || 21.5;
+                                const distancePatterns = ['.stat-value', '.weekly-distance', '#weeklyDistance', '[data-weekly-distance]'];
+                                let distanceUpdated = false;
+                                for (const sel of distancePatterns) { const el = document.querySelector(sel); if (el && /\d+\.\d+\//.test(el.textContent || '')) { el.textContent = `${totalDistance.toFixed(1)}/${goal.toFixed(1)} km`; console.log('✅ Weekly distance updated:', sel); distanceUpdated = true; break; }}
+                                if (!distanceUpdated) { const all = document.querySelectorAll('div, span, p, h3, h4'); for (const el of all) { if ((el.textContent || '').match(/\d+\.\d+\/\d+\.\d+\s*km/)) { el.textContent = `${totalDistance.toFixed(1)}/${goal.toFixed(1)} km`; console.log('✅ Distance updated via fallback'); break; } } }
+                            } catch (err) { console.error('❌ Error in loadWeeklyProgress:', err); }
+                        }
+
+                        async function loadRPEData(userId) {
+                            try {
+                                if (!userId) return;
+                                const supabase = window.AkuraAuth?.getClient(); if (!supabase) return;
+                                const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7); const weekAgoStr = weekAgo.toISOString().split('T')[0];
+                                const { data: activities, error } = await supabase.from('activity_logs').select('rpe').eq('athlete_id', userId).gte('activity_date', weekAgoStr).not('rpe', 'is', null);
+                                if (error) { console.warn('⚠️ loadRPEData supabase error:', error.message || error); return; }
+                                if (!activities || activities.length === 0) return; const avgRPE = activities.reduce((s, a) => s + (a.rpe || 0), 0) / activities.length;
+                                const rpeSelectors = ['.stat-value', '.rpe-value', '#rpeValue', '[data-rpe]'];
+                                for (const sel of rpeSelectors) { const el = document.querySelector(sel); if (el && (el.textContent || '').match(/^\d+\.\d+$/)) { el.textContent = avgRPE.toFixed(1); console.log('✅ RPE updated:', sel, avgRPE.toFixed(1)); return; }}
+                                const all = document.querySelectorAll('div, span, p, h3, h4'); for (const el of all) { if ((el.textContent || '').match(/^\d+\.\d+$/)) { el.textContent = avgRPE.toFixed(1); console.log('✅ RPE updated via fallback', avgRPE.toFixed(1)); break; } }
+                            } catch (err) { console.error('❌ Error in loadRPEData:', err); }
+                        }
+                        </script>
+
     <!-- Logout Function -->
     <script>
         async function handleLogout() {
