@@ -2169,23 +2169,64 @@
                         }
 
                         async function calculateStreak(userId) {
+                            console.log('🔥 Calculating streak for user:', userId);
                             try {
-                                if (!userId) return;
-                                const supabase = window.AkuraAuth?.getClient(); if (!supabase) return;
-                                const { data: logs, error } = await supabase.from('activity_logs').select('activity_date, completed').eq('athlete_id', userId).order('activity_date', { ascending: false });
-                                if (error) { console.warn('⚠️ calculateStreak supabase error:', error.message || error); return; }
+                                if (!userId) return 0;
+                                const supabase = window.AkuraAuth?.getClient() || (typeof supabase !== 'undefined' ? supabase : null);
+                                if (!supabase) return 0;
+
+                                // Query activity dates only
+                                const { data: logs, error } = await supabase
+                                    .from('activity_logs')
+                                    .select('activity_date')
+                                    .eq('athlete_id', userId)
+                                    .order('activity_date', { ascending: false });
+
+                                if (error) {
+                                    console.warn('⚠️ calculateStreak supabase error:', error.message || error);
+                                    return 0;
+                                }
+
                                 let streak = 0;
                                 if (logs && logs.length > 0) {
-                                    let currentDate = new Date(); currentDate.setHours(0,0,0,0);
-                                    for (const log of logs) {
-                                        const logDate = new Date(log.activity_date); logDate.setHours(0,0,0,0);
-                                        const diffDays = Math.floor((currentDate - logDate) / (1000*60*60*24));
-                                        if (diffDays === streak && (log.completed === true || log.completed === 't' || log.completed === 1)) { streak++; currentDate.setDate(currentDate.getDate() - 1); } else { break; }
+                                    console.log('📊 Activity logs loaded:', logs.length, 'activities');
+
+                                    const activityDates = new Set(logs.map(l => new Date(l.activity_date).toISOString().split('T')[0]));
+                                    let checkDate = new Date(); checkDate.setHours(0,0,0,0);
+
+                                    while (true) {
+                                        const dateStr = checkDate.toISOString().split('T')[0];
+                                        if (activityDates.has(dateStr)) {
+                                            streak++;
+                                            checkDate.setDate(checkDate.getDate() - 1);
+                                        } else {
+                                            break;
+                                        }
+                                    }
+                                    console.log('✅ Streak calculated:', streak, 'days');
+                                } else {
+                                    console.log('ℹ️ No activity logs found - streak is 0');
+                                }
+
+                                // Update UI - try multiple selectors
+                                const selectors = ['#streakCount', '.streak-count', '.streak-value', '[data-streak]', '#streakBadge', '.streak-badge'];
+                                let updated = false;
+                                for (const sel of selectors) {
+                                    const el = document.querySelector(sel);
+                                    if (el) {
+                                        if (sel === '#streakBadge' || sel === '.streak-badge') el.innerText = `🔥 ${streak} Days\nStreak`;
+                                        else el.textContent = streak;
+                                        console.log('✅ Streak updated in DOM:', sel, '=', streak);
+                                        updated = true;
+                                        break;
                                     }
                                 }
-                                const streakSelectors = ['.streak-badge', '#streakBadge', '.streak-count', '[data-streak]'];
-                                for (const sel of streakSelectors) { const el = document.querySelector(sel); if (el) { if (sel === '.streak-badge' || sel === '#streakBadge') el.innerText = `🔥 ${streak} Days\nStreak`; else el.textContent = streak; console.log('✅ Streak updated:', sel, streak); break; }}
-                            } catch (err) { console.error('❌ Error in calculateStreak:', err); }
+                                if (!updated) console.warn('⚠️ Could not find streak element to update');
+                                return streak;
+                            } catch (err) {
+                                console.error('❌ calculateStreak error:', err);
+                                return 0;
+                            }
                         }
 
                         async function loadWeeklyProgress(userId) {
@@ -2266,6 +2307,14 @@
             console.log('%c🔍 AKURA DASHBOARD DEBUG REPORT', 'color: #4CAF50; font-weight: bold; font-size: 16px;');
             console.log('%c========================================', 'color: #4CAF50; font-weight: bold; font-size: 16px;');
             console.log('');
+            // Ensure a Supabase client is available (prefer AkuraAuth client)
+            const supabase = window.AkuraAuth?.getClient() || (typeof supabase !== 'undefined' ? supabase : null);
+            if (!supabase) {
+                console.error('❌ Supabase client not initialized');
+                console.log('   → Check that the Supabase script is loaded and `AkuraAuth` is initialized');
+                return;
+            }
+
             try {
                 // 1. Authentication Status
                 console.log('%c1️⃣ AUTHENTICATION STATUS', 'color: #2196F3; font-weight: bold; font-size: 14px;');
