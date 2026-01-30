@@ -1,0 +1,24 @@
+{
+  "name": "vscode-supabase-dataobject-helper",
+  "displayName": "Supabase Data Object Helper",
+  "description": "Create and manage reactive data objects from Supabase inside VS Code",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.70.0"
+  },
+  "activationEvents": [
+    "onCommand:supabase.openHelper",
+    "onCommand:supabase.createDataObject",
+    "onCommand:supabase.testConnection",
+    "onCommand:supabase.clearConfig"
+  ],
+  "main": "./src/extension.js",
+  "scripts": {
+    "start": "node ./src/extension.js",
+    "package": "vsce package || true"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "vsce": "^2.10.0"
+  }
+}
