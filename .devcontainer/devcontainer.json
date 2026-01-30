@@ -1,0 +1,31 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/typescript-node
+{
+	"name": "Node.js & TypeScript",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	"image": "mcr.microsoft.com/devcontainers/typescript-node:1-24-bookworm",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"Supabase.vscode-supabase-extension"
+			]
+		}
+	}
+
+  // Features to add to the dev container. More info: https://containers.dev/features.
+  // "features": {},
+
+  // Forward the default Supabase CLI local port (used by some local workflows).
+  "forwardPorts": [54321],
+
+  // Install the Supabase CLI in the container after creation so you can run
+  // `supabase` commands from the integrated terminal. Authentication still
+  // needs to be performed via `supabase login` interactively.
+  "postCreateCommand": "npm install -g supabase && echo 'Supabase CLI installed. Run \"supabase login\" to authenticate.'",
+
+	// Configure tool-specific properties.
+	// "customizations": {},
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+}
