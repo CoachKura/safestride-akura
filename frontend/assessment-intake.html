@@ -1645,6 +1645,133 @@
           step.classList.remove('active');
         }
       });
+
+      // If user navigates to Step 8, compute and render AIFRI results
+      if (currentStep === 8) {
+        try {
+          renderAifriStep();
+        } catch (err) {
+          console.error('Error rendering AIFRI step:', err);
+        }
+      }
+    }
+
+    // Compute and render AIFRI results for Step 8
+    function renderAifriStep() {
+      const resultsContainer = document.getElementById('resultsContainer');
+      const pillarBreakdown = document.getElementById('pillarBreakdown');
+      const recommendationsContainer = document.getElementById('recommendationsContainer');
+
+      if (!resultsContainer) return;
+
+      // Keep the loading UI while we compute
+      resultsContainer.innerHTML = `
+        <div class="results-loading">
+          <div class="loading-spinner"></div>
+          <p class="results-loading-text">Calculating your AIFRI score...</p>
+        </div>
+      `;
+
+      // Collect minimal inputs required by the AIFRI engine (use defaults where fields are missing)
+      const weeklyKm = parseFloat(document.getElementById('weeklyKm')?.value || '0');
+      const runningYears = parseInt(document.getElementById('runningYears')?.value || '0');
+      const injuries = Array.from(document.querySelectorAll('input[name="injuries"]:checked')).map(el => el.value);
+      const injuryHistory = injuries.join(', ');
+      const painLevel = parseFloat(document.getElementById('painLevel')?.value || '0');
+      const fmsDeepSquat = parseInt(document.getElementById('fmsDeepSquat')?.value || '0');
+      const fmsHurdleStep = parseInt(document.getElementById('fmsHurdleStep')?.value || '0');
+      const fmsLunge = parseInt(document.getElementById('fmsLunge')?.value || '0');
+      const fmsShoulderMobility = parseInt(document.getElementById('fmsShoulderMobility')?.value || '0');
+      const fmsActiveLegRaise = parseInt(document.getElementById('fmsActiveLegRaise')?.value || '0');
+      const fmsPushup = parseInt(document.getElementById('fmsPushup')?.value || '0');
+      const fmsRotaryStability = parseInt(document.getElementById('fmsRotaryStability')?.value || '0');
+      const fmsTotal = fmsDeepSquat + fmsHurdleStep + fmsLunge + fmsShoulderMobility + fmsActiveLegRaise + fmsPushup + fmsRotaryStability;
+
+      const age = parseInt(document.getElementById('age')?.value || '30');
+      const ankleFlexibility = parseFloat(document.getElementById('ankleFlexibility')?.value || '0');
+      const hipFlexibility = parseFloat(document.getElementById('hipFlexibility')?.value || '0');
+      const singleLegBalance = parseFloat(document.getElementById('singleLegBalance')?.value || '0');
+      const squats = parseInt(document.getElementById('squats')?.value || '0');
+      const plankTime = parseInt(document.getElementById('plankTime')?.value || '0');
+
+      const engineInput = {
+        weeklyKm,
+        runningYears,
+        injuryHistory,
+        painLevel,
+        fmsScore: fmsTotal,
+        fmsDeepSquat,
+        ankleFlexibility,
+        hipFlexibility,
+        singleLegBalance,
+        squats,
+        plankTime,
+        age
+      };
+
+      // Calculate using AIFRI engine if available
+      try {
+        const calculator = typeof AIFRICalculator !== 'undefined' ? new AIFRICalculator(engineInput) : null;
+        const aifriResult = calculator ? calculator.calculateAIFRI() : { total: 70, pillars: {}, grade: { label: 'UNKNOWN', color: '#999' }, breakdown: {} };
+
+        // Persist for other parts of the form (submit flow expects this)
+        try { sessionStorage.setItem('aifriResult', JSON.stringify(aifriResult)); } catch (err) { console.warn('sessionStorage set failed', err); }
+
+        // Render main result and chart container
+        resultsContainer.innerHTML = `
+          <div class="results-main">
+            <div class="aifri-summary">
+              <div class="aifri-score" data-aifri-score>
+                <div class="aifri-score-value">${aifriResult.total}</div>
+                <div class="aifri-grade" style="color:${aifriResult.grade.color}">${aifriResult.grade.label}</div>
+              </div>
+              <canvas id="aifriDonutCanvas" width="300" height="300"></canvas>
+            </div>
+          </div>
+        `;
+
+        // Render pillar breakdown
+        if (pillarBreakdown) {
+          pillarBreakdown.innerHTML = '';
+          Object.entries(aifriResult.pillars || {}).forEach(([key, value]) => {
+            const card = document.createElement('div');
+            card.className = 'pillar-card';
+            card.innerHTML = `<div class="pillar-name">${key.charAt(0).toUpperCase() + key.slice(1)}</div><div class="pillar-score">${Math.round(value)}</div>`;
+            pillarBreakdown.appendChild(card);
+          });
+        }
+
+        // Render recommendations
+        if (recommendationsContainer) {
+          const recs = (aifriResult.breakdown && aifriResult.breakdown.recommendations) || [];
+          const risk = (aifriResult.breakdown && aifriResult.breakdown.injuryRisk) || null;
+          recommendationsContainer.innerHTML = '';
+          const recList = document.createElement('div');
+          recList.className = 'recommendation-list';
+          recList.innerHTML = `<h4>Recommendations</h4>` + (recs.length ? `<ul>${recs.map(r => `<li>${r}</li>`).join('')}</ul>` : '<p>No recommendations available.</p>');
+          recommendationsContainer.appendChild(recList);
+
+          if (risk) {
+            const riskEl = document.createElement('div');
+            riskEl.className = 'risk-summary';
+            riskEl.innerHTML = `<strong>Injury Risk:</strong> ${risk.level} <br> ${risk.factors ? risk.factors.join('; ') : ''}`;
+            recommendationsContainer.appendChild(riskEl);
+          }
+        }
+
+        // Render Chart if Chart.js is available and helper exists
+        if (typeof renderAIFRIDonutChart === 'function' && window.Chart) {
+          try {
+            renderAIFRIDonutChart('aifriDonutCanvas', aifriResult);
+          } catch (err) {
+            console.warn('Failed to render AIFRI chart', err);
+          }
+        }
+
+      } catch (err) {
+        console.error('AIFRI calculation failed', err);
+        resultsContainer.innerHTML = '<p class="results-error">Unable to calculate AIFRI at this time.</p>';
+      }
     }
 
     function updateNavigationButtons() {
