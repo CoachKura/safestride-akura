@@ -9,7 +9,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
+
+    <!-- Load auth module deferred to avoid blocking rendering -->
+    <script src="js/auth.js" defer></script>
     
     <!-- CSS Framework -->
     <link rel="stylesheet" href="css/cards.css">
@@ -765,6 +768,35 @@
             background: rgba(255, 255, 255, 0.3);
             border-color: rgba(255, 255, 255, 0.5);
         }
+    /* Empty State Styles */
+    .empty-state-message {
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .risk-not-assessed {
+        background-color: #e0e0e0 !important;
+        color: #757575 !important;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    /* Hide demo workout card */
+    .workout-card-demo {
+        display: none !important;
+    }
+
+    /* Fade out effect for empty data */
+    [data-empty="true"] {
+        opacity: 0.3;
+        pointer-events: none;
+    }
     </style>
 </head>
 <body>
@@ -1068,12 +1100,8 @@
 
     <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    <!-- Auth Module -->
-    <script src="js/auth.js"></script>
-    
+
     <!-- JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js"></script>
     <script src="js/api-client.js"></script>
     <script>
         // ============================================
@@ -1256,75 +1284,100 @@
             }
         }
 
-        // Update dashboard UI with real data
-        function updateDashboardUI() {
+        // Update dashboard UI with real data (accepts profile & assessment, defaults to globals)
+        function updateDashboardUI(profile = userProfile, assessment = userAssessment) {
             console.log('🎨 Updating UI with real data...');
-            console.log('📊 userProfile:', userProfile);
-            console.log('📊 userAssessment:', userAssessment);
+            console.log('📊 userProfile:', profile);
+            console.log('📊 userAssessment:', assessment);
             
-            // Check assessment status and show banner if needed
-            checkAssessmentStatus();
+            // ============================================
+            // 1. UPDATE USER NAME
+            // ============================================
+            const nameElement = document.querySelector('[data-user-name]') 
+                || document.querySelector('.user-name')
+                || document.querySelector('#userName')
+                || document.querySelector('h1');
             
-            // Update greeting with real name
-            if (userProfile && userProfile.full_name) {
-                document.getElementById('userGreeting').textContent = `Welcome back, ${userProfile.full_name}`;
-                console.log('✅ Updated greeting with:', userProfile.full_name);
-            } else {
-                console.log('⚠️ No full_name in userProfile, keeping default greeting');
-            }
-            
-            // Update AIFRI score and grade
-            if (userAssessment && userAssessment.aifri_score) {
-                const scoreEl = document.getElementById('aifriScore');
-                const gradeEl = document.getElementById('aifriGrade');
-                if (scoreEl) {
-                    const score = Math.round(userAssessment.aifri_score);
-                    scoreEl.textContent = score;
-                    console.log('✅ Updated AIFRI Score element to:', score);
+            if (nameElement) {
+                const userName = profile?.full_name || profile?.email?.split('@')[0] || 'Athlete';
+                
+                if (nameElement.tagName === 'H1') {
+                    nameElement.textContent = `Welcome back, ${userName}`;
+                } else {
+                    nameElement.textContent = userName;
                 }
-                if (gradeEl) {
-                    const score = userAssessment.aifri_score;
-                    let grade = 'BASIC';
-                    if (score >= 80) grade = 'ADVANCED';
-                    else if (score >= 60) grade = 'INTERMEDIATE';
-                    gradeEl.textContent = grade;
-                    console.log('✅ Updated Grade element to:', grade);
+                console.log('✅ User name updated to:', userName);
+            }
+            
+            // ============================================
+            // 2. HANDLE NO ASSESSMENT CASE
+            // ============================================
+            if (!assessment || !assessment.aifri_score) {
+                console.log('⚠️ NO assessment data - showing empty state');
+                
+                // Show empty state for AIFRI score
+                const scoreElement = document.querySelector('[data-aifri-score]')
+                    || document.querySelector('.aifri-score')
+                    || document.querySelector('#aifriScore');
+                if (scoreElement) {
+                    scoreElement.textContent = '---';
+                    scoreElement.style.opacity = '0.3';
                 }
-            } else {
-                console.log('⚠️ NO AIFRI assessment data found - user needs to complete assessment');
-                // Show message to user
-                const scoreEl = document.getElementById('aifriScore');
-                const gradeEl = document.getElementById('aifriGrade');
-                if (scoreEl) scoreEl.textContent = '--';
-                if (gradeEl) gradeEl.textContent = 'NOT ASSESSED';
-            }
-            
-            // Update workout streak (placeholder - will calculate from workout history)
-            const streakBadge = document.getElementById('streakBadge');
-            if (streakBadge && userWorkouts.length > 0) {
-                const streakDays = calculateStreak(userWorkouts);
-                streakBadge.innerHTML = `🔥 ${streakDays} Days<br>Streak`;
-                console.log('✅ Updated Streak:', streakDays, 'days');
-            } else {
-                console.log('⚠️ No workout data found for streak calculation');
-            }
-            
-            // Update profile badge
-            if (userProfile && userProfile.role) {
-                // Role badge already in UI, but can update if needed
-                console.log('✅ Role:', userProfile.role);
-            }
-            
-            // Update weekly progress (placeholder)
-            const progressText = document.querySelector('.stat-value');
-            if (progressText && userWorkouts.length > 0) {
-                const weeklyDist = calculateWeeklyDistance(userWorkouts);
-                if (progressText.textContent.includes('km')) {
-                    progressText.textContent = weeklyDist;
+                
+                // Show "NOT ASSESSED" for risk level
+                const riskElement = document.querySelector('[data-risk-level]')
+                    || document.querySelector('.risk-level')
+                    || document.querySelector('#riskLevel');
+                if (riskElement) {
+                    riskElement.textContent = 'NOT ASSESSED';
+                    riskElement.className = 'risk-badge risk-not-assessed';
+                    riskElement.style.backgroundColor = '#ccc';
+                    riskElement.style.color = '#666';
                 }
+                
+                // Hide or show empty state for all stats cards
+                hideStatsCards();
+                
+                // Show prominent assessment reminder
+                showAssessmentReminder();
+                
+                return; // Exit early - no data to show
             }
             
-            console.log('✅ UI updated with real data');
+            // ============================================
+            // 3. SHOW REAL DATA (Only if assessment exists)
+            // ============================================
+            
+            // Update AIFRI score
+            const scoreElement = document.querySelector('[data-aifri-score]')
+                || document.querySelector('.aifri-score')
+                || document.querySelector('#aifriScore');
+            if (scoreElement && assessment.aifri_score) {
+                scoreElement.textContent = Math.round(assessment.aifri_score);
+                scoreElement.style.opacity = '1';
+                console.log('✅ AIFRI score updated to:', assessment.aifri_score);
+            }
+            
+            // Update risk level
+            const riskElement = document.querySelector('[data-risk-level]')
+                || document.querySelector('.risk-level')
+                || document.querySelector('#riskLevel');
+            if (riskElement && assessment.risk_level) {
+                riskElement.textContent = assessment.risk_level.toUpperCase();
+                riskElement.className = `risk-badge risk-${assessment.risk_level}`;
+                console.log('✅ Risk level updated to:', assessment.risk_level);
+            }
+            
+            // Show real assessment status
+            const statusElement = document.querySelector('[data-assessment-status]')
+                || document.querySelector('.assessment-status');
+            if (statusElement) {
+                statusElement.innerHTML = '<i class="fas fa-check-circle"></i> Assessment Complete';
+                statusElement.className = 'status-complete';
+                statusElement.style.color = '#4CAF50';
+            }
+            
+            console.log('✅ UI updated with real assessment data');
         }
 
         // Calculate workout streak
