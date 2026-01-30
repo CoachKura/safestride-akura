@@ -6,7 +6,7 @@ BEGIN;
 
 INSERT INTO public.profiles (id, full_name, email, role, created_at, updated_at)
 SELECT u.id,
-       COALESCE(u.raw_user_meta->>'fullName', u.raw_user_meta->>'full_name', u.email) AS full_name,
+       COALESCE(u.raw_user_meta_data->>'full_name', u.raw_user_meta_data->>'fullName', u.email) AS full_name,
        u.email,
        'athlete',
        NOW(),
