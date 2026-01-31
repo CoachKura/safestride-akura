@@ -7,7 +7,8 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				"Supabase.vscode-supabase-extension"
+				"Supabase.vscode-supabase-extension",
+				"genspark.genspark"
 			]
 		}
 	}
