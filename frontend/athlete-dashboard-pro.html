@@ -469,6 +469,102 @@
       font-size: 18px;
     }
     
+    /* Monthly Distance Card */
+    .monthly-distance-card {
+      background: linear-gradient(135deg, #9333ea 0%, #c026d3 100%);
+      border-radius: 20px;
+      padding: 32px;
+      margin-bottom: 32px;
+      box-shadow: 0 4px 16px rgba(147, 51, 234, 0.3);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      color: white;
+    }
+    
+    .monthly-distance-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: pulse 4s ease-in-out infinite;
+    }
+    
+    .monthly-distance-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 28px rgba(147, 51, 234, 0.4);
+    }
+    
+    .monthly-content {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .monthly-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    
+    .monthly-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    
+    .monthly-subtitle {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    
+    .monthly-icon {
+      font-size: 48px;
+      opacity: 0.8;
+    }
+    
+    .monthly-stats {
+      padding: 24px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      backdrop-filter: blur(10px);
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    .monthly-stat-main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .monthly-number {
+      font-size: 56px;
+      font-weight: 800;
+      line-height: 1;
+    }
+    
+    .monthly-label {
+      font-size: 14px;
+      opacity: 0.9;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .monthly-footer {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      opacity: 0.9;
+      font-weight: 600;
+    }
+    
     /* Progress Grid */
     .progress-grid {
       display: grid;
@@ -682,6 +778,20 @@
         padding: 24px;
       }
       
+      .monthly-distance-card {
+        padding: 24px;
+      }
+      
+      .monthly-number {
+        font-size: 42px;
+      }
+      
+      .monthly-footer {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+      }
+      
       .stat-number {
         font-size: 28px;
       }
@@ -821,6 +931,31 @@
       </div>
     </div>
     
+    <!-- Total Monthly Distance Card -->
+    <div class="monthly-distance-card" onclick="showMonthlyDistanceToast()">
+      <div class="monthly-content">
+        <div class="monthly-header">
+          <div>
+            <h3 class="monthly-title">📊 Total Monthly Distance</h3>
+            <p class="monthly-subtitle">Your running progress this month</p>
+          </div>
+          <div class="monthly-icon">🏃</div>
+        </div>
+        
+        <div class="monthly-stats">
+          <div class="monthly-stat-main">
+            <div class="monthly-number" id="monthlyDistance">0.0</div>
+            <div class="monthly-label">Kilometers This Month</div>
+          </div>
+        </div>
+        
+        <div class="monthly-footer">
+          <span id="monthName">January 2026</span>
+          <span id="runCount">0 runs logged</span>
+        </div>
+      </div>
+    </div>
+    
     <!-- Progress Cards -->
     <div class="progress-grid">
       <div class="progress-card" onclick="showComingSoon('Weekly Progress Details')">
@@ -888,6 +1023,66 @@
         toast.style.opacity = '0';
         setTimeout(() => toast.remove(), 300);
       }, 3000);
+    }
+    
+    // ========================================
+    // LOAD MONTHLY DISTANCE
+    // ========================================
+    async function loadMonthlyDistance(userId) {
+      try {
+        console.log('📊 Loading monthly distance...');
+        
+        // Get current month boundaries
+        const now = new Date();
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        
+        // Query activity_logs for this month
+        const { data, error } = await supabase
+          .from('activity_logs')
+          .select('distance_km, activity_date')
+          .eq('athlete_id', userId)
+          .gte('activity_date', monthStart.toISOString().split('T')[0])
+          .lte('activity_date', monthEnd.toISOString().split('T')[0]);
+        
+        if (error) throw error;
+        
+        // Calculate totals
+        const totalDistance = data && data.length > 0 
+          ? data.reduce((sum, log) => sum + (parseFloat(log.distance_km) || 0), 0)
+          : 0;
+        
+        const runCount = data ? data.length : 0;
+        
+        // Update UI
+        document.getElementById('monthlyDistance').textContent = totalDistance.toFixed(1);
+        document.getElementById('runCount').textContent = `${runCount} ${runCount === 1 ? 'run' : 'runs'} logged`;
+        
+        // Update month name
+        const monthName = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        document.getElementById('monthName').textContent = monthName;
+        
+        console.log('✅ Monthly distance loaded:', { totalDistance, runCount, month: monthName });
+        
+        return { totalDistance, runCount, monthName };
+        
+      } catch (error) {
+        console.error('❌ Error loading monthly distance:', error);
+        document.getElementById('monthlyDistance').textContent = '0.0';
+        document.getElementById('runCount').textContent = '0 runs logged';
+        return null;
+      }
+    }
+    
+    // ========================================
+    // SHOW MONTHLY DISTANCE TOAST
+    // ========================================
+    function showMonthlyDistanceToast() {
+      const distance = document.getElementById('monthlyDistance').textContent;
+      const runCount = document.getElementById('runCount').textContent;
+      const monthName = document.getElementById('monthName').textContent;
+      
+      showToast(`📊 ${monthName}: ${distance} km across ${runCount}! Keep crushing it! 💪`, 'success');
     }
     
     function showComingSoon(feature) {
@@ -969,6 +1164,9 @@
       
       // Load weekly mileage card
       await loadWeeklyMileage(userId);
+      
+      // Load monthly distance
+      await loadMonthlyDistance(userId);
       
       // Load RPE
       await loadRPE(userId);
