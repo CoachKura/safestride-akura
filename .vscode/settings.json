@@ -47,5 +47,28 @@
   
   // Terminal
   "terminal.integrated.defaultProfile.linux": "bash",
-  "terminal.integrated.cwd": "${workspaceFolder}"
+  "terminal.integrated.cwd": "${workspaceFolder}",
+  
+  // GitHub Copilot Configuration
+  "github.copilot.enable": {
+    "*": true,
+    "yaml": true,
+    "plaintext": true,
+    "markdown": true,
+    "javascript": true,
+    "html": true,
+    "css": true,
+    "sql": true
+  },
+  "github.copilot.advanced": {
+    "debug.overrideEngine": "gpt-4",
+    "debug.useNodeFetcher": true
+  },
+  
+  // Copilot Instructions Path
+  "github.copilot.chat.codeGeneration.instructions": [
+    {
+      "file": ".github/copilot-instructions.md"
+    }
+  ]
 }
