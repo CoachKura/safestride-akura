@@ -1,0 +1,15 @@
+{
+  "recommendations": [
+    "ritwickdey.liveserver",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "bradlc.vscode-tailwindcss",
+    "formulahendry.auto-rename-tag",
+    "formulahendry.auto-close-tag",
+    "christian-kohler.path-intellisense",
+    "eamodio.gitlens",
+    "donjayamanne.githistory",
+    "ms-vscode.live-server",
+    "supabase.vscode-supabase"
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 1000,
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.wordWrap": "on",
+  "editor.minimap.enabled": true,
+  "editor.suggestSelection": "first",
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+  
+  // Live Server Configuration
+  "liveServer.settings.port": 3000,
+  "liveServer.settings.root": "/frontend",
+  "liveServer.settings.CustomBrowser": "chrome",
+  "liveServer.settings.donotShowInfoMsg": true,
+  
+  // Git Configuration
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.enableSmartCommit": true,
+  "git.postCommitCommand": "push",
+  
+  // File Associations
+  "files.associations": {
+    "*.html": "html",
+    "*.css": "css",
+    "*.js": "javascript",
+    "*.sql": "sql"
+  },
+  
+  // Exclude from file watcher
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/node_modules/**": true,
+    "**/.hg/store/**": true,
+    "**/frontend-backup*/**": true
+  },
+  
+  // Emmet for HTML
+  "emmet.includeLanguages": {
+    "html": "html"
+  },
+  
+  // Terminal
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "terminal.integrated.cwd": "${workspaceFolder}"
+}

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VS Code Setup - Akura SafeStride</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .gradient-bg {
+            background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #4facfe);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+        .code-block {
+            background: #1e1e1e;
+            border-radius: 8px;
+            padding: 1rem;
+            overflow-x: auto;
+        }
+        .code-block code {
+            color: #d4d4d4;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <div class="gradient-bg text-white py-12">
+        <div class="max-w-6xl mx-auto px-6">
+            <h1 class="text-4xl font-bold mb-2">🚀 VS Code Setup Guide</h1>
+            <p class="text-xl opacity-90">Complete development environment for Akura SafeStride</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-6xl mx-auto px-6 py-12">
+        
+        <!-- Quick Start -->
+        <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+                <span class="text-4xl mr-3">⚡</span> Quick Start (5 Minutes)
+            </h2>
+            
+            <div class="space-y-6">
+                <!-- Step 1 -->
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0 w-10 h-10 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold">
+                        1
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Open Project in VS Code</h3>
+                        <div class="code-block">
+                            <code>cd "E:\Akura Safe Stride\safestride"<br>code .</code>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0 w-10 h-10 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold">
+                        2
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Install Recommended Extensions</h3>
+                        <p class="text-gray-600 mb-2">Press <kbd class="px-2 py-1 bg-gray-200 rounded">Ctrl+Shift+P</kbd></p>
+                        <p class="text-gray-600">Type: <strong>"Extensions: Show Recommended Extensions"</strong></p>
+                        <p class="text-gray-600">Click: <strong>"Install All"</strong></p>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0 w-10 h-10 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold">
+                        3
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Start Development Server</h3>
+                        <p class="text-gray-600 mb-2">Press <kbd class="px-2 py-1 bg-gray-200 rounded">Ctrl+Shift+P</kbd></p>
+                        <p class="text-gray-600">Type: <strong>"Tasks: Run Task"</strong></p>
+                        <p class="text-gray-600">Select: <strong>"🚀 Start Development Server"</strong></p>
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0 w-10 h-10 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold">
+                        4
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Open Browser</h3>
+                        <p class="text-gray-600">Navigate to: <a href="http://localhost:3000" class="text-purple-600 font-semibold">http://localhost:3000</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- One-Click Tasks -->
+        <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+                <span class="text-4xl mr-3">🎯</span> One-Click Tasks
+            </h2>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Development -->
+                <div class="border-l-4 border-purple-500 pl-4">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Development</h3>
+                    <ul class="space-y-2 text-gray-600">
+                        <li>🚀 Start Development Server</li>
+                        <li>🔧 Open Local Preview</li>
+                        <li>🧹 Clean Port 3000</li>
+                    </ul>
+                </div>
+
+                <!-- Git -->
+                <div class="border-l-4 border-blue-500 pl-4">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Git Operations</h3>
+                    <ul class="space-y-2 text-gray-600">
+                        <li>🔄 Quick Commit & Push</li>
+                        <li>📊 Git Status</li>
+                        <li>🔙 Pull Latest</li>
+                    </ul>
+                </div>
+
+                <!-- Deployment -->
+                <div class="border-l-4 border-green-500 pl-4">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Deployment</h3>
+                    <ul class="space-y-2 text-gray-600">
+                        <li>🌐 Deploy to Vercel</li>
+                        <li>🌐 Open Live Site</li>
+                    </ul>
+                </div>
+
+                <!-- Supabase -->
+                <div class="border-l-4 border-yellow-500 pl-4">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Supabase</h3>
+                    <ul class="space-y-2 text-gray-600">
+                        <li>🗄️ Open SQL Editor</li>
+                        <li>🗄️ Open Auth Users</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mt-6 p-4 bg-purple-50 rounded-lg">
+                <p class="text-gray-700">
+                    <strong>Access all tasks:</strong> Press 
+                    <kbd class="px-2 py-1 bg-white rounded shadow">Ctrl+Shift+P</kbd> → 
+                    Type <strong>"Tasks: Run Task"</strong>
+                </p>
+            </div>
+        </div>
+
+        <!-- Keyboard Shortcuts -->
+        <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+                <span class="text-4xl mr-3">⌨️</span> Essential Keyboard Shortcuts
+            </h2>
+            
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                    <span class="text-gray-700">Command Palette</span>
+                    <kbd class="px-3 py-1 bg-white rounded shadow">Ctrl+Shift+P</kbd>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                    <span class="text-gray-700">Quick Open File</span>
+                    <kbd class="px-3 py-1 bg-white rounded shadow">Ctrl+P</kbd>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                    <span class="text-gray-700">Toggle Terminal</span>
+                    <kbd class="px-3 py-1 bg-white rounded shadow">Ctrl+`</kbd>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                    <span class="text-gray-700">Save All</span>
+                    <kbd class="px-3 py-1 bg-white rounded shadow">Ctrl+K S</kbd>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                    <span class="text-gray-700">Format Document</span>
+                    <kbd class="px-3 py-1 bg-white rounded shadow">Shift+Alt+F</kbd>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                    <span class="text-gray-700">Split Editor</span>
+                    <kbd class="px-3 py-1 bg-white rounded shadow">Ctrl+\</kbd>
+                </div>
+            </div>
+        </div>
+
+        <!-- Typical Workflow -->
+        <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+                <span class="text-4xl mr-3">🔄</span> Typical Development Workflow
+            </h2>
+            
+            <div class="space-y-4">
+                <div class="flex items-center space-x-4 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg">
+                    <span class="text-2xl">📝</span>
+                    <div>
+                        <h4 class="font-semibold text-gray-800">1. Edit Files</h4>
+                        <p class="text-gray-600">Press Ctrl+P, type filename, edit and save (auto-saves)</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg">
+                    <span class="text-2xl">🔍</span>
+                    <div>
+                        <h4 class="font-semibold text-gray-800">2. Test Locally</h4>
+                        <p class="text-gray-600">Changes visible immediately at http://localhost:3000</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg">
+                    <span class="text-2xl">💾</span>
+                    <div>
+                        <h4 class="font-semibold text-gray-800">3. Commit & Push</h4>
+                        <p class="text-gray-600">Run task: "🔄 Git: Quick Commit & Push"</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg">
+                    <span class="text-2xl">🚀</span>
+                    <div>
+                        <h4 class="font-semibold text-gray-800">4. Deploy to Production</h4>
+                        <p class="text-gray-600">Run task: "🌐 Deploy to Vercel" (wait 2 min, then test)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SQL Snippets -->
+        <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+                <span class="text-4xl mr-3">🗄️</span> Supabase SQL Snippets
+            </h2>
+            
+            <p class="text-gray-600 mb-4">Type these prefixes in SQL files to get quick templates:</p>
+            
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="p-4 border-l-4 border-purple-500 bg-gray-50 rounded">
+                    <code class="text-purple-600 font-semibold">sb-profile-create</code>
+                    <p class="text-gray-600 text-sm mt-1">Create/update user profile</p>
+                </div>
+                <div class="p-4 border-l-4 border-blue-500 bg-gray-50 rounded">
+                    <code class="text-blue-600 font-semibold">sb-query-user</code>
+                    <p class="text-gray-600 text-sm mt-1">Query complete user data</p>
+                </div>
+                <div class="p-4 border-l-4 border-green-500 bg-gray-50 rounded">
+                    <code class="text-green-600 font-semibold">sb-assessment-insert</code>
+                    <p class="text-gray-600 text-sm mt-1">Insert new assessment</p>
+                </div>
+                <div class="p-4 border-l-4 border-yellow-500 bg-gray-50 rounded">
+                    <code class="text-yellow-600 font-semibold">sb-check-columns</code>
+                    <p class="text-gray-600 text-sm mt-1">Check table columns</p>
+                </div>
+                <div class="p-4 border-l-4 border-pink-500 bg-gray-50 rounded">
+                    <code class="text-pink-600 font-semibold">sb-data-audit</code>
+                    <p class="text-gray-600 text-sm mt-1">Quick data audit</p>
+                </div>
+                <div class="p-4 border-l-4 border-indigo-500 bg-gray-50 rounded">
+                    <code class="text-indigo-600 font-semibold">sb-test-data</code>
+                    <p class="text-gray-600 text-sm mt-1">Create test data</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Important Links -->
+        <div class="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl shadow-lg p-8">
+            <h2 class="text-3xl font-bold mb-6 flex items-center">
+                <span class="text-4xl mr-3">🔗</span> Important Links
+            </h2>
+            
+            <div class="grid md:grid-cols-2 gap-4">
+                <a href="https://www.akura.in" target="_blank" 
+                   class="block p-4 bg-white bg-opacity-20 rounded-lg hover:bg-opacity-30 transition">
+                    <h3 class="font-semibold mb-1">🌐 Live Site</h3>
+                    <p class="text-sm opacity-90">https://www.akura.in</p>
+                </a>
+                <a href="https://supabase.com/dashboard/project/yawxlwcniqfspcgefuro" target="_blank"
+                   class="block p-4 bg-white bg-opacity-20 rounded-lg hover:bg-opacity-30 transition">
+                    <h3 class="font-semibold mb-1">🗄️ Supabase Dashboard</h3>
+                    <p class="text-sm opacity-90">Database Management</p>
+                </a>
+                <a href="https://github.com/CoachKura/safestride-akura" target="_blank"
+                   class="block p-4 bg-white bg-opacity-20 rounded-lg hover:bg-opacity-30 transition">
+                    <h3 class="font-semibold mb-1">📦 GitHub Repository</h3>
+                    <p class="text-sm opacity-90">Source Code</p>
+                </a>
+                <a href="http://localhost:3000" target="_blank"
+                   class="block p-4 bg-white bg-opacity-20 rounded-lg hover:bg-opacity-30 transition">
+                    <h3 class="font-semibold mb-1">💻 Local Development</h3>
+                    <p class="text-sm opacity-90">http://localhost:3000</p>
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="bg-gray-800 text-white py-8 mt-12">
+        <div class="max-w-6xl mx-auto px-6 text-center">
+            <p class="text-lg mb-2">🚀 <strong>Akura SafeStride</strong> - Professional Development Workflow</p>
+            <p class="text-gray-400">Last Updated: January 2026 • Version 1.0.0</p>
+        </div>
+    </div>
+</body>
+</html>

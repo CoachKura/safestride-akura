@@ -1,0 +1,27 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "🚀 Launch Dashboard",
+      "url": "http://localhost:3000/athlete-dashboard-pro.html",
+      "webRoot": "${workspaceFolder}/frontend",
+      "preLaunchTask": "🚀 Start Development Server"
+    },
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "🏃 Launch Workout Tracker",
+      "url": "http://localhost:3000/track-workout.html",
+      "webRoot": "${workspaceFolder}/frontend"
+    },
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "📝 Launch Assessment",
+      "url": "http://localhost:3000/assessment-intake.html",
+      "webRoot": "${workspaceFolder}/frontend"
+    }
+  ]
+}

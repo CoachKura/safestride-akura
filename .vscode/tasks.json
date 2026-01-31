@@ -1,0 +1,148 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "🚀 Start Development Server",
+      "type": "shell",
+      "command": "cd frontend && python3 -m http.server 3000",
+      "isBackground": true,
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "clear": true
+      }
+    },
+    {
+      "label": "🔄 Git: Quick Commit & Push",
+      "type": "shell",
+      "command": "git add . && git commit -m '${input:commitMessage}' && git push origin main",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": false
+      }
+    },
+    {
+      "label": "📊 Git: Status",
+      "type": "shell",
+      "command": "git status",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      }
+    },
+    {
+      "label": "📝 Git: View Recent Commits",
+      "type": "shell",
+      "command": "git log --oneline -10",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      }
+    },
+    {
+      "label": "🔙 Git: Pull Latest",
+      "type": "shell",
+      "command": "git pull origin main",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": false
+      }
+    },
+    {
+      "label": "🌐 Deploy to Vercel",
+      "type": "shell",
+      "command": "git add . && git commit -m 'Deploy: ${input:deployMessage}' && git push origin main && echo '⏳ Deployment started... Check Vercel dashboard in 2 minutes'",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "🗄️ Supabase: Open SQL Editor",
+      "type": "shell",
+      "command": "echo 'Opening Supabase SQL Editor...' && xdg-open 'https://supabase.com/dashboard/project/yawxlwcniqfspcgefuro/sql/new' || open 'https://supabase.com/dashboard/project/yawxlwcniqfspcgefuro/sql/new' || start 'https://supabase.com/dashboard/project/yawxlwcniqfspcgefuro/sql/new'",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "never"
+      }
+    },
+    {
+      "label": "🗄️ Supabase: Open Auth Users",
+      "type": "shell",
+      "command": "echo 'Opening Supabase Auth Dashboard...' && xdg-open 'https://supabase.com/dashboard/project/yawxlwcniqfspcgefuro/auth/users' || open 'https://supabase.com/dashboard/project/yawxlwcniqfspcgefuro/auth/users' || start 'https://supabase.com/dashboard/project/yawxlwcniqfspcgefuro/auth/users'",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "never"
+      }
+    },
+    {
+      "label": "🌐 Open Live Site",
+      "type": "shell",
+      "command": "echo 'Opening https://www.akura.in...' && xdg-open 'https://www.akura.in' || open 'https://www.akura.in' || start 'https://www.akura.in'",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "never"
+      }
+    },
+    {
+      "label": "🔧 Open Local Preview",
+      "type": "shell",
+      "command": "echo 'Opening http://localhost:3000...' && xdg-open 'http://localhost:3000' || open 'http://localhost:3000' || start 'http://localhost:3000'",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "never"
+      }
+    },
+    {
+      "label": "🧹 Clean Port 3000",
+      "type": "shell",
+      "command": "fuser -k 3000/tcp 2>/dev/null || pkill -f 'http.server 3000' || echo 'Port 3000 is clean'",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      }
+    },
+    {
+      "label": "📦 Backup Project",
+      "type": "shell",
+      "command": "cd /home/user && tar -czf webapp-backup-$(date +%Y%m%d-%H%M%S).tar.gz webapp/ && echo '✅ Backup created successfully!'",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "commitMessage",
+      "type": "promptString",
+      "description": "Enter commit message:",
+      "default": "Update: dashboard improvements"
+    },
+    {
+      "id": "deployMessage",
+      "type": "promptString",
+      "description": "Enter deployment message:",
+      "default": "Production deployment"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "folders": [
+    {
+      "name": "🏠 SafeStride Root",
+      "path": ".."
+    },
+    {
+      "name": "🎨 Frontend",
+      "path": "../frontend"
+    },
+    {
+      "name": "⚙️ Backend",
+      "path": "../backend"
+    },
+    {
+      "name": "🗄️ Database",
+      "path": "../database"
+    },
+    {
+      "name": "📚 Documentation",
+      "path": "../."
+    }
+  ],
+  "settings": {
+    "files.autoSave": "afterDelay",
+    "liveServer.settings.port": 3000,
+    "liveServer.settings.root": "/frontend"
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": []
+  }
+}
