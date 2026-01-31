@@ -1281,6 +1281,7 @@
     // ========================================
     async function loadTodaysWorkout(userId) {
       try {
+        console.log('🏋️ Loading today\'s workout...');
         const today = new Date().toISOString().split('T')[0];
         
         const { data, error } = await supabase
@@ -1288,20 +1289,42 @@
           .select('*')
           .eq('athlete_id', userId)
           .eq('scheduled_date', today)
-          .single();
+          .eq('status', 'scheduled')
+          .maybeSingle();
         
-        if (data) {
-          document.getElementById('workoutTitle').textContent = data.workout_type || 'Workout';
-          document.getElementById('workoutDuration').textContent = `${data.duration_minutes || 0} min`;
-          document.getElementById('workoutLocation').textContent = data.location || 'Anywhere';
-          document.getElementById('workoutRPE').textContent = `${data.target_rpe || 0}/10`;
-        }
-        
-        // Update date
+        // Update date first
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         document.getElementById('workoutDate').textContent = new Date().toLocaleDateString('en-US', options);
+        
+        if (error) {
+          console.error('❌ Error loading workout:', error);
+          throw error;
+        }
+        
+        if (data) {
+          // Workout found - display it
+          document.getElementById('workoutTitle').textContent = data.workout_type || 'Scheduled Workout';
+          document.getElementById('workoutDuration').textContent = `${data.duration_minutes || 45} min`;
+          document.getElementById('workoutLocation').textContent = data.location || 'Anywhere';
+          document.getElementById('workoutRPE').textContent = data.target_rpe ? `${data.target_rpe}/10` : '6-7/10';
+          
+          console.log('✅ Today\'s workout loaded:', data.workout_type);
+        } else {
+          // No workout scheduled - show Rest Day
+          document.getElementById('workoutTitle').textContent = '🌟 Rest Day';
+          document.getElementById('workoutDuration').textContent = 'Recovery';
+          document.getElementById('workoutLocation').textContent = 'Take it easy';
+          document.getElementById('workoutRPE').textContent = 'N/A';
+          
+          console.log('✅ No workout scheduled - Rest Day');
+        }
       } catch (error) {
-        console.error('Error loading workout:', error);
+        console.error('❌ Error loading today\'s workout:', error);
+        // Set fallback values
+        document.getElementById('workoutTitle').textContent = 'No Workout Scheduled';
+        document.getElementById('workoutDuration').textContent = '--';
+        document.getElementById('workoutLocation').textContent = '--';
+        document.getElementById('workoutRPE').textContent = '--';
       }
     }
     
@@ -1515,76 +1538,158 @@
     // ========================================
     async function loadPillarChart(userId) {
       try {
+        console.log('📊 Loading 6-Pillar progress chart...');
+        
         const { data, error } = await supabase
           .from('pillar_progress')
           .select('*')
           .eq('athlete_id', userId)
-          .order('week_number', { ascending: true });
+          .order('week_number', { ascending: false })
+          .limit(1)
+          .maybeSingle();
         
-        if (data && data.length > 0) {
-          const ctx = document.getElementById('pillarChart').getContext('2d');
+        if (error) {
+          console.error('❌ Error loading pillar data:', error);
+        }
+        
+        const ctx = document.getElementById('pillarChart');
+        if (!ctx) {
+          console.error('❌ pillarChart canvas not found');
+          return;
+        }
+        
+        const chartContext = ctx.getContext('2d');
+        
+        if (data) {
+          // Use real pillar data
+          const pillarData = [
+            data.mobility_score || 0,
+            data.stability_score || 0,
+            data.strength_score || 0,
+            data.endurance_score || 0,
+            data.technique_score || 0,
+            data.recovery_score || 0
+          ];
           
-          new Chart(ctx, {
-            type: 'line',
+          console.log('✅ Pillar data loaded for week', data.week_number, pillarData);
+          
+          new Chart(chartContext, {
+            type: 'radar',
             data: {
-              labels: data.map(d => `Week ${d.week_number}`),
-              datasets: [
-                {
-                  label: 'Mobility',
-                  data: data.map(d => d.mobility_score),
-                  borderColor: '#667eea',
-                  tension: 0.4
-                },
-                {
-                  label: 'Stability',
-                  data: data.map(d => d.stability_score),
-                  borderColor: '#f093fb',
-                  tension: 0.4
-                },
-                {
-                  label: 'Strength',
-                  data: data.map(d => d.strength_score),
-                  borderColor: '#4facfe',
-                  tension: 0.4
-                },
-                {
-                  label: 'Endurance',
-                  data: data.map(d => d.endurance_score),
-                  borderColor: '#43e97b',
-                  tension: 0.4
-                },
-                {
-                  label: 'Technique',
-                  data: data.map(d => d.technique_score),
-                  borderColor: '#fa709a',
-                  tension: 0.4
-                },
-                {
-                  label: 'Recovery',
-                  data: data.map(d => d.recovery_score),
-                  borderColor: '#fee140',
-                  tension: 0.4
-                }
-              ]
+              labels: ['Mobility', 'Stability', 'Strength', 'Endurance', 'Technique', 'Recovery'],
+              datasets: [{
+                label: `Week ${data.week_number}`,
+                data: pillarData,
+                backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                borderColor: '#667eea',
+                borderWidth: 2,
+                pointBackgroundColor: '#667eea',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: '#667eea',
+                pointRadius: 5,
+                pointHoverRadius: 7
+              }]
             },
             options: {
               responsive: true,
+              maintainAspectRatio: false,
               plugins: {
                 legend: {
-                  position: 'bottom'
+                  display: false
+                },
+                tooltip: {
+                  callbacks: {
+                    label: function(context) {
+                      return `${context.label}: ${context.parsed.r}/100`;
+                    }
+                  }
                 }
               },
               scales: {
-                y: {
+                r: {
                   beginAtZero: true,
-                  max: 100
+                  max: 100,
+                  ticks: {
+                    stepSize: 20,
+                    font: {
+                      size: 12
+                    }
+                  },
+                  pointLabels: {
+                    font: {
+                      size: 14,
+                      weight: '600'
+                    }
+                  },
+                  grid: {
+                    color: 'rgba(0, 0, 0, 0.1)'
+                  }
+                }
+              }
+            }
+          });
+        } else {
+          // No pillar data - show placeholder
+          console.log('⚠️ No pillar data found - showing placeholder');
+          
+          // Create a placeholder chart with sample data
+          new Chart(chartContext, {
+            type: 'radar',
+            data: {
+              labels: ['Mobility', 'Stability', 'Strength', 'Endurance', 'Technique', 'Recovery'],
+              datasets: [{
+                label: 'Complete Assessment',
+                data: [50, 50, 50, 50, 50, 50],
+                backgroundColor: 'rgba(200, 200, 200, 0.2)',
+                borderColor: '#ccc',
+                borderWidth: 2,
+                pointBackgroundColor: '#ccc',
+                pointBorderColor: '#fff',
+                pointRadius: 5
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  display: false
+                },
+                tooltip: {
+                  callbacks: {
+                    label: function(context) {
+                      return 'Complete your assessment to see scores';
+                    }
+                  }
+                }
+              },
+              scales: {
+                r: {
+                  beginAtZero: true,
+                  max: 100,
+                  ticks: {
+                    stepSize: 20,
+                    font: {
+                      size: 12
+                    }
+                  },
+                  pointLabels: {
+                    font: {
+                      size: 14,
+                      weight: '600'
+                    }
+                  },
+                  grid: {
+                    color: 'rgba(0, 0, 0, 0.1)'
+                  }
                 }
               }
             }
           });
         }
       } catch (error) {
-        console.error('Error loading chart:', error);
+        console.error('❌ Error loading pillar chart:', error);
       }
     }
     

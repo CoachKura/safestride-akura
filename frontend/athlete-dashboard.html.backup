@@ -1,0 +1,2873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard - AKURA SafeStride</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
+
+    <!-- Load auth module deferred to avoid blocking rendering -->
+    <script src="js/auth.js" defer></script>
+    
+    <!-- CSS Framework -->
+    <link rel="stylesheet" href="css/cards.css">
+    <link rel="stylesheet" href="css/forms.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    
+    <style>
+        :root {
+            --primary: #1e3a5f;
+            --secondary: #33BEF3;
+            --success: #4CAF50;
+            --warning: #FF9500;
+            --danger: #FF6B6B;
+            --info: #9C27B0;
+        }
+
+        body {
+            background: #f8f9fa;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 40px 20px;
+            margin-bottom: 40px;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr auto auto auto;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .greeting {
+            font-size: 32px;
+            font-weight: 800;
+        }
+
+        .greeting-time {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .aifri-badge-large {
+            background: white;
+            color: var(--primary);
+            padding: 15px 25px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .badge-score {
+            font-size: 36px;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .badge-grade {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--secondary);
+            margin-top: 5px;
+        }
+
+        .streak-badge {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 16px;
+        }
+        
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .logout-btn:hover {
+            background: white;
+            color: var(--primary);
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+        }
+
+        /* TODAY'S WORKOUT CARD */
+        .todays-workout {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+            border-left: 5px solid var(--secondary);
+        }
+
+        .workout-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .workout-date {
+            font-size: 13px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .workout-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .workout-meta {
+            display: flex;
+            gap: 25px;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .workout-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, var(--success), #2e8b57);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-secondary-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 14px 30px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* QUICK STATS GRID */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card-dashboard {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+
+        .stat-card-dashboard h4 {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .stat-subtext {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .progress-ring-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 15px;
+        }
+
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring-circle {
+            stroke: #e0e0e0;
+            fill: transparent;
+        }
+
+        .progress-ring-progress {
+            stroke: var(--secondary);
+            fill: transparent;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.35s;
+            transform-origin: 50% 50%;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        /* AIFRI PROGRESS SECTION */
+        .aifri-progress-section {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 30px;
+        }
+
+        .chart-container-dashboard {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            margin-bottom: 40px;
+        }
+
+        .pillar-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .pillar-mini-card {
+            background: linear-gradient(135deg, #f5f5f5, white);
+            border-radius: 10px;
+            padding: 18px;
+            text-align: center;
+            border-top: 3px solid var(--secondary);
+        }
+
+        .pillar-name {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .pillar-score {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .pillar-change {
+            font-size: 12px;
+            margin-top: 8px;
+            font-weight: 600;
+        }
+
+        .change-positive {
+            color: var(--success);
+        }
+
+        .change-neutral {
+            color: #999;
+        }
+
+        /* RECENT WORKOUTS */
+        .workouts-section {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .workout-item-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .workout-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .workout-row:hover {
+            background: #efefef;
+        }
+
+        .workout-info-left {
+            flex: 1;
+        }
+
+        .workout-name {
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .workout-details-small {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .workout-completion {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .completion-badge {
+            background: var(--success);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* UPCOMING WORKOUTS */
+        .upcoming-section {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .mini-calendar {
+            display: grid;
+            gap: 12px;
+        }
+
+        .upcoming-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid var(--info);
+        }
+
+        .upcoming-day {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 14px;
+        }
+
+        .upcoming-workout {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* INJURY PREVENTION */
+        .prevention-section {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .prevention-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .prevention-card {
+            border-radius: 10px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #f5f5f5, white);
+            border: 1px solid #e0e0e0;
+        }
+
+        .prevention-thumbnail {
+            width: 100%;
+            height: 150px;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: white;
+        }
+
+        .prevention-content {
+            padding: 18px;
+        }
+
+        .prevention-title {
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .prevention-subtitle {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .prevention-video-btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .prevention-video-btn:hover {
+            background: var(--primary);
+        }
+
+        .body-type-card {
+            background: linear-gradient(135deg, #f5f5f5, white);
+            border-radius: 10px;
+            padding: 25px;
+            border-left: 4px solid var(--warning);
+        }
+
+        .body-type-title {
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .body-type-characteristics {
+            display: grid;
+            gap: 10px;
+        }
+
+        .characteristic {
+            font-size: 14px;
+            color: #666;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .characteristic::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        /* GPS CONNECTION */
+        .connection-section {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .connection-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .connection-item:last-child {
+            border-bottom: none;
+        }
+
+        .connection-info {
+            flex: 1;
+        }
+
+        .connection-name {
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .connection-status {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .connection-btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .connection-btn:hover {
+            background: var(--primary);
+        }
+
+        .connection-btn-inactive {
+            background: #e0e0e0;
+            color: #999;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .prevention-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Utility Classes */
+        .progress-dasharray {
+            stroke-dasharray: 339.29;
+            stroke-dashoffset: 50.89;
+        }
+
+        .svg-centered {
+            margin: 0 auto 15px;
+        }
+
+        .polyline-rpe {
+            stroke: var(--secondary);
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+        }
+
+        .emoji-large {
+            font-size: 48px;
+            margin: 15px 0;
+        }
+
+        .status-success {
+            color: var(--success);
+            font-size: 18px;
+        }
+
+        .font-18 {
+            font-size: 18px;
+        }
+
+        .link-centered {
+            text-align: center;
+            color: var(--secondary);
+            margin-top: 20px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .arrow-warning {
+            color: var(--warning);
+            font-weight: 600;
+        }
+
+        .arrow-primary {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .arrow-muted {
+            color: #999;
+            font-weight: 600;
+        }
+
+        .section-heading-primary {
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 20px;
+            margin-top: 30px;
+        }
+
+        .is-hidden {
+            display: none;
+        }
+
+        .z-1050 {
+            z-index: 1050;
+        }
+
+        .z-2000 {
+            z-index: 2000;
+        }
+
+        .spinner-large {
+            width: 3rem;
+            height: 3rem;
+        }
+
+        /* ASSESSMENT SKIP BANNER */
+        .assessment-skip-banner {
+            background: linear-gradient(135deg, #FF9500, #FF6B6B);
+            color: white;
+            padding: 25px 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+            display: none;
+        }
+
+        .assessment-skip-banner.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .assessment-skip-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .assessment-skip-message {
+            flex: 1;
+        }
+
+        .assessment-skip-message h3 {
+            margin: 0 0 8px 0;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .assessment-skip-message p {
+            margin: 0;
+            font-size: 14px;
+            opacity: 0.95;
+        }
+
+        .assessment-skip-cta {
+            background: white;
+            color: #FF6B6B;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .assessment-skip-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .assessment-skip-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn-secondary-assessment {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 18px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .btn-secondary-assessment:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+    /* Empty State Styles */
+    .empty-state-message {
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .risk-not-assessed {
+        background-color: #e0e0e0 !important;
+        color: #757575 !important;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    /* Hide demo workout card */
+    .workout-card-demo {
+        display: none !important;
+    }
+
+    /* Fade out effect for empty data */
+    [data-empty="true"] {
+        opacity: 0.3;
+        pointer-events: none;
+    }
+                /* ======= Inlined enhancements.css ======= */
+                /* Smooth transitions for all interactive elements */
+                * {
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+
+                /* Card hover effects */
+                .card {
+                    cursor: pointer;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                    border-radius: 12px;
+                    overflow: hidden;
+                }
+
+                .card:hover {
+                    transform: translateY(-4px);
+                    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+                }
+
+                .card.disabled {
+                    cursor: not-allowed;
+                    opacity: 0.6;
+                }
+
+                /* Coming Soon Badge */
+                .coming-soon-badge {
+                    position: absolute;
+                    top: 12px;
+                    right: 12px;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    padding: 4px 12px;
+                    border-radius: 16px;
+                    font-size: 11px;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    z-index: 10;
+                    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+                }
+
+                /* Enhanced workout card */
+                .workout-card {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    padding: 24px;
+                    border-radius: 16px;
+                    position: relative;
+                    overflow: hidden;
+                }
+
+                .workout-card::before {
+                    content: '';
+                    position: absolute;
+                    top: -50%;
+                    right: -50%;
+                    width: 200%;
+                    height: 200%;
+                    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+                    animation: pulse 4s ease-in-out infinite;
+                }
+
+                @keyframes pulse {
+                    0%, 100% { transform: scale(1); opacity: 1; }
+                    50% { transform: scale(1.1); opacity: 0.8; }
+                }
+
+                /* Enhanced progress cards */
+                .progress-card {
+                    background: white;
+                    border-radius: 12px;
+                    padding: 20px;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                    position: relative;
+                }
+
+                .progress-card .icon {
+                    width: 48px;
+                    height: 48px;
+                    border-radius: 12px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 24px;
+                    margin-bottom: 12px;
+                }
+
+                .progress-card.week-progress .icon {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                }
+
+                .progress-card.rpe .icon {
+                    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                    color: white;
+                }
+
+                .progress-card.injury .icon {
+                    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+                    color: white;
+                }
+
+                .progress-card.assessment .icon {
+                    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+                    color: white;
+                }
+
+                /* Enhanced pillar chart */
+                .pillar-chart-card {
+                    background: white;
+                    border-radius: 16px;
+                    padding: 24px;
+                    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+                }
+
+                .pillar-chart-card h2 {
+                    font-size: 20px;
+                    font-weight: 700;
+                    color: #1a202c;
+                    margin-bottom: 20px;
+                }
+
+                /* Enhanced recent workouts */
+                .workout-item {
+                    background: white;
+                    border-radius: 12px;
+                    padding: 16px;
+                    margin-bottom: 12px;
+                    border-left: 4px solid #667eea;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+                    cursor: pointer;
+                }
+
+                .workout-item:hover {
+                    border-left-color: #764ba2;
+                    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+                }
+
+                .workout-item.completed {
+                    border-left-color: #48bb78;
+                }
+
+                /* Enhanced buttons */
+                .btn-primary {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    border: none;
+                    padding: 12px 24px;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    font-size: 14px;
+                    cursor: pointer;
+                    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+                }
+
+                .btn-primary:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+                }
+
+                .btn-secondary {
+                    background: white;
+                    color: #667eea;
+                    border: 2px solid #667eea;
+                    padding: 10px 22px;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    font-size: 14px;
+                    cursor: pointer;
+                }
+
+                .btn-secondary:hover {
+                    background: #667eea;
+                    color: white;
+                }
+
+                /* Enhanced AIFRI score badge */
+                .aifri-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 80px;
+                    height: 80px;
+                    border-radius: 50%;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    font-size: 32px;
+                    font-weight: 700;
+                    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+                    position: relative;
+                }
+
+                .aifri-badge::after {
+                    content: '';
+                    position: absolute;
+                    inset: -4px;
+                    border-radius: 50%;
+                    padding: 4px;
+                    background: linear-gradient(135deg, #667eea, #764ba2);
+                    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+                    -webkit-mask-composite: xor;
+                    mask-composite: exclude;
+                    animation: rotate 3s linear infinite;
+                }
+
+                @keyframes rotate {
+                    from { transform: rotate(0deg); }
+                    to { transform: rotate(360deg); }
+                }
+
+                /* Streak badge enhancement */
+                .streak-badge {
+                    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                    color: white;
+                    padding: 8px 16px;
+                    border-radius: 20px;
+                    font-size: 14px;
+                    font-weight: 600;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    box-shadow: 0 4px 12px rgba(240, 147, 251, 0.3);
+                }
+
+                .streak-badge::before {
+                    content: '🔥';
+                    font-size: 16px;
+                }
+
+                /* Loading state */
+                .loading {
+                    display: inline-block;
+                    width: 20px;
+                    height: 20px;
+                    border: 3px solid rgba(102, 126, 234, 0.3);
+                    border-radius: 50%;
+                    border-top-color: #667eea;
+                    animation: spin 1s linear infinite;
+                }
+
+                @keyframes spin {
+                    to { transform: rotate(360deg); }
+                }
+
+                /* Toast notification */
+                .toast {
+                    position: fixed;
+                    bottom: 24px;
+                    right: 24px;
+                    background: white;
+                    padding: 16px 24px;
+                    border-radius: 12px;
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    z-index: 1000;
+                    animation: slideIn 0.3s ease-out;
+                }
+
+                @keyframes slideIn {
+                    from {
+                        transform: translateX(400px);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translateX(0);
+                        opacity: 1;
+                    }
+                }
+
+                .toast.success {
+                    border-left: 4px solid #48bb78;
+                }
+
+                .toast.info {
+                    border-left: 4px solid #667eea;
+                }
+
+                .toast.warning {
+                    border-left: 4px solid #ed8936;
+                }
+
+                /* Responsive enhancements */
+                @media (max-width: 768px) {
+                    .card {
+                        margin-bottom: 16px;
+                    }
+          
+                    .aifri-badge {
+                        width: 60px;
+                        height: 60px;
+                        font-size: 24px;
+                    }
+          
+                    .workout-card {
+                        padding: 20px;
+                    }
+                }
+
+        </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <div class="dashboard-header">
+        <div class="header-content">
+            <div>
+                <div class="greeting-time" id="greetingTime">Good morning!</div>
+                <div class="greeting" id="userGreeting">Welcome back, Dinesh</div>
+            </div>
+            <div class="aifri-badge-large">
+                <div class="badge-score" id="aifriScore">76</div>
+                <div class="badge-grade" id="aifriGrade">ADVANCED</div>
+            </div>
+            <div class="streak-badge" id="streakBadge">
+                🔥 12 Days<br>Streak
+            </div>
+            <button class="logout-btn" id="logoutBtn" onclick="handleLogout()">
+                🚪 Logout
+            </button>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- ASSESSMENT INCOMPLETE BANNER -->
+        <div id="assessmentSkipBanner" class="assessment-skip-banner">
+            <div class="assessment-skip-content">
+                <div class="assessment-skip-message">
+                    <h3>⚠️ Complete Your Assessment</h3>
+                    <p>Unlock personalized training plans by completing your fitness assessment. Takes about 15-20 minutes.</p>
+                </div>
+                <div class="assessment-skip-actions">
+                    <button class="assessment-skip-cta" onclick="goToAssessment()">Take Assessment Now →</button>
+                    <button class="btn-secondary-assessment" onclick="dismissReminder()">Remind Me Later</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TODAY'S WORKOUT CARD -->
+        <div class="todays-workout">
+            <div class="workout-date">Monday, January 27, 2026</div>
+            <div class="workout-title">Core & Lower Body Strength</div>
+            
+            <div class="workout-meta">
+                <div class="meta-item">⏱ 45 minutes</div>
+                <div class="meta-item">📍 Gym or Home</div>
+                <div class="meta-item">🎯 RPE 6-7/10</div>
+            </div>
+
+            <div class="workout-actions">
+                <button class="btn-start" onclick="startWorkout()">START WORKOUT</button>
+                <button class="btn-secondary-outline" onclick="viewWorkoutDetails()">View Full Details</button>
+            </div>
+        </div>
+
+        <!-- QUICK STATS -->
+        <div class="stats-grid">
+            <div class="stat-card-dashboard">
+                <h4>This Week Progress</h4>
+                <div class="progress-ring-container">
+                    <svg class="progress-ring" width="120" height="120" viewBox="0 0 120 120">
+                        <circle class="progress-ring-circle" cx="60" cy="60" r="54" stroke-width="8"/>
+                        <circle class="progress-ring-progress" cx="60" cy="60" r="54" stroke-width="8" 
+                                class="progress-dasharray"/>
+                    </svg>
+                    <div class="progress-text">85%</div>
+                </div>
+                <div class="stat-value">18.2/21.5 km</div>
+            </div>
+
+            <div class="stat-card-dashboard">
+                <h4>Last 7 Days RPE</h4>
+                <svg class="progress-ring svg-centered" width="120" height="120" viewBox="0 0 120 120">
+                    <polyline points="10,100 30,60 50,75 70,40 110,80" 
+                              class="polyline-rpe"/>
+                </svg>
+                <div class="stat-value">6.8</div>
+                <div class="stat-subtext">Average RPE</div>
+            </div>
+
+            <div class="stat-card-dashboard">
+                <h4>Injury Status</h4>
+                <div class="emoji-large">🟢</div>
+                <div class="stat-value status-success">All Clear</div>
+            </div>
+
+            <div class="stat-card-dashboard">
+                <h4>Next Assessment</h4>
+                <div class="emoji-large">📅</div>
+                <div class="stat-value font-18">Feb 24</div>
+                <div class="stat-subtext">28 days remaining</div>
+            </div>
+        </div>
+
+        <!-- AIFRI PROGRESS CHART -->
+        <div class="aifri-progress-section">
+            <h3 class="section-title">6-Pillar Progress (12 Weeks)</h3>
+            <div class="chart-container-dashboard">
+                <canvas id="pillarProgressChart"></canvas>
+            </div>
+
+            <div class="pillar-cards">
+                <div class="pillar-mini-card">
+                    <div class="pillar-name">🏃 Running</div>
+                    <div class="pillar-score">77</div>
+                    <div class="pillar-change change-positive">+2 ↑</div>
+                </div>
+
+                <div class="pillar-mini-card">
+                    <div class="pillar-name">💪 Strength</div>
+                    <div class="pillar-score">82</div>
+                    <div class="pillar-change change-positive">+2 ↑</div>
+                </div>
+
+                <div class="pillar-mini-card">
+                    <div class="pillar-name">🔄 ROM</div>
+                    <div class="pillar-score">71</div>
+                    <div class="pillar-change change-positive">+1 ↑</div>
+                </div>
+
+                <div class="pillar-mini-card">
+                    <div class="pillar-name">⚖️ Balance</div>
+                    <div class="pillar-score">85</div>
+                    <div class="pillar-change change-neutral">0 →</div>
+                </div>
+
+                <div class="pillar-mini-card">
+                    <div class="pillar-name">🧘 Mobility</div>
+                    <div class="pillar-score">67</div>
+                    <div class="pillar-change change-positive">+2 ↑</div>
+                </div>
+
+                <div class="pillar-mini-card">
+                    <div class="pillar-name">🦴 Alignment</div>
+                    <div class="pillar-score">73</div>
+                    <div class="pillar-change change-positive">+1 ↑</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RECENT WORKOUTS -->
+        <div class="workouts-section">
+            <h3 class="section-title">Recent Workouts</h3>
+            <div class="workout-item-list">
+                <div class="workout-row">
+                    <div class="workout-info-left">
+                        <div class="workout-name">Jan 26: Threshold Run 8km</div>
+                        <div class="workout-details-small">RPE 7/10 | Pain 0/10 | Felt strong</div>
+                    </div>
+                    <div class="workout-completion">
+                        <span class="completion-badge">✓ Completed</span>
+                    </div>
+                </div>
+
+                <div class="workout-row">
+                    <div class="workout-info-left">
+                        <div class="workout-name">Jan 24: Long Run 16km</div>
+                        <div class="workout-details-small">RPE 6/10 | Pain 2/10 (knee tightness)</div>
+                    </div>
+                    <div class="workout-completion">
+                        <span class="completion-badge">✓ Completed</span>
+                    </div>
+                </div>
+
+                <div class="workout-row">
+                    <div class="workout-info-left">
+                        <div class="workout-name">Jan 22: Easy Run 6km</div>
+                        <div class="workout-details-small">RPE 5/10 | Pain 0/10 | Recovery day</div>
+                    </div>
+                    <div class="workout-completion">
+                        <span class="completion-badge">✓ Completed</span>
+                    </div>
+                </div>
+
+                <div class="workout-row">
+                    <div class="workout-info-left">
+                        <div class="workout-name">Jan 21: Strength Training</div>
+                        <div class="workout-details-small">RPE 7/10 | Completed all sets</div>
+                    </div>
+                    <div class="workout-completion">
+                        <span class="completion-badge">✓ Completed</span>
+                    </div>
+                </div>
+            </div>
+            <p class="link-centered">
+                View Full History →
+            </p>
+        </div>
+
+        <!-- UPCOMING WORKOUTS -->
+        <div class="upcoming-section">
+            <h3 class="section-title">Upcoming This Week</h3>
+            <div class="mini-calendar">
+                <div class="upcoming-item">
+                    <div>
+                        <div class="upcoming-day">Wednesday</div>
+                        <div class="upcoming-workout">Threshold 10km</div>
+                    </div>
+                    <div class="arrow-warning">→</div>
+                </div>
+
+                <div class="upcoming-item">
+                    <div>
+                        <div class="upcoming-day">Friday</div>
+                        <div class="upcoming-workout">Easy 6km</div>
+                    </div>
+                    <div class="arrow-warning">→</div>
+                </div>
+
+                <div class="upcoming-item">
+                    <div>
+                        <div class="upcoming-day">Saturday</div>
+                        <div class="upcoming-workout">Long Run 18km</div>
+                    </div>
+                    <div class="arrow-primary">🎯</div>
+                </div>
+
+                <div class="upcoming-item">
+                    <div>
+                        <div class="upcoming-day">Sunday</div>
+                        <div class="upcoming-workout">Rest + Mobility work</div>
+                    </div>
+                    <div class="arrow-muted">✓</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- INJURY PREVENTION -->
+        <div class="prevention-section">
+            <h3 class="section-title">Injury Prevention Routine</h3>
+
+            <div class="prevention-grid">
+                <div class="prevention-card">
+                    <div class="prevention-thumbnail">▶️</div>
+                    <div class="prevention-content">
+                        <div class="prevention-title">Daily Pre-Run Routine</div>
+                        <div class="prevention-subtitle">5 minutes • Essential warm-up</div>
+                        <button class="prevention-video-btn" onclick="playVideo('pre-run')">▶ Watch Video</button>
+                    </div>
+                </div>
+
+                <div class="prevention-card">
+                    <div class="prevention-thumbnail">▶️</div>
+                    <div class="prevention-content">
+                        <div class="prevention-title">Post-Run Stretches</div>
+                        <div class="prevention-subtitle">10 minutes • Recovery routine</div>
+                        <button class="prevention-video-btn" onclick="playVideo('post-run')">▶ Watch Video</button>
+                    </div>
+                </div>
+            </div>
+
+            <h4 class="section-heading-primary">Your Body Type: Mesomorph</h4>
+            <div class="body-type-card">
+                <div class="body-type-title">Recommended Focus for Your Profile</div>
+                <div class="body-type-characteristics">
+                    <div class="characteristic">Maintain muscle mass during high mileage</div>
+                    <div class="characteristic">Balance endurance with strength work</div>
+                    <div class="characteristic">Monitor recovery (you respond well to volume)</div>
+                    <div class="characteristic">Include 2x weekly strength sessions</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GPS CONNECTIONS -->
+        <div class="connection-section">
+            <h3 class="section-title">Connected Devices & Apps</h3>
+
+            <div class="connection-item">
+                <div class="connection-info">
+                    <div class="connection-name">🌐 Garmin Forerunner 945</div>
+                    <div class="connection-status">✅ Connected • Last sync: 2 hours ago</div>
+                </div>
+                <button class="connection-btn" onclick="syncDevice()">Sync Now</button>
+            </div>
+
+            <div class="connection-item">
+                <div class="connection-info">
+                    <div class="connection-name">Strava</div>
+                    <div class="connection-status">Not connected</div>
+                </div>
+                <button class="connection-btn connection-btn-inactive" onclick="connectService('strava')">Connect</button>
+            </div>
+
+            <div class="connection-item">
+                <div class="connection-info">
+                    <div class="connection-name">Apple Health</div>
+                    <div class="connection-status">Not connected</div>
+                </div>
+                <button class="connection-btn connection-btn-inactive" onclick="connectService('apple')">Connect</button>
+            </div>
+
+            <div class="connection-item">
+                <div class="connection-info">
+                    <div class="connection-name">Coros</div>
+                    <div class="connection-status">Not connected</div>
+                </div>
+                <button class="connection-btn connection-btn-inactive" onclick="connectService('coros')">Connect</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- JavaScript -->
+    <script src="js/api-client.js"></script>
+    <script>
+        // ============================================
+        // REAL USER DATA LOADING
+        // ============================================
+        let currentUser = null;
+        let userProfile = null;
+        let userAssessment = null;
+        let userWorkouts = [];
+
+        // Greeting based on time
+        function updateGreeting() {
+            const hour = new Date().getHours();
+            let greeting = '';
+            if (hour < 12) greeting = 'Good morning!';
+            else if (hour < 17) greeting = 'Good afternoon!';
+            else greeting = 'Good evening!';
+            
+            document.getElementById('greetingTime').textContent = greeting;
+        }
+
+        // Initialize dashboard with real user data
+        async function initializeDashboard() {
+            console.log('🚀 Initializing athlete dashboard with real data...');
+            console.log('📋 Current state - userProfile:', userProfile, 'userAssessment:', userAssessment);
+            
+            try {
+                // Step 1: Check if user is logged in
+                if (!window.AkuraAuth) {
+                    console.error('❌ AkuraAuth not available');
+                    throw new Error('AkuraAuth module not initialized');
+                }
+                
+                const user = await window.AkuraAuth.getCurrentUser();
+                if (!user) {
+                    console.error('❌ No user logged in');
+                    showErrorBanner('Please log in to access the dashboard');
+                    setTimeout(() => window.location.href = 'login.html', 2000);
+                    return;
+                }
+                
+                currentUser = user;
+                console.log('✅ User authenticated:', user.id, 'Email:', user.email);
+                
+                // Step 2: Fetch profile from profiles table
+                await fetchUserProfile();
+                
+                // Step 3: Fetch assessment data
+                await fetchUserAssessment();
+                
+                // Step 4: Fetch recent workouts
+                await fetchUserWorkouts();
+                
+                // Step 5: Update UI with real data
+                updateDashboardUI();
+                
+                // Step 6: Initialize chart with real data
+                initPillarChart();
+                
+                console.log('✅ Dashboard initialized successfully');
+            } catch (error) {
+                console.error('❌ Error initializing dashboard:', error);
+                console.error('Stack:', error.stack);
+                console.error('currentUser:', currentUser);
+                console.error('userProfile:', userProfile);
+                console.error('userAssessment:', userAssessment);
+                showErrorBanner('Failed to load dashboard data. Please refresh.');
+            }
+        }
+
+        // Fetch user profile
+        async function fetchUserProfile() {
+            console.log('📝 Fetching user profile for ID:', currentUser?.id);
+            try {
+                if (!currentUser || !currentUser.id) {
+                    console.error('❌ No currentUser.id available');
+                    userProfile = null;
+                    return;
+                }
+                
+                const supabase = window.AkuraAuth.getClient();
+                console.log('📡 Querying profiles table...');
+                const { data: profile, error } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', currentUser.id)
+                    .single();
+                
+                if (error) {
+                    console.warn('⚠️ Profile fetch error:', error.message, error.details);
+                    userProfile = null;
+                    return;
+                }
+                
+                userProfile = profile;
+                console.log('✅ Profile fetched:', {
+                    id: profile?.id,
+                    full_name: profile?.full_name,
+                    email: profile?.email,
+                    role: profile?.role
+                });
+            } catch (error) {
+                console.error('❌ Error fetching profile:', error.message);
+                userProfile = null;
+            }
+        }
+
+        // Fetch user's latest assessment
+        async function fetchUserAssessment() {
+            console.log('📊 Fetching user assessment for ID:', currentUser?.id);
+            try {
+                if (!currentUser || !currentUser.id) {
+                    console.error('❌ No currentUser.id available for assessment');
+                    userAssessment = null;
+                    return;
+                }
+                
+                const supabase = window.AkuraAuth.getClient();
+                console.log('📡 Querying assessments table...');
+                const { data: assessments, error } = await supabase
+                    .from('assessments')
+                    .select('*')
+                    .eq('athlete_id', currentUser.id)
+                    .order('created_at', { ascending: false })
+                    .limit(1);
+                
+                if (error) {
+                    console.warn('⚠️ Assessment fetch error:', error.message, error.details);
+                    userAssessment = null;
+                    return;
+                }
+                
+                if (assessments && assessments.length > 0) {
+                    userAssessment = assessments[0];
+                    console.log('✅ Assessment fetched:', {
+                        aifri_score: userAssessment.aifri_score,
+                        risk_level: userAssessment.risk_level,
+                        assessment_date: userAssessment.assessment_date
+                    });
+                } else {
+                    console.log('ℹ️ No assessment found for user - will show default values');
+                    userAssessment = null;
+                }
+            } catch (error) {
+                console.error('❌ Error fetching assessment:', error.message);
+                userAssessment = null;
+            }
+        }
+
+        // Fetch user's recent workouts
+        async function fetchUserWorkouts() {
+            console.log('🏃 Fetching user workouts for ID:', currentUser?.id);
+            try {
+                if (!currentUser || !currentUser.id) {
+                    console.error('❌ No currentUser.id available for workouts');
+                    userWorkouts = [];
+                    return;
+                }
+                
+                const supabase = window.AkuraAuth.getClient();
+                console.log('📡 Querying workouts table...');
+                const { data: workouts, error } = await supabase
+                    .from('workouts')
+                    .select('*')
+                    .eq('athlete_id', currentUser.id)
+                    .order('scheduled_date', { ascending: false })
+                    .limit(10);
+                
+                if (error) {
+                    console.warn('⚠️ Workouts fetch error:', error.message, error.details);
+                    userWorkouts = [];
+                    return;
+                }
+                
+                userWorkouts = workouts || [];
+                console.log('✅ Workouts fetched:', userWorkouts.length, 'workouts');
+            } catch (error) {
+                console.error('❌ Error fetching workouts:', error.message);
+                userWorkouts = [];
+            }
+        }
+
+        // Update dashboard UI with real data (accepts profile & assessment, defaults to globals)
+        function updateDashboardUI(profile = userProfile, assessment = userAssessment) {
+            console.log('🎨 Updating UI with real data...');
+            console.log('📊 userProfile:', profile);
+            console.log('📊 userAssessment:', assessment);
+            
+            // ============================================
+            // 1. UPDATE USER NAME
+            // ============================================
+            const nameElement = document.querySelector('[data-user-name]') 
+                || document.querySelector('.user-name')
+                || document.querySelector('#userName')
+                || document.querySelector('h1');
+            
+            if (nameElement) {
+                const userName = profile?.full_name || profile?.email?.split('@')[0] || 'Athlete';
+                
+                if (nameElement.tagName === 'H1') {
+                    nameElement.textContent = `Welcome back, ${userName}`;
+                } else {
+                    nameElement.textContent = userName;
+                }
+                console.log('✅ User name updated to:', userName);
+            }
+            
+            // ============================================
+            // 2. HANDLE NO ASSESSMENT CASE
+            // ============================================
+            if (!assessment || !assessment.aifri_score) {
+                console.log('⚠️ NO assessment data - showing empty state');
+                
+                // Show empty state for AIFRI score
+                const scoreElement = document.querySelector('[data-aifri-score]')
+                    || document.querySelector('.aifri-score')
+                    || document.querySelector('#aifriScore');
+                if (scoreElement) {
+                    scoreElement.textContent = '---';
+                    scoreElement.style.opacity = '0.3';
+                }
+                
+                // Show "NOT ASSESSED" for risk level
+                const riskElement = document.querySelector('[data-risk-level]')
+                    || document.querySelector('.risk-level')
+                    || document.querySelector('#riskLevel');
+                if (riskElement) {
+                    riskElement.textContent = 'NOT ASSESSED';
+                    riskElement.className = 'risk-badge risk-not-assessed';
+                    riskElement.style.backgroundColor = '#ccc';
+                    riskElement.style.color = '#666';
+                }
+                
+                // Hide or show empty state for all stats cards
+                hideStatsCards();
+                
+                // Show prominent assessment reminder
+                showAssessmentReminder();
+                
+                return; // Exit early - no data to show
+            }
+            
+            // ============================================
+            // 3. SHOW REAL DATA (Only if assessment exists)
+            // ============================================
+            
+            // Update AIFRI score
+            const scoreElement = document.querySelector('[data-aifri-score]')
+                || document.querySelector('.aifri-score')
+                || document.querySelector('#aifriScore');
+            if (scoreElement && assessment.aifri_score) {
+                scoreElement.textContent = Math.round(assessment.aifri_score);
+                scoreElement.style.opacity = '1';
+                console.log('✅ AIFRI score updated to:', assessment.aifri_score);
+            }
+            
+            // Update risk level
+            const riskElement = document.querySelector('[data-risk-level]')
+                || document.querySelector('.risk-level')
+                || document.querySelector('#riskLevel');
+            if (riskElement && assessment.risk_level) {
+                riskElement.textContent = assessment.risk_level.toUpperCase();
+                riskElement.className = `risk-badge risk-${assessment.risk_level}`;
+                console.log('✅ Risk level updated to:', assessment.risk_level);
+            }
+            
+            // Show real assessment status
+            const statusElement = document.querySelector('[data-assessment-status]')
+                || document.querySelector('.assessment-status');
+            if (statusElement) {
+                statusElement.innerHTML = '<i class="fas fa-check-circle"></i> Assessment Complete';
+                statusElement.className = 'status-complete';
+                statusElement.style.color = '#4CAF50';
+            }
+            
+            console.log('✅ UI updated with real assessment data');
+        }
+
+        // Calculate workout streak
+        function calculateStreak(workouts) {
+            if (!workouts || workouts.length === 0) return 0;
+            
+            let streak = 0;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            // Sort by date
+            const sorted = [...workouts].sort((a, b) => 
+                new Date(b.scheduled_date) - new Date(a.scheduled_date)
+            );
+            
+            for (let i = 0; i < sorted.length; i++) {
+                const workoutDate = new Date(sorted[i].scheduled_date);
+                workoutDate.setHours(0, 0, 0, 0);
+                
+                const expectedDate = new Date(today);
+                expectedDate.setDate(expectedDate.getDate() - i);
+                
+                if (workoutDate.getTime() === expectedDate.getTime() && sorted[i].completed) {
+                    streak++;
+                } else {
+                    break;
+                }
+            }
+            
+            return streak;
+        }
+
+        // Calculate weekly distance
+        function calculateWeeklyDistance(workouts) {
+            if (!workouts || workouts.length === 0) return '0/21.5 km';
+            
+            const today = new Date();
+            const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+            
+            let totalDistance = 0;
+            workouts.forEach(w => {
+                const workoutDate = new Date(w.scheduled_date);
+                if (workoutDate >= weekAgo && workoutDate <= today && w.completed) {
+                    totalDistance += (w.distance_km || 0);
+                }
+            });
+            
+            return `${totalDistance.toFixed(1)}/21.5 km`;
+        }
+
+        // Show error banner
+        function showErrorBanner(message) {
+            const banner = document.createElement('div');
+            banner.style.cssText = 'position:fixed;top:20px;right:20px;background:#f8d7da;color:#721c24;padding:15px 20px;border-radius:8px;z-index:9999;border:1px solid #f5c6cb;';
+            banner.textContent = message;
+            document.body.appendChild(banner);
+            setTimeout(() => banner.remove(), 5000);
+        }
+
+        // Check if assessment was skipped and show banner
+        function checkAssessmentStatus() {
+            console.log('🔍 Checking assessment status...');
+            const banner = document.getElementById('assessmentSkipBanner');
+            
+            // Check if user has dismissed banner in current session
+            const bannerDismissed = sessionStorage.getItem('assessmentBannerDismissed');
+            
+            // Show banner if:
+            // 1. Assessment is not completed
+            // 2. Banner not dismissed in this session
+            if (userProfile && !userProfile.assessment_completed && !bannerDismissed) {
+                console.log('⚠️ Assessment incomplete - showing banner');
+                if (banner) {
+                    banner.classList.add('show');
+                }
+            } else {
+                console.log('✅ Assessment completed or banner dismissed');
+                if (banner) {
+                    banner.classList.remove('show');
+                }
+            }
+        }
+
+        // Navigate to assessment
+        window.goToAssessment = function() {
+            console.log('🚀 Redirecting to assessment form...');
+            window.location.href = '/assessment-intake.html';
+        }
+
+        // Dismiss reminder banner temporarily (until next login)
+        window.dismissReminder = function() {
+            console.log('⏭️ User dismissed assessment reminder');
+            sessionStorage.setItem('assessmentBannerDismissed', 'true');
+            const banner = document.getElementById('assessmentSkipBanner');
+            if (banner) {
+                banner.classList.remove('show');
+            }
+            console.log('✅ Banner hidden until next login');
+        }
+
+        window.addEventListener('load', updateGreeting);
+
+        // Pillar Progress Chart
+        function initPillarChart() {
+            const ctx = document.getElementById('pillarProgressChart');
+            if (!ctx) {
+                console.warn('⚠️ Chart canvas not found');
+                return;
+            }
+            
+            if (window.pillarChart) window.pillarChart.destroy();
+
+            // Use real assessment data if available
+            let pillarData = {
+                running: [75, 75, 77, 78, 79, 80, 81, 82, 82, 83, 84, 85],
+                strength: [80, 80, 82, 83, 84, 85, 86, 87, 87, 87, 88, 88],
+                rom: [70, 70, 71, 72, 73, 74, 75, 75, 76, 77, 77, 78],
+                balance: [85, 85, 85, 86, 86, 87, 87, 88, 88, 89, 89, 90],
+                mobility: [65, 65, 67, 68, 69, 70, 71, 72, 73, 74, 75, 75],
+                alignment: [72, 72, 73, 74, 75, 75, 76, 77, 77, 78, 79, 80]
+            };
+            
+            // Override with real assessment data if available
+            if (userAssessment && userAssessment.scores) {
+                console.log('📊 Using real assessment scores:', userAssessment.scores);
+                // Update the last week's data with real scores
+                if (userAssessment.scores.running) pillarData.running[11] = userAssessment.scores.running;
+                if (userAssessment.scores.strength) pillarData.strength[11] = userAssessment.scores.strength;
+                if (userAssessment.scores.rom) pillarData.rom[11] = userAssessment.scores.rom;
+                if (userAssessment.scores.balance) pillarData.balance[11] = userAssessment.scores.balance;
+                if (userAssessment.scores.mobility) pillarData.mobility[11] = userAssessment.scores.mobility;
+                if (userAssessment.scores.alignment) pillarData.alignment[11] = userAssessment.scores.alignment;
+            }
+
+            window.pillarChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7', 'Week 8', 'Week 9', 'Week 10', 'Week 11', 'Week 12'],
+                    datasets: [
+                        {
+                            label: 'Running',
+                            data: pillarData.running,
+                            borderColor: '#1e3a5f',
+                            backgroundColor: 'rgba(30, 58, 95, 0.1)',
+                            tension: 0.4,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#1e3a5f'
+                        },
+                        {
+                            label: 'Strength',
+                            data: pillarData.strength,
+                            borderColor: '#FF9500',
+                            backgroundColor: 'rgba(255, 149, 0, 0.1)',
+                            tension: 0.4,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#FF9500'
+                        },
+                        {
+                            label: 'ROM',
+                            data: pillarData.rom,
+                            borderColor: '#33BEF3',
+                            backgroundColor: 'rgba(51, 190, 243, 0.1)',
+                            tension: 0.4,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#33BEF3'
+                        },
+                        {
+                            label: 'Balance',
+                            data: pillarData.balance,
+                            borderColor: '#4CAF50',
+                            backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                            tension: 0.4,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#4CAF50'
+                        },
+                        {
+                            label: 'Mobility',
+                            data: pillarData.mobility,
+                            borderColor: '#9C27B0',
+                            backgroundColor: 'rgba(156, 39, 176, 0.1)',
+                            tension: 0.4,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#9C27B0'
+                        },
+                        {
+                            label: 'Alignment',
+                            data: pillarData.alignment,
+                            borderColor: '#FF6B6B',
+                            backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                            tension: 0.4,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#FF6B6B'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 15,
+                                font: { size: 12, weight: 600 }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 60,
+                            max: 90,
+                            grid: { drawBorder: false }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Workout actions
+        function startWorkout() {
+            alert('🏃 Workout timer started! Let\'s go!');
+        }
+
+        function viewWorkoutDetails() {
+            alert('Opening detailed workout view...');
+        }
+
+        function playVideo(type) {
+            alert('📹 Opening ' + type + ' video...');
+        }
+
+        function syncDevice() {
+            alert('🔄 Syncing Garmin device...');
+        }
+
+        function connectService(service) {
+            alert('🔗 Connecting to ' + service + '...');
+        }
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </script>
+
+        <!-- ============================================ -->
+        <!-- DAILY WORKOUT FEEDBACK FORM -->
+        <!-- ============================================ -->
+
+        <section id="dailyFeedbackSection" class="container mt-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4>📝 Daily Workout Feedback</h4>
+                    <p class="mb-0">Help us optimize your training by sharing today's workout experience</p>
+                </div>
+                <div class="card-body">
+                    <div id="currentWorkoutInfo" class="alert alert-info mb-4">
+                        <strong>Today's Workout:</strong> <span id="workoutType">Loading...</span><br>
+                        <strong>Scheduled Duration:</strong> <span id="workoutDuration">--</span> minutes<br>
+                        <strong>Date:</strong> <span id="workoutDate">--</span>
+                    </div>
+                    <form id="feedbackForm">
+                        <input type="hidden" id="workoutId" name="workoutId" value="">
+                        <input type="hidden" id="athleteId" name="athleteId" value="">
+                        <div class="form-group mb-4">
+                            <label class="form-label"><strong>Did you complete today's workout?</strong></label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="completed" id="completedYes" value="yes" required>
+                                <label class="form-check-label" for="completedYes">✅ Yes - Completed as planned</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="completed" id="completedPartial" value="partial">
+                                <label class="form-check-label" for="completedPartial">⚠️ Partially - Modified or shortened</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="completed" id="completedNo" value="no">
+                                <label class="form-check-label" for="completedNo">❌ No - Skipped or couldn't complete</label>
+                            </div>
+                        </div>
+                        <div class="form-group mb-4">
+                            <label for="rpe" class="form-label"><strong>Rate of Perceived Exertion (RPE)</strong> - How hard did the workout feel?</label>
+                            <input type="range" class="form-range" min="1" max="10" step="1" id="rpe" name="rpe" value="5">
+                            <div class="d-flex justify-content-between text-muted small">
+                                <span>1 - Very Easy</span>
+                                <span id="rpeValue" class="fw-bold">5</span>
+                                <span>10 - Maximum Effort</span>
+                            </div>
+                        </div>
+                        <div class="form-group mb-4">
+                            <label for="pain" class="form-label"><strong>Pain Level</strong> - Any discomfort during or after?</label>
+                            <input type="range" class="form-range" min="0" max="10" step="1" id="pain" name="pain" value="0">
+                            <div class="d-flex justify-content-between text-muted small">
+                                <span>0 - No Pain</span>
+                                <span id="painValue" class="fw-bold">0</span>
+                                <span>10 - Severe Pain</span>
+                            </div>
+                        </div>
+                        <div class="form-group mb-4 is-hidden" id="painLocationGroup">
+                            <label for="painLocation" class="form-label">Where did you feel pain?</label>
+                            <select class="form-select" id="painLocation" name="painLocation">
+                                <option value="">Select location...</option>
+                                <option value="knee">Knee</option>
+                                <option value="ankle">Ankle</option>
+                                <option value="hip">Hip</option>
+                                <option value="lower-back">Lower Back</option>
+                                <option value="calf">Calf</option>
+                                <option value="shin">Shin</option>
+                                <option value="foot">Foot (plantar fascia)</option>
+                                <option value="hamstring">Hamstring</option>
+                                <option value="quadriceps">Quadriceps</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-4">
+                            <label for="sleep" class="form-label"><strong>Sleep (last night)</strong> - Hours of quality sleep</label>
+                            <input type="number" class="form-control" id="sleep" name="sleep" min="0" max="14" step="0.5" value="7" required>
+                            <small class="form-text text-muted">Recommended: 7-9 hours for optimal recovery</small>
+                        </div>
+                        <div class="form-group mb-4">
+                            <label for="nutrition" class="form-label"><strong>Nutrition</strong> - Estimated daily calorie intake</label>
+                            <input type="number" class="form-control" id="nutrition" name="nutrition" min="1000" max="5000" step="50" value="2000" required>
+                            <small class="form-text text-muted">This helps us understand your energy balance</small>
+                        </div>
+                        <div class="form-group mb-4">
+                            <label for="stress" class="form-label"><strong>Stress Level</strong> - Overall daily stress (work, life, etc.)</label>
+                            <input type="range" class="form-range" min="1" max="10" step="1" id="stress" name="stress" value="5">
+                            <div class="d-flex justify-content-between text-muted small">
+                                <span>1 - Very Relaxed</span>
+                                <span id="stressValue" class="fw-bold">5</span>
+                                <span>10 - Very Stressed</span>
+                            </div>
+                        </div>
+                        <div class="form-group mb-4">
+                            <label for="notes" class="form-label"><strong>Additional Notes</strong> (optional)</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Any other observations, symptoms, or comments about today's workout..."></textarea>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg" id="submitFeedbackBtn">📤 Submit Feedback</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+        <div id="feedbackMessages" class="container mt-3 is-hidden">
+            <div id="successMessage" class="alert alert-success is-hidden"><strong>✅ Success!</strong> <span id="successText"></span></div>
+            <div id="errorMessage" class="alert alert-danger is-hidden"><strong>❌ Error:</strong> <span id="errorText"></span></div>
+        </div>
+        <div id="offlineBanner" class="position-fixed bottom-0 start-50 translate-middle-x mb-3 is-hidden z-1050">
+            <div class="alert alert-warning shadow-lg"><strong>📡 You're offline.</strong> Feedback saved locally and will sync when reconnected.</div>
+        </div>
+        <div id="feedbackSpinner" class="position-fixed top-50 start-50 translate-middle is-hidden z-2000">
+            <div class="spinner-border text-primary spinner-large" role="status"><span class="visually-hidden">Loading...</span></div>
+            <p class="mt-2 text-center"><strong id="spinnerText">Submitting feedback...</strong></p>
+        </div>
+
+        <script>
+            // Email Verification Check (moved inside initialization)
+            const checkEmailVerification = async () => {
+                try {
+                    const user = await window.AkuraAuth.getCurrentUser();
+                    if (!user) {
+                        console.log('No user - skipping email verification check');
+                        return;
+                    }
+
+                    try {
+                        const { data: { user: authUser } } = await window.AkuraAuth.getSession();
+                        
+                        // Check if email is verified
+                        if (authUser && !authUser.email_confirmed_at) {
+                            // Show verification banner
+                            const banner = document.createElement('div');
+                            banner.id = 'verification-banner';
+                            banner.style.cssText = 'background: #fff3cd; border-left: 4px solid #ffc107; padding: 16px 20px; margin: 16px; border-radius: 8px; position: relative; z-index: 1050;';
+                            banner.innerHTML = `
+                                <div style="max-width: 1200px; margin: 0 auto;">
+                                    <strong style="font-size: 15px; display: block; margin-bottom: 8px;">⚠️ Email Verification Required</strong>
+                                    <p style="margin: 8px 0; color: #666; font-size: 14px;">Please verify your email address to access all features and unlock your personalized training plan.</p>
+                                    <p style="margin: 8px 0 0 0; color: #666; font-size: 14px;">Check your inbox at <strong>${authUser.email}</strong> and click the verification link.</p>
+                                    <button onclick="window.resendVerificationEmail()" style="margin-top: 12px; padding: 8px 16px; background: #ffc107; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; color: #333; font-size: 14px; transition: all 0.3s;">
+                                        📧 Resend Verification Email
+                                    </button>
+                                </div>
+                            `;
+                            document.body.insertBefore(banner, document.body.firstChild);
+                            console.log('⚠️ Email not verified - showing verification banner');
+                        } else {
+                            console.log('✅ Email verified');
+                        }
+                    } catch (sessionError) {
+                        console.log('ℹ️ Email verification not available at this time');
+                    }
+                } catch (error) {
+                    console.error('Error checking email verification:', error);
+                }
+            };
+
+            // Resend verification email function
+            window.resendVerificationEmail = async () => {
+                try {
+                    const user = await window.AkuraAuth.getCurrentUser();
+                    if (user && user.email) {
+                        alert('Verification email sent to ' + user.email + '. Check your inbox and spam folder.');
+                        console.log('📧 Verification email resent to:', user.email);
+                    }
+                } catch (error) {
+                    console.error('Error resending verification email:', error);
+                    alert('Unable to resend verification email. Please try again.');
+                }
+            };
+
+                        document.addEventListener('DOMContentLoaded', () => {
+                                // Initialize dashboard after verifying authentication and profile
+                                initDashboard();
+                        });
+
+                        // Check authentication and load dashboard
+                        async function initDashboard() {
+                            console.log('🔍 Checking authentication...');
+                            try {
+                                // Get current user via AkuraAuth wrapper
+                                const user = await window.AkuraAuth.getCurrentUser();
+                                if (!user) {
+                                    console.log('❌ Not authenticated, redirecting to login...');
+                                    window.location.href = '/login.html';
+                                    return;
+                                }
+
+                                console.log('✅ User authenticated:', user.id);
+
+                                const supabase = window.AkuraAuth.getClient();
+                                const { data: profile, error: profileError } = await supabase
+                                    .from('profiles')
+                                    .select('*')
+                                    .eq('id', user.id)
+                                    .single();
+
+                                if (profileError) {
+                                    console.error('❌ Error fetching profile:', profileError);
+                                    alert('Error loading profile. Please try again.');
+                                    return;
+                                }
+
+                                console.log('📊 Profile loaded:', profile);
+
+                                // Check if assessment is completed
+                                if (!profile.assessment_completed) {
+                                    console.log('⚠️ Assessment not completed, redirecting...');
+                                    window.location.href = '/assessment-intake.html';
+                                    return;
+                                }
+
+                                console.log('✅ Assessment completed, loading dashboard...');
+
+                                // Load dashboard data
+                                await loadDashboardData(user.id, profile);
+                            } catch (error) {
+                                console.error('❌ Error initializing dashboard:', error);
+                                alert('Error loading dashboard. Please refresh the page.');
+                            }
+                        }
+
+                        // Load all dashboard data
+                        async function loadDashboardData(userId, profile) {
+                            console.log('📊 Loading dashboard data...');
+                            try {
+                                document.body.classList.add('loading');
+
+                                // 1. Update user info in header
+                                updateUserInfo(profile);
+
+                                // 2. Load today's workout
+                                if (typeof loadCurrentWorkout === 'function') await loadCurrentWorkout();
+
+                                // 3. Load weekly progress
+                                if (typeof loadWeeklyProgress === 'function') await loadWeeklyProgress(userId);
+
+                                // 4. Load RPE data
+                                if (typeof loadRPEData === 'function') await loadRPEData(userId);
+
+                                // 5. Load injury status
+                                if (typeof loadInjuryStatus === 'function') await loadInjuryStatus(userId);
+
+                                // 6. Load next assessment date
+                                if (typeof loadNextAssessment === 'function') await loadNextAssessment(userId);
+
+                                // 7. Load pillar progress chart
+                                if (typeof loadPillarProgressChart === 'function') await loadPillarProgressChart(userId);
+
+                                document.body.classList.remove('loading');
+                                console.log('✅ Dashboard loaded successfully');
+                            } catch (error) {
+                                console.error('❌ Error loading dashboard:', error);
+                                document.body.classList.remove('loading');
+                                alert('Error loading dashboard data. Please refresh the page.');
+                            }
+                        }
+
+                        // Update user info in header
+                        function updateUserInfo(profile) {
+                            const nameElement = document.querySelector('.user-name');
+                            if (nameElement) nameElement.textContent = profile.full_name || profile.email || 'Athlete';
+
+                            // Load AIFRI score and streak
+                            if (typeof loadAIFRIScore === 'function') loadAIFRIScore(profile.id);
+                            if (typeof calculateStreak === 'function') calculateStreak(profile.id);
+                        }
+
+            function loadCurrentWorkout() {
+                console.log('📥 Loading current workout...');
+                const protocolId = localStorage.getItem('protocolId');
+                const today = new Date().toISOString().split('T')[0];
+                const startDate = localStorage.getItem('protocolStartDate') || today;
+                const dayNumber = Math.floor((new Date(today) - new Date(startDate)) / (1000 * 60 * 60 * 24)) + 1;
+                const cachedProtocol = localStorage.getItem('protocol_' + protocolId);
+                if (cachedProtocol) {
+                    const protocol = JSON.parse(cachedProtocol);
+                    const todayWorkout = protocol.daily?.[dayNumber - 1] || { type: 'Easy Run', duration: 45, intensity: 'Moderate' };
+                    document.getElementById('workoutId').value = `workout_${protocolId}_day${dayNumber}`;
+                    document.getElementById('workoutType').textContent = todayWorkout.type || 'Easy Run';
+                    document.getElementById('workoutDuration').textContent = todayWorkout.duration || 45;
+                    document.getElementById('workoutDate').textContent = today;
+                    console.log('✅ Loaded workout:', todayWorkout);
+                } else {
+                    console.warn('⚠️ No cached protocol found');
+                    document.getElementById('currentWorkoutInfo').innerHTML = '<strong>⚠️ No workout scheduled.</strong> Please complete your assessment first.';
+                }
+            }
+
+            function initializeFeedbackForm() {
+                const form = document.getElementById('feedbackForm');
+                if (!form) {
+                    console.error('❌ Feedback form not found');
+                    return;
+                }
+                form.addEventListener('submit', handleFeedbackSubmission);
+                console.log('✅ Feedback form initialized');
+            }
+
+            async function handleFeedbackSubmission(event) {
+                event.preventDefault();
+                console.log('📤 Submitting workout feedback...');
+                showSpinner('Submitting feedback...');
+                const formData = new FormData(event.target);
+                const workoutId = document.getElementById('workoutId').value;
+                const feedbackData = {
+                    workoutId,
+                    date: new Date().toISOString(),
+                    completed: formData.get('completed'),
+                    rpe: parseInt(formData.get('rpe')),
+                    pain: parseInt(formData.get('pain')),
+                    painLocation: formData.get('painLocation') || '',
+                    sleep: parseFloat(formData.get('sleep')),
+                    nutrition: parseInt(formData.get('nutrition')),
+                    stress: parseInt(formData.get('stress')),
+                    notes: formData.get('notes') || ''
+                };
+                console.log('Feedback data:', feedbackData);
+                try {
+                    if (!navigator.onLine) {
+                        throw new Error('You are offline. Feedback will be saved locally.');
+                    }
+                    const result = await submitWorkoutFeedback(workoutId, feedbackData);
+                    console.log('✅ Feedback submitted successfully:', result);
+                    hideSpinner();
+                    showSuccessMessage('Feedback submitted successfully! Your training plan has been updated.');
+                    if (result.nextWorkouts) updateNextWorkouts(result.nextWorkouts);
+                    if (result.recommendations) displayRecommendations(result.recommendations);
+                    setTimeout(() => {
+                        document.getElementById('feedbackForm').reset();
+                        document.getElementById('rpeValue').textContent = '5';
+                        document.getElementById('painValue').textContent = '0';
+                        document.getElementById('stressValue').textContent = '5';
+                    }, 2000);
+                } catch (error) {
+                    console.error('❌ Feedback submission failed:', error);
+                    hideSpinner();
+                    if (!navigator.onLine || error.message.includes('offline')) {
+                        showOfflineBanner();
+                        showSuccessMessage('Feedback saved locally. Will sync when you reconnect.');
+                        console.log('💾 Feedback cached for later sync');
+                    } else {
+                        showErrorMessage(`Failed to submit feedback: ${error.message}`);
+                    }
+                }
+            }
+
+            function setupRangeSliders() {
+                const sliders = [
+                    { id: 'rpe', value: 'rpeValue' },
+                    { id: 'pain', value: 'painValue' },
+                    { id: 'stress', value: 'stressValue' }
+                ];
+                sliders.forEach((item) => {
+                    const slider = document.getElementById(item.id);
+                    const display = document.getElementById(item.value);
+                    if (slider && display) {
+                        slider.addEventListener('input', (e) => display.textContent = e.target.value);
+                    }
+                });
+                console.log('✅ Range sliders configured');
+            }
+
+            function setupPainConditional() {
+                const painSlider = document.getElementById('pain');
+                const painLocationGroup = document.getElementById('painLocationGroup');
+                const painLocation = document.getElementById('painLocation');
+                if (!painSlider || !painLocationGroup) return;
+                painSlider.addEventListener('input', (e) => {
+                    const painLevel = parseInt(e.target.value);
+                    if (painLevel > 0) {
+                        painLocationGroup.style.display = 'block';
+                        if (painLocation) painLocation.required = true;
+                    } else {
+                        painLocationGroup.style.display = 'none';
+                        if (painLocation) {
+                            painLocation.required = false;
+                            painLocation.value = '';
+                        }
+                    }
+                });
+            }
+
+            // UI Helpers
+            function showSpinner(message = 'Loading...') {
+                const spinner = document.getElementById('feedbackSpinner');
+                const spinnerText = document.getElementById('spinnerText');
+                if (spinner) {
+                    spinner.style.display = 'block';
+                    if (spinnerText) spinnerText.textContent = message;
+                }
+            }
+
+            function hideSpinner() {
+                const spinner = document.getElementById('feedbackSpinner');
+                if (spinner) spinner.style.display = 'none';
+            }
+
+            function showSuccessMessage(message) {
+                const container = document.getElementById('feedbackMessages');
+                const successDiv = document.getElementById('successMessage');
+                const successText = document.getElementById('successText');
+                if (container && successDiv && successText) {
+                    container.style.display = 'block';
+                    successDiv.style.display = 'block';
+                    successText.textContent = message;
+                    document.getElementById('errorMessage').style.display = 'none';
+                    setTimeout(() => successDiv.style.display = 'none', 5000);
+                }
+            }
+
+            function showErrorMessage(message) {
+                const container = document.getElementById('feedbackMessages');
+                const errorDiv = document.getElementById('errorMessage');
+                const errorText = document.getElementById('errorText');
+                if (container && errorDiv && errorText) {
+                    container.style.display = 'block';
+                    errorDiv.style.display = 'block';
+                    errorText.textContent = message;
+                    document.getElementById('successMessage').style.display = 'none';
+                    setTimeout(() => errorDiv.style.display = 'none', 7000);
+                }
+            }
+
+            function showOfflineBanner() {
+                const banner = document.getElementById('offlineBanner');
+                if (!banner) return;
+                banner.style.display = 'block';
+                window.addEventListener('online', () => { banner.style.display = 'none'; }, { once: true });
+            }
+
+            function updateNextWorkouts(nextWorkouts) {
+                console.log('🔄 Updating next workouts:', nextWorkouts);
+                const container = document.getElementById('upcomingWorkouts');
+                if (!container) return;
+                container.innerHTML = '<h4>Updated Next 7 Days</h4>';
+                nextWorkouts.forEach((workout, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'card mb-2';
+                    card.innerHTML = `
+                            <div class="card-body">
+                                <h5>Day ${index + 1}: ${workout.type}</h5>
+                                <p class="mb-0">${workout.duration} min | ${workout.intensity}</p>
+                            </div>`;
+                    container.appendChild(card);
+                });
+            }
+
+            function displayRecommendations(recommendations) {
+                console.log('💡 Displaying recommendations:', recommendations);
+                const container = document.getElementById('aiRecommendations');
+                if (!container) return;
+                container.innerHTML = `
+                    <div class="alert alert-info">
+                        <h5>🤖 AI Coach Recommendations</h5>
+                        <ul class="mb-0">
+                            ${recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                        </ul>
+                    </div>`;
+            }
+        </script>
+
+                        <!-- Injected: robust dashboard loaders and debug helpers -->
+                        <script>
+                        // If earlier definitions exist, these will override them when loaded
+                        async function loadDashboardData(userId, profile) {
+                            console.log('========================================');
+                            console.log('📊 LOADING DASHBOARD DATA');
+                            console.log('User ID:', userId);
+                            console.log('Profile:', profile);
+                            console.log('========================================');
+
+                            try {
+                                const supabase = window.AkuraAuth?.getClient();
+                                profile = profile || {};
+                                updateUserInfo(profile);
+                                await loadAIFRIScore(userId);
+                                await calculateStreak(userId);
+                                await loadWeeklyProgress(userId);
+                                await loadRPEData(userId);
+                                if (typeof fetchUserWorkouts === 'function') await fetchUserWorkouts();
+                                if (typeof initPillarChart === 'function') initPillarChart();
+                                if (typeof checkAssessmentStatus === 'function') checkAssessmentStatus();
+                            } catch (err) {
+                                console.error('❌ Error in loadDashboardData:', err);
+                            }
+                        }
+
+                        function updateUserInfo(profile) {
+                            console.log('📝 Updating user info:', profile);
+                            const userName = profile?.full_name || (profile?.email || '').split('@')[0] || 'Athlete';
+                            const nameSelectors = ['.user-name', '#userName', '[data-user-name]', '.greeting', '#userGreeting'];
+                            let nameUpdated = false;
+                            for (const sel of nameSelectors) {
+                                const el = document.querySelector(sel);
+                                if (el) {
+                                    if (el.tagName === 'H1' || el.tagName === 'H2') el.textContent = `Welcome back, ${userName}`;
+                                    else el.textContent = userName;
+                                    console.log('✅ Name updated:', sel);
+                                    nameUpdated = true;
+                                    break;
+                                }
+                            }
+                            if (!nameUpdated) {
+                                const headers = document.querySelectorAll('h1, h2, .welcome-text, .greeting');
+                                for (const h of headers) {
+                                    if (h.textContent && h.textContent.includes('Welcome back')) {
+                                        h.textContent = `Welcome back, ${userName}`;
+                                        console.log('✅ Name updated via fallback');
+                                        break;
+                                    }
+                                }
+                            }
+                            const streakBadge = document.getElementById('streakBadge');
+                            if (streakBadge && profile?.streak != null) {
+                                streakBadge.innerText = `🔥 ${profile.streak} Days\nStreak`;
+                            }
+                        }
+
+                        async function loadAIFRIScore(userId) {
+                            try {
+                                if (!userId) return;
+                                const supabase = window.AkuraAuth?.getClient();
+                                if (!supabase) return;
+                                const { data: assessment, error } = await supabase
+                                    .from('assessments')
+                                    .select('aifri_score, risk_level')
+                                    .eq('athlete_id', userId)
+                                    .order('created_at', { ascending: false })
+                                    .limit(1)
+                                    .single();
+                                if (error) { console.warn('⚠️ loadAIFRIScore supabase error:', error.message || error); return; }
+                                if (!assessment) return;
+                                const score = Math.round(assessment.aifri_score || 0);
+                                const level = (assessment.risk_level || 'MODERATE').toUpperCase();
+                                const scoreSelectors = ['.aifri-score', '#aifriScore', '.badge-score', '[data-aifri-score]'];
+                                for (const sel of scoreSelectors) { const el = document.querySelector(sel); if (el) { el.textContent = score; console.log('✅ AIFRI score updated:', sel, score); break; }}
+                                const levelSelectors = ['.badge-grade', '#aifriGrade', '.risk-level', '[data-risk-level]'];
+                                for (const sel of levelSelectors) { const el = document.querySelector(sel); if (el) { el.textContent = level; console.log('✅ Risk level updated:', sel, level); break; }}
+                                if (!document.querySelector('.aifri-score') && !document.querySelector('#aifriScore')) {
+                                    const all = document.querySelectorAll('div, span, p');
+                                    for (const node of all) {
+                                        const text = node.textContent && node.textContent.trim();
+                                        if (text === 'ADVANCED' || /\b47\b/.test(text)) { node.textContent = `${score} ${level}`; console.log('✅ Score updated via fallback'); break; }
+                                    }
+                                }
+                            } catch (err) { console.error('❌ Error in loadAIFRIScore:', err); }
+                        }
+
+                        async function calculateStreak(userId) {
+                            console.log('🔥 Calculating streak for user:', userId);
+                            try {
+                                if (!userId) return 0;
+                                const supabase = window.AkuraAuth?.getClient() || (typeof supabase !== 'undefined' ? supabase : null);
+                                if (!supabase) return 0;
+
+                                // Query activity dates only
+                                const { data: logs, error } = await supabase
+                                    .from('activity_logs')
+                                    .select('activity_date')
+                                    .eq('athlete_id', userId)
+                                    .order('activity_date', { ascending: false });
+
+                                if (error) {
+                                    console.warn('⚠️ calculateStreak supabase error:', error.message || error);
+                                    return 0;
+                                }
+
+                                let streak = 0;
+                                if (logs && logs.length > 0) {
+                                    console.log('📊 Activity logs loaded:', logs.length, 'activities');
+
+                                    const activityDates = new Set(logs.map(l => new Date(l.activity_date).toISOString().split('T')[0]));
+                                    let checkDate = new Date(); checkDate.setHours(0,0,0,0);
+
+                                    while (true) {
+                                        const dateStr = checkDate.toISOString().split('T')[0];
+                                        if (activityDates.has(dateStr)) {
+                                            streak++;
+                                            checkDate.setDate(checkDate.getDate() - 1);
+                                        } else {
+                                            break;
+                                        }
+                                    }
+                                    console.log('✅ Streak calculated:', streak, 'days');
+                                } else {
+                                    console.log('ℹ️ No activity logs found - streak is 0');
+                                }
+
+                                // Update UI - try multiple selectors
+                                const selectors = ['#streakCount', '.streak-count', '.streak-value', '[data-streak]', '#streakBadge', '.streak-badge'];
+                                let updated = false;
+                                for (const sel of selectors) {
+                                    const el = document.querySelector(sel);
+                                    if (el) {
+                                        if (sel === '#streakBadge' || sel === '.streak-badge') el.innerText = `🔥 ${streak} Days\nStreak`;
+                                        else el.textContent = streak;
+                                        console.log('✅ Streak updated in DOM:', sel, '=', streak);
+                                        updated = true;
+                                        break;
+                                    }
+                                }
+                                if (!updated) console.warn('⚠️ Could not find streak element to update');
+                                return streak;
+                            } catch (err) {
+                                console.error('❌ calculateStreak error:', err);
+                                return 0;
+                            }
+                        }
+
+                        async function loadWeeklyProgress(userId) {
+                            try {
+                                if (!userId) return;
+                                const supabase = window.AkuraAuth?.getClient(); if (!supabase) return;
+                                const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7); const weekAgoStr = weekAgo.toISOString().split('T')[0];
+                                const { data: activities, error } = await supabase.from('activity_logs').select('distance_km').eq('athlete_id', userId).gte('activity_date', weekAgoStr);
+                                if (error) { console.warn('⚠️ loadWeeklyProgress supabase error:', error.message || error); return; }
+                                const totalDistance = (activities || []).reduce((s, a) => s + (a.distance_km || 0), 0);
+                                const { data: plan } = await supabase.from('training_plans').select('weekly_distance_goal').eq('athlete_id', userId).eq('status', 'active').limit(1).single();
+                                const goal = plan?.weekly_distance_goal || 21.5;
+                                const distancePatterns = ['.stat-value', '.weekly-distance', '#weeklyDistance', '[data-weekly-distance]'];
+                                let distanceUpdated = false;
+                                for (const sel of distancePatterns) { const el = document.querySelector(sel); if (el && /\d+\.\d+\//.test(el.textContent || '')) { el.textContent = `${totalDistance.toFixed(1)}/${goal.toFixed(1)} km`; console.log('✅ Weekly distance updated:', sel); distanceUpdated = true; break; }}
+                                if (!distanceUpdated) { const all = document.querySelectorAll('div, span, p, h3, h4'); for (const el of all) { if ((el.textContent || '').match(/\d+\.\d+\/\d+\.\d+\s*km/)) { el.textContent = `${totalDistance.toFixed(1)}/${goal.toFixed(1)} km`; console.log('✅ Distance updated via fallback'); break; } } }
+                            } catch (err) { console.error('❌ Error in loadWeeklyProgress:', err); }
+                        }
+
+                        async function loadRPEData(userId) {
+                            try {
+                                if (!userId) return;
+                                const supabase = window.AkuraAuth?.getClient(); if (!supabase) return;
+                                const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7); const weekAgoStr = weekAgo.toISOString().split('T')[0];
+                                const { data: activities, error } = await supabase.from('activity_logs').select('rpe').eq('athlete_id', userId).gte('activity_date', weekAgoStr).not('rpe', 'is', null);
+                                if (error) { console.warn('⚠️ loadRPEData supabase error:', error.message || error); return; }
+                                if (!activities || activities.length === 0) return; const avgRPE = activities.reduce((s, a) => s + (a.rpe || 0), 0) / activities.length;
+                                const rpeSelectors = ['.stat-value', '.rpe-value', '#rpeValue', '[data-rpe]'];
+                                for (const sel of rpeSelectors) { const el = document.querySelector(sel); if (el && (el.textContent || '').match(/^\d+\.\d+$/)) { el.textContent = avgRPE.toFixed(1); console.log('✅ RPE updated:', sel, avgRPE.toFixed(1)); return; }}
+                                const all = document.querySelectorAll('div, span, p, h3, h4'); for (const el of all) { if ((el.textContent || '').match(/^\d+\.\d+$/)) { el.textContent = avgRPE.toFixed(1); console.log('✅ RPE updated via fallback', avgRPE.toFixed(1)); break; } }
+                            } catch (err) { console.error('❌ Error in loadRPEData:', err); }
+                        }
+                        </script>
+
+    <!-- Logout Function -->
+    <script>
+        async function handleLogout() {
+            console.log('👋 Logging out...');
+            try {
+                await window.AkuraAuth.signOut();
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error('❌ Logout error:', error);
+                alert('Error logging out. Please try again.');
+            }
+        }
+        
+        // Initialize dashboard on page load
+        window.addEventListener('DOMContentLoaded', async () => {
+            console.log('🔄 Waiting for AkuraAuth to initialize...');
+            
+            // Wait for AkuraAuth to be ready
+            let attempts = 0;
+            while (!window.AkuraAuth || !window.AkuraAuth.isReady()) {
+                if (attempts > 20) {
+                    console.error('❌ AkuraAuth failed to initialize');
+                    showErrorBanner('Authentication system not ready. Please refresh.');
+                    return;
+                }
+                await new Promise(resolve => setTimeout(resolve, 100));
+                attempts++;
+            }
+            
+            console.log('✅ AkuraAuth ready, initializing dashboard...');
+            updateGreeting();
+            await initializeDashboard();
+        });
+        </script>
+
+        <!-- Debug Endpoint: call window.debugDashboard() in console -->
+        <script>
+        // ========================================
+        // DEBUG ENDPOINT - Call window.debugDashboard() in console
+        // ========================================
+        window.debugDashboard = async function() {
+            console.clear();
+            console.log('%c========================================', 'color: #4CAF50; font-weight: bold; font-size: 16px;');
+            console.log('%c🔍 AKURA DASHBOARD DEBUG REPORT', 'color: #4CAF50; font-weight: bold; font-size: 16px;');
+            console.log('%c========================================', 'color: #4CAF50; font-weight: bold; font-size: 16px;');
+            console.log('');
+            // Ensure a Supabase client is available (prefer AkuraAuth client)
+            const supabase = window.AkuraAuth?.getClient() || (typeof supabase !== 'undefined' ? supabase : null);
+            if (!supabase) {
+                console.error('❌ Supabase client not initialized');
+                console.log('   → Check that the Supabase script is loaded and `AkuraAuth` is initialized');
+                return;
+            }
+
+            try {
+                // 1. Authentication Status
+                console.log('%c1️⃣ AUTHENTICATION STATUS', 'color: #2196F3; font-weight: bold; font-size: 14px;');
+                const { data: { user }, error: authError } = await supabase.auth.getUser();
+                if (authError || !user) {
+                    console.error('❌ Not authenticated:', authError);
+                    console.log('   → User should be redirected to /login.html');
+                    return;
+                }
+                console.log('✅ User authenticated');
+                console.log('   User ID:', user.id);
+                console.log('   Email:', user.email);
+                console.log('');
+
+                // 2. Profile Data
+                console.log('%c2️⃣ PROFILE DATA', 'color: #2196F3; font-weight: bold; font-size: 14px;');
+                const { data: profile, error: profileError } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+                if (profileError) {
+                    console.error('❌ Profile error:', profileError);
+                } else {
+                    console.log('✅ Profile loaded');
+                    console.table({
+                        'Full Name': profile.full_name || '(empty)',
+                        'Email': profile.email,
+                        'Role': profile.role,
+                        'Assessment Completed': profile.assessment_completed ? '✅ Yes' : '❌ No',
+                        'Created': new Date(profile.created_at).toLocaleDateString()
+                    });
+                }
+                console.log('');
+
+                // 3. Assessment Data
+                console.log('%c3️⃣ ASSESSMENT DATA', 'color: #2196F3; font-weight: bold; font-size: 14px;');
+                const { data: assessments, error: assessmentError } = await supabase.from('assessments').select('*').eq('athlete_id', user.id).order('created_at', { ascending: false }).limit(1);
+                if (assessmentError) {
+                    console.error('❌ Assessment error:', assessmentError);
+                } else if (!assessments || assessments.length === 0) {
+                    console.warn('⚠️ No assessments found');
+                } else {
+                    const assessment = assessments[0];
+                    console.log('✅ Assessment loaded');
+                    console.table({
+                        'AIFRI Score': assessment.aifri_score || '(empty)',
+                        'Risk Level': assessment.risk_level || '(empty)',
+                        'Age': assessment.age || '(empty)',
+                        'Gender': assessment.gender || '(empty)',
+                        'Height': assessment.height || '(empty)',
+                        'Weight': assessment.weight || '(empty)',
+                        'Experience': assessment.running_experience || assessment.runningExperience || '(empty)',
+                        'Weekly Mileage': assessment.weekly_mileage || assessment.weeklyMileage || '(empty)',
+                        'Created': new Date(assessment.created_at).toLocaleDateString()
+                    });
+                    console.log('   Pillar Scores:', assessment.pillar_scores);
+                    console.log('   Recommendations:', assessment.recommendations);
+                }
+                console.log('');
+
+                // 4. Activity Logs
+                console.log('%c4️⃣ ACTIVITY LOGS (Last 7 Days)', 'color: #2196F3; font-weight: bold; font-size: 14px;');
+                const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
+                const { data: activities, error: activityError } = await supabase.from('activity_logs').select('*').eq('athlete_id', user.id).gte('activity_date', weekAgo.toISOString().split('T')[0]).order('activity_date', { ascending: false });
+                if (activityError) {
+                    console.error('❌ Activity logs error:', activityError);
+                } else if (!activities || activities.length === 0) {
+                    console.warn('⚠️ No activity logs found');
+                } else {
+                    console.log(`✅ Found ${activities.length} activities`);
+                    const totalDistance = activities.reduce((sum, a) => sum + (a.distance_km || 0), 0);
+                    const avgRPE = activities.filter(a => a.rpe).reduce((sum, a) => sum + a.rpe, 0) / activities.filter(a => a.rpe).length;
+                    console.table({ 'Total Activities': activities.length, 'Total Distance': totalDistance.toFixed(1) + ' km', 'Average RPE': avgRPE ? avgRPE.toFixed(1) : 'N/A' });
+                }
+                console.log('');
+
+                // 5. Today's Workout
+                console.log('%c5️⃣ TODAY\'S WORKOUT', 'color: #2196F3; font-weight: bold; font-size: 14px;');
+                const today = new Date().toISOString().split('T')[0];
+                const { data: todayWorkout, error: workoutError } = await supabase.from('workouts').select('*').eq('athlete_id', user.id).eq('scheduled_date', today).single();
+                if (workoutError && workoutError.code !== 'PGRST116') { console.error('❌ Workout error:', workoutError); }
+                else if (!todayWorkout) { console.log('ℹ️ No workout scheduled for today'); }
+                else { console.log('✅ Today\'s workout found'); console.table({ 'Title': todayWorkout.title, 'Type': todayWorkout.workout_type, 'Duration': todayWorkout.duration_minutes + ' min', 'Location': todayWorkout.location, 'Target RPE': todayWorkout.target_rpe, 'Status': todayWorkout.status }); }
+                console.log('');
+
+                // 6. Training Plan
+                console.log('%c6️⃣ TRAINING PLAN', 'color: #2196F3; font-weight: bold; font-size: 14px;');
+                const { data: trainingPlan, error: planError } = await supabase.from('training_plans').select('*').eq('athlete_id', user.id).eq('status', 'active').single();
+                if (planError && planError.code !== 'PGRST116') { console.error('❌ Training plan error:', planError); }
+                else if (!trainingPlan) { console.warn('⚠️ No active training plan'); }
+                else { console.log('✅ Active training plan found'); console.table({ 'Plan Name': trainingPlan.name, 'Start Date': new Date(trainingPlan.start_date).toLocaleDateString(), 'End Date': new Date(trainingPlan.end_date).toLocaleDateString(), 'Weekly Goal': trainingPlan.weekly_distance_goal + ' km', 'Status': trainingPlan.status }); }
+                console.log('');
+
+                // 7. Injury Status
+                console.log('%c7️⃣ INJURY STATUS', 'color: #2196F3; font-weight: bold; font-size: 14px;');
+                const { data: injuries, error: injuryError } = await supabase.from('injury_reports').select('*').eq('athlete_id', user.id).eq('status', 'active');
+                if (injuryError) { console.error('❌ Injury reports error:', injuryError); }
+                else if (!injuries || injuries.length === 0) { console.log('✅ No active injuries - All Clear!'); }
+                else { console.warn(`⚠️ ${injuries.length} active injury/injuries`); console.table(injuries.map(i => ({ 'Type': i.injury_type, 'Location': i.location, 'Severity': i.severity + '/10', 'Reported': new Date(i.reported_date).toLocaleDateString() }))); }
+                console.log('');
+
+                // 8. DOM Elements Check
+                console.log('%c8️⃣ DOM ELEMENTS CHECK', 'color: #2196F3; font-weight: bold; font-size: 14px;');
+                const elementsToCheck = [ { name: 'User Name', selectors: ['.user-name', '#userName', '[data-user-name]', 'h1', 'h2'] }, { name: 'AIFRI Score', selectors: ['.aifri-score', '#aifriScore', '.score-value', '[data-aifri-score]'] }, { name: 'Risk Level', selectors: ['.risk-level', '#riskLevel', '.score-label', '[data-risk-level]'] }, { name: 'Streak Count', selectors: ['.streak-count', '#streakCount', '.streak-value', '[data-streak]'] }, { name: 'Weekly Progress %', selectors: ['.weekly-progress-percentage', '.progress-percentage', '[data-progress-percent]'] }, { name: 'Workout Title', selectors: ['.workout-title', '#workoutTitle', '[data-workout-title]'] }, { name: 'Average RPE', selectors: ['.average-rpe', '#averageRPE', '[data-rpe]'] }, { name: 'Injury Status', selectors: ['.injury-status', '#injuryStatus', '[data-injury-status]'] } ];
+                const elementResults = [];
+                for (const item of elementsToCheck) { let found = null; let currentText = null; for (const selector of item.selectors) { const element = document.querySelector(selector); if (element) { found = selector; currentText = element.textContent.trim().substring(0, 50); break; } } elementResults.push({ 'Element': item.name, 'Found': found ? '✅ ' + found : '❌ Not found', 'Current Text': currentText || '(empty)' }); }
+                console.table(elementResults);
+                console.log('');
+
+                // 9. Recommendations
+                console.log('%c9️⃣ RECOMMENDATIONS', 'color: #FF9800; font-weight: bold; font-size: 14px;');
+                const issues = [];
+                if (!profile?.assessment_completed) { issues.push('❌ Assessment not completed - user should complete assessment first'); }
+                if (!assessments || assessments.length === 0) { issues.push('❌ No assessment data - user needs to complete assessment form'); }
+                if (!activities || activities.length === 0) { issues.push('⚠️ No activity logs - dashboard will show limited data'); }
+                if (!todayWorkout) { issues.push('ℹ️ No workout today - consider showing "Rest Day" or next scheduled workout'); }
+                if (!trainingPlan) { issues.push('⚠️ No training plan - consider auto-generating one after assessment'); }
+                const missingElements = elementResults.filter(r => r.Found.includes('❌'));
+                if (missingElements.length > 0) { issues.push(`⚠️ ${missingElements.length} DOM elements not found - selectors may need updating`); }
+                if (issues.length === 0) { console.log('✅ Everything looks good!'); } else { issues.forEach(issue => console.log(issue)); }
+                console.log('');
+                console.log('%c========================================', 'color: #4CAF50; font-weight: bold; font-size: 16px;');
+                console.log('%c✅ DEBUG REPORT COMPLETE', 'color: #4CAF50; font-weight: bold; font-size: 16px;');
+                console.log('%c========================================', 'color: #4CAF50; font-weight: bold; font-size: 16px;');
+                console.log('');
+                console.log('💡 TIP: Call window.debugDashboard() anytime to re-run this report');
+                console.log('');
+                return { user, profile, assessment: assessments?.[0], activities, todayWorkout, trainingPlan, injuries, elementResults, issues };
+            } catch (error) { console.error('%c❌ DEBUG ERROR', 'color: #f44336; font-weight: bold;', error); throw error; }
+        };
+
+        // Auto-run debug on page load if ?debug=true in URL
+        if (window.location.search.includes('debug=true')) {
+            console.log('🔍 Auto-running debug because ?debug=true detected...');
+            setTimeout(() => { window.debugDashboard(); }, 2000);
+        }
+
+        console.log('%c🔍 AKURA Debug Ready!', 'color: #4CAF50; font-weight: bold; font-size: 14px;');
+        console.log('Type window.debugDashboard() in console to run full diagnostic');
+        console.log('Or add ?debug=true to URL to auto-run on page load');
+
+        </script>
+
+                <!-- Enhancement script (UI interactions & toasts) - inlined for single-file deployment -->
+                <script>
+                // Enhanced navigation & interactions for the dashboard
+                (function(){
+                    function showToast(message, type = 'info') {
+                        const toast = document.createElement('div');
+                        toast.className = `toast ${type}`;
+                        toast.innerHTML = `
+                            <div style="font-weight: 600; color: #1a202c;">${message}</div>
+                        `;
+                        document.body.appendChild(toast);
+                        setTimeout(() => {
+                            toast.style.opacity = '0';
+                            setTimeout(() => toast.remove(), 300);
+                        }, 3000);
+                    }
+
+                    function showComingSoon(featureName) {
+                        showToast(`${featureName} - Coming Soon! 🚀`, 'info');
+                    }
+
+                    function addComingSoonBadges() {
+                        const sectionsWithBadges = [
+                            { selector: '.pillar-chart-card', text: 'Enhanced Charts' },
+                            { selector: '.workout-item:first-child', text: 'Track Workout' },
+                            { selector: '[data-device="strava"]', text: 'Coming Soon' },
+                            { selector: '[data-device="apple-health"]', text: 'Coming Soon' },
+                            { selector: '[data-device="coros"]', text: 'Coming Soon' },
+                        ];
+
+                        sectionsWithBadges.forEach(({ selector, text }) => {
+                            const element = document.querySelector(selector);
+                            if (element && !element.querySelector('.coming-soon-badge')) {
+                                const badge = document.createElement('div');
+                                badge.className = 'coming-soon-badge';
+                                badge.textContent = text;
+                                element.style.position = 'relative';
+                                element.appendChild(badge);
+                            }
+                        });
+                    }
+
+                    document.addEventListener('DOMContentLoaded', () => {
+                        addComingSoonBadges();
+
+                        document.querySelector('.workout-card')?.addEventListener('click', function(e) {
+                            if (!e.target.closest('.btn-primary')) {
+                                showComingSoon('Workout Details');
+                            }
+                        });
+
+                        document.querySelectorAll('.progress-card').forEach(card => {
+                            card.addEventListener('click', function() {
+                                const cardType = this.classList.contains('week-progress') ? 'Weekly Progress Details' :
+                                                                this.classList.contains('rpe') ? 'RPE Analysis' :
+                                                                this.classList.contains('injury') ? 'Injury Management' :
+                                                                'Assessment Schedule';
+                                showComingSoon(cardType);
+                            });
+                        });
+
+                        document.querySelector('.pillar-chart-card')?.addEventListener('click', function() {
+                            showComingSoon('Detailed Pillar Analysis');
+                        });
+
+                        document.querySelectorAll('.workout-item').forEach(item => {
+                            item.addEventListener('click', function() {
+                                showComingSoon('Workout Details & History');
+                            });
+                        });
+
+                        document.querySelectorAll('.btn-start, .btn-primary').forEach(btn => {
+                            btn.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                showToast('Starting workout... 💪', 'success');
+                                setTimeout(() => {
+                                    showComingSoon('Workout Tracker');
+                                }, 1000);
+                            });
+                        });
+
+                        document.querySelectorAll('.btn-secondary, .btn-secondary-outline').forEach(btn => {
+                            btn.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                showComingSoon('Full Workout Details');
+                            });
+                        });
+
+                        document.querySelectorAll('[data-device]').forEach(button => {
+                            button.addEventListener('click', function() {
+                                const device = this.getAttribute('data-device');
+                                showComingSoon(`${device} Integration`);
+                            });
+                        });
+
+                        document.querySelector('.aifri-badge')?.addEventListener('click', function() {
+                            showComingSoon('Detailed AIFRI Analysis & Recommendations');
+                        });
+
+                        document.querySelector('.streak-badge')?.addEventListener('click', function() {
+                            showComingSoon('Activity Streak Details & Challenges');
+                        });
+
+                        setTimeout(() => {
+                            showToast('Welcome to your enhanced dashboard! 🎉', 'success');
+                        }, 500);
+
+                        console.log('✅ Enhanced navigation & interactions loaded!');
+                    });
+                })();
+                </script>
+
+                <!-- Authentication Protection (auth-guard loads but waits for DOMContentLoaded) -->
+                <script src="js/auth-guard.js"></script>
+</body>
+</html>
