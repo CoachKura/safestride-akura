@@ -1790,98 +1790,122 @@
             
             if (window.pillarChart) window.pillarChart.destroy();
 
-            // Use real assessment data if available
-            let pillarData = {
-                running: [75, 75, 77, 78, 79, 80, 81, 82, 82, 83, 84, 85],
-                strength: [80, 80, 82, 83, 84, 85, 86, 87, 87, 87, 88, 88],
-                rom: [70, 70, 71, 72, 73, 74, 75, 75, 76, 77, 77, 78],
-                balance: [85, 85, 85, 86, 86, 87, 87, 88, 88, 89, 89, 90],
-                mobility: [65, 65, 67, 68, 69, 70, 71, 72, 73, 74, 75, 75],
-                alignment: [72, 72, 73, 74, 75, 75, 76, 77, 77, 78, 79, 80]
-            };
+            // Load real pillar data from Supabase
+            console.log('📊 Loading pillar progress data from Supabase...');
             
-            // Override with real assessment data if available
-            if (userAssessment && userAssessment.scores) {
-                console.log('📊 Using real assessment scores:', userAssessment.scores);
-                // Update the last week's data with real scores
-                if (userAssessment.scores.running) pillarData.running[11] = userAssessment.scores.running;
-                if (userAssessment.scores.strength) pillarData.strength[11] = userAssessment.scores.strength;
-                if (userAssessment.scores.rom) pillarData.rom[11] = userAssessment.scores.rom;
-                if (userAssessment.scores.balance) pillarData.balance[11] = userAssessment.scores.balance;
-                if (userAssessment.scores.mobility) pillarData.mobility[11] = userAssessment.scores.mobility;
-                if (userAssessment.scores.alignment) pillarData.alignment[11] = userAssessment.scores.alignment;
-            }
+            try {
+                const { data: pillarHistory, error } = await supabase
+                    .from('pillar_progress')
+                    .select('*')
+                    .eq('athlete_id', userId)
+                    .order('week_number', { ascending: true })
+                    .limit(12);
+                
+                if (error) {
+                    console.error('❌ Error loading pillar data:', error);
+                }
+                
+                let pillarData;
+                let chartLabels;
+                
+                if (pillarHistory && pillarHistory.length > 0) {
+                    console.log(`✅ Loaded ${pillarHistory.length} weeks of pillar data`);
+                    
+                    // Use real data
+                    chartLabels = pillarHistory.map(d => `Week ${d.week_number}`);
+                    pillarData = {
+                        mobility: pillarHistory.map(d => d.mobility_score || 0),
+                        stability: pillarHistory.map(d => d.stability_score || 0),
+                        strength: pillarHistory.map(d => d.strength_score || 0),
+                        endurance: pillarHistory.map(d => d.endurance_score || 0),
+                        technique: pillarHistory.map(d => d.technique_score || 0),
+                        recovery: pillarHistory.map(d => d.recovery_score || 0)
+                    };
+                } else {
+                    console.log('⚠️ No pillar data found - using placeholder');
+                    
+                    // Placeholder data
+                    chartLabels = ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7', 'Week 8', 'Week 9', 'Week 10', 'Week 11', 'Week 12'];
+                    pillarData = {
+                        mobility: [65, 65, 67, 68, 69, 70, 71, 72, 73, 74, 75, 75],
+                        stability: [85, 85, 85, 86, 86, 87, 87, 88, 88, 89, 89, 90],
+                        strength: [80, 80, 82, 83, 84, 85, 86, 87, 87, 87, 88, 88],
+                        endurance: [75, 75, 77, 78, 79, 80, 81, 82, 82, 83, 84, 85],
+                        technique: [70, 70, 71, 72, 73, 74, 75, 75, 76, 77, 77, 78],
+                        recovery: [72, 72, 73, 74, 75, 75, 76, 77, 77, 78, 79, 80]
+                    };
+                }
 
-            window.pillarChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7', 'Week 8', 'Week 9', 'Week 10', 'Week 11', 'Week 12'],
-                    datasets: [
-                        {
-                            label: 'Running',
-                            data: pillarData.running,
-                            borderColor: '#1e3a5f',
-                            backgroundColor: 'rgba(30, 58, 95, 0.1)',
-                            tension: 0.4,
-                            pointRadius: 5,
-                            pointBackgroundColor: '#1e3a5f'
-                        },
-                        {
-                            label: 'Strength',
-                            data: pillarData.strength,
-                            borderColor: '#FF9500',
-                            backgroundColor: 'rgba(255, 149, 0, 0.1)',
-                            tension: 0.4,
-                            pointRadius: 5,
-                            pointBackgroundColor: '#FF9500'
-                        },
-                        {
-                            label: 'ROM',
-                            data: pillarData.rom,
-                            borderColor: '#33BEF3',
-                            backgroundColor: 'rgba(51, 190, 243, 0.1)',
-                            tension: 0.4,
-                            pointRadius: 5,
-                            pointBackgroundColor: '#33BEF3'
-                        },
-                        {
-                            label: 'Balance',
-                            data: pillarData.balance,
-                            borderColor: '#4CAF50',
-                            backgroundColor: 'rgba(76, 175, 80, 0.1)',
-                            tension: 0.4,
-                            pointRadius: 5,
-                            pointBackgroundColor: '#4CAF50'
-                        },
-                        {
-                            label: 'Mobility',
-                            data: pillarData.mobility,
-                            borderColor: '#9C27B0',
-                            backgroundColor: 'rgba(156, 39, 176, 0.1)',
-                            tension: 0.4,
-                            pointRadius: 5,
-                            pointBackgroundColor: '#9C27B0'
-                        },
-                        {
-                            label: 'Alignment',
-                            data: pillarData.alignment,
-                            borderColor: '#FF6B6B',
-                            backgroundColor: 'rgba(255, 107, 107, 0.1)',
-                            tension: 0.4,
-                            pointRadius: 5,
-                            pointBackgroundColor: '#FF6B6B'
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                usePointStyle: true,
-                                padding: 15,
+                window.pillarChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: chartLabels,
+                        datasets: [
+                            {
+                                label: 'Mobility',
+                                data: pillarData.mobility,
+                                borderColor: '#9C27B0',
+                                backgroundColor: 'rgba(156, 39, 176, 0.1)',
+                                tension: 0.4,
+                                pointRadius: 5,
+                                pointBackgroundColor: '#9C27B0'
+                            },
+                            {
+                                label: 'Stability',
+                                data: pillarData.stability,
+                                borderColor: '#4CAF50',
+                                backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                                tension: 0.4,
+                                pointRadius: 5,
+                                pointBackgroundColor: '#4CAF50'
+                            },
+                            {
+                                label: 'Strength',
+                                data: pillarData.strength,
+                                borderColor: '#FF9500',
+                                backgroundColor: 'rgba(255, 149, 0, 0.1)',
+                                tension: 0.4,
+                                pointRadius: 5,
+                                pointBackgroundColor: '#FF9500'
+                            },
+                            {
+                                label: 'Endurance',
+                                data: pillarData.endurance,
+                                borderColor: '#1e3a5f',
+                                backgroundColor: 'rgba(30, 58, 95, 0.1)',
+                                tension: 0.4,
+                                pointRadius: 5,
+                                pointBackgroundColor: '#1e3a5f'
+                            },
+                            {
+                                label: 'Technique',
+                                data: pillarData.technique,
+                                borderColor: '#33BEF3',
+                                backgroundColor: 'rgba(51, 190, 243, 0.1)',
+                                tension: 0.4,
+                                pointRadius: 5,
+                                pointBackgroundColor: '#33BEF3'
+                            },
+                            {
+                                label: 'Recovery',
+                                data: pillarData.recovery,
+                                borderColor: '#FF6B6B',
+                                backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                                tension: 0.4,
+                                pointRadius: 5,
+                                pointBackgroundColor: '#FF6B6B'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    usePointStyle: true,
+                                    padding: 15,
                                 font: { size: 12, weight: 600 }
                             }
                         }
@@ -2532,18 +2556,83 @@
                         async function loadWeeklyProgress(userId) {
                             try {
                                 if (!userId) return;
-                                const supabase = window.AkuraAuth?.getClient(); if (!supabase) return;
-                                const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7); const weekAgoStr = weekAgo.toISOString().split('T')[0];
-                                const { data: activities, error } = await supabase.from('activity_logs').select('distance_km').eq('athlete_id', userId).gte('activity_date', weekAgoStr);
-                                if (error) { console.warn('⚠️ loadWeeklyProgress supabase error:', error.message || error); return; }
+                                const supabase = window.AkuraAuth?.getClient(); 
+                                if (!supabase) return;
+                                
+                                const weekAgo = new Date(); 
+                                weekAgo.setDate(weekAgo.getDate() - 7); 
+                                const weekAgoStr = weekAgo.toISOString().split('T')[0];
+                                
+                                const { data: activities, error } = await supabase
+                                    .from('activity_logs')
+                                    .select('distance_km')
+                                    .eq('athlete_id', userId)
+                                    .gte('activity_date', weekAgoStr);
+                                
+                                if (error) { 
+                                    console.warn('⚠️ loadWeeklyProgress supabase error:', error.message || error); 
+                                    return; 
+                                }
+                                
                                 const totalDistance = (activities || []).reduce((s, a) => s + (a.distance_km || 0), 0);
-                                const { data: plan } = await supabase.from('training_plans').select('weekly_distance_goal').eq('athlete_id', userId).eq('status', 'active').limit(1).single();
+                                
+                                const { data: plan } = await supabase
+                                    .from('training_plans')
+                                    .select('weekly_distance_goal')
+                                    .eq('athlete_id', userId)
+                                    .eq('status', 'active')
+                                    .limit(1)
+                                    .maybeSingle();
+                                
                                 const goal = plan?.weekly_distance_goal || 21.5;
+                                const percentage = Math.min(Math.round((totalDistance / goal) * 100), 100);
+                                
+                                // Update distance text
                                 const distancePatterns = ['.stat-value', '.weekly-distance', '#weeklyDistance', '[data-weekly-distance]'];
                                 let distanceUpdated = false;
-                                for (const sel of distancePatterns) { const el = document.querySelector(sel); if (el && /\d+\.\d+\//.test(el.textContent || '')) { el.textContent = `${totalDistance.toFixed(1)}/${goal.toFixed(1)} km`; console.log('✅ Weekly distance updated:', sel); distanceUpdated = true; break; }}
-                                if (!distanceUpdated) { const all = document.querySelectorAll('div, span, p, h3, h4'); for (const el of all) { if ((el.textContent || '').match(/\d+\.\d+\/\d+\.\d+\s*km/)) { el.textContent = `${totalDistance.toFixed(1)}/${goal.toFixed(1)} km`; console.log('✅ Distance updated via fallback'); break; } } }
-                            } catch (err) { console.error('❌ Error in loadWeeklyProgress:', err); }
+                                
+                                for (const sel of distancePatterns) { 
+                                    const el = document.querySelector(sel); 
+                                    if (el && /\d+\.\d+\//.test(el.textContent || '')) { 
+                                        el.textContent = `${totalDistance.toFixed(1)}/${goal.toFixed(1)} km`; 
+                                        console.log('✅ Weekly distance updated:', sel); 
+                                        distanceUpdated = true; 
+                                        break; 
+                                    }
+                                }
+                                
+                                if (!distanceUpdated) { 
+                                    const all = document.querySelectorAll('div, span, p, h3, h4'); 
+                                    for (const el of all) { 
+                                        if ((el.textContent || '').match(/\d+\.\d+\/\d+\.\d+\s*km/)) { 
+                                            el.textContent = `${totalDistance.toFixed(1)}/${goal.toFixed(1)} km`; 
+                                            console.log('✅ Distance updated via fallback'); 
+                                            break; 
+                                        } 
+                                    } 
+                                }
+                                
+                                // Update progress percentage
+                                const progressText = document.querySelector('.progress-text');
+                                if (progressText) {
+                                    progressText.textContent = `${percentage}%`;
+                                    console.log('✅ Progress percentage updated:', percentage + '%');
+                                }
+                                
+                                // Update progress circle
+                                const progressCircle = document.querySelector('.progress-ring-progress');
+                                if (progressCircle) {
+                                    const radius = 54; // from SVG r="54"
+                                    const circumference = 2 * Math.PI * radius;
+                                    const offset = circumference - (percentage / 100) * circumference;
+                                    progressCircle.style.strokeDasharray = `${circumference} ${circumference}`;
+                                    progressCircle.style.strokeDashoffset = offset;
+                                    console.log('✅ Progress circle updated:', percentage + '%');
+                                }
+                                
+                            } catch (err) { 
+                                console.error('❌ Error in loadWeeklyProgress:', err); 
+                            }
                         }
 
                         async function loadRPEData(userId) {
