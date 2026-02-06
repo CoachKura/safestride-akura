@@ -1,0 +1,4 @@
+# Supabase Edge Functions Configuration
+
+[functions.strava-callback]
+verify_jwt = false  # No authentication required for OAuth callback
