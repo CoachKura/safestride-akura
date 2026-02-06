@@ -2,5 +2,11 @@
   "$schema": "https://openapis.vercel.sh/vercel.json",
   "buildCommand": "cd mobile && npm install && npm run build",
   "outputDirectory": "mobile/dist",
-  "framework": null
+  "framework": null,
+  "routes": [
+    {
+      "src": "/strava-callback.html",
+      "dest": "/strava-callback.html"
+    }
+  ]
 }
