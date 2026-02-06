@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import mapboxgl from "mapbox-gl";
-import { supabase } from "../services/supabase";
+import { supabase, offlineInsert } from "../services/supabase";
 import { calculateDistance, formatPace } from "../utils/distance";
 import "mapbox-gl/dist/mapbox-gl.css";
+import gps from "../services/gps";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoiYWt1cmFzYWZlc3RyaWRlMjAyNiIsImEiOiJjbWwyM3VqczUwZXQzM2xwc2RpcjB1ZzF2In0.JwAJmlhNvIYGjb1sWaQs2g";
@@ -130,7 +131,7 @@ export default function LiveTracker() {
         data: { user },
       } = await supabase.auth.getUser();
       if (user) {
-        await supabase.from("activity_logs").insert({
+        const { queued } = await offlineInsert("activity_logs", {
           athlete_id: user.id,
           activity_date: new Date().toISOString().split("T")[0],
           distance_km: distance,

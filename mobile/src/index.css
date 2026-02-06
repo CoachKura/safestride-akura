@@ -17,3 +17,38 @@ body {
     "Helvetica Neue",
     Arial;
 }
+
+/* PWA Animations */
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+
+/* Safe area insets for iOS */
+.safe-area-inset-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.safe-area-inset-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+@media (display-mode: standalone) {
+  body {
+    background: #f7fafc;
+  }
+}
+
+@supports (-webkit-touch-callout: none) {
+  .safe-area-inset-bottom {
+    padding-bottom: max(env(safe-area-inset-bottom), 20px);
+  }
+}
