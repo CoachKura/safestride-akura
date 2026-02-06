@@ -68,6 +68,11 @@
     </div>
 
     <script>
+        // DEBUG: Log full URL
+        console.log('Full URL:', window.location.href);
+        console.log('Search params:', window.location.search);
+        console.log('Hash:', window.location.hash);
+        
         // Get the authorization code from URL
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get('code');
@@ -75,6 +80,9 @@
         const statusEl = document.getElementById('status');
         const errorEl = document.getElementById('error');
         const manualEl = document.getElementById('manual');
+
+        console.log('Code:', code);
+        console.log('Error:', error);
 
         if (error) {
             statusEl.textContent = 'Authorization failed';
@@ -96,7 +104,7 @@
             }, 2000);
         } else {
             statusEl.textContent = 'Invalid callback';
-            errorEl.textContent = 'No authorization code received';
+            errorEl.innerHTML = 'No authorization code received<br><br>DEBUG INFO:<br>Full URL: ' + window.location.href + '<br>Search: ' + window.location.search + '<br>Hash: ' + window.location.hash;
             errorEl.style.display = 'block';
         }
     </script>
