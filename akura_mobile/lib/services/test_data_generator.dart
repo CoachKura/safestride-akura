@@ -3,8 +3,11 @@
 /// Provides mock assessment data for testing all screens and features
 /// without needing to complete the full evaluation form
 
+library test_data_generator;
+
 import '../services/gait_pathology_analyzer.dart';
 import '../services/assessment_report_generator.dart';
+import 'dart:developer' as developer;
 
 class TestDataGenerator {
   /// Generate a complete assessment dataset with severe issues
@@ -162,29 +165,29 @@ class TestDataGenerator {
 extension TestDataHelpers on Map<String, dynamic> {
   /// Print a formatted summary of assessment data
   void printSummary() {
-    print('\n═══════════════════════════════════════');
-    print('ASSESSMENT DATA SUMMARY');
-    print('═══════════════════════════════════════');
-    print('User ID: ${this['user_id']}');
-    print('');
-    print('ROM TESTS:');
-    print('  Ankle Dorsiflexion: ${this['ankle_dorsiflexion_cm']}cm');
-    print('  Hip Flexion: ${this['hip_flexion_angle']}°');
-    print('  Toe Touch: ${this['toe_touch_distance_cm']}cm');
-    print('');
-    print('STRENGTH TESTS:');
-    print('  Hip Abduction: ${this['hip_abduction_reps']} reps');
-    print('  Hip Extension: ${this['hip_extension_reps']} reps');
-    print('  Single Leg Bridge: ${this['single_leg_bridge_reps']} reps');
-    print('  Balance: ${this['balance_test_seconds']} seconds');
-    print('  Plank: ${this['plank_hold_seconds']} seconds');
-    print('  Side Plank: ${this['side_plank_hold_seconds']} seconds');
-    print('');
-    print('HISTORY:');
-    print('  Previous Injuries: ${this['previous_injuries']}');
-    print('  Current Pain: ${this['current_pain']}');
-    print('  Weekly Mileage: ${this['weekly_mileage']}km');
-    print('═══════════════════════════════════════\n');
+    developer.log('\n═══════════════════════════════════════');
+    developer.log('ASSESSMENT DATA SUMMARY');
+    developer.log('═══════════════════════════════════════');
+    developer.log('User ID: ${this['user_id']}');
+    developer.log('');
+    developer.log('ROM TESTS:');
+    developer.log('  Ankle Dorsiflexion: ${this['ankle_dorsiflexion_cm']}cm');
+    developer.log('  Hip Flexion: ${this['hip_flexion_angle']}°');
+    developer.log('  Toe Touch: ${this['toe_touch_distance_cm']}cm');
+    developer.log('');
+    developer.log('STRENGTH TESTS:');
+    developer.log('  Hip Abduction: ${this['hip_abduction_reps']} reps');
+    developer.log('  Hip Extension: ${this['hip_extension_reps']} reps');
+    developer.log('  Single Leg Bridge: ${this['single_leg_bridge_reps']} reps');
+    developer.log('  Balance: ${this['balance_test_seconds']} seconds');
+    developer.log('  Plank: ${this['plank_hold_seconds']} seconds');
+    developer.log('  Side Plank: ${this['side_plank_hold_seconds']} seconds');
+    developer.log('');
+    developer.log('HISTORY:');
+    developer.log('  Previous Injuries: ${this['previous_injuries']}');
+    developer.log('  Current Pain: ${this['current_pain']}');
+    developer.log('  Weekly Mileage: ${this['weekly_mileage']}km');
+    developer.log('═══════════════════════════════════════\n');
   }
 }
 

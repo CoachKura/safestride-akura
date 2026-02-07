@@ -9,10 +9,13 @@
 /// 
 /// Date: February 5, 2026
 
+library gps_connection_screen;
+
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../services/strava_oauth_service.dart';
 import '../services/gps_data_fetcher.dart';
+import 'dart:developer' as developer;
 
 class GPSConnectionScreen extends StatefulWidget {
   const GPSConnectionScreen({Key? key}) : super(key: key);
@@ -425,7 +428,7 @@ class _GPSConnectionScreenState extends State<GPSConnectionScreen> {
 
     try {
       // Fetch ALL activities from day 1 (no date limits, no activity limit)
-      print('🔄 Starting full sync of ALL Strava activities...');
+      developer.log('🔄 Starting full sync of ALL Strava activities...');
       
       final activities = await _gpsDataFetcher.fetchFromPlatform(
         platform: GPSPlatform.strava,
@@ -434,7 +437,7 @@ class _GPSConnectionScreenState extends State<GPSConnectionScreen> {
         // No limit = fetch everything
       );
 
-      print('✅ Fetched ${activities.length} total activities');
+      developer.log('✅ Fetched ${activities.length} total activities');
 
       // Save activities to database with calendar date organization
       setState(() {
@@ -562,7 +565,7 @@ class _GPSConnectionScreenState extends State<GPSConnectionScreen> {
         );
       }
     } catch (e) {
-      print('❌ Sync error: $e');
+      developer.log('❌ Sync error: $e');
       setState(() {
         _statusMessage = '❌ Sync failed: $e';
       });

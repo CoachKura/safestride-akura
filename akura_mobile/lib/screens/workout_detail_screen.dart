@@ -2,23 +2,26 @@
 /// Displays detailed workout analysis with graphs similar to Strava/Garmin Connect
 /// Shows Duration, Distance, Calories, Heart Rate, Pace, Elevation charts
 
+library workout_detail_screen;
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../services/gps_data_fetcher.dart';
 import '../widgets/workout_analysis_charts.dart';
+import 'dart:developer' as developer;
 
 class WorkoutDetailScreen extends StatefulWidget {
   final String activityId;
   final GPSPlatform platform;
   final Map<String, dynamic>? initialData;
-  
+
   const WorkoutDetailScreen({
     super.key,
     required this.activityId,
     this.platform = GPSPlatform.strava,
     this.initialData,
   });
-  
+
   @override
   State<WorkoutDetailScreen> createState() => _WorkoutDetailScreenState();
 }
@@ -27,36 +30,36 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
     with SingleTickerProviderStateMixin {
   final GPSDataFetcher _fetcher = GPSDataFetcher();
   late TabController _tabController;
-  
+
   ActivityDetails? _activity;
   bool _isLoading = true;
   String? _error;
-  
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _loadActivityDetails();
   }
-  
+
   @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
   }
-  
+
   Future<void> _loadActivityDetails() async {
     try {
       setState(() {
         _isLoading = true;
         _error = null;
       });
-      
+
       final activity = await _fetcher.fetchActivityDetails(
         activityId: widget.activityId,
         platform: widget.platform,
       );
-      
+
       if (mounted) {
         setState(() {
           _activity = activity;
@@ -64,7 +67,7 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
         });
       }
     } catch (e) {
-      print('Error loading activity details: $e');
+      developer.log('Error loading activity details: $e');
       if (mounted) {
         setState(() {
           _error = e.toString();
@@ -73,7 +76,7 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
       }
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -86,7 +89,7 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          _activity != null 
+          _activity != null
               ? DateFormat('EEEE, MMM d').format(_activity!.startTime)
               : 'Workout Details',
           style: const TextStyle(color: Colors.white, fontSize: 18),
@@ -114,7 +117,7 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
       body: _buildBody(),
     );
   }
-  
+
   Widget _buildBody() {
     if (_isLoading) {
       return const Center(
@@ -131,7 +134,7 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
         ),
       );
     }
-    
+
     if (_error != null) {
       return Center(
         child: Padding(
@@ -170,7 +173,7 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
         ),
       );
     }
-    
+
     if (_activity == null) {
       return const Center(
         child: Text(
@@ -179,7 +182,7 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
         ),
       );
     }
-    
+
     return TabBarView(
       controller: _tabController,
       children: [
@@ -189,10 +192,10 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
       ],
     );
   }
-  
+
   Widget _buildOverviewTab() {
     final activity = _activity!;
-    
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -214,7 +217,7 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
@@ -239,7 +242,7 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
                       Text(
                         DateFormat('h:mm a').format(activity.startTime),
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withValues(alpha: 0.8),
                           fontSize: 14,
                         ),
                       ),
@@ -248,9 +251,10 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
                 ),
                 // Platform icon
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -265,34 +269,35 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
               ],
             ),
           ),
-          
+
           const SizedBox(height: 20),
-          
+
           // Summary card
           WorkoutSummaryCard(
             duration: activity.durationDisplay,
             distance: activity.distanceDisplay,
             calories: activity.calories?.toInt() ?? 0,
           ),
-          
+
           const SizedBox(height: 20),
-          
+
           // Key metrics grid
           _buildMetricsGrid(activity),
-          
+
           const SizedBox(height: 20),
-          
+
           // Heart Rate summary
           if (activity.avgHeartRate != null) ...[
             HeartRateChart(
               data: activity.timeSeriesData,
               avgHeartRate: activity.avgHeartRate!,
-              maxHeartRate: activity.maxHeartRate ?? activity.avgHeartRate! * 1.1,
+              maxHeartRate:
+                  activity.maxHeartRate ?? activity.avgHeartRate! * 1.1,
               totalDurationSeconds: activity.durationSeconds,
             ),
             const SizedBox(height: 16),
           ],
-          
+
           // Pace chart
           if (activity.avgPace != null) ...[
             PaceChart(
@@ -307,11 +312,11 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
       ),
     );
   }
-  
+
   Widget _buildChartsTab() {
     final activity = _activity!;
     final totalDuration = activity.durationSeconds;
-    
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -345,18 +350,19 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
             ),
             const SizedBox(height: 24),
           ],
-          
+
           // Heart Rate Chart - Full time range
           if (activity.avgHeartRate != null) ...[
             HeartRateChart(
               data: activity.timeSeriesData,
               avgHeartRate: activity.avgHeartRate!,
-              maxHeartRate: activity.maxHeartRate ?? activity.avgHeartRate! * 1.1,
+              maxHeartRate:
+                  activity.maxHeartRate ?? activity.avgHeartRate! * 1.1,
               totalDurationSeconds: totalDuration,
             ),
             const SizedBox(height: 16),
           ],
-          
+
           // Pace Chart - Full time range
           if (activity.avgPace != null) ...[
             PaceChart(
@@ -367,7 +373,7 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
             ),
             const SizedBox(height: 16),
           ],
-          
+
           // Cadence Chart
           if (activity.avgCadence != null) ...[
             CadenceChart(
@@ -378,9 +384,10 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
             ),
             const SizedBox(height: 16),
           ],
-          
+
           // Elevation Chart
-          if (activity.elevationGain != null && activity.elevationGain! > 0) ...[
+          if (activity.elevationGain != null &&
+              activity.elevationGain! > 0) ...[
             ElevationChart(
               data: activity.timeSeriesData,
               elevationGain: activity.elevationGain!,
@@ -388,42 +395,53 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
             ),
             const SizedBox(height: 16),
           ],
-          
+
           // Vertical Oscillation (simulated data since Strava doesn't have it)
           VerticalOscillationChart(
-            avgVO: 8.5 + (activity.avgPace ?? 6) * 0.3, // Estimate based on pace
+            avgVO:
+                8.5 + (activity.avgPace ?? 6) * 0.3, // Estimate based on pace
             maxVO: 10.5 + (activity.avgPace ?? 6) * 0.3,
             totalDurationSeconds: totalDuration,
           ),
           const SizedBox(height: 16),
-          
+
           // Ground Contact Time
           GroundContactTimeChart(
-            avgGCT: 240 + ((activity.avgPace ?? 6) - 5) * 10, // Estimate based on pace
+            avgGCT: 240 +
+                ((activity.avgPace ?? 6) - 5) * 10, // Estimate based on pace
             maxGCT: 280 + ((activity.avgPace ?? 6) - 5) * 10,
             totalDurationSeconds: totalDuration,
           ),
           const SizedBox(height: 16),
-          
+
           // Stride Length (estimated from pace and cadence)
           StrideLengthChart(
-            avgStrideLength: activity.avgCadence != null && activity.avgPace != null
-                ? (1000 / (activity.avgCadence! * 2 * activity.avgPace!)).clamp(0.7, 1.6)
-                : 1.1,
-            maxStrideLength: activity.avgCadence != null && activity.avgPace != null
-                ? (1000 / (activity.avgCadence! * 2 * (activity.bestPace > 0 ? activity.bestPace : activity.avgPace!))).clamp(0.7, 1.8)
-                : 1.3,
+            avgStrideLength:
+                activity.avgCadence != null && activity.avgPace != null
+                    ? (1000 / (activity.avgCadence! * 2 * activity.avgPace!))
+                        .clamp(0.7, 1.6)
+                    : 1.1,
+            maxStrideLength:
+                activity.avgCadence != null && activity.avgPace != null
+                    ? (1000 /
+                            (activity.avgCadence! *
+                                2 *
+                                (activity.bestPace > 0
+                                    ? activity.bestPace
+                                    : activity.avgPace!)))
+                        .clamp(0.7, 1.8)
+                    : 1.3,
             totalDurationSeconds: totalDuration,
           ),
           const SizedBox(height: 16),
-          
+
           // Training Effect
           TrainingEffectChart(
             aerobicEffect: _calculateAerobicEffect(activity),
             anaerobicEffect: _calculateAnaerobicEffect(activity),
           ),
           const SizedBox(height: 16),
-          
+
           // Power (estimated from pace and elevation)
           PowerChart(
             avgPower: _estimateRunningPower(activity),
@@ -431,28 +449,29 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
             totalDurationSeconds: totalDuration,
           ),
           const SizedBox(height: 16),
-          
+
           // Performance Condition
           PerformanceConditionChart(
             performanceCondition: _calculatePerformanceCondition(activity),
           ),
           const SizedBox(height: 16),
-          
+
           // Stamina
           StaminaChart(
             staminaPercent: _calculateStaminaRemaining(activity),
             potentialPercent: _calculateStaminaPotential(activity),
           ),
           const SizedBox(height: 16),
-          
+
           // Body Temperature (estimated)
           BodyTemperatureChart(
-            coreTemp: 37.0 + (activity.durationSeconds / 3600) * 0.8 + 
+            coreTemp: 37.0 +
+                (activity.durationSeconds / 3600) * 0.8 +
                 ((activity.avgHeartRate ?? 140) - 120) / 100,
             skinTemp: 35.0 + (activity.durationSeconds / 3600) * 0.5,
           ),
           const SizedBox(height: 16),
-          
+
           // Run/Walk
           RunWalkChart(
             runningSeconds: _calculateRunningTime(activity),
@@ -460,7 +479,7 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
             totalSeconds: totalDuration,
           ),
           const SizedBox(height: 16),
-          
+
           // HR Zone Donut Chart
           if (activity.avgHeartRate != null) ...[
             TimeInHRZoneChart(
@@ -468,7 +487,7 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
             ),
             const SizedBox(height: 16),
           ],
-          
+
           // Power Zone Donut Chart
           TimeInPowerZoneChart(
             zoneSeconds: _calculatePowerZoneTimes(activity),
@@ -478,35 +497,35 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
       ),
     );
   }
-  
+
   // Calculate Training Effect (Aerobic)
   double _calculateAerobicEffect(ActivityDetails activity) {
     final duration = activity.durationSeconds / 60; // minutes
-    final hrPercent = activity.avgHeartRate != null 
-        ? (activity.avgHeartRate! / 180) 
-        : 0.75;
+    final hrPercent =
+        activity.avgHeartRate != null ? (activity.avgHeartRate! / 180) : 0.75;
     return ((duration / 30) * hrPercent * 2.5).clamp(0.5, 5.0);
   }
-  
+
   // Calculate Training Effect (Anaerobic)
   double _calculateAnaerobicEffect(ActivityDetails activity) {
     final hrMax = activity.maxHeartRate ?? (activity.avgHeartRate ?? 150) * 1.1;
     final hrPercent = hrMax / 200;
-    final pace = activity.bestPace > 0 ? activity.bestPace : (activity.avgPace ?? 6);
+    final pace =
+        activity.bestPace > 0 ? activity.bestPace : (activity.avgPace ?? 6);
     return ((10 / pace) * hrPercent * 1.5).clamp(0.0, 5.0);
   }
-  
+
   // Estimate Running Power
   double _estimateRunningPower(ActivityDetails activity) {
     // Basic running power estimation: ~1W per kg per (speed in m/s)
     // Assuming 70kg runner
-    final speed = activity.avgPace != null && activity.avgPace! > 0 
+    final speed = activity.avgPace != null && activity.avgPace! > 0
         ? (1000 / (activity.avgPace! * 60)) // m/s
         : 2.5;
     final elevationFactor = 1 + (activity.elevationGain ?? 0) / 1000;
     return (70 * speed * 1.1 * elevationFactor).clamp(100, 500);
   }
-  
+
   // Calculate Performance Condition
   int _calculatePerformanceCondition(ActivityDetails activity) {
     if (activity.avgHeartRate == null || activity.avgPace == null) return 0;
@@ -515,17 +534,16 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
     final hrDiff = expectedHR - activity.avgHeartRate!;
     return hrDiff.clamp(-20, 20).toInt();
   }
-  
+
   // Calculate Stamina Remaining
   double _calculateStaminaRemaining(ActivityDetails activity) {
     // Estimate based on duration and intensity
     final duration = activity.durationSeconds / 60;
-    final intensity = activity.avgHeartRate != null 
-        ? activity.avgHeartRate! / 180 
-        : 0.75;
+    final intensity =
+        activity.avgHeartRate != null ? activity.avgHeartRate! / 180 : 0.75;
     return (100 - (duration * intensity * 1.2)).clamp(0, 100);
   }
-  
+
   // Calculate Stamina Potential
   double _calculateStaminaPotential(ActivityDetails activity) {
     // Estimate based on pace consistency
@@ -534,7 +552,7 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
         : 1.0;
     return (100 * consistency * 0.9).clamp(0, 100);
   }
-  
+
   // Calculate Running Time (walking detection based on pace)
   int _calculateRunningTime(ActivityDetails activity) {
     // Count data points where pace < 8 min/km as running
@@ -545,12 +563,12 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
     if (totalPoints == 0) return activity.durationSeconds;
     return (activity.durationSeconds * runningPoints / totalPoints).toInt();
   }
-  
+
   // Calculate Walking Time
   int _calculateWalkingTime(ActivityDetails activity) {
     return activity.durationSeconds - _calculateRunningTime(activity);
   }
-  
+
   // Calculate time in each HR zone
   Map<String, int> _calculateHRZoneTimes(ActivityDetails activity) {
     final zones = {
@@ -560,13 +578,13 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
       'Zone 4': 0, // 80-90% max HR (Threshold)
       'Zone 5': 0, // 90-100% max HR (Max)
     };
-    
+
     final maxHR = 200.0; // Assumed max HR
-    
+
     for (final point in activity.timeSeriesData) {
       if (point.heartRate == null) continue;
       final hrPercent = point.heartRate! / maxHR;
-      
+
       if (hrPercent < 0.6) {
         zones['Zone 1'] = zones['Zone 1']! + 1;
       } else if (hrPercent < 0.7) {
@@ -579,12 +597,12 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
         zones['Zone 5'] = zones['Zone 5']! + 1;
       }
     }
-    
+
     // If no time series data, estimate from average
     if (activity.timeSeriesData.isEmpty && activity.avgHeartRate != null) {
       final hrPercent = activity.avgHeartRate! / maxHR;
       final totalTime = activity.durationSeconds;
-      
+
       if (hrPercent < 0.7) {
         zones['Zone 2'] = totalTime;
       } else if (hrPercent < 0.8) {
@@ -593,16 +611,16 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
         zones['Zone 4'] = totalTime;
       }
     }
-    
+
     return zones;
   }
-  
+
   // Calculate time in each power zone
   Map<String, int> _calculatePowerZoneTimes(ActivityDetails activity) {
     final avgPower = _estimateRunningPower(activity);
     final ftp = avgPower * 1.05; // Estimated FTP
     final totalTime = activity.durationSeconds;
-    
+
     // Estimate distribution based on pace variability
     return {
       'Recovery': (totalTime * 0.05).toInt(),
@@ -613,10 +631,10 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
       'Anaerobic': (totalTime * 0.02).toInt(),
     };
   }
-  
+
   Widget _buildAnalysisTab() {
     final activity = _activity!;
-    
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -645,9 +663,9 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
               ),
             ],
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Heart Rate Analysis
           if (activity.avgHeartRate != null) ...[
             _buildAnalysisSection(
@@ -669,8 +687,8 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
             ),
             const SizedBox(height: 16),
           ],
-          
-          // Pace Analysis  
+
+          // Pace Analysis
           if (activity.avgPace != null) ...[
             _buildAnalysisSection(
               title: 'Pace Analysis',
@@ -685,7 +703,7 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
                 _buildAnalysisItem(
                   'Negative Split',
                   _hasNegativeSplit(activity) ? 'Yes ✓' : 'No',
-                  _hasNegativeSplit(activity) 
+                  _hasNegativeSplit(activity)
                       ? 'Great job! You ran the second half faster.'
                       : 'Try to run the second half as fast or faster.',
                 ),
@@ -693,7 +711,7 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
             ),
             const SizedBox(height: 16),
           ],
-          
+
           // Recommendations
           _buildAnalysisSection(
             title: 'Recommendations',
@@ -705,7 +723,7 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
       ),
     );
   }
-  
+
   Widget _buildMetricsGrid(ActivityDetails activity) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -750,7 +768,7 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
                 child: _buildMetricTile(
                   icon: Icons.favorite,
                   label: 'Avg HR',
-                  value: activity.avgHeartRate != null 
+                  value: activity.avgHeartRate != null
                       ? '${activity.avgHeartRate!.toStringAsFixed(0)} bpm'
                       : 'N/A',
                   color: Colors.red,
@@ -783,7 +801,7 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
       ),
     );
   }
-  
+
   Widget _buildMetricTile({
     required IconData icon,
     required String label,
@@ -793,7 +811,7 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -825,7 +843,7 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
       ),
     );
   }
-  
+
   Widget _buildLegendItem(String label, Color color) {
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -846,7 +864,7 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
       ],
     );
   }
-  
+
   Widget _buildAnalysisSection({
     required String title,
     required IconData icon,
@@ -882,7 +900,7 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
       ),
     );
   }
-  
+
   Widget _buildAnalysisItem(String title, String value, String description) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -915,71 +933,74 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
       ),
     );
   }
-  
+
   // Analysis helper methods
   String _estimateVO2max(ActivityDetails activity) {
     if (activity.avgPace == null || activity.avgHeartRate == null) return 'N/A';
-    
+
     // Simplified VO2max estimation using pace and HR
     final speed = 60 / activity.avgPace!; // km/h
-    final vo2max = (15 + (speed * 3)) * (1 - (activity.avgHeartRate! - 120) / 200);
+    final vo2max =
+        (15 + (speed * 3)) * (1 - (activity.avgHeartRate! - 120) / 200);
     return '${vo2max.clamp(30, 85).toStringAsFixed(1)} ml/kg/min';
   }
-  
+
   String _getVO2maxDescription(ActivityDetails activity) {
     if (activity.avgPace == null || activity.avgHeartRate == null) {
       return 'Not enough data to estimate VO2max';
     }
     final speed = 60 / activity.avgPace!;
-    final vo2max = ((15 + (speed * 3)) * (1 - (activity.avgHeartRate! - 120) / 200)).clamp(30, 85);
-    
+    final vo2max =
+        ((15 + (speed * 3)) * (1 - (activity.avgHeartRate! - 120) / 200))
+            .clamp(30, 85);
+
     if (vo2max >= 55) return 'Excellent - Elite athlete level';
     if (vo2max >= 45) return 'Good - Well-trained runner';
     if (vo2max >= 35) return 'Average - Recreational runner';
     return 'Below average - Room for improvement';
   }
-  
+
   String _getEfficiencyRating(ActivityDetails activity) {
     if (activity.avgCadence == null) return 'N/A';
-    
+
     final cadence = activity.avgCadence!;
     if (cadence >= 170 && cadence <= 180) return 'Excellent';
     if (cadence >= 160 && cadence < 170) return 'Good';
     if (cadence >= 150 && cadence < 160) return 'Fair';
     return 'Needs Work';
   }
-  
+
   String _getEfficiencyDescription(ActivityDetails activity) {
     if (activity.avgCadence == null) {
       return 'Cadence data not available';
     }
-    
+
     final cadence = activity.avgCadence!;
     if (cadence >= 170 && cadence <= 180) {
       return 'Your cadence (${cadence.toStringAsFixed(0)} spm) is in the optimal range';
     }
     return 'Optimal cadence is 170-180 spm. Try metronome drills to improve.';
   }
-  
+
   String _getTrainingLoad(ActivityDetails activity) {
     // Simple training load based on duration and intensity
     final duration = activity.durationSeconds / 60; // minutes
-    final intensity = activity.avgHeartRate != null 
+    final intensity = activity.avgHeartRate != null
         ? (activity.avgHeartRate! / 180).clamp(0.5, 1.2)
         : 0.8;
-    
+
     final load = (duration * intensity).round();
     if (load < 30) return 'Light';
     if (load < 60) return 'Moderate';
     if (load < 90) return 'Hard';
     return 'Very Hard';
   }
-  
+
   String _getTrainingLoadDescription(ActivityDetails activity) {
     final duration = activity.durationSeconds / 60;
     return '${duration.toStringAsFixed(0)} min workout';
   }
-  
+
   int _getHRReserveUsed(ActivityDetails activity) {
     if (activity.avgHeartRate == null) return 0;
     // Assume max HR of 220 - age (using 190 as estimate for 30yo)
@@ -989,89 +1010,99 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
     final used = (activity.avgHeartRate! - restingHR) / hrReserve * 100;
     return used.clamp(0, 100).round();
   }
-  
+
   String _getHRZoneDescription(ActivityDetails activity) {
     if (activity.avgHeartRate == null) return 'No HR data';
-    
+
     final hrPercent = activity.avgHeartRate! / 190 * 100;
-    if (hrPercent < 60) return 'Zone 1 - Recovery';  
+    if (hrPercent < 60) return 'Zone 1 - Recovery';
     if (hrPercent < 70) return 'Zone 2 - Aerobic Base Building';
     if (hrPercent < 80) return 'Zone 3 - Tempo/Threshold';
     if (hrPercent < 90) return 'Zone 4 - Lactate Threshold';
     return 'Zone 5 - VO2max';
   }
-  
+
   String _estimateCardiacDrift(ActivityDetails activity) {
     if (activity.timeSeriesData.length < 10) return 'N/A';
-    
-    final hrData = activity.timeSeriesData
-        .where((d) => d.heartRate != null)
-        .toList();
-    
+
+    final hrData =
+        activity.timeSeriesData.where((d) => d.heartRate != null).toList();
+
     if (hrData.length < 10) return 'N/A';
-    
+
     final firstHalf = hrData.take(hrData.length ~/ 2);
     final secondHalf = hrData.skip(hrData.length ~/ 2);
-    
-    final avgFirst = firstHalf.map((d) => d.heartRate!).reduce((a, b) => a + b) / firstHalf.length;
-    final avgSecond = secondHalf.map((d) => d.heartRate!).reduce((a, b) => a + b) / secondHalf.length;
-    
+
+    final avgFirst =
+        firstHalf.map((d) => d.heartRate!).reduce((a, b) => a + b) /
+            firstHalf.length;
+    final avgSecond =
+        secondHalf.map((d) => d.heartRate!).reduce((a, b) => a + b) /
+            secondHalf.length;
+
     final drift = ((avgSecond - avgFirst) / avgFirst * 100);
-    
+
     if (drift < 3) return 'Minimal (${drift.toStringAsFixed(1)}%)';
     if (drift < 6) return 'Normal (${drift.toStringAsFixed(1)}%)';
     return 'High (${drift.toStringAsFixed(1)}%)';
   }
-  
+
   String _getPaceConsistency(ActivityDetails activity) {
     if (activity.timeSeriesData.isEmpty) return 'N/A';
-    
+
     final paceData = activity.timeSeriesData
         .where((d) => d.pace != null && d.pace! > 0 && d.pace! < 30)
         .map((d) => d.pace!)
         .toList();
-    
+
     if (paceData.length < 10) return 'N/A';
-    
+
     final avg = paceData.reduce((a, b) => a + b) / paceData.length;
-    final variance = paceData.map((p) => (p - avg) * (p - avg)).reduce((a, b) => a + b) / paceData.length;
+    final variance =
+        paceData.map((p) => (p - avg) * (p - avg)).reduce((a, b) => a + b) /
+            paceData.length;
     final stdDev = variance > 0 ? (variance as num).toDouble() : 0.0;
     final cv = (stdDev / avg * 100);
-    
+
     if (cv < 5) return 'Excellent';
     if (cv < 10) return 'Good';
     if (cv < 15) return 'Fair';
     return 'Variable';
   }
-  
+
   String _getPaceConsistencyDescription(ActivityDetails activity) {
     return 'Lower variation indicates steady pacing strategy';
   }
-  
+
   bool _hasNegativeSplit(ActivityDetails activity) {
     if (activity.timeSeriesData.length < 10) return false;
-    
+
     final paceData = activity.timeSeriesData
         .where((d) => d.pace != null && d.pace! > 0 && d.pace! < 30)
         .toList();
-    
+
     if (paceData.length < 10) return false;
-    
-    final firstHalf = paceData.take(paceData.length ~/ 2)
-        .map((d) => d.pace!)
-        .reduce((a, b) => a + b) / (paceData.length ~/ 2);
-    final secondHalf = paceData.skip(paceData.length ~/ 2)
-        .map((d) => d.pace!)
-        .reduce((a, b) => a + b) / (paceData.length - paceData.length ~/ 2);
-    
+
+    final firstHalf = paceData
+            .take(paceData.length ~/ 2)
+            .map((d) => d.pace!)
+            .reduce((a, b) => a + b) /
+        (paceData.length ~/ 2);
+    final secondHalf = paceData
+            .skip(paceData.length ~/ 2)
+            .map((d) => d.pace!)
+            .reduce((a, b) => a + b) /
+        (paceData.length - paceData.length ~/ 2);
+
     return secondHalf < firstHalf; // Lower pace = faster
   }
-  
+
   List<Widget> _buildRecommendations(ActivityDetails activity) {
     final recommendations = <Widget>[];
-    
+
     // Cadence recommendation
-    if (activity.avgCadence != null && (activity.avgCadence! < 160 || activity.avgCadence! > 190)) {
+    if (activity.avgCadence != null &&
+        (activity.avgCadence! < 160 || activity.avgCadence! > 190)) {
       recommendations.add(_buildRecommendationItem(
         'Improve Cadence',
         'Your cadence of ${activity.avgCadence!.toStringAsFixed(0)} spm is outside the optimal range (170-180 spm). Try metronome drills at 180 bpm.',
@@ -1079,11 +1110,12 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
         Colors.orange,
       ));
     }
-    
+
     // HR zone recommendation
     if (activity.avgHeartRate != null) {
       final hrPercent = activity.avgHeartRate! / 190 * 100;
-      if (hrPercent > 85 && activity.durationSeconds > 2700) { // > 45 min
+      if (hrPercent > 85 && activity.durationSeconds > 2700) {
+        // > 45 min
         recommendations.add(_buildRecommendationItem(
           'Recovery Needed',
           'High intensity run (${hrPercent.toStringAsFixed(0)}% max HR) for ${(activity.durationSeconds / 60).toStringAsFixed(0)} minutes. Allow 48-72 hours recovery.',
@@ -1099,7 +1131,7 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
         ));
       }
     }
-    
+
     // Pacing recommendation
     if (!_hasNegativeSplit(activity)) {
       recommendations.add(_buildRecommendationItem(
@@ -1109,7 +1141,7 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
         Colors.blue,
       ));
     }
-    
+
     if (recommendations.isEmpty) {
       recommendations.add(_buildRecommendationItem(
         'Great Job!',
@@ -1118,18 +1150,19 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
         Colors.amber,
       ));
     }
-    
+
     return recommendations;
   }
-  
-  Widget _buildRecommendationItem(String title, String description, IconData icon, Color color) {
+
+  Widget _buildRecommendationItem(
+      String title, String description, IconData icon, Color color) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1137,7 +1170,7 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen>
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.2),
+              color: color.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(icon, color: color, size: 20),

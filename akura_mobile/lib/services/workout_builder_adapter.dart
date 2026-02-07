@@ -1,6 +1,8 @@
 ﻿/// Workout Builder Adapter for SafeStride
 /// Bridges WorkoutDefinition (new builder models) with Workout/WorkoutCalendarEntry (existing calendar models)
 
+library workout_builder_adapter;
+
 import 'package:flutter/material.dart';
 import '../models/workout_builder_models.dart';
 import '../models/workout_calendar_entry.dart';
@@ -34,7 +36,7 @@ class WorkoutBuilderAdapter {
       workoutId: workout.id,
       scheduledDate: scheduledDate ?? definition.date,
       scheduledTime: scheduledTime,
-      status: ''scheduled'',
+      status: 'scheduled',
       workout: workout,
     );
   }
@@ -43,17 +45,17 @@ class WorkoutBuilderAdapter {
   static String _mapWorkoutType(WorkoutType type) {
     switch (type) {
       case WorkoutType.easyRun:
-        return ''easy_run'';
+        return 'easy_run';
       case WorkoutType.qualitySession:
-        return ''quality_session'';
+        return 'quality_session';
       case WorkoutType.race:
-        return ''race'';
+        return 'race';
       case WorkoutType.crossTraining:
-        return ''cross_training'';
+        return 'cross_training';
       case WorkoutType.restDay:
-        return ''rest_day'';
+        return 'rest_day';
       case WorkoutType.note:
-        return ''note'';
+        return 'note';
     }
   }
 
@@ -65,18 +67,18 @@ class WorkoutBuilderAdapter {
       case WorkoutType.easyRun:
         final easyRun = EasyRunWorkout.fromJson(definition.details);
         exercises.add(Exercise(
-          name: ''Easy Run: ${easyRun.distance} ${easyRun.distanceUnit.shortName}'',
-          notes: ''Maintain conversational pace'',
+          name: 'Easy Run: ${easyRun.distance} ${easyRun.distanceUnit.shortName}',
+          notes: 'Maintain conversational pace',
         ));
         if (easyRun.strides != null) {
           final strides = easyRun.strides!;
           exercises.add(Exercise(
-            name: ''Strides'',
+            name: 'Strides',
             sets: strides.reps,
             reps: 1,
             durationSeconds: 20, // Estimate based on distance
             restSeconds: strides.recovery.toInt(),
-            notes: ''${strides.distance}${strides.distanceUnit.shortName} @ fast pace'',
+            notes: '${strides.distance}${strides.distanceUnit.shortName} @ fast pace',
           ));
         }
         break;
@@ -87,8 +89,8 @@ class WorkoutBuilderAdapter {
         // Warmup
         if (session.warmup > 0) {
           exercises.add(Exercise(
-            name: ''Warmup'',
-            notes: ''${session.warmup} ${session.warmupUnit.shortName} easy pace'',
+            name: 'Warmup',
+            notes: '${session.warmup} ${session.warmupUnit.shortName} easy pace',
           ));
         }
 
@@ -96,20 +98,20 @@ class WorkoutBuilderAdapter {
         for (var set in session.sets) {
           if (set is RunningSet) {
             exercises.add(Exercise(
-              name: ''${set.intensity.displayName} Intervals'',
+              name: '${set.intensity.displayName} Intervals',
               sets: set.reps,
               reps: 1,
               notes: set.description,
             ));
           } else if (set is RestSet) {
             exercises.add(Exercise(
-              name: ''Rest'',
+              name: 'Rest',
               restSeconds: (set.duration * 60).toInt(),
               notes: set.description,
             ));
           } else if (set is RepeatingGroup) {
             exercises.add(Exercise(
-              name: ''Repeating Set'',
+              name: 'Repeating Set',
               sets: set.repeatCount,
               reps: set.sets.length,
               notes: set.description,
@@ -120,8 +122,8 @@ class WorkoutBuilderAdapter {
         // Cooldown
         if (session.cooldown > 0) {
           exercises.add(Exercise(
-            name: ''Cooldown'',
-            notes: ''${session.cooldown} ${session.cooldownUnit.shortName} easy pace'',
+            name: 'Cooldown',
+            notes: '${session.cooldown} ${session.cooldownUnit.shortName} easy pace',
           ));
         }
         break;
@@ -130,18 +132,18 @@ class WorkoutBuilderAdapter {
         final race = RaceWorkout.fromJson(definition.details);
         if (race.warmup > 0) {
           exercises.add(Exercise(
-            name: ''Warmup'',
-            notes: ''${race.warmup} ${race.warmupUnit.shortName}'',
+            name: 'Warmup',
+            notes: '${race.warmup} ${race.warmupUnit.shortName}',
           ));
         }
         exercises.add(Exercise(
           name: race.raceName,
-          notes: ''${race.raceDistance} ${race.raceDistanceUnit.shortName} race'',
+          notes: '${race.raceDistance} ${race.raceDistanceUnit.shortName} race',
         ));
         if (race.cooldown > 0) {
           exercises.add(Exercise(
-            name: ''Cooldown'',
-            notes: ''${race.cooldown} ${race.cooldownUnit.shortName}'',
+            name: 'Cooldown',
+            notes: '${race.cooldown} ${race.cooldownUnit.shortName}',
           ));
         }
         break;
@@ -159,9 +161,9 @@ class WorkoutBuilderAdapter {
           }
         } else {
           exercises.add(Exercise(
-            name: ''${crossTraining.type.displayName}'',
+            name: '${crossTraining.type.displayName}',
             durationSeconds: (crossTraining.duration * 60).toInt(),
-            notes: ''${crossTraining.intensity.displayName} intensity'',
+            notes: '${crossTraining.intensity.displayName} intensity',
           ));
         }
         break;
@@ -169,15 +171,15 @@ class WorkoutBuilderAdapter {
       case WorkoutType.restDay:
         final restDay = RestDayWorkout.fromJson(definition.details);
         exercises.add(Exercise(
-          name: ''Rest Day'',
-          notes: restDay.reason ?? ''Complete rest and recovery'',
+          name: 'Rest Day',
+          notes: restDay.reason ?? 'Complete rest and recovery',
         ));
         break;
 
       case WorkoutType.note:
         exercises.add(Exercise(
-          name: ''Note'',
-          notes: definition.coachNotes ?? ''Training note'',
+          name: 'Note',
+          notes: definition.coachNotes ?? 'Training note',
         ));
         break;
     }
@@ -223,7 +225,7 @@ class WorkoutBuilderAdapter {
   static String _determineDifficulty(WorkoutDefinition definition) {
     switch (definition.type) {
       case WorkoutType.easyRun:
-        return ''easy'';
+        return 'easy';
 
       case WorkoutType.qualitySession:
         final session = QualitySessionWorkout.fromJson(definition.details);
@@ -239,29 +241,29 @@ class WorkoutBuilderAdapter {
             }
           }
         }
-        return hasHardSets ? ''hard'' : ''moderate'';
+        return hasHardSets ? 'hard' : 'moderate';
 
       case WorkoutType.race:
-        return ''hard'';
+        return 'hard';
 
       case WorkoutType.crossTraining:
         final crossTraining = CrossTrainingWorkout.fromJson(definition.details);
         switch (crossTraining.intensity) {
           case WorkoutIntensity.easy:
           case WorkoutIntensity.recovery:
-            return ''easy'';
+            return 'easy';
           case WorkoutIntensity.threshold:
           case WorkoutIntensity.marathon:
-            return ''moderate'';
+            return 'moderate';
           default:
-            return ''hard'';
+            return 'hard';
         }
 
       case WorkoutType.restDay:
-        return ''easy'';
+        return 'easy';
 
       case WorkoutType.note:
-        return ''easy'';
+        return 'easy';
     }
   }
 
@@ -273,38 +275,38 @@ class WorkoutBuilderAdapter {
       case WorkoutType.easyRun:
       case WorkoutType.qualitySession:
       case WorkoutType.race:
-        equipment.addAll([''running_shoes'', ''watch'']);
+        equipment.addAll(['running_shoes', 'watch']);
         break;
 
       case WorkoutType.crossTraining:
         final crossTraining = CrossTrainingWorkout.fromJson(definition.details);
         switch (crossTraining.type) {
           case CrossTrainingType.strength:
-            equipment.addAll([''mat'', ''dumbbells'', ''resistance_band'']);
+            equipment.addAll(['mat', 'dumbbells', 'resistance_band']);
             break;
           case CrossTrainingType.yoga:
-            equipment.add(''mat'');
+            equipment.add('mat');
             break;
           case CrossTrainingType.cycling:
-            equipment.add(''bike'');
+            equipment.add('bike');
             break;
           case CrossTrainingType.swimming:
-            equipment.addAll([''pool_access'', ''goggles'']);
+            equipment.addAll(['pool_access', 'goggles']);
             break;
           case CrossTrainingType.rowing:
-            equipment.add(''rowing_machine'');
+            equipment.add('rowing_machine');
             break;
           case CrossTrainingType.elliptical:
-            equipment.add(''elliptical_machine'');
+            equipment.add('elliptical_machine');
             break;
           default:
-            equipment.add(''none'');
+            equipment.add('none');
         }
         break;
 
       case WorkoutType.restDay:
       case WorkoutType.note:
-        equipment.add(''none'');
+        equipment.add('none');
         break;
     }
 
@@ -318,23 +320,23 @@ class WorkoutBuilderAdapter {
 
     // Map workout_type back to WorkoutType
     switch (workout.workoutType) {
-      case ''easy_run'':
+      case 'easy_run':
         type = WorkoutType.easyRun;
         details = EasyRunWorkout(
           distance: 10.0, // Default, would need actual data
           distanceUnit: WorkoutUnit.kilometers,
         ).toJson();
         break;
-      case ''quality_session'':
+      case 'quality_session':
         type = WorkoutType.qualitySession;
         break;
-      case ''race'':
+      case 'race':
         type = WorkoutType.race;
         break;
-      case ''cross_training'':
+      case 'cross_training':
         type = WorkoutType.crossTraining;
         break;
-      case ''rest_day'':
+      case 'rest_day':
         type = WorkoutType.restDay;
         break;
       default:
@@ -355,30 +357,30 @@ class WorkoutBuilderAdapter {
     switch (definition.type) {
       case WorkoutType.easyRun:
         final easyRun = EasyRunWorkout.fromJson(definition.details);
-        String desc = ''${easyRun.distance} ${easyRun.distanceUnit.shortName} easy run'';
+        String desc = '${easyRun.distance} ${easyRun.distanceUnit.shortName} easy run';
         if (easyRun.strides != null) {
-          desc += '' + ${easyRun.strides!.reps} x ${easyRun.strides!.distance}${easyRun.strides!.distanceUnit.shortName} strides'';
+          desc += ' + ${easyRun.strides!.reps} x ${easyRun.strides!.distance}${easyRun.strides!.distanceUnit.shortName} strides';
         }
         return desc;
 
       case WorkoutType.qualitySession:
         final session = QualitySessionWorkout.fromJson(definition.details);
-        return ''${session.totalDistance.toStringAsFixed(1)} km total (${session.estimatedDurationMinutes} min)'';
+        return '${session.totalDistance.toStringAsFixed(1)} km total (${session.estimatedDurationMinutes} min)';
 
       case WorkoutType.race:
         final race = RaceWorkout.fromJson(definition.details);
-        return ''${race.raceName} - ${race.raceDistance} ${race.raceDistanceUnit.shortName}'';
+        return '${race.raceName} - ${race.raceDistance} ${race.raceDistanceUnit.shortName}';
 
       case WorkoutType.crossTraining:
         final crossTraining = CrossTrainingWorkout.fromJson(definition.details);
-        return ''${crossTraining.type.displayName} (${crossTraining.duration.round()} ${crossTraining.durationUnit.shortName})'';
+        return '${crossTraining.type.displayName} (${crossTraining.duration.round()} ${crossTraining.durationUnit.shortName})';
 
       case WorkoutType.restDay:
         final restDay = RestDayWorkout.fromJson(definition.details);
-        return restDay.reason ?? ''Rest day'';
+        return restDay.reason ?? 'Rest day';
 
       case WorkoutType.note:
-        return definition.coachNotes ?? ''Training note'';
+        return definition.coachNotes ?? 'Training note';
     }
   }
 }

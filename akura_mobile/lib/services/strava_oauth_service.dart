@@ -5,10 +5,13 @@
 /// 
 /// Date: February 5, 2026
 
+library strava_oauth_service;
+
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'gps_data_fetcher.dart';
+import 'dart:developer' as developer;
 
 class StravaOAuthService {
   final SupabaseClient _supabase = Supabase.instance.client;
@@ -52,7 +55,7 @@ class StravaOAuthService {
   /// Returns: Map with access_token, refresh_token, expires_at, athlete info
   Future<Map<String, dynamic>> exchangeCodeForToken(String code) async {
     try {
-      print('🔄 Exchanging Strava authorization code for token...');
+      developer.log('🔄 Exchanging Strava authorization code for token...');
       
       final response = await http.post(
         Uri.parse(_tokenUrl),
@@ -68,9 +71,9 @@ class StravaOAuthService {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         
-        print('✅ Strava token received successfully');
-        print('   Athlete: ${data['athlete']['firstname']} ${data['athlete']['lastname']}');
-        print('   Expires: ${DateTime.fromMillisecondsSinceEpoch(data['expires_at'] * 1000)}');
+        developer.log('✅ Strava token received successfully');
+        developer.log('   Athlete: ${data['athlete']['firstname']} ${data['athlete']['lastname']}');
+        developer.log('   Expires: ${DateTime.fromMillisecondsSinceEpoch(data['expires_at'] * 1000)}');
 
         // Store token in Supabase
         await _storeToken(
@@ -88,8 +91,8 @@ class StravaOAuthService {
           'athlete': data['athlete'],
         };
       } else {
-        print('❌ Token exchange failed: ${response.statusCode}');
-        print('   Response: ${response.body}');
+        developer.log('❌ Token exchange failed: ${response.statusCode}');
+        developer.log('   Response: ${response.body}');
         
         return {
           'success': false,
@@ -98,9 +101,9 @@ class StravaOAuthService {
         };
       }
     } catch (e) {
-      print('❌ Error exchanging token: $e');
-      print('❌ Error details: ${e.toString()}');
-      print('❌ Error type: ${e.runtimeType}');
+      developer.log('❌ Error exchanging token: $e');
+      developer.log('❌ Error details: ${e.toString()}');
+      developer.log('❌ Error type: ${e.runtimeType}');
       return {
         'success': false,
         'error': 'Exception: ${e.toString()}',
@@ -119,7 +122,7 @@ class StravaOAuthService {
   /// Returns: New access token and expiration time
   Future<Map<String, dynamic>> refreshAccessToken(String refreshToken) async {
     try {
-      print('🔄 Refreshing Strava access token...');
+      developer.log('🔄 Refreshing Strava access token...');
       
       final response = await http.post(
         Uri.parse(_tokenUrl),
@@ -135,8 +138,8 @@ class StravaOAuthService {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         
-        print('✅ Strava token refreshed successfully');
-        print('   New expiration: ${DateTime.fromMillisecondsSinceEpoch(data['expires_at'] * 1000)}');
+        developer.log('✅ Strava token refreshed successfully');
+        developer.log('   New expiration: ${DateTime.fromMillisecondsSinceEpoch(data['expires_at'] * 1000)}');
 
         // Update stored token
         await _storeToken(
@@ -152,14 +155,14 @@ class StravaOAuthService {
           'expires_at': data['expires_at'],
         };
       } else {
-        print('❌ Token refresh failed: ${response.statusCode}');
+        developer.log('❌ Token refresh failed: ${response.statusCode}');
         return {
           'success': false,
           'error': 'Token refresh failed: ${response.statusCode}',
         };
       }
     } catch (e) {
-      print('❌ Error refreshing token: $e');
+      developer.log('❌ Error refreshing token: $e');
       return {
         'success': false,
         'error': 'Exception during token refresh',
@@ -199,7 +202,7 @@ class StravaOAuthService {
       }
     }
 
-    print('💾 Strava token stored in database');
+    developer.log('💾 Strava token stored in database');
   }
 
   /// Check if Strava connection is valid (not expired)
@@ -223,14 +226,14 @@ class StravaOAuthService {
 
       // If token expires in less than 1 hour, refresh it
       if (expiresAt.isBefore(now.add(Duration(hours: 1)))) {
-        print('⏰ Strava token expiring soon, refreshing...');
+        developer.log('⏰ Strava token expiring soon, refreshing...');
         final refreshResult = await refreshAccessToken(response['refresh_token']);
         return refreshResult['success'] == true;
       }
 
       return true;
     } catch (e) {
-      print('❌ Error checking Strava connection: $e');
+      developer.log('❌ Error checking Strava connection: $e');
       return false;
     }
   }
@@ -239,10 +242,10 @@ class StravaOAuthService {
   Future<bool> disconnect() async {
     try {
       await _gpsDataFetcher.disconnectPlatform(GPSPlatform.strava);
-      print('🔌 Strava disconnected successfully');
+      developer.log('🔌 Strava disconnected successfully');
       return true;
     } catch (e) {
-      print('❌ Error disconnecting Strava: $e');
+      developer.log('❌ Error disconnecting Strava: $e');
       return false;
     }
   }
@@ -261,7 +264,7 @@ class StravaOAuthService {
 
       return response;
     } catch (e) {
-      print('❌ Error fetching Strava profile: $e');
+      developer.log('❌ Error fetching Strava profile: $e');
       return null;
     }
   }

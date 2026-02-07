@@ -7,6 +7,7 @@ import '../widgets/workout_card.dart';
 import '../widgets/gps_activity_tabs.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'garmin_workout_builder_screen.dart';
+import 'dart:developer' as developer;
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({Key? key}) : super(key: key);
@@ -71,7 +72,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         _isLoading = false;
       });
     } catch (e) {
-      print('Error loading workouts: $e');
+      developer.log('Error loading workouts: $e');
       setState(() => _isLoading = false);
     }
   }
@@ -220,7 +221,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
@@ -255,7 +256,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -276,7 +277,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             shape: BoxShape.circle,
           ),
           todayDecoration: BoxDecoration(
-            color: Colors.green.withOpacity(0.3),
+            color: Colors.green.withValues(alpha: 0.3),
             shape: BoxShape.circle,
           ),
           selectedDecoration: const BoxDecoration(
@@ -481,7 +482,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         
         _showGPSActivitySheet(response, workout);
       } catch (e) {
-        print('Error loading GPS activity: $e');
+        developer.log('Error loading GPS activity: $e');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error loading activity details: $e')),
         );
@@ -589,7 +590,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.blue.withOpacity(0.1),
+        color: Colors.blue.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -715,7 +716,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.1),
+                      color: Colors.green.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: const Row(
@@ -738,9 +739,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.05),
+                  color: Colors.blue.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.blue.withOpacity(0.2)),
+                  border: Border.all(color: Colors.blue.withValues(alpha: 0.2)),
                 ),
                 child: Column(
                   children: [
@@ -799,9 +800,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.05),
+                    color: Colors.red.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.red.withOpacity(0.2)),
+                    border: Border.all(color: Colors.red.withValues(alpha: 0.2)),
                   ),
                   child: Row(
                     children: [
@@ -848,9 +849,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.orange.withOpacity(0.05),
+                    color: Colors.orange.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.orange.withOpacity(0.2)),
+                    border: Border.all(color: Colors.orange.withValues(alpha: 0.2)),
                   ),
                   child: Row(
                     children: [
@@ -897,9 +898,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.purple.withOpacity(0.05),
+                    color: Colors.purple.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.purple.withOpacity(0.2)),
+                    border: Border.all(color: Colors.purple.withValues(alpha: 0.2)),
                   ),
                   child: Column(
                     children: [
@@ -921,9 +922,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.05),
+                  color: Colors.grey.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.withOpacity(0.2)),
+                  border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
                 ),
                 child: Column(
                   children: [

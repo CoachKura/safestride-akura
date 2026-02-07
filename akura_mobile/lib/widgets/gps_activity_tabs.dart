@@ -5,6 +5,9 @@ import 'dart:math' as math;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../screens/workout_detail_screen.dart';
 import '../services/gps_data_fetcher.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart' hide Path;
+import 'dart:developer' as developer;
 
 class GPSActivityTabs extends StatefulWidget {
   final Map<String, dynamic> activity;
@@ -25,12 +28,15 @@ class _GPSActivityTabsState extends State<GPSActivityTabs> with SingleTickerProv
   List<Map<String, dynamic>>? _actualSplits;
   Map<String, dynamic>? _physiologicalAnalysis;
   bool _isLoadingData = true;
+  List<LatLng> _routePoints = [];
+  LatLng? _centerLocation;
   
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _loadActualData();
+    _loadRouteData();
   }
 
   @override
@@ -64,10 +70,64 @@ class _GPSActivityTabsState extends State<GPSActivityTabs> with SingleTickerProv
         _isLoadingData = false;
       });
     } catch (e) {
-      print('Error loading actual split data: $e');
+      developer.log('Error loading actual split data: $e');
       setState(() {
         _isLoadingData = false;
       });
+    }
+  }
+
+  Future<void> _loadRouteData() async {
+    try {
+      final activityId = widget.activity['id'];
+      if (activityId == null) return;
+
+      // Fetch GPS track points from database
+      final response = await Supabase.instance.client
+          .from('gps_track_points')
+          .select('latitude, longitude')
+          .eq('activity_id', activityId)
+          .order('timestamp', ascending: true);
+
+      if (response != null && response.isNotEmpty) {
+        final points = (response as List).map((point) {
+          return LatLng(
+            (point['latitude'] as num).toDouble(),
+            (point['longitude'] as num).toDouble(),
+          );
+        }).toList();
+
+        if (points.isNotEmpty) {
+          // Calculate center point
+          double lat = points.fold(0.0, (sum, p) => sum + p.latitude) / points.length;
+          double lng = points.fold(0.0, (sum, p) => sum + p.longitude) / points.length;
+
+          setState(() {
+            _routePoints = points;
+            _centerLocation = LatLng(lat, lng);
+          });
+        }
+      } else {
+        // If no track points in database, try to create a simple route based on start/end locations
+        final startLat = widget.activity['start_latitude'] as num?;
+        final startLng = widget.activity['start_longitude'] as num?;
+        final endLat = widget.activity['end_latitude'] as num?;
+        final endLng = widget.activity['end_longitude'] as num?;
+
+        if (startLat != null && startLng != null) {
+          final startPoint = LatLng(startLat.toDouble(), startLng.toDouble());
+          final endPoint = (endLat != null && endLng != null)
+              ? LatLng(endLat.toDouble(), endLng.toDouble())
+              : startPoint;
+
+          setState(() {
+            _routePoints = [startPoint, endPoint];
+            _centerLocation = startPoint;
+          });
+        }
+      }
+    } catch (e) {
+      developer.log('Error loading route data: $e');
     }
   }
 
@@ -392,7 +452,7 @@ class _GPSActivityTabsState extends State<GPSActivityTabs> with SingleTickerProv
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
+                  color: Colors.green.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Row(
@@ -488,42 +548,116 @@ class _GPSActivityTabsState extends State<GPSActivityTabs> with SingleTickerProv
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Map Placeholder
+          // Route Map
           Container(
-            height: 200,
+            height: 250,
             decoration: BoxDecoration(
               color: Colors.grey[100],
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: Colors.grey[300]!),
             ),
-            child: Stack(
-              children: [
-                Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+            clipBehavior: Clip.hardEdge,
+            child: _routePoints.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.map_outlined, size: 48, color: Colors.grey[400]),
+                        const SizedBox(height: 8),
+                        Text('Route Map', style: TextStyle(color: Colors.grey[600], fontSize: 16, fontWeight: FontWeight.bold)),
+                        Text('${distanceKm.toStringAsFixed(2)} km route', style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+                        const SizedBox(height: 8),
+                        Text('GPS data not available', style: TextStyle(color: Colors.grey[400], fontSize: 11)),
+                      ],
+                    ),
+                  )
+                : Stack(
                     children: [
-                      Icon(Icons.map_outlined, size: 48, color: Colors.grey[400]),
-                      const SizedBox(height: 8),
-                      Text('Route Map', style: TextStyle(color: Colors.grey[600], fontSize: 16, fontWeight: FontWeight.bold)),
-                      Text('${distanceKm.toStringAsFixed(2)} km route', style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+                      FlutterMap(
+                        options: MapOptions(
+                          initialCenter: _centerLocation ?? const LatLng(0, 0),
+                          initialZoom: 14.0,
+                          minZoom: 3.0,
+                          maxZoom: 18.0,
+                        ),
+                        children: [
+                          TileLayer(
+                            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                            userAgentPackageName: 'com.akura.safestride',
+                          ),
+                          if (_routePoints.length > 1)
+                            PolylineLayer(
+                              polylines: [
+                                Polyline(
+                                  points: _routePoints,
+                                  color: Colors.deepPurple,
+                                  strokeWidth: 4.0,
+                                ),
+                              ],
+                            ),
+                          // Start and End markers
+                          if (_routePoints.isNotEmpty)
+                            MarkerLayer(
+                              markers: [
+                                // Start marker (green)
+                                Marker(
+                                  point: _routePoints.first,
+                                  width: 30,
+                                  height: 30,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.green,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: Colors.white, width: 2),
+                                    ),
+                                    child: const Icon(Icons.play_arrow, color: Colors.white, size: 16),
+                                  ),
+                                ),
+                                // End marker (red)
+                                if (_routePoints.length > 1)
+                                  Marker(
+                                    point: _routePoints.last,
+                                    width: 30,
+                                    height: 30,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.red,
+                                        shape: BoxShape.circle,
+                                        border: Border.all(color: Colors.white, width: 2),
+                                      ),
+                                      child: const Icon(Icons.stop, color: Colors.white, size: 16),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                        ],
+                      ),
+                      // Info overlay
+                      Positioned(
+                        top: 12,
+                        left: 12,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.9),
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4)],
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.route, size: 16, color: Colors.deepPurple),
+                              const SizedBox(width: 6),
+                              Text(
+                                '${distanceKm.toStringAsFixed(2)} km',
+                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ],
                   ),
-                ),
-                Positioned(
-                  top: 12,
-                  right: 12,
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4)],
-                    ),
-                    child: const Icon(Icons.fullscreen, size: 20, color: Colors.grey),
-                  ),
-                ),
-              ],
-            ),
           ),
           const SizedBox(height: 20),
           
@@ -532,7 +666,7 @@ class _GPSActivityTabsState extends State<GPSActivityTabs> with SingleTickerProv
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Colors.blue.withOpacity(0.1), Colors.blue.withOpacity(0.05)],
+                colors: [Colors.blue.withValues(alpha: 0.1), Colors.blue.withValues(alpha: 0.05)],
               ),
               borderRadius: BorderRadius.circular(12),
             ),
@@ -571,9 +705,9 @@ class _GPSActivityTabsState extends State<GPSActivityTabs> with SingleTickerProv
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.05),
+                color: Colors.red.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.red.withOpacity(0.2)),
+                border: Border.all(color: Colors.red.withValues(alpha: 0.2)),
               ),
               child: Row(
                 children: [ 
@@ -620,9 +754,9 @@ class _GPSActivityTabsState extends State<GPSActivityTabs> with SingleTickerProv
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.orange.withOpacity(0.05),
+                color: Colors.orange.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.orange.withOpacity(0.2)),
+                border: Border.all(color: Colors.orange.withValues(alpha: 0.2)),
               ),
               child: Row(
                 children: [
@@ -669,9 +803,9 @@ class _GPSActivityTabsState extends State<GPSActivityTabs> with SingleTickerProv
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.purple.withOpacity(0.05),
+                color: Colors.purple.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.purple.withOpacity(0.2)),
+                border: Border.all(color: Colors.purple.withValues(alpha: 0.2)),
               ),
               child: Column(
                 children: [
@@ -696,9 +830,9 @@ class _GPSActivityTabsState extends State<GPSActivityTabs> with SingleTickerProv
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.grey.withOpacity(0.05),
+              color: Colors.grey.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.withOpacity(0.2)),
+              border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
             ),
             child: Column(
               children: [
@@ -767,7 +901,7 @@ class _GPSActivityTabsState extends State<GPSActivityTabs> with SingleTickerProv
                                   gradient: LinearGradient(
                                     begin: Alignment.bottomCenter,
                                     end: Alignment.topCenter,
-                                    colors: [Colors.orange, Colors.orange.withOpacity(0.6)],
+                                    colors: [Colors.orange, Colors.orange.withValues(alpha: 0.6)],
                                   ),
                                   borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
                                 ),
@@ -820,7 +954,7 @@ class _GPSActivityTabsState extends State<GPSActivityTabs> with SingleTickerProv
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                   decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.1),
+                    color: Colors.blue.withValues(alpha: 0.1),
                     borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
                   ),
                   child: Row(
@@ -912,10 +1046,10 @@ class _GPSActivityTabsState extends State<GPSActivityTabs> with SingleTickerProv
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Colors.blue.withOpacity(0.1), Colors.purple.withOpacity(0.1)],
+                colors: [Colors.blue.withValues(alpha: 0.1), Colors.purple.withValues(alpha: 0.1)],
               ),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.blue.withOpacity(0.3)),
+              border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -957,9 +1091,9 @@ class _GPSActivityTabsState extends State<GPSActivityTabs> with SingleTickerProv
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.05),
+                color: Colors.green.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.green.withOpacity(0.3)),
+                border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1101,7 +1235,7 @@ class _GPSActivityTabsState extends State<GPSActivityTabs> with SingleTickerProv
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: (analysis['isEconomical'] == true) ? Colors.green.withOpacity(0.1) : Colors.orange.withOpacity(0.1),
+              color: (analysis['isEconomical'] == true) ? Colors.green.withValues(alpha: 0.1) : Colors.orange.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: (analysis['isEconomical'] == true) ? Colors.green : Colors.orange,
@@ -1149,10 +1283,10 @@ class _GPSActivityTabsState extends State<GPSActivityTabs> with SingleTickerProv
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.orange.withOpacity(0.1), Colors.red.withOpacity(0.1)],
+                  colors: [Colors.orange.withValues(alpha: 0.1), Colors.red.withValues(alpha: 0.1)],
                 ),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.orange.withOpacity(0.4)),
+                border: Border.all(color: Colors.orange.withValues(alpha: 0.4)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1225,7 +1359,7 @@ class _GPSActivityTabsState extends State<GPSActivityTabs> with SingleTickerProv
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4, offset: const Offset(0, 2))],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4, offset: const Offset(0, 2))],
       ),
       child: Column(
         children: [
@@ -1265,7 +1399,7 @@ class PaceChartPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.purple.withOpacity(0.3)
+      ..color = Colors.purple.withValues(alpha: 0.3)
       ..style = PaintingStyle.fill;
 
     final linePaint = Paint()
@@ -1313,7 +1447,7 @@ class HRChartPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.red.withOpacity(0.2)
+      ..color = Colors.red.withValues(alpha: 0.2)
       ..style = PaintingStyle.fill;
 
     final linePaint = Paint()
@@ -1373,7 +1507,7 @@ class DetailedPaceChartPainter extends CustomPainter {
     
     // Draw grid lines
     final gridPaint = Paint()
-      ..color = Colors.grey.withOpacity(0.2)
+      ..color = Colors.grey.withValues(alpha: 0.2)
       ..strokeWidth = 1;
     
     for (int i = 0; i <= 4; i++) {
@@ -1399,7 +1533,7 @@ class DetailedPaceChartPainter extends CustomPainter {
       ..shader = LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
-        colors: [Colors.purple.withOpacity(0.3), Colors.purple.withOpacity(0.05)],
+        colors: [Colors.purple.withValues(alpha: 0.3), Colors.purple.withValues(alpha: 0.05)],
       ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
       ..style = PaintingStyle.fill;
     
@@ -1457,7 +1591,7 @@ class DetailedHRChartPainter extends CustomPainter {
     // Draw grid
     for (int i = 0; i <= 4; i++) {
       final y = (i / 4) * size.height;
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), Paint()..color = Colors.grey.withOpacity(0.2)..strokeWidth = 1);
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), Paint()..color = Colors.grey.withValues(alpha: 0.2)..strokeWidth = 1);
     }
     
     // Draw area
@@ -1479,7 +1613,7 @@ class DetailedHRChartPainter extends CustomPainter {
       ..shader = LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
-        colors: [Colors.red.withOpacity(0.3), Colors.red.withOpacity(0.05)],
+        colors: [Colors.red.withValues(alpha: 0.3), Colors.red.withValues(alpha: 0.05)],
       ).createShader(Rect.fromLTWH(0, 0, size.width, size.height)));
     
     // Draw line and points

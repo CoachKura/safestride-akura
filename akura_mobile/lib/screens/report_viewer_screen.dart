@@ -3,6 +3,8 @@
 /// Dedicated screen for viewing comprehensive assessment reports
 /// with timeline visualization, sharing, and export capabilities
 
+library report_viewer_screen;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../services/assessment_report_generator.dart';
@@ -172,7 +174,7 @@ class _ReportViewerScreenState extends State<ReportViewerScreen>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: riskColor.withOpacity(0.2),
+                color: riskColor.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(color: riskColor, width: 2),
               ),
@@ -383,9 +385,9 @@ class _ReportViewerScreenState extends State<ReportViewerScreen>
         
         // Timeline Widget
         Expanded(
-          child: RoadmapTimelineWidget(
+          child: timeline.RoadmapTimelineWidget(
             phases: widget.report.recoveryRoadmap.phases.map((phase) {
-              return TimelinePhase(
+              return timeline.TimelinePhase(
                 name: phase.phaseName,
                 weekRange: phase.weekRange,
                 goals: phase.goals,

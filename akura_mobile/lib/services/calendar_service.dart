@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/workout_calendar_entry.dart';
+import 'dart:developer' as developer;
 
 class CalendarService {
   final SupabaseClient _supabase = Supabase.instance.client;
@@ -19,7 +20,7 @@ class CalendarService {
 
       return response['id'] as String;
     } catch (e) {
-      print('Error getting athlete ID: $e');
+      developer.log('Error getting athlete ID: $e');
       return null;
     }
   }
@@ -76,7 +77,7 @@ class CalendarService {
               .map((json) => WorkoutCalendarEntry.fromJson(json))
               .toList());
         } catch (e) {
-          print('Note: No planned workouts found: $e');
+          developer.log('Note: No planned workouts found: $e');
         }
       }
 
@@ -96,13 +97,13 @@ class CalendarService {
             allWorkouts.add(WorkoutCalendarEntry.fromGpsActivity(activity));
           }
         } catch (e) {
-          print('Note: No GPS activities found: $e');
+          developer.log('Note: No GPS activities found: $e');
         }
       }
 
       return allWorkouts;
     } catch (e) {
-      print('Error fetching workouts for month: $e');
+      developer.log('Error fetching workouts for month: $e');
       return [];
     }
   }
@@ -132,7 +133,7 @@ class CalendarService {
             return WorkoutCalendarEntry.fromGpsActivity(gpsActivities.first);
           }
         } catch (e) {
-          print('Note: No GPS activities for today: $e');
+          developer.log('Note: No GPS activities for today: $e');
         }
       }
 
@@ -170,13 +171,13 @@ class CalendarService {
             return WorkoutCalendarEntry.fromJson(response);
           }
         } catch (e) {
-          print('Note: No planned workouts for today: $e');
+          developer.log('Note: No planned workouts for today: $e');
         }
       }
       
       return _getMockTodayWorkout();
     } catch (e) {
-      print('Error fetching today workout: $e');
+      developer.log('Error fetching today workout: $e');
       return null;
     }
   }
@@ -222,13 +223,13 @@ class CalendarService {
             return WorkoutCalendarEntry.fromJson(response);
           }
         } catch (e) {
-          print('Note: No planned workouts for tomorrow: $e');
+          developer.log('Note: No planned workouts for tomorrow: $e');
         }
       }
       
       return _getMockTomorrowWorkout();
     } catch (e) {
-      print('Error fetching tomorrow workout: $e');
+      developer.log('Error fetching tomorrow workout: $e');
       return null;
     }
   }
@@ -258,7 +259,7 @@ class CalendarService {
             return WorkoutCalendarEntry.fromGpsActivity(gpsActivities.first);
           }
         } catch (e) {
-          print('Note: No GPS activities for yesterday: $e');
+          developer.log('Note: No GPS activities for yesterday: $e');
         }
       }
 
@@ -295,13 +296,13 @@ class CalendarService {
             return WorkoutCalendarEntry.fromJson(response);
           }
         } catch (e) {
-          print('Note: No planned workouts for yesterday: $e');
+          developer.log('Note: No planned workouts for yesterday: $e');
         }
       }
       
       return null;
     } catch (e) {
-      print('Error fetching yesterday workout: $e');
+      developer.log('Error fetching yesterday workout: $e');
       return null;
     }
   }
@@ -326,7 +327,7 @@ class CalendarService {
 
       return true;
     } catch (e) {
-      print('Error marking workout complete: $e');
+      developer.log('Error marking workout complete: $e');
       return false;
     }
   }
@@ -341,7 +342,7 @@ class CalendarService {
 
       return true;
     } catch (e) {
-      print('Error skipping workout: $e');
+      developer.log('Error skipping workout: $e');
       return false;
     }
   }
@@ -358,7 +359,7 @@ class CalendarService {
 
       return true;
     } catch (e) {
-      print('Error rescheduling workout: $e');
+      developer.log('Error rescheduling workout: $e');
       return false;
     }
   }

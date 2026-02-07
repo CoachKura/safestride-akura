@@ -1,16 +1,15 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../services/auth_service.dart';
 import '../services/calendar_service.dart';
 import '../models/workout_calendar_entry.dart';
 import '../widgets/bottom_nav.dart';
+import '../theme/dashboard_colors.dart';
 import 'tracker_screen.dart';
 import 'logger_screen.dart';
 import 'calendar_screen.dart';
-import 'history_screen.dart';
 import 'profile_screen.dart' as profile;
 import 'assessment_screen.dart';
+import 'dart:developer' as developer;
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -67,6 +66,13 @@ class _DashboardHomeState extends State<_DashboardHome> {
   WorkoutCalendarEntry? todayWorkout;
   WorkoutCalendarEntry? tomorrowWorkout;
   
+  // GPS Activity Data for Fitness Metrics
+  int todaySteps = 0;
+  double todayDistance = 0.0;
+  int todayCalories = 0;
+  int avgHeartRate = 0;
+  List<double> weeklySteps = List.filled(7, 0.0);
+  
   // Pillar scores
   Map<String, int> pillarScores = {
     'adaptability': 0,
@@ -81,13 +87,14 @@ class _DashboardHomeState extends State<_DashboardHome> {
   void initState() {
     super.initState();
     _loadUserData();
+    _loadGPSActivityData();
   }
 
   Future<void> _loadUserData() async {
     try {
       final userId = Supabase.instance.client.auth.currentUser?.id;
       if (userId == null) {
-        print('⚠️ WARNING: No authenticated user found! Using mock data for testing...');
+        developer.log('⚠️ WARNING: No authenticated user found! Using mock data for testing...');
         setState(() {
           userName = 'KURA SATHYAMOORTHY';
           aifriScore = 52.0;
@@ -106,7 +113,7 @@ class _DashboardHomeState extends State<_DashboardHome> {
         return;
       }
 
-      print('🔍 DEBUG: Loading dashboard data for user: $userId');
+      developer.log('🔍 DEBUG: Loading dashboard data for user: $userId');
 
       // Fetch today's and tomorrow's workouts
       todayWorkout = await _calendarService.getTodayWorkout();
@@ -119,7 +126,7 @@ class _DashboardHomeState extends State<_DashboardHome> {
           .eq('id', userId)
           .maybeSingle();
 
-      print('🔍 DEBUG: Profile response: $profileResponse');
+      developer.log('🔍 DEBUG: Profile response: $profileResponse');
 
       // Fetch AIFRI score from latest assessment
       final aifriResponse = await Supabase.instance.client
@@ -130,20 +137,20 @@ class _DashboardHomeState extends State<_DashboardHome> {
           .limit(1)
           .maybeSingle();
 
-      print('🔍 DEBUG: AIFRI response: $aifriResponse');
+      developer.log('🔍 DEBUG: AIFRI response: $aifriResponse');
       
       if (aifriResponse == null) {
-        print('⚠️ WARNING: No AISRI assessment found for user!');
+        developer.log('⚠️ WARNING: No AISRI assessment found for user!');
       } else {
-        print('✅ Total Score: ${aifriResponse['total_score']}');
-        print('✅ AIFRI Score: ${aifriResponse['aifri_score']}');
-        print('✅ Risk Level: ${aifriResponse['risk_level']}');
-        print('✅ Pillar Adaptability: ${aifriResponse['pillar_adaptability']}');
-        print('✅ Pillar Injury Risk: ${aifriResponse['pillar_injury_risk']}');
-        print('✅ Pillar Fatigue: ${aifriResponse['pillar_fatigue']}');
-        print('✅ Pillar Recovery: ${aifriResponse['pillar_recovery']}');
-        print('✅ Pillar Intensity: ${aifriResponse['pillar_intensity']}');
-        print('✅ Pillar Consistency: ${aifriResponse['pillar_consistency']}');
+        developer.log('✅ Total Score: ${aifriResponse['total_score']}');
+        developer.log('✅ AIFRI Score: ${aifriResponse['aifri_score']}');
+        developer.log('✅ Risk Level: ${aifriResponse['risk_level']}');
+        developer.log('✅ Pillar Adaptability: ${aifriResponse['pillar_adaptability']}');
+        developer.log('✅ Pillar Injury Risk: ${aifriResponse['pillar_injury_risk']}');
+        developer.log('✅ Pillar Fatigue: ${aifriResponse['pillar_fatigue']}');
+        developer.log('✅ Pillar Recovery: ${aifriResponse['pillar_recovery']}');
+        developer.log('✅ Pillar Intensity: ${aifriResponse['pillar_intensity']}');
+        developer.log('✅ Pillar Consistency: ${aifriResponse['pillar_consistency']}');
       }
 
       // Calculate current streak from GPS activities
@@ -182,11 +189,11 @@ class _DashboardHomeState extends State<_DashboardHome> {
         isLoading = false;
       });
       
-      print('✅ Dashboard state updated! AIFRI Score: $aifriScore');
-      print('✅ Pillar scores: $pillarScores');
+      developer.log('✅ Dashboard state updated! AIFRI Score: $aifriScore');
+      developer.log('✅ Pillar scores: $pillarScores');
     } catch (e, stackTrace) {
-      print('❌ ERROR loading user data: $e');
-      print('Stack trace: $stackTrace');
+      developer.log('❌ ERROR loading user data: $e');
+      developer.log('Stack trace: $stackTrace');
       setState(() => isLoading = false);
     }
   }
@@ -221,6 +228,77 @@ class _DashboardHomeState extends State<_DashboardHome> {
     return activities.fold(0.0, (sum, a) => sum + ((a['distance_meters'] ?? 0.0) as num).toDouble() / 1000);
   }
 
+  Future<void> _loadGPSActivityData() async {
+    try {
+      final userId = Supabase.instance.client.auth.currentUser?.id;
+      if (userId == null) {
+        // Use mock data for testing
+        setState(() {
+          todaySteps = 8234;
+          todayDistance = 6.2;
+          todayCalories = 450;
+          avgHeartRate = 142;
+          weeklySteps = [5200, 7800, 6500, 8200, 4300, 9100, 8234];
+        });
+        return;
+      }
+
+      // Fetch today's activities
+      final today = DateTime.now();
+      final startOfDay = DateTime(today.year, today.month, today.day);
+      final todayResponse = await Supabase.instance.client
+          .from('gps_activities')
+          .select('distance_meters, calories, avg_heart_rate')
+          .eq('user_id', userId)
+          .gte('start_time', startOfDay.toIso8601String());
+
+      // Fetch weekly activities (last 7 days)
+      final weekAgo = DateTime.now().subtract(const Duration(days: 7));
+      final weeklyResponse = await Supabase.instance.client
+          .from('gps_activities')
+          .select('distance_meters, start_time')
+          .eq('user_id', userId)
+          .gte('start_time', weekAgo.toIso8601String())
+          .order('start_time', ascending: true);
+
+      // Calculate today's metrics
+      double totalDistance = 0.0;
+      int totalCalories = 0;
+      List<int> heartRates = [];
+
+      for (var activity in todayResponse) {
+        totalDistance += ((activity['distance_meters'] ?? 0.0) as num).toDouble();
+        totalCalories += ((activity['calories'] ?? 0) as num).toInt();
+        final hr = activity['avg_heart_rate'];
+        if (hr != null && hr > 0) {
+          heartRates.add((hr as num).toInt());
+        }
+      }
+
+      // Calculate weekly steps (distance-based approximation: 1km ≈ 1312 steps)
+      List<double> steps = List.filled(7, 0.0);
+      for (var activity in weeklyResponse) {
+        final activityDate = DateTime.parse(activity['start_time']);
+        final dayIndex = today.difference(activityDate).inDays;
+        if (dayIndex >= 0 && dayIndex < 7) {
+          final distance = ((activity['distance_meters'] ?? 0.0) as num).toDouble();
+          steps[6 - dayIndex] += (distance / 1000) * 1312; // Convert km to steps
+        }
+      }
+
+      setState(() {
+        todaySteps = ((totalDistance / 1000) * 1312).toInt();
+        todayDistance = totalDistance / 1000;
+        todayCalories = totalCalories;
+        avgHeartRate = heartRates.isEmpty ? 0 : (heartRates.reduce((a, b) => a + b) / heartRates.length).toInt();
+        weeklySteps = steps;
+      });
+    } catch (e) {
+      developer.log('Error loading GPS activity data: $e');
+      // Keep default/mock values on error
+    }
+  }
+
   String _getAifriRiskLevel() {
     if (aifriScore >= 70) return 'Low Risk';
     if (aifriScore >= 40) return 'Moderate';
@@ -229,7 +307,6 @@ class _DashboardHomeState extends State<_DashboardHome> {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<AuthService>().user;
     final now = DateTime.now();
 
     if (isLoading) {
@@ -277,7 +354,7 @@ class _DashboardHomeState extends State<_DashboardHome> {
                     Text(
                       'Today ${now.day}.${now.month.toString().padLeft(2, '0')}.${now.year}',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha: 0.9),
                       ),
                     ),
                   ],
@@ -378,7 +455,7 @@ class _DashboardHomeState extends State<_DashboardHome> {
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.purple.withOpacity(0.3),
+                        color: Colors.purple.withValues(alpha: 0.3),
                         blurRadius: 12,
                         offset: const Offset(0, 6),
                       ),
@@ -422,6 +499,65 @@ class _DashboardHomeState extends State<_DashboardHome> {
               ),
               const SizedBox(height: 20),
               
+              // Fitness Metrics - Compact Circular Progress
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Today\'s Activity',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildCompactMetric(
+                          icon: Icons.directions_walk,
+                          value: todaySteps,
+                          label: 'Steps',
+                          goal: 10000,
+                          color1: DashboardColors.stepsGradient[0],
+                          color2: DashboardColors.stepsGradient[1],
+                        ),
+                        _buildCompactMetric(
+                          icon: Icons.map,
+                          value: todayDistance.toStringAsFixed(1),
+                          label: 'km',
+                          goal: 10,
+                          goalValue: todayDistance,
+                          color1: DashboardColors.distanceGradient[0],
+                          color2: DashboardColors.distanceGradient[1],
+                        ),
+                        _buildCompactMetric(
+                          icon: Icons.local_fire_department,
+                          value: todayCalories,
+                          label: 'Cal',
+                          goal: 600,
+                          color1: DashboardColors.caloriesGradient[0],
+                          color2: DashboardColors.caloriesGradient[1],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              
               // Stats Row
               Row(
                 children: [
@@ -433,7 +569,7 @@ class _DashboardHomeState extends State<_DashboardHome> {
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
+                            color: Colors.black.withValues(alpha: 0.05),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),
@@ -473,7 +609,7 @@ class _DashboardHomeState extends State<_DashboardHome> {
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
+                            color: Colors.black.withValues(alpha: 0.05),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),
@@ -513,6 +649,32 @@ class _DashboardHomeState extends State<_DashboardHome> {
               ),
               const SizedBox(height: 24),
               
+              // Weekly Activity Chart
+              Text(
+                'Weekly Activity',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                height: 200,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: _buildWeeklyStepsChart(),
+              ),
+              const SizedBox(height: 24),
+              
               // Pillar Scores Section
               if (pillarScores.values.any((score) => score > 0)) ...[
                 Text(
@@ -529,7 +691,7 @@ class _DashboardHomeState extends State<_DashboardHome> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -675,6 +837,147 @@ class _DashboardHomeState extends State<_DashboardHome> {
     );
   }
 
+  Widget _buildWeeklyStepsChart() {
+    final days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    final maxSteps = weeklySteps.reduce((a, b) => a > b ? a : b);
+    const minBarHeight = 20.0;
+
+    return Column(
+      children: [
+        // Chart
+        Expanded(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: List.generate(7, (index) {
+              final height = maxSteps > 0
+                  ? (weeklySteps[index] / maxSteps * 120).clamp(minBarHeight, 120.0)
+                  : minBarHeight;
+              final isToday = index == 6;
+
+              return Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      // Value label
+                      if (weeklySteps[index] > 0)
+                        Text(
+                          '${(weeklySteps[index] / 1000).toStringAsFixed(1)}k',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.grey[600],
+                            fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
+                          ),
+                        ),
+                      const SizedBox(height: 4),
+                      // Bar
+                      Container(
+                        height: height,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: isToday
+                                ? DashboardColors.stepsGradient
+                                : [Colors.grey[300]!, Colors.grey[400]!],
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.topCenter,
+                          ),
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(6),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+          ),
+        ),
+        const SizedBox(height: 8),
+        // Day labels
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: List.generate(7, (index) {
+            final isToday = index == 6;
+            return Expanded(
+              child: Text(
+                days[index],
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isToday ? Colors.deepPurple : Colors.grey[600],
+                  fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+            );
+          }),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCompactMetric({
+    required IconData icon,
+    required dynamic value,
+    required String label,
+    required num goal,
+    double? goalValue,
+    required Color color1,
+    required Color color2,
+  }) {
+    final numValue = goalValue ?? (value is int ? value.toDouble() : (value is String ? double.tryParse(value) ?? 0.0 : value as double));
+    final progress = goal > 0 ? (numValue / goal).clamp(0.0, 1.0) : 0.0;
+    
+    return Column(
+      children: [
+        SizedBox(
+          width: 70,
+          height: 70,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              SizedBox(
+                width: 70,
+                height: 70,
+                child: CircularProgressIndicator(
+                  value: progress,
+                  strokeWidth: 6,
+                  backgroundColor: Colors.grey[200],
+                  valueColor: AlwaysStoppedAnimation<Color>(color1),
+                ),
+              ),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(icon, color: color1, size: 24),
+                  const SizedBox(height: 2),
+                  Text(
+                    value.toString(),
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey[800],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.grey[600],
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildTodayActivityCard(BuildContext context, WorkoutCalendarEntry workout) {
     // Check if it's a GPS activity
     final isGPSActivity = workout.athleteNotes?.contains('km') ?? false;
@@ -691,7 +994,7 @@ class _DashboardHomeState extends State<_DashboardHome> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.green.withOpacity(0.3),
+            color: Colors.green.withValues(alpha: 0.3),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -715,7 +1018,7 @@ class _DashboardHomeState extends State<_DashboardHome> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -766,7 +1069,7 @@ class _DashboardHomeState extends State<_DashboardHome> {
           Text(
             workout.workout.workoutType.toUpperCase(),
             style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
               fontSize: 12,
               fontWeight: FontWeight.w600,
             ),
@@ -785,7 +1088,7 @@ class _DashboardHomeState extends State<_DashboardHome> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -903,7 +1206,7 @@ class _ActivityMetric extends StatelessWidget {
           Text(
             unit,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
               fontSize: 12,
             ),
           ),
@@ -936,9 +1239,9 @@ class _QuickAccessCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.3)),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
         ),
         child: Column(
           children: [

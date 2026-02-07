@@ -12,6 +12,7 @@ import 'screens/tracker_screen.dart';
 import 'screens/logger_screen.dart';
 import 'screens/history_screen.dart';
 import 'screens/profile_screen.dart';
+import 'dart:developer' as developer;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -62,12 +63,12 @@ class _MyAppState extends State<MyApp> {
         _handleDeepLink(initialUri);
       }
     } catch (e) {
-      print('Error getting initial deep link: $e');
+      developer.log('Error getting initial deep link: $e');
     }
   }
 
   void _handleDeepLink(Uri uri) {
-    print('Received deep link: $uri');
+    developer.log('Received deep link: $uri');
     
     // Handle Strava OAuth callback (localhost or custom scheme)
     bool isStravaCallback = (uri.scheme == 'http' && uri.host == 'localhost' && uri.path == '/strava-callback') ||
@@ -78,11 +79,11 @@ class _MyAppState extends State<MyApp> {
       final error = uri.queryParameters['error'];
       
       if (error != null) {
-        print('Strava OAuth error: $error');
+        developer.log('Strava OAuth error: $error');
       } else if (code != null) {
-        print('Received Strava authorization code: $code');
+        developer.log('Received Strava authorization code: $code');
         _stravaService.handleAuthorizationCode(code).then((success) {
-          print('Strava connection ${success ? 'successful' : 'failed'}');
+          developer.log('Strava connection ${success ? 'successful' : 'failed'}');
         });
       }
     }

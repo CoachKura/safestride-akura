@@ -9,9 +9,12 @@
 /// Data Standardization:
 /// All data is normalized to a common format compatible with AISRI system
 
+library gps_data_fetcher;
+
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:developer' as developer;
 
 /// Platform enum
 enum GPSPlatform {
@@ -208,7 +211,7 @@ class GPSDataFetcher {
           );
           activities.addAll(platformActivities);
         } catch (e) {
-          print('Error fetching from $platform: $e');
+          developer.log('Error fetching from $platform: $e');
         }
       }
     }
@@ -303,7 +306,7 @@ class GPSDataFetcher {
         throw Exception('Garmin API error: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error fetching Garmin activities: $e');
+      developer.log('Error fetching Garmin activities: $e');
       return [];
     }
   }
@@ -372,7 +375,7 @@ class GPSDataFetcher {
         throw Exception('Coros API error: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error fetching Coros activities: $e');
+      developer.log('Error fetching Coros activities: $e');
       return [];
     }
   }
@@ -414,7 +417,7 @@ class GPSDataFetcher {
     // Strava API v3 - Fetch ALL activities with pagination
     // Documentation: https://developers.strava.com/docs/reference/
     
-    print('🔄 Fetching ALL Strava activities from day 1...');
+    developer.log('🔄 Fetching ALL Strava activities from day 1...');
     
     final allActivities = <GPSActivity>[];
     int page = 1;
@@ -436,7 +439,7 @@ class GPSDataFetcher {
           queryParams['before'] = (endDate.millisecondsSinceEpoch ~/ 1000).toString();
         }
 
-        print('   Fetching page $page (${allActivities.length} activities so far)...');
+        developer.log('   Fetching page $page (${allActivities.length} activities so far)...');
 
         final response = await http.get(
           Uri.parse('https://www.strava.com/api/v3/athlete/activities')
@@ -454,27 +457,27 @@ class GPSDataFetcher {
             final pageActivities = _parseStravaActivities(data);
             allActivities.addAll(pageActivities);
             
-            print('   ✅ Page $page: Found ${pageActivities.length} activities');
+            developer.log('   ✅ Page $page: Found ${pageActivities.length} activities');
             
             // Check if we've hit the user's limit
             if (limit != null && allActivities.length >= limit) {
-              print('   🛑 Reached limit of $limit activities');
+              developer.log('   🛑 Reached limit of $limit activities');
               hasMoreActivities = false;
             } else if (data.length < perPage) {
               // Less than perPage means this is the last page
-              print('   🏁 Reached last page');
+              developer.log('   🏁 Reached last page');
               hasMoreActivities = false;
             } else {
               page++;
             }
           } else {
             // Empty page means no more activities
-            print('   🏁 No more activities found');
+            developer.log('   🏁 No more activities found');
             hasMoreActivities = false;
           }
         } else if (response.statusCode == 429) {
           // Rate limit exceeded
-          print('   ⚠️ Rate limit exceeded, waiting 60 seconds...');
+          developer.log('   ⚠️ Rate limit exceeded, waiting 60 seconds...');
           await Future.delayed(const Duration(seconds: 60));
           // Retry the same page
         } else {
@@ -482,11 +485,11 @@ class GPSDataFetcher {
         }
       }
 
-      print('✅ Total activities fetched: ${allActivities.length}');
+      developer.log('✅ Total activities fetched: ${allActivities.length}');
       return limit != null ? allActivities.take(limit).toList() : allActivities;
       
     } catch (e) {
-      print('❌ Error fetching Strava activities: $e');
+      developer.log('❌ Error fetching Strava activities: $e');
       return allActivities; // Return what we have so far
     }
   }
@@ -602,14 +605,14 @@ class GPSDataFetcher {
             );
             connections[platform] = accessToken;
           } catch (e) {
-            print('Unknown platform: $platformName');
+            developer.log('Unknown platform: $platformName');
           }
         }
       }
 
       return connections;
     } catch (e) {
-      print('Error getting connected platforms: $e');
+      developer.log('Error getting connected platforms: $e');
       return {};
     }
   }
@@ -617,7 +620,37 @@ class GPSDataFetcher {
   /// Get access token for specific platform
   Future<String?> _getAccessToken(GPSPlatform platform) async {
     final connections = await _getConnectedPlatforms();
-    return connections[platform];
+    var token = connections[platform];
+
+    // Fallback: if Strava isn't cached in gps_connections yet, pull from profiles
+    if (token == null && platform == GPSPlatform.strava) {
+      final userId = _supabase.auth.currentUser?.id;
+      if (userId == null) return null;
+
+      final profile = await _supabase
+          .from('profiles')
+          .select('strava_access_token, strava_refresh_token, strava_expires_at')
+          .eq('id', userId)
+          .maybeSingle();
+
+      final profileToken = profile?['strava_access_token'] as String?;
+      if (profileToken != null) {
+        final expiresAtRaw = profile?['strava_expires_at'] as String?;
+        final expiresAt = expiresAtRaw != null ? DateTime.tryParse(expiresAtRaw) : null;
+
+        // Cache into gps_connections so downstream calls work without reconnecting
+        await storeAccessToken(
+          platform: platform,
+          accessToken: profileToken,
+          refreshToken: profile?['strava_refresh_token'] as String?,
+          expiresAt: expiresAt,
+        );
+
+        token = profileToken;
+      }
+    }
+
+    return token;
   }
 
   /// Store access token for platform
@@ -662,7 +695,7 @@ class GPSDataFetcher {
     int savedCount = 0;
     final activitiesByDate = <DateTime, List<GPSActivity>>{};
     
-    print('\n📅 ORGANIZING ACTIVITIES BY CALENDAR DATE...');
+    developer.log('\n📅 ORGANIZING ACTIVITIES BY CALENDAR DATE...');
 
     // Group activities by calendar date BEFORE saving
     for (var activity in activities) {
@@ -672,8 +705,8 @@ class GPSDataFetcher {
       activitiesByDate.putIfAbsent(dateOnly, () => []).add(activity);
     }
     
-    print('📊 Found ${activitiesByDate.length} unique dates with activities');
-    print('   Date range: ${activities.last.startTime.toString().split(' ')[0]} to ${activities.first.startTime.toString().split(' ')[0]}\n');
+    developer.log('📊 Found ${activitiesByDate.length} unique dates with activities');
+    developer.log('   Date range: ${activities.last.startTime.toString().split(' ')[0]} to ${activities.first.startTime.toString().split(' ')[0]}\n');
 
     // Save each activity with calendar date organization
     for (var activity in activities) {
@@ -750,25 +783,25 @@ class GPSDataFetcher {
           savedCount++;
         }
       } catch (e) {
-        print('Error saving activity ${activity.id}: $e');
+        developer.log('Error saving activity ${activity.id}: $e');
       }
     }
 
-    print('\n✅ CALENDAR DATE STORAGE COMPLETE:');
-    print('   💾 Saved $savedCount NEW activities');
-    print('   📅 Organized across ${activitiesByDate.length} calendar dates');
-    print('   📊 Total activities processed: ${activities.length}');
+    developer.log('\n✅ CALENDAR DATE STORAGE COMPLETE:');
+    developer.log('   💾 Saved $savedCount NEW activities');
+    developer.log('   📅 Organized across ${activitiesByDate.length} calendar dates');
+    developer.log('   📊 Total activities processed: ${activities.length}');
     
     // Display calendar summary
-    print('\n📅 ACTIVITIES BY CALENDAR DATE:');
+    developer.log('\n📅 ACTIVITIES BY CALENDAR DATE:');
     final sortedDates = activitiesByDate.keys.toList()..sort((a, b) => b.compareTo(a));
     for (var date in sortedDates.take(10)) {
       final count = activitiesByDate[date]!.length;
       final totalKm = activitiesByDate[date]!.fold<double>(0, (sum, a) => sum + a.distanceMeters / 1000);
-      print('   ${date.toString().split(' ')[0]}: $count run(s), ${totalKm.toStringAsFixed(1)} km');
+      developer.log('   ${date.toString().split(' ')[0]}: $count run(s), ${totalKm.toStringAsFixed(1)} km');
     }
     if (sortedDates.length > 10) {
-      print('   ... and ${sortedDates.length - 10} more dates');
+      developer.log('   ... and ${sortedDates.length - 10} more dates');
     }
     
     return {
@@ -848,7 +881,7 @@ class GPSDataFetcher {
 
       return grouped;
     } catch (e) {
-      print('Error fetching activities by date: $e');
+      developer.log('Error fetching activities by date: $e');
       return {};
     }
   }
@@ -886,7 +919,7 @@ class GPSDataFetcher {
       final streamsResponse = await http.get(
         Uri.parse(
           'https://www.strava.com/api/v3/activities/$activityId/streams'
-          '?keys=time,heartrate,altitude,velocity_smooth,cadence,distance'
+          '?keys=time,heartrate,altitude,velocity_smooth,cadence,distance,latlng'
           '&key_by_type=true'
         ),
         headers: {'Authorization': 'Bearer $accessToken'},
@@ -906,7 +939,7 @@ class GPSDataFetcher {
         final movingTime = (activity['moving_time'] as int?) ?? 0;
         double? avgPace;
         if (distance > 0 && movingTime > 0) {
-          avgPace = (movingTime / 60) / (distance / 1000); // min/km
+          avgPace = (movingTime / 60) / (distance / 1000); // min/kmw
         }
         
         return ActivityDetails(
@@ -931,7 +964,7 @@ class GPSDataFetcher {
       
       throw Exception('Failed to fetch Strava activity: ${activityResponse.statusCode}');
     } catch (e) {
-      print('Error fetching Strava activity details: $e');
+      developer.log('Error fetching Strava activity details: $e');
       rethrow;
     }
   }
@@ -944,11 +977,12 @@ class GPSDataFetcher {
     final velocityData = streams['velocity_smooth']?['data'] as List?;
     final cadenceData = streams['cadence']?['data'] as List?;
     final distanceData = streams['distance']?['data'] as List?;
-    
+    final latLngData = streams['latlng']?['data'] as List?;
+
     if (timeData == null || timeData.isEmpty) return [];
-    
+
     final startTime = DateTime.parse(startDateStr);
-    
+
     return List.generate(timeData.length, (i) {
       final speed = velocityData?[i]?.toDouble();
       double? pace;
@@ -956,7 +990,19 @@ class GPSDataFetcher {
         // Convert m/s to min/km
         pace = 1000 / (speed * 60);
       }
-      
+
+      double? latitude;
+      double? longitude;
+      if (latLngData != null && i < latLngData.length) {
+        final point = latLngData[i];
+        if (point is List && point.length >= 2) {
+          final lat = point[0];
+          final lng = point[1];
+          if (lat is num) latitude = lat.toDouble();
+          if (lng is num) longitude = lng.toDouble();
+        }
+      }
+
       return DataPoint(
         timestamp: startTime.add(Duration(seconds: timeData[i])),
         timeSeconds: timeData[i],
@@ -966,9 +1012,12 @@ class GPSDataFetcher {
         cadence: cadenceData?[i]?.toDouble(),
         pace: pace,
         distance: distanceData?[i]?.toDouble(),
+        latitude: latitude,
+        longitude: longitude,
       );
     });
   }
+
   
   /// Garmin activity details (placeholder)
   Future<ActivityDetails> _fetchGarminActivityDetails(String activityId, String accessToken) async {
@@ -993,6 +1042,8 @@ class DataPoint {
   final double? cadence;
   final double? speed;
   final double? distance;
+  final double? latitude;
+  final double? longitude;
   
   DataPoint({
     required this.timestamp,
@@ -1003,6 +1054,8 @@ class DataPoint {
     this.cadence,
     this.speed,
     this.distance,
+    this.latitude,
+    this.longitude,
   });
 }
 

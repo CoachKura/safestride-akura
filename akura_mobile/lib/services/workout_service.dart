@@ -2,10 +2,13 @@
 /// Handles CRUD operations for structured workouts
 /// Supports local storage and Supabase sync
 
+library workout_service;
+
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/workout_step.dart';
+import 'dart:developer' as developer;
 
 class WorkoutService {
   static const String _workoutsKey = 'structured_workouts';
@@ -19,7 +22,7 @@ class WorkoutService {
     try {
       return Supabase.instance.client;
     } catch (e) {
-      print('⚠️ Supabase not initialized, using local storage only');
+      developer.log('⚠️ Supabase not initialized, using local storage only');
       return null;
     }
   }
@@ -34,7 +37,7 @@ class WorkoutService {
       try {
         await _syncToCloud(workout);
       } catch (e) {
-        print('⚠️ Failed to sync to cloud: $e');
+        developer.log('⚠️ Failed to sync to cloud: $e');
         // Continue anyway - local save succeeded
       }
     }
@@ -52,7 +55,7 @@ class WorkoutService {
       return list.map((item) => StructuredWorkout.fromJson(item)).toList()
         ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
     } catch (e) {
-      print('⚠️ Error loading workouts: $e');
+      developer.log('⚠️ Error loading workouts: $e');
       return [];
     }
   }
@@ -101,7 +104,7 @@ class WorkoutService {
       try {
         await _supabase!.from('structured_workouts').delete().eq('id', id);
       } catch (e) {
-        print('⚠️ Failed to delete from cloud: $e');
+        developer.log('⚠️ Failed to delete from cloud: $e');
       }
     }
   }
@@ -341,7 +344,7 @@ class WorkoutService {
       
       await _saveAll(merged.values.toList());
     } catch (e) {
-      print('⚠️ Failed to sync from cloud: $e');
+      developer.log('⚠️ Failed to sync from cloud: $e');
     }
   }
 }

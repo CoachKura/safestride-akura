@@ -7,10 +7,13 @@
 /// - Generate AI training plans
 /// - Disconnect Strava
 
+library strava_connect_screen;
+
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../services/strava_service.dart';
 import 'training_plan_screen.dart';
+import 'dart:developer' as developer;
 
 class StravaConnectScreen extends StatefulWidget {
   const StravaConnectScreen({super.key});
@@ -64,7 +67,7 @@ class _StravaConnectScreenState extends State<StravaConnectScreen> {
         });
       }
     } catch (e) {
-      print('Error loading activity count: $e');
+      developer.log('Error loading activity count: $e');
     }
   }
 
@@ -238,7 +241,7 @@ class _StravaConnectScreenState extends State<StravaConnectScreen> {
           Text(
             _isConnected ? '$_activityCount Activities Synced' : 'Connect Your Account',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
               fontSize: 14,
             ),
           ),
@@ -263,7 +266,7 @@ class _StravaConnectScreenState extends State<StravaConnectScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: (_isConnected ? Colors.green : Colors.orange).withOpacity(0.2),
+              color: (_isConnected ? Colors.green : Colors.orange).withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -456,7 +459,7 @@ class _StravaConnectScreenState extends State<StravaConnectScreen> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.deepOrange.withOpacity(0.2),
+              color: Colors.deepOrange.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(icon, color: Colors.deepOrange, size: 20),

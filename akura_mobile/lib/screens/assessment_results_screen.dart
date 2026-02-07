@@ -8,6 +8,8 @@
 /// - Specific corrective protocols
 /// - Next steps and action items
 
+library assessment_results_screen;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io';
@@ -137,7 +139,7 @@ class _AssessmentResultsScreenState extends State<AssessmentResultsScreen>
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 10,
               offset: const Offset(0, -2),
             ),
@@ -242,7 +244,7 @@ class _AssessmentResultsScreenState extends State<AssessmentResultsScreen>
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           gradient: LinearGradient(
-            colors: [scoreColor.withOpacity(0.1), scoreColor.withOpacity(0.05)],
+            colors: [scoreColor.withValues(alpha: 0.1), scoreColor.withValues(alpha: 0.05)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),

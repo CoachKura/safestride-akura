@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'dashboard_screen.dart';
+
 import 'assessment_results_screen.dart';
 import '../services/aisri_calculator.dart';
+import 'dart:developer' as developer;
 
 class EvaluationFormScreen extends StatefulWidget {
   const EvaluationFormScreen({super.key});
@@ -340,25 +341,25 @@ class _EvaluationFormScreenState extends State<EvaluationFormScreen> {
         throw Exception('User not authenticated');
       }
 
-      print('🔍 DEBUG: Starting AISRI calculation...');
-      print('Years running: ${_yearsRunningController.text}');
-      print('Training frequency: $_selectedTrainingFrequency');
-      print('Training intensity: $_trainingIntensity');
-      print('Current pain: $_currentPain');
-      print('Sleep hours: ${_sleepHoursController.text}');
-      print('Sleep quality: $_sleepQuality');
-      print('Stress level: $_stressLevel');
-      print('Weekly mileage: ${_weeklyMileageController.text}');
-      print('Fitness level: $_selectedFitnessLevel');
-      print('Ankle dorsiflexion: ${_ankleDorsiflexionController.text} cm');
-      print('Hip flexion: ${_hipFlexionController.text}°');
-      print('Balance test: ${_balanceTestController.text}s');
-      print('Plank hold: ${_plankHoldController.text}s');
-      print('Resting HR: ${_restingHRController.text} BPM');
-      print('Perceived fatigue: $_perceivedFatigue');
-      print('Knee strength: $_selectedKneeStrength');
-      print('Shoulder rotation: $_selectedShoulderRotation');
-      print('Neck flexion: $_selectedNeckFlexion');
+      developer.log('🔍 DEBUG: Starting AISRI calculation...');
+      developer.log('Years running: ${_yearsRunningController.text}');
+      developer.log('Training frequency: $_selectedTrainingFrequency');
+      developer.log('Training intensity: $_trainingIntensity');
+      developer.log('Current pain: $_currentPain');
+      developer.log('Sleep hours: ${_sleepHoursController.text}');
+      developer.log('Sleep quality: $_sleepQuality');
+      developer.log('Stress level: $_stressLevel');
+      developer.log('Weekly mileage: ${_weeklyMileageController.text}');
+      developer.log('Fitness level: $_selectedFitnessLevel');
+      developer.log('Ankle dorsiflexion: ${_ankleDorsiflexionController.text} cm');
+      developer.log('Hip flexion: ${_hipFlexionController.text}°');
+      developer.log('Balance test: ${_balanceTestController.text}s');
+      developer.log('Plank hold: ${_plankHoldController.text}s');
+      developer.log('Resting HR: ${_restingHRController.text} BPM');
+      developer.log('Perceived fatigue: $_perceivedFatigue');
+      developer.log('Knee strength: $_selectedKneeStrength');
+      developer.log('Shoulder rotation: $_selectedShoulderRotation');
+      developer.log('Neck flexion: $_selectedNeckFlexion');
 
       // Calculate AISRI score using the calculator service
       final scoreData = AISRICalculator.calculateScore({
@@ -393,16 +394,16 @@ class _EvaluationFormScreenState extends State<EvaluationFormScreen> {
       });
 
       // Debug: Check calculator output
-      print('🎯 DEBUG: AISRI Calculator returned:');
-      print('Full scoreData: $scoreData');
-      print('AISRI Score: ${scoreData['aifri_score']}');
-      print('Risk Level: ${scoreData['risk_level']}');
-      print('Pillar Adaptability: ${scoreData['pillar_adaptability']}');
-      print('Pillar Injury Risk: ${scoreData['pillar_injury_risk']}');
-      print('Pillar Fatigue: ${scoreData['pillar_fatigue']}');
-      print('Pillar Recovery: ${scoreData['pillar_recovery']}');
-      print('Pillar Intensity: ${scoreData['pillar_intensity']}');
-      print('Pillar Consistency: ${scoreData['pillar_consistency']}');
+      developer.log('🎯 DEBUG: AISRI Calculator returned:');
+      developer.log('Full scoreData: $scoreData');
+      developer.log('AISRI Score: ${scoreData['aifri_score']}');
+      developer.log('Risk Level: ${scoreData['risk_level']}');
+      developer.log('Pillar Adaptability: ${scoreData['pillar_adaptability']}');
+      developer.log('Pillar Injury Risk: ${scoreData['pillar_injury_risk']}');
+      developer.log('Pillar Fatigue: ${scoreData['pillar_fatigue']}');
+      developer.log('Pillar Recovery: ${scoreData['pillar_recovery']}');
+      developer.log('Pillar Intensity: ${scoreData['pillar_intensity']}');
+      developer.log('Pillar Consistency: ${scoreData['pillar_consistency']}');
       
       if (scoreData['aifri_score'] == null) {
         throw Exception('AISRI calculation failed - score is null');
@@ -481,7 +482,7 @@ class _EvaluationFormScreenState extends State<EvaluationFormScreen> {
         'created_at': DateTime.now().toIso8601String(),
       }).select().single();
 
-      print('✅ Assessment saved successfully!');
+      developer.log('✅ Assessment saved successfully!');
 
       // Update profile with current AIFRI score
       await Supabase.instance.client
@@ -545,8 +546,8 @@ class _EvaluationFormScreenState extends State<EvaluationFormScreen> {
         );
       }
     } catch (e, stackTrace) {
-      print('❌ ERROR saving assessment: $e');
-      print('Stack trace: $stackTrace');
+      developer.log('❌ ERROR saving assessment: $e');
+      developer.log('Stack trace: $stackTrace');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -598,7 +599,7 @@ class _EvaluationFormScreenState extends State<EvaluationFormScreen> {
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 2),
                 ),
@@ -662,7 +663,7 @@ class _EvaluationFormScreenState extends State<EvaluationFormScreen> {
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, -2),
                 ),
@@ -1219,7 +1220,7 @@ class _EvaluationFormScreenState extends State<EvaluationFormScreen> {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: _selectedKneeStrength,
+                  initialValue: _selectedKneeStrength,
                   decoration: const InputDecoration(
                     labelText: 'Squat Depth',
                     border: OutlineInputBorder(),
@@ -1360,7 +1361,7 @@ class _EvaluationFormScreenState extends State<EvaluationFormScreen> {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: _selectedShoulderRotation,
+                  initialValue: _selectedShoulderRotation,
                   decoration: const InputDecoration(
                     labelText: 'Highest Point Reached',
                     border: OutlineInputBorder(),
@@ -1425,7 +1426,7 @@ class _EvaluationFormScreenState extends State<EvaluationFormScreen> {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: _selectedNeckFlexion,
+                  initialValue: _selectedNeckFlexion,
                   decoration: const InputDecoration(
                     labelText: 'Chin-to-Chest Result',
                     border: OutlineInputBorder(),
@@ -1522,7 +1523,7 @@ class _EvaluationFormScreenState extends State<EvaluationFormScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.deepPurple.withOpacity(0.1),
+              color: Colors.deepPurple.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: Colors.deepPurple, width: 2),
             ),
@@ -1713,7 +1714,7 @@ class _EvaluationFormScreenState extends State<EvaluationFormScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.deepPurple.withOpacity(0.1),
+              color: Colors.deepPurple.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: Colors.deepPurple, width: 2),
             ),

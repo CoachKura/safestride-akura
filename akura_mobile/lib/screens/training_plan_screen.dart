@@ -1,6 +1,8 @@
 /// Training Plan Generator Screen
 /// Generates personalized 4-week training plans based on Strava data
 
+library training_plan_screen;
+
 import 'package:flutter/material.dart';
 import '../services/training_plan_service.dart';
 import 'garmin_workout_builder_screen.dart';
@@ -222,7 +224,7 @@ class _TrainingPlanScreenState extends State<TrainingPlanScreen> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.2),
+                color: Colors.red.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -265,7 +267,7 @@ class _TrainingPlanScreenState extends State<TrainingPlanScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(Icons.analytics, color: Colors.white, size: 28),
@@ -324,7 +326,7 @@ class _TrainingPlanScreenState extends State<TrainingPlanScreen> {
           Text(
             label,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.7),
+              color: Colors.white.withValues(alpha: 0.7),
               fontSize: 11,
             ),
           ),
@@ -356,7 +358,7 @@ class _TrainingPlanScreenState extends State<TrainingPlanScreen> {
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: isSelected ? Colors.green.withOpacity(0.2) : null,
+                color: isSelected ? Colors.green.withValues(alpha: 0.2) : null,
                 border: isSelected
                     ? Border.all(color: Colors.green, width: 2)
                     : null,
@@ -539,7 +541,7 @@ class _TrainingPlanScreenState extends State<TrainingPlanScreen> {
                     const SizedBox(height: 4),
                     Text(
                       '${plan.totalWorkouts} workouts • ${plan.totalDistance.toStringAsFixed(0)} km total',
-                      style: TextStyle(color: Colors.white.withOpacity(0.8)),
+                      style: TextStyle(color: Colors.white.withValues(alpha: 0.8)),
                     ),
                   ],
                 ),
@@ -588,7 +590,7 @@ class _TrainingPlanScreenState extends State<TrainingPlanScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.green.withOpacity(0.2),
+              color: Colors.green.withValues(alpha: 0.2),
               borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
             ),
             child: Row(

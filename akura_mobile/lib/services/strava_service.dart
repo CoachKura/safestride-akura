@@ -1,8 +1,13 @@
+﻿library strava_service;
+
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+import 'gps_data_fetcher.dart';
+import 'dart:developer' as developer;
 
 class StravaService {
   // Strava API credentials loaded from .env file
@@ -44,7 +49,7 @@ class StravaService {
       
       return launched;
     } catch (e) {
-      print('Error launching Strava auth: $e');
+      developer.log('Error launching Strava auth: $e');
       return false;
     }
   }
@@ -81,15 +86,25 @@ class StravaService {
         final userId = Supabase.instance.client.auth.currentUser?.id;
         if (userId == null) return false;
         
+        final expiresAt = DateTime.fromMillisecondsSinceEpoch(
+          data['expires_at'] * 1000,
+        );
+
         await Supabase.instance.client.from('profiles').update({
           'strava_access_token': data['access_token'],
           'strava_refresh_token': data['refresh_token'],
           'strava_athlete_id': data['athlete']['id'],
           'strava_connected_at': DateTime.now().toIso8601String(),
-          'strava_expires_at': DateTime.fromMillisecondsSinceEpoch(
-            data['expires_at'] * 1000,
-          ).toIso8601String(),
+          'strava_expires_at': expiresAt.toIso8601String(),
         }).eq('id', userId);
+
+        // Keep gps_connections in sync so activity detail lookups work
+        await GPSDataFetcher().storeAccessToken(
+          platform: GPSPlatform.strava,
+          accessToken: data['access_token'],
+          refreshToken: data['refresh_token'],
+          expiresAt: expiresAt,
+        );
         
         // Immediately sync activities after connecting
         await syncActivities();
@@ -97,10 +112,10 @@ class StravaService {
         return true;
       }
       
-      print('Strava token exchange failed: ${response.statusCode}');
+      developer.log('Strava token exchange failed: ${response.statusCode}');
       return false;
     } catch (e) {
-      print('Error exchanging Strava code: $e');
+      developer.log('Error exchanging Strava code: $e');
       return false;
     }
   }
@@ -143,20 +158,30 @@ class StravaService {
         final data = json.decode(response.body);
         
         // Update tokens in database
+        final expiresAt = DateTime.fromMillisecondsSinceEpoch(
+          data['expires_at'] * 1000,
+        );
+
         await Supabase.instance.client.from('profiles').update({
           'strava_access_token': data['access_token'],
           'strava_refresh_token': data['refresh_token'],
-          'strava_expires_at': DateTime.fromMillisecondsSinceEpoch(
-            data['expires_at'] * 1000,
-          ).toIso8601String(),
+          'strava_expires_at': expiresAt.toIso8601String(),
         }).eq('id', userId);
+
+        // Refresh token cache used by gps detail fetcher
+        await GPSDataFetcher().storeAccessToken(
+          platform: GPSPlatform.strava,
+          accessToken: data['access_token'],
+          refreshToken: data['refresh_token'],
+          expiresAt: expiresAt,
+        );
         
         return data['access_token'];
       }
       
       return null;
     } catch (e) {
-      print('Error refreshing token: $e');
+      developer.log('Error refreshing token: $e');
       return null;
     }
   }
@@ -180,7 +205,7 @@ class StravaService {
       );
       
       if (response.statusCode != 200) {
-        print('Strava API error: ${response.statusCode}');
+        developer.log('Strava API error: ${response.statusCode}');
         return 0;
       }
       
@@ -215,13 +240,13 @@ class StravaService {
           
           syncedCount++;
         } catch (e) {
-          print('Error importing activity ${activity['id']}: $e');
+          developer.log('Error importing activity ${activity['id']}: $e');
         }
       }
       
       return syncedCount;
     } catch (e) {
-      print('Error syncing Strava activities: $e');
+      developer.log('Error syncing Strava activities: $e');
       return 0;
     }
   }
@@ -256,7 +281,7 @@ class StravaService {
       
       return profile?['strava_access_token'] != null;
     } catch (e) {
-      print('Error checking Strava connection: $e');
+      developer.log('Error checking Strava connection: $e');
       return false;
     }
   }
@@ -282,7 +307,7 @@ class StravaService {
         'connected_at': profile['strava_connected_at'],
       };
     } catch (e) {
-      print('Error getting connection info: $e');
+      developer.log('Error getting connection info: $e');
       return null;
     }
   }
@@ -300,10 +325,13 @@ class StravaService {
         'strava_connected_at': null,
         'strava_expires_at': null,
       }).eq('id', userId);
+
+      // Also clear gps_connections so detail views stop using stale tokens
+      await GPSDataFetcher().disconnectPlatform(GPSPlatform.strava);
       
       return true;
     } catch (e) {
-      print('Error disconnecting Strava: $e');
+      developer.log('Error disconnecting Strava: $e');
       return false;
     }
   }

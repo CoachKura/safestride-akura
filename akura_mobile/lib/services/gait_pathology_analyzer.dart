@@ -9,6 +9,8 @@
 ///
 /// Uses physical assessment data to infer gait patterns and predict injury risks
 
+library gait_pathology_analyzer;
+
 import 'package:flutter/foundation.dart';
 import 'biomechanics_reference.dart';
 

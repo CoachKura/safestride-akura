@@ -1,11 +1,13 @@
 ﻿/// Workout Builder Screen for SafeStride
 /// Allows coaches/athletes to create custom workouts
 
-import ''package:flutter/material.dart'';
-import ''package:intl/intl.dart'';
-import ''../models/workout_builder_models.dart'';
-import ''../services/workout_builder_adapter.dart'';
-import ''../services/calendar_service.dart'';
+library workout_builder_screen;
+
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import '../models/workout_builder_models.dart';
+import '../services/workout_builder_adapter.dart';
+import '../services/calendar_service.dart';
 
 class WorkoutBuilderScreen extends StatefulWidget {
   final DateTime? initialDate;
@@ -38,10 +40,10 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
   bool _includeStrides = false;
   
   // Strides fields
-  final TextEditingController _stridesRepsController = TextEditingController(text: ''6'');
-  final TextEditingController _stridesDistanceController = TextEditingController(text: ''100'');
+  final TextEditingController _stridesRepsController = TextEditingController(text: '6');
+  final TextEditingController _stridesDistanceController = TextEditingController(text: '100');
   WorkoutUnit _stridesDistanceUnit = WorkoutUnit.meters;
-  final TextEditingController _stridesRecoveryController = TextEditingController(text: ''90'');
+  final TextEditingController _stridesRecoveryController = TextEditingController(text: '90');
   RecoveryUnit _stridesRecoveryUnit = RecoveryUnit.secondsWalk;
   
   // Quality Session fields
@@ -78,12 +80,12 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(''Create Workout''),
+        title: const Text('Create Workout'),
         actions: [
           TextButton(
             onPressed: _saveWorkout,
             child: const Text(
-              ''SAVE'',
+              'SAVE',
               style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             ),
           ),
@@ -113,7 +115,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              ''Workout Type'',
+              'Workout Type',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
@@ -125,7 +127,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                   label: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(type.icon),
+                      Icon(type.icon),
                       const SizedBox(width: 4),
                       Text(type.displayName),
                     ],
@@ -153,27 +155,27 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              ''Basic Info'',
+              'Basic Info',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: _nameController,
               decoration: const InputDecoration(
-                labelText: ''Custom Name (optional)'',
-                hintText: ''e.g., Monday Morning Run'',
+                labelText: 'Custom Name (optional)',
+                hintText: 'e.g., Monday Morning Run',
               ),
             ),
             const SizedBox(height: 16),
             ListTile(
               leading: const Icon(Icons.calendar_today),
-              title: const Text(''Date''),
-              subtitle: Text(DateFormat(''MMM d, yyyy'').format(_selectedDate)),
+              title: const Text('Date'),
+              subtitle: Text(DateFormat('MMM d, yyyy').format(_selectedDate)),
               onTap: _selectDate,
             ),
             ListTile(
               leading: const Icon(Icons.access_time),
-              title: const Text(''Time''),
+              title: const Text('Time'),
               subtitle: Text(_selectedTime.format(context)),
               onTap: _selectTime,
             ),
@@ -181,8 +183,8 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
             TextField(
               controller: _notesController,
               decoration: const InputDecoration(
-                labelText: ''Coach Notes'',
-                hintText: ''Instructions or tips for this workout...'',
+                labelText: 'Coach Notes',
+                hintText: 'Instructions or tips for this workout...',
               ),
               maxLines: 3,
             ),
@@ -217,7 +219,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              ''Easy Run Details'',
+              'Easy Run Details',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
@@ -228,7 +230,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                     controller: _distanceController,
                     keyboardType: TextInputType.number,
                     decoration: const InputDecoration(
-                      labelText: ''Distance'',
+                      labelText: 'Distance',
                     ),
                   ),
                 ),
@@ -251,14 +253,14 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
             ),
             const SizedBox(height: 16),
             CheckboxListTile(
-              title: const Text(''Include Strides''),
+              title: const Text('Include Strides'),
               value: _includeStrides,
               onChanged: (value) => setState(() => _includeStrides = value ?? false),
             ),
             if (_includeStrides) ...[
               const Divider(),
               const Text(
-                ''Strides Setup'',
+                'Strides Setup',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
@@ -268,7 +270,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                     child: TextField(
                       controller: _stridesRepsController,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(labelText: ''Reps''),
+                      decoration: const InputDecoration(labelText: 'Reps'),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -276,7 +278,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                     child: TextField(
                       controller: _stridesDistanceController,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(labelText: ''Distance''),
+                      decoration: const InputDecoration(labelText: 'Distance'),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -303,7 +305,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                     child: TextField(
                       controller: _stridesRecoveryController,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(labelText: ''Recovery''),
+                      decoration: const InputDecoration(labelText: 'Recovery'),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -346,7 +348,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              ''Quality Session'',
+              'Quality Session',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
@@ -356,7 +358,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                   child: TextField(
                     controller: _warmupController,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(labelText: ''Warmup''),
+                    decoration: const InputDecoration(labelText: 'Warmup'),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -378,14 +380,14 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
             ),
             const SizedBox(height: 16),
             const Text(
-              ''Main Sets'',
+              'Main Sets',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             if (_sets.isEmpty)
               Center(
                 child: Text(
-                  ''No sets added yet'',
+                  'No sets added yet',
                   style: TextStyle(color: Colors.grey[600]),
                 ),
               )
@@ -396,14 +398,14 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                 itemCount: _sets.length,
                 itemBuilder: (context, index) {
                   final set = _sets[index];
-                  String description = '''';
+                  String description = '';
                   if (set is RunningSet) {
                     description = set.description;
                   } else if (set is RestSet) {
                     description = set.description;
                   }
                   return ListTile(
-                    leading: CircleAvatar(child: Text(''${index + 1}'')),
+                    leading: CircleAvatar(child: Text('${index + 1}')),
                     title: Text(description),
                     trailing: IconButton(
                       icon: const Icon(Icons.delete),
@@ -416,7 +418,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
             OutlinedButton.icon(
               onPressed: _addSet,
               icon: const Icon(Icons.add),
-              label: const Text(''Add Set''),
+              label: const Text('Add Set'),
             ),
             const SizedBox(height: 16),
             Row(
@@ -425,7 +427,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                   child: TextField(
                     controller: _cooldownController,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(labelText: ''Cooldown''),
+                    decoration: const InputDecoration(labelText: 'Cooldown'),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -459,15 +461,15 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              ''Race Details'',
+              'Race Details',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: _raceNameController,
               decoration: const InputDecoration(
-                labelText: ''Race Name'',
-                hintText: ''e.g., 5K City Championship'',
+                labelText: 'Race Name',
+                hintText: 'e.g., 5K City Championship',
               ),
             ),
             const SizedBox(height: 16),
@@ -477,7 +479,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                   child: TextField(
                     controller: _raceDistanceController,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(labelText: ''Distance''),
+                    decoration: const InputDecoration(labelText: 'Distance'),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -504,11 +506,11 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                   child: TextField(
                     controller: _warmupController,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(labelText: ''Warmup''),
+                    decoration: const InputDecoration(labelText: 'Warmup'),
                   ),
                 ),
                 const SizedBox(width: 8),
-                const Text(''km''),
+                const Text('km'),
               ],
             ),
             const SizedBox(height: 16),
@@ -518,11 +520,11 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                   child: TextField(
                     controller: _cooldownController,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(labelText: ''Cooldown''),
+                    decoration: const InputDecoration(labelText: 'Cooldown'),
                   ),
                 ),
                 const SizedBox(width: 8),
-                const Text(''km''),
+                const Text('km'),
               ],
             ),
           ],
@@ -539,19 +541,19 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              ''Cross Training'',
+              'Cross Training',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<CrossTrainingType>(
               value: _crossTrainingType,
-              decoration: const InputDecoration(labelText: ''Activity''),
+              decoration: const InputDecoration(labelText: 'Activity'),
               items: CrossTrainingType.values
                   .map((type) => DropdownMenuItem(
                         value: type,
                         child: Row(
                           children: [
-                            Text(type.icon),
+                            Icon(type.icon),
                             const SizedBox(width: 8),
                             Text(type.displayName),
                           ],
@@ -571,7 +573,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                   child: TextField(
                     controller: _durationController,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(labelText: ''Duration''),
+                    decoration: const InputDecoration(labelText: 'Duration'),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -594,7 +596,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
             const SizedBox(height: 16),
             DropdownButtonFormField<WorkoutIntensity>(
               value: _intensity,
-              decoration: const InputDecoration(labelText: ''Intensity''),
+              decoration: const InputDecoration(labelText: 'Intensity'),
               items: [
                 WorkoutIntensity.easy,
                 WorkoutIntensity.recovery,
@@ -616,14 +618,14 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
               const SizedBox(height: 16),
               const Divider(),
               const Text(
-                ''Exercises'',
+                'Exercises',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               if (_strengthExercises.isEmpty)
                 Center(
                   child: Text(
-                    ''No exercises added'',
+                    'No exercises added',
                     style: TextStyle(color: Colors.grey[600]),
                   ),
                 )
@@ -636,7 +638,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                     final ex = _strengthExercises[index];
                     return ListTile(
                       title: Text(ex.name),
-                      subtitle: Text(ex.description),
+                      subtitle: Text(ex.description ?? ''),
                       trailing: IconButton(
                         icon: const Icon(Icons.delete),
                         onPressed: () => setState(() => _strengthExercises.removeAt(index)),
@@ -647,7 +649,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
               OutlinedButton.icon(
                 onPressed: _addStrengthExercise,
                 icon: const Icon(Icons.add),
-                label: const Text(''Add Exercise''),
+                label: const Text('Add Exercise'),
               ),
             ],
           ],
@@ -664,15 +666,15 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              ''Rest Day'',
+              'Rest Day',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: _restReasonController,
               decoration: const InputDecoration(
-                labelText: ''Reason (optional)'',
-                hintText: ''e.g., Recovery, Injury, Travel'',
+                labelText: 'Reason (optional)',
+                hintText: 'e.g., Recovery, Injury, Travel',
               ),
             ),
           ],
@@ -689,12 +691,12 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              ''Training Note'',
+              'Training Note',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 8),
             Text(
-              ''Use the Coach Notes field above to add your note'',
+              'Use the Coach Notes field above to add your note',
               style: TextStyle(color: Colors.grey),
             ),
           ],
@@ -707,8 +709,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
     final picked = await showDatePicker(
       context: context,
       initialDate: _selectedDate,
-      firstDate: DateTime(202)
-0),
+      firstDate: DateTime(2020),
       lastDate: DateTime(2030),
     );
     if (picked != null) {
@@ -727,7 +728,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
   }
 
   void _addSet() {
-    // Show dialog to add running set or rest set
+    // Show dialog to add a running set or rest set
     showDialog(
       context: context,
       builder: (context) => _AddSetDialog(
@@ -756,7 +757,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
       // Convert to calendar entry
       final calendarEntry = WorkoutBuilderAdapter.toCalendarEntry(
         definition: workoutDef,
-        athleteId: widget.athleteId ?? ''mock-athlete'',
+        athleteId: widget.athleteId ?? 'mock-athlete',
         scheduledDate: _selectedDate,
         scheduledTime: _selectedTime,
       );
@@ -764,7 +765,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
       // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(''Workout created successfully! ''),
+          content: Text('Workout created successfully! '),
           backgroundColor: Colors.green,
         ),
       );
@@ -773,7 +774,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(''Error creating workout: $e''),
+          content: Text('Error creating workout: $e'),
           backgroundColor: Colors.red,
         ),
       );
@@ -847,6 +848,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
     }
 
     return WorkoutDefinition(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
       type: _selectedType,
       date: _selectedDate,
       customName: _nameController.text.isEmpty ? null : _nameController.text,
@@ -884,30 +886,30 @@ class _AddSetDialog extends StatefulWidget {
 }
 
 class _AddSetDialogState extends State<_AddSetDialog> {
-  String _setType = ''running''; // running, rest
+  String _setType = 'running'; // running, rest
   
-  final TextEditingController _repsController = TextEditingController(text: ''8'');
-  final TextEditingController _distanceController = TextEditingController(text: ''400'');
+  final TextEditingController _repsController = TextEditingController(text: '8');
+  final TextEditingController _distanceController = TextEditingController(text: '400');
   WorkoutUnit _distanceUnit = WorkoutUnit.meters;
   WorkoutIntensity _intensity = WorkoutIntensity.interval;
-  final TextEditingController _recoveryController = TextEditingController(text: ''90'');
+  final TextEditingController _recoveryController = TextEditingController(text: '90');
   RecoveryUnit _recoveryUnit = RecoveryUnit.secondsJog;
   
-  final TextEditingController _restDurationController = TextEditingController(text: ''3'');
+  final TextEditingController _restDurationController = TextEditingController(text: '3');
   RecoveryUnit _restUnit = RecoveryUnit.minutesWalk;
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text(''Add Set''),
+      title: const Text('Add Set'),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             SegmentedButton<String>(
               segments: const [
-                ButtonSegment(value: ''running'', label: Text(''Running'')),
-                ButtonSegment(value: ''rest'', label: Text(''Rest'')),
+                ButtonSegment(value: 'running', label: Text('Running')),
+                ButtonSegment(value: 'rest', label: Text('Rest')),
               ],
               selected: {_setType},
               onSelectionChanged: (Set<String> newSelection) {
@@ -915,11 +917,11 @@ class _AddSetDialogState extends State<_AddSetDialog> {
               },
             ),
             const SizedBox(height: 16),
-            if (_setType== ''running'') ...[
+            if (_setType == 'running') ...[
               TextField(
                 controller: _repsController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: ''Reps''),
+                decoration: const InputDecoration(labelText: 'Reps'),
               ),
               const SizedBox(height: 8),
               Row(
@@ -928,7 +930,7 @@ class _AddSetDialogState extends State<_AddSetDialog> {
                     child: TextField(
                       controller: _distanceController,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(labelText: ''Distance''),
+                      decoration: const InputDecoration(labelText: 'Distance'),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -951,7 +953,7 @@ class _AddSetDialogState extends State<_AddSetDialog> {
               const SizedBox(height: 8),
               DropdownButtonFormField<WorkoutIntensity>(
                 value: _intensity,
-                decoration: const InputDecoration(labelText: ''Intensity''),
+                decoration: const InputDecoration(labelText: 'Intensity'),
                 items: WorkoutIntensity.values
                     .map((intensity) => DropdownMenuItem(
                           value: intensity,
@@ -971,7 +973,7 @@ class _AddSetDialogState extends State<_AddSetDialog> {
                     child: TextField(
                       controller: _recoveryController,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(labelText: ''Recovery''),
+                      decoration: const InputDecoration(labelText: 'Recovery'),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -1001,7 +1003,7 @@ class _AddSetDialogState extends State<_AddSetDialog> {
                     child: TextField(
                       controller: _restDurationController,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(labelText: ''Duration''),
+                      decoration: const InputDecoration(labelText: 'Duration'),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -1034,12 +1036,12 @@ class _AddSetDialogState extends State<_AddSetDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text(''Cancel''),
+          child: const Text('Cancel'),
         ),
         ElevatedButton(
           onPressed: () {
             WorkoutSet set;
-            if (_setType == ''running'') {
+            if (_setType == 'running') {
               set = RunningSet(
                 reps: int.tryParse(_repsController.text) ?? 8,
                 distance: double.tryParse(_distanceController.text) ?? 400,
@@ -1051,13 +1053,13 @@ class _AddSetDialogState extends State<_AddSetDialog> {
             } else {
               set = RestSet(
                 duration: double.tryParse(_restDurationController.text) ?? 3,
-                unit: _restUnit,
+                unit: WorkoutUnit.minutes,
               );
             }
             widget.onSetAdded(set);
             Navigator.pop(context);
           },
-          child: const Text(''Add''),
+          child: const Text('Add'),
         ),
       ],
     );
@@ -1085,15 +1087,15 @@ class _AddStrengthExerciseDialog extends StatefulWidget {
 
 class _AddStrengthExerciseDialogState extends State<_AddStrengthExerciseDialog> {
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _setsController = TextEditingController(text: ''3'');
-  final TextEditingController _repsController = TextEditingController(text: ''12'');
+  final TextEditingController _setsController = TextEditingController(text: '3');
+  final TextEditingController _repsController = TextEditingController(text: '12');
   final TextEditingController _weightController = TextEditingController();
-  String? _unit = ''bodyweight'';
+  String? _unit = 'bodyweight';
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text(''Add Exercise''),
+      title: const Text('Add Exercise'),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -1101,8 +1103,8 @@ class _AddStrengthExerciseDialogState extends State<_AddStrengthExerciseDialog> 
             TextField(
               controller: _nameController,
               decoration: const InputDecoration(
-                labelText: ''Exercise Name'',
-                hintText: ''e.g., Single Leg Squats'',
+                labelText: 'Exercise Name',
+                hintText: 'e.g., Single Leg Squats',
               ),
             ),
             const SizedBox(height: 8),
@@ -1112,7 +1114,7 @@ class _AddStrengthExerciseDialogState extends State<_AddStrengthExerciseDialog> 
                   child: TextField(
                     controller: _setsController,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(labelText: ''Sets''),
+                    decoration: const InputDecoration(labelText: 'Sets'),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -1120,7 +1122,7 @@ class _AddStrengthExerciseDialogState extends State<_AddStrengthExerciseDialog> 
                   child: TextField(
                     controller: _repsController,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(labelText: ''Reps''),
+                    decoration: const InputDecoration(labelText: 'Reps'),
                   ),
                 ),
               ],
@@ -1132,13 +1134,13 @@ class _AddStrengthExerciseDialogState extends State<_AddStrengthExerciseDialog> 
                   child: TextField(
                     controller: _weightController,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(labelText: ''Weight (optional)''),
+                    decoration: const InputDecoration(labelText: 'Weight (optional)'),
                   ),
                 ),
                 const SizedBox(width: 8),
                 DropdownButton<String>(
                   value: _unit,
-                  items: [''bodyweight'', ''kg'', ''lbs'']
+                  items: ['bodyweight', 'kg', 'lbs']
                       .map((u) => DropdownMenuItem(value: u, child: Text(u)))
                       .toList(),
                   onChanged: (u) => setState(() => _unit = u),
@@ -1151,7 +1153,7 @@ class _AddStrengthExerciseDialogState extends State<_AddStrengthExerciseDialog> 
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text(''Cancel''),
+          child: const Text('Cancel'),
         ),
         ElevatedButton(
           onPressed: () {
@@ -1164,12 +1166,12 @@ class _AddStrengthExerciseDialogState extends State<_AddStrengthExerciseDialog> 
               weight: _weightController.text.isEmpty
                   ? null
                   : double.tryParse(_weightController.text),
-              unit: _unit == ''bodyweight'' ? _unit : (_weightController.text.isEmpty ? null : _unit),
+              unit: _unit == 'bodyweight' ? _unit : (_weightController.text.isEmpty ? null : _unit),
             );
             widget.onExerciseAdded(exercise);
             Navigator.pop(context);
           },
-          child: const Text(''Add''),
+          child: const Text('Add'),
         ),
       ],
     );

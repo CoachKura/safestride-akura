@@ -1,7 +1,9 @@
+/// Screen to display comprehensive workout analysis with issues and remedies
+library analysis_report_screen;
+
 import 'package:flutter/material.dart';
 import '../services/workout_analysis_service.dart';
 
-/// Screen to display comprehensive workout analysis with issues and remedies
 class AnalysisReportScreen extends StatelessWidget {
   final WorkoutAnalysis analysis;
 
@@ -76,14 +78,14 @@ class AnalysisReportScreen extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [scoreColor.withOpacity(0.8), scoreColor],
+          colors: [scoreColor.withValues(alpha: 0.8), scoreColor],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: scoreColor.withOpacity(0.3),
+            color: scoreColor.withValues(alpha: 0.3),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -106,7 +108,7 @@ class AnalysisReportScreen extends StatelessWidget {
             'Injury Prevention Score',
             style: TextStyle(
               fontSize: 14,
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
             ),
           ),
           const SizedBox(height: 16),
@@ -176,7 +178,7 @@ class AnalysisReportScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.2),
+              color: color.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
@@ -319,7 +321,7 @@ class AnalysisReportScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: issue.severityColor.withOpacity(0.1),
+                color: issue.severityColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Column(
@@ -478,9 +480,9 @@ class AnalysisReportScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

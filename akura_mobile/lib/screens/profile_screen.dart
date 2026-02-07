@@ -9,6 +9,7 @@ import '../services/workout_analysis_service.dart';
 import 'analysis_report_screen.dart';
 import 'gps_connection_screen.dart';
 import 'login_screen.dart';
+import 'dart:developer' as developer;
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -109,7 +110,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         );
       }
     } catch (e) {
-      print('Error analyzing data: $e');
+      developer.log('Error analyzing data: $e');
       
       if (mounted) {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -197,7 +198,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         isLoading = false;
       });
     } catch (e) {
-      print('Error loading profile: $e');
+      developer.log('Error loading profile: $e');
       setState(() {
         userName = 'KURA SATHYAMOORTHY BALENDAR';
         userEmail = 'test@safestride.com';

@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'protocol_generator.dart';
+import 'dart:developer' as developer;
 
 class CalendarScheduler {
   final SupabaseClient _supabase = Supabase.instance.client;
@@ -42,7 +43,7 @@ class CalendarScheduler {
           scheduledWorkouts.add(workoutId);
           successCount++;
         } catch (e) {
-          print('Error scheduling workout: $e');
+          developer.log('Error scheduling workout: $e');
           failCount++;
         }
       }
@@ -57,7 +58,7 @@ class CalendarScheduler {
         endDate: start.add(Duration(days: protocol.durationWeeks * 7)),
       );
     } catch (e) {
-      print('Error scheduling protocol: $e');
+      developer.log('Error scheduling protocol: $e');
       return SchedulingResult(
         success: false,
         scheduledCount: 0,
@@ -140,7 +141,7 @@ class CalendarScheduler {
 
       return newCoach['id'] as String;
     } catch (e) {
-      print('Error getting system coach: $e');
+      developer.log('Error getting system coach: $e');
       // Fallback: use current user as coach
       final userId = _supabase.auth.currentUser?.id;
       if (userId == null) throw Exception('No user logged in');
@@ -239,7 +240,7 @@ class CalendarScheduler {
           .eq('status', 'pending');
       return true;
     } catch (e) {
-      print('Error clearing schedule: $e');
+      developer.log('Error clearing schedule: $e');
       return false;
     }
   }

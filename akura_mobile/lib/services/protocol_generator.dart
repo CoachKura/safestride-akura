@@ -1,6 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/workout_calendar_entry.dart';
 import 'strava_analyzer.dart';
+import 'dart:developer' as developer;
 
 class ProtocolGenerator {
   final SupabaseClient _supabase = Supabase.instance.client;
@@ -16,8 +17,8 @@ class ProtocolGenerator {
     final focusAreas = StravaAnalyzer.identifyFocusAreas(analysis);
     final injuryRisk = StravaAnalyzer.calculateInjuryRisk(analysis);
 
-    print('Focus areas: $focusAreas');
-    print('Injury risk: $injuryRisk');
+    developer.log('Focus areas: $focusAreas');
+    developer.log('Injury risk: $injuryRisk');
 
     // Fetch exercises from database based on focus areas
     final exercises = await _fetchRelevantExercises(focusAreas);
@@ -76,7 +77,7 @@ class ProtocolGenerator {
 
       return List<Map<String, dynamic>>.from(response);
     } catch (e) {
-      print('Error fetching exercises: $e');
+      developer.log('Error fetching exercises: $e');
       return [];
     }
   }

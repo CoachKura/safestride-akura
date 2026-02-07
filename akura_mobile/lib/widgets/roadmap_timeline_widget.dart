@@ -8,7 +8,10 @@
 /// - Expected ROM improvements at each checkpoint
 /// - Interactive phase details
 
+library roadmap_timeline_widget;
+
 import 'package:flutter/material.dart';
+import 'dart:developer' as developer;
 
 class RoadmapTimelineWidget extends StatelessWidget {
   final List<TimelinePhase> phases;
@@ -117,7 +120,7 @@ class RoadmapTimelineWidget extends StatelessWidget {
                 ),
                 boxShadow: isCurrent ? [
                   BoxShadow(
-                    color: Colors.orange.withOpacity(0.4),
+                    color: Colors.orange.withValues(alpha: 0.4),
                     blurRadius: 8,
                     spreadRadius: 2,
                   ),
@@ -276,7 +279,7 @@ class PhaseCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: phaseColor.withOpacity(0.2),
+                      color: phaseColor.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
@@ -457,7 +460,7 @@ class Milestone {
 ///   ],
 ///   onPhaseClicked: (phaseIndex) {
 ///     // Navigate to phase details
-///     print('Phase $phaseIndex clicked');
+///     developer.log('Phase $phaseIndex clicked');
 ///   },
 /// )
 /// ```

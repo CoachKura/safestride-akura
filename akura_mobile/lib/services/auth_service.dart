@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:developer' as developer;
 
 class AuthService extends ChangeNotifier {
   final _supabase = Supabase.instance.client;
@@ -99,7 +100,7 @@ class AuthService extends ChangeNotifier {
       ));
       notifyListeners();
     } catch (e) {
-      print(e.toString());
+      developer.log(e.toString());
     }
   }
 }

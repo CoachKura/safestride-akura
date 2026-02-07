@@ -4,6 +4,8 @@
 /// for running gait analysis. All values based on peer-reviewed research.
 
 /// ROM Standards and Thresholds
+library biomechanics_reference;
+
 class ROMStandards {
   // Ankle Dorsiflexion (Weight-Bearing Lunge Test)
   // Research: Howe et al. (2011)

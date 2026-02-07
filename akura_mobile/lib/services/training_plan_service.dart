@@ -1,6 +1,8 @@
-/// Training Plan Generator Service
+﻿/// Training Plan Generator Service
 /// Creates personalized 4-week training plans based on Strava activity data
 /// Uses athlete's fitness level, recent performance, and goals
+
+library training_plan_service;
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/workout_step.dart';
@@ -76,10 +78,10 @@ class TrainingPlanService {
     return AthleteProfile(
       level: level,
       weeklyDistance: weeklyDistance,
-      avgPace: avgPace,
+      avgPace: avgPace.toDouble(),
       weeklyRuns: weeklyRuns,
-      longestRun: maxDistance / 1000,
-      avgHeartRate: avgHr,
+      longestRun: (maxDistance / 1000).toDouble(),
+      avgHeartRate: avgHr.toDouble(),
     );
   }
 
@@ -318,10 +320,7 @@ class TrainingPlanService {
           type: StepType.run,
           target: StepTarget.distance,
           targetValue: distance,
-          targetUnit: 'm',
-          paceMin: easyPace,
-          paceMax: easyPace + 1,
-          order: 1,
+          targetUnit: 'm',          order: 1,
         ),
         WorkoutStep(
           id: '${DateTime.now().millisecondsSinceEpoch}_cooldown',
@@ -355,10 +354,7 @@ class TrainingPlanService {
           type: StepType.run,
           target: StepTarget.distance,
           targetValue: tempoDistance,
-          targetUnit: 'm',
-          paceMin: tempoPace - 0.2,
-          paceMax: tempoPace + 0.2,
-          order: 1,
+          targetUnit: 'm',          order: 1,
         ),
         WorkoutStep(
           id: '${DateTime.now().millisecondsSinceEpoch}_cooldown',
@@ -413,10 +409,7 @@ class TrainingPlanService {
         type: StepType.run,
         target: StepTarget.distance,
         targetValue: intervalDistance,
-        targetUnit: 'm',
-        paceMin: intervalPace - 0.3,
-        paceMax: intervalPace + 0.3,
-        order: steps.length,
+        targetUnit: 'm',        order: steps.length,
       ));
       
       if (i < reps - 1) {
@@ -484,10 +477,7 @@ class TrainingPlanService {
           type: StepType.run,
           target: StepTarget.distance,
           targetValue: longRunDistance * 1000,
-          targetUnit: 'm',
-          paceMin: easyPace,
-          paceMax: easyPace + 1,
-          order: 1,
+          targetUnit: 'm',          order: 1,
         ),
         WorkoutStep(
           id: '${DateTime.now().millisecondsSinceEpoch}_cooldown',
@@ -512,10 +502,7 @@ class TrainingPlanService {
           id: '${DateTime.now().millisecondsSinceEpoch}_recovery',
           type: StepType.run,
           target: StepTarget.duration,
-          targetValue: 25 * 60, // 25 min
-          paceMin: recoveryPace,
-          paceMax: recoveryPace + 1,
-          order: 0,
+          targetValue: 25 * 60, // 25 min          order: 0,
         ),
       ],
     );
@@ -538,10 +525,7 @@ class TrainingPlanService {
           id: '${DateTime.now().millisecondsSinceEpoch}_fartlek',
           type: StepType.run,
           target: StepTarget.duration,
-          targetValue: 20 * 60,
-          paceMin: basePace - 1,
-          paceMax: basePace + 0.5,
-          notes: 'Alternate between fast and easy efforts based on feel',
+          targetValue: 20 * 60,          notes: 'Alternate between fast and easy efforts based on feel',
           order: 1,
         ),
         WorkoutStep(

@@ -1,6 +1,8 @@
 /// Workout Step Model
 /// Represents individual steps in a structured workout (warm-up, run, intervals, cool-down)
 
+library workout_step;
+
 import 'package:flutter/material.dart';
 
 enum StepType {

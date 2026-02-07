@@ -8,7 +8,7 @@
 /// 4. Recovery - Sleep quality and stress levels
 /// 5. Intensity - Training intensity relative to fitness level
 /// 6. Consistency - Training frequency and regularity
-library;
+library aisri_calculator;
 
 class AISRICalculator {
   /// Calculate AISRI score from assessment data

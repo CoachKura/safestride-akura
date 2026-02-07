@@ -39,7 +39,7 @@ class WorkoutCard extends StatelessWidget {
           boxShadow: [
             if (entry.isPending && label == 'TODAY')
               BoxShadow(
-                color: Colors.green.withOpacity(0.2),
+                color: Colors.green.withValues(alpha: 0.2),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -55,7 +55,7 @@ class WorkoutCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: (labelColor ?? Colors.blue).withOpacity(0.1),
+                      color: (labelColor ?? Colors.blue).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
@@ -125,7 +125,7 @@ class WorkoutCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
+                  color: Colors.green.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -251,7 +251,7 @@ class WorkoutCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -276,7 +276,7 @@ class WorkoutCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
@@ -291,15 +291,15 @@ class WorkoutCard extends StatelessWidget {
   }
 
   Color _getBackgroundColor() {
-    if (entry.isCompleted) return Colors.green.withOpacity(0.05);
-    if (entry.isSkipped) return Colors.red.withOpacity(0.05);
+    if (entry.isCompleted) return Colors.green.withValues(alpha: 0.05);
+    if (entry.isSkipped) return Colors.red.withValues(alpha: 0.05);
     if (label == 'TODAY' && entry.isPending) return Colors.white;
     return Colors.white;
   }
 
   Color _getBorderColor() {
-    if (entry.isCompleted) return Colors.green.withOpacity(0.3);
-    if (entry.isSkipped) return Colors.red.withOpacity(0.3);
+    if (entry.isCompleted) return Colors.green.withValues(alpha: 0.3);
+    if (entry.isSkipped) return Colors.red.withValues(alpha: 0.3);
     if (label == 'TODAY' && entry.isPending) return Colors.green;
     return Colors.grey[300]!;
   }

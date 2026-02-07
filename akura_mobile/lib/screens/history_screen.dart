@@ -1,6 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
+import 'dart:developer' as developer;
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -45,7 +46,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         isLoading = false;
       });
     } catch (e) {
-      print('Error loading workouts: $e');
+      developer.log('Error loading workouts: $e');
       setState(() => isLoading = false);
     }
   }
@@ -220,7 +221,7 @@ class _SummaryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -273,7 +274,7 @@ class _FilterChip extends StatelessWidget {
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -333,7 +334,7 @@ class _WorkoutCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),

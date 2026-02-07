@@ -4,6 +4,7 @@ import 'strava_analyzer.dart';
 import 'protocol_generator.dart';
 import 'calendar_scheduler.dart';
 import 'gps_data_fetcher.dart';
+import 'dart:developer' as developer;
 
 class StravaProtocolService {
   final SupabaseClient _supabase = Supabase.instance.client;
@@ -23,7 +24,7 @@ class StravaProtocolService {
       }
 
       // Step 2: Fetch Strava activities
-      print('Fetching Strava activities...');
+      developer.log('Fetching Strava activities...');
       final activities = await _fetchStravaActivities(athleteId);
       
       if (activities.isEmpty) {
@@ -31,11 +32,11 @@ class StravaProtocolService {
       }
 
       // Step 3: Fetch AISRI assessment data
-      print('Fetching AISRI assessment...');
+      developer.log('Fetching AISRI assessment...');
       final aisriData = await _fetchAISRIData(athleteId);
 
       // Step 4: Analyze data
-      print('Analyzing Strava + AISRI data...');
+      developer.log('Analyzing Strava + AISRI data...');
       final analysis = StravaAnalyzer.analyzeActivities(activities, aisriData);
 
       if (!analysis.hasData) {
@@ -43,7 +44,7 @@ class StravaProtocolService {
       }
 
       // Step 5: Generate protocol
-      print('Generating workout protocol...');
+      developer.log('Generating workout protocol...');
       final protocol = await _protocolGenerator.generateProtocol(
         analysis: analysis,
         athleteId: athleteId,
@@ -53,12 +54,12 @@ class StravaProtocolService {
 
       // Step 6: Clear existing schedule if requested
       if (clearExisting) {
-        print('Clearing existing schedule...');
+        developer.log('Clearing existing schedule...');
         await _scheduler.clearExistingSchedule(athleteId);
       }
 
       // Step 7: Schedule to calendar
-      print('Scheduling workouts to calendar...');
+      developer.log('Scheduling workouts to calendar...');
       final schedulingResult = await _scheduler.scheduleProtocol(
         athleteId: athleteId,
         protocol: protocol,
@@ -74,7 +75,7 @@ class StravaProtocolService {
             : '❌ Failed to schedule workouts',
       );
     } catch (e) {
-      print('Error generating protocol: $e');
+      developer.log('Error generating protocol: $e');
       return ProtocolGenerationResult(
         success: false,
         protocol: null,
@@ -99,7 +100,7 @@ class StravaProtocolService {
 
       return response['id'] as String;
     } catch (e) {
-      print('Error getting athlete ID: $e');
+      developer.log('Error getting athlete ID: $e');
       return null;
     }
   }
@@ -110,12 +111,12 @@ class StravaProtocolService {
       // Option 1: Try to fetch from database (previously synced activities)
       final dbActivities = await _fetchActivitiesFromDatabase(athleteId);
       if (dbActivities.isNotEmpty) {
-        print('Using ${dbActivities.length} activities from database');
+        developer.log('Using ${dbActivities.length} activities from database');
         return dbActivities;
       }
 
       // Option 2: Fetch from GPS watch platforms (Garmin, Coros, Strava)
-      print('Fetching activities from GPS platforms...');
+      developer.log('Fetching activities from GPS platforms...');
       final endDate = DateTime.now();
       final startDate = endDate.subtract(const Duration(days: 30)); // Last 30 days
       
@@ -126,7 +127,7 @@ class StravaProtocolService {
       );
 
       if (gpsActivities.isNotEmpty) {
-        print('Fetched ${gpsActivities.length} activities from GPS platforms');
+        developer.log('Fetched ${gpsActivities.length} activities from GPS platforms');
         // Store activities in database for future use
         await _storeActivitiesInDatabase(athleteId, gpsActivities);
         return gpsActivities.map((a) => a.toJson()).toList();
@@ -136,15 +137,15 @@ class StravaProtocolService {
       final user = _supabase.auth.currentUser;
       final stravaData = user?.userMetadata?['strava_activities'];
       if (stravaData != null && stravaData is List) {
-        print('Using activities from user metadata');
+        developer.log('Using activities from user metadata');
         return List<Map<String, dynamic>>.from(stravaData);
       }
 
       // Option 4: Return mock data for testing (if no real data available)
-      print('No real activities found - using mock data for testing');
+      developer.log('No real activities found - using mock data for testing');
       return _getMockStravaActivities();
     } catch (e) {
-      print('Error fetching activities: $e');
+      developer.log('Error fetching activities: $e');
       // Fallback to mock data
       return _getMockStravaActivities();
     }
@@ -163,7 +164,7 @@ class StravaProtocolService {
 
       return List<Map<String, dynamic>>.from(response);
     } catch (e) {
-      print('Error fetching from database: $e');
+      developer.log('Error fetching from database: $e');
       return [];
     }
   }
@@ -199,7 +200,7 @@ class StravaProtocolService {
         });
       }
     } catch (e) {
-      print('Error storing activities: $e');
+      developer.log('Error storing activities: $e');
     }
   }
 
@@ -241,7 +242,7 @@ class StravaProtocolService {
         };
       }
 
-      print('No AISRI assessment found for user');
+      developer.log('No AISRI assessment found for user');
       
       // Return default values if no assessment exists
       return {
@@ -259,7 +260,7 @@ class StravaProtocolService {
         'past_injuries': [],
       };
     } catch (e) {
-      print('Error fetching AISRI data: $e');
+      developer.log('Error fetching AISRI data: $e');
       return null;
     }
   }

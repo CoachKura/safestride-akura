@@ -1,7 +1,9 @@
-import 'package:flutter/material.dart';
-
 /// Comprehensive workout data analysis service
 /// Analyzes Strava/GPS data and identifies issues with remedies
+library workout_analysis_service;
+
+import 'package:flutter/material.dart';
+
 class WorkoutAnalysisService {
   
   /// Analyzes workout data and returns detailed findings

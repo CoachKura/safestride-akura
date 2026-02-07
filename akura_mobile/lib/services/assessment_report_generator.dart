@@ -9,7 +9,8 @@
 /// - Week-by-week protocol specifications
 /// - Progress tracking milestones
 
-import 'package:flutter/foundation.dart';
+library assessment_report_generator;
+
 
 class AssessmentReport {
   final String athleteId;

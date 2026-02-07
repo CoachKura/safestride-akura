@@ -114,7 +114,7 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
             // Score Display Card
             Card(
               elevation: 4,
-              color: _riskColor.withOpacity(0.1),
+              color: _riskColor.withValues(alpha: 0.1),
               child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: Column(
@@ -292,7 +292,7 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(

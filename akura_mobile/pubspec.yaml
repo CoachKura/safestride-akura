@@ -29,6 +29,10 @@ dependencies:
   
   # Charts
   fl_chart: ^0.66.0
+  
+  # Maps
+  flutter_map: ^6.1.0
+  latlong2: ^0.9.0
 
 dev_dependencies:
   flutter_test:

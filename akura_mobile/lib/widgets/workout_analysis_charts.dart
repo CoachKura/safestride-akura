@@ -2,6 +2,8 @@
 /// Displays detailed workout metrics with interactive graphs
 /// Similar to Strava/Garmin Connect visualizations
 
+library workout_analysis_charts;
+
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'dart:math' as math;
@@ -12,14 +14,14 @@ class WorkoutSummaryCard extends StatelessWidget {
   final String duration;
   final String distance;
   final int calories;
-  
+
   const WorkoutSummaryCard({
     super.key,
     required this.duration,
     required this.distance,
     required this.calories,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -60,14 +62,14 @@ class _SummaryMetric extends StatelessWidget {
   final String label;
   final IconData icon;
   final Color color;
-  
+
   const _SummaryMetric({
     required this.value,
     required this.label,
     required this.icon,
     required this.color,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -117,7 +119,7 @@ class HeartRateChart extends StatelessWidget {
   final double avgHeartRate;
   final double maxHeartRate;
   final int totalDurationSeconds;
-  
+
   const HeartRateChart({
     super.key,
     required this.data,
@@ -125,18 +127,18 @@ class HeartRateChart extends StatelessWidget {
     required this.maxHeartRate,
     this.totalDurationSeconds = 0,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     final hrData = data.where((d) => d.heartRate != null).toList();
     if (hrData.isEmpty) {
       return _buildEmptyState('No heart rate data available');
     }
-    
-    final duration = totalDurationSeconds > 0 
-        ? totalDurationSeconds 
+
+    final duration = totalDurationSeconds > 0
+        ? totalDurationSeconds
         : (hrData.isNotEmpty ? hrData.last.timeSeconds : 0);
-    
+
     return _ChartContainer(
       title: 'Heart Rate',
       icon: Icons.favorite,
@@ -164,7 +166,7 @@ class HeartRateChart extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          
+
           // Chart - Full time axis showing every second
           SizedBox(
             height: 150,
@@ -193,7 +195,10 @@ class HeartRateChart extends StatelessWidget {
                 maxY: 200,
                 lineBarsData: [
                   LineChartBarData(
-                    spots: hrData.map((d) => FlSpot(d.timeSeconds.toDouble(), d.heartRate!)).toList(),
+                    spots: hrData
+                        .map((d) =>
+                            FlSpot(d.timeSeconds.toDouble(), d.heartRate!))
+                        .toList(),
                     isCurved: false,
                     color: Colors.red,
                     barWidth: 1.5,
@@ -201,7 +206,7 @@ class HeartRateChart extends StatelessWidget {
                     dotData: const FlDotData(show: false),
                     belowBarData: BarAreaData(
                       show: true,
-                      color: Colors.red.withOpacity(0.3),
+                      color: Colors.red.withValues(alpha: 0.3),
                     ),
                   ),
                   // Average line (dashed)
@@ -211,7 +216,7 @@ class HeartRateChart extends StatelessWidget {
                       FlSpot(duration.toDouble(), avgHeartRate),
                     ],
                     isCurved: false,
-                    color: Colors.white.withOpacity(0.5),
+                    color: Colors.white.withValues(alpha: 0.5),
                     barWidth: 1,
                     dotData: const FlDotData(show: false),
                     dashArray: [8, 4],
@@ -237,9 +242,9 @@ class HeartRateChart extends StatelessWidget {
       ),
     );
   }
-  
+
   FlTitlesData _buildFullTimeTitles(int duration) {
-    final interval = duration > 0 ? duration / 4 :  60.0;
+    final interval = duration > 0 ? duration / 4 : 60.0;
     return FlTitlesData(
       leftTitles: AxisTitles(
         sideTitles: SideTitles(
@@ -247,7 +252,11 @@ class HeartRateChart extends StatelessWidget {
           reservedSize: 35,
           interval: 20,
           getTitlesWidget: (value, meta) {
-            if (value == 60 || value == 100 || value == 140 || value == 160 || value == 180) {
+            if (value == 60 ||
+                value == 100 ||
+                value == 140 ||
+                value == 160 ||
+                value == 180) {
               return Text(
                 value.toInt().toString(),
                 style: TextStyle(color: Colors.grey[500], fontSize: 10),
@@ -275,7 +284,7 @@ class HeartRateChart extends StatelessWidget {
       topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
     );
   }
-  
+
   String _formatTimeMinSec(int seconds) {
     final m = seconds ~/ 60;
     final s = seconds % 60;
@@ -290,7 +299,7 @@ class PaceChart extends StatelessWidget {
   final double avgPace;
   final double bestPace;
   final int totalDurationSeconds;
-  
+
   const PaceChart({
     super.key,
     required this.data,
@@ -298,18 +307,20 @@ class PaceChart extends StatelessWidget {
     required this.bestPace,
     this.totalDurationSeconds = 0,
   });
-  
+
   @override
   Widget build(BuildContext context) {
-    final paceData = data.where((d) => d.pace != null && d.pace! > 0 && d.pace! < 30).toList();
+    final paceData = data
+        .where((d) => d.pace != null && d.pace! > 0 && d.pace! < 30)
+        .toList();
     if (paceData.isEmpty) {
       return _buildEmptyState('No pace data available');
     }
-    
-    final duration = totalDurationSeconds > 0 
-        ? totalDurationSeconds 
+
+    final duration = totalDurationSeconds > 0
+        ? totalDurationSeconds
         : (paceData.isNotEmpty ? paceData.last.timeSeconds : 0);
-    
+
     return _ChartContainer(
       title: 'Pace',
       icon: Icons.speed,
@@ -337,7 +348,7 @@ class PaceChart extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          
+
           // Chart - Full time axis showing every second
           SizedBox(
             height: 150,
@@ -366,7 +377,10 @@ class PaceChart extends StatelessWidget {
                 maxY: 20,
                 lineBarsData: [
                   LineChartBarData(
-                    spots: paceData.map((d) => FlSpot(d.timeSeconds.toDouble(), d.pace!.clamp(4, 20))).toList(),
+                    spots: paceData
+                        .map((d) => FlSpot(
+                            d.timeSeconds.toDouble(), d.pace!.clamp(4, 20)))
+                        .toList(),
                     isCurved: false,
                     color: Colors.blue,
                     barWidth: 1.5,
@@ -374,7 +388,7 @@ class PaceChart extends StatelessWidget {
                     dotData: const FlDotData(show: false),
                     belowBarData: BarAreaData(
                       show: true,
-                      color: Colors.blue.withOpacity(0.3),
+                      color: Colors.blue.withValues(alpha: 0.3),
                     ),
                   ),
                   // Average line (dashed)
@@ -384,7 +398,7 @@ class PaceChart extends StatelessWidget {
                       FlSpot(duration.toDouble(), avgPace),
                     ],
                     isCurved: false,
-                    color: Colors.white.withOpacity(0.5),
+                    color: Colors.white.withValues(alpha: 0.5),
                     barWidth: 1,
                     dotData: const FlDotData(show: false),
                     dashArray: [8, 4],
@@ -397,9 +411,9 @@ class PaceChart extends StatelessWidget {
       ),
     );
   }
-  
+
   FlTitlesData _buildFullTimeTitles(int duration) {
-    final interval = duration > 0 ? duration / 4 :  60.0;
+    final interval = duration > 0 ? duration / 4 : 60.0;
     return FlTitlesData(
       leftTitles: AxisTitles(
         sideTitles: SideTitles(
@@ -435,7 +449,7 @@ class PaceChart extends StatelessWidget {
       topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
     );
   }
-  
+
   String _formatPace(double pace) {
     final minutes = pace.floor();
     final seconds = ((pace - minutes) * 60).round();
@@ -450,7 +464,7 @@ class CadenceChart extends StatelessWidget {
   final double avgCadence;
   final double? maxCadence;
   final int totalDurationSeconds;
-  
+
   const CadenceChart({
     super.key,
     required this.data,
@@ -458,18 +472,19 @@ class CadenceChart extends StatelessWidget {
     this.maxCadence,
     this.totalDurationSeconds = 0,
   });
-  
+
   @override
   Widget build(BuildContext context) {
-    final cadenceData = data.where((d) => d.cadence != null && d.cadence! > 0).toList();
+    final cadenceData =
+        data.where((d) => d.cadence != null && d.cadence! > 0).toList();
     if (cadenceData.isEmpty) {
       return _buildEmptyState('No cadence data available');
     }
-    
-    final duration = totalDurationSeconds > 0 
-        ? totalDurationSeconds 
+
+    final duration = totalDurationSeconds > 0
+        ? totalDurationSeconds
         : (cadenceData.isNotEmpty ? cadenceData.last.timeSeconds : 0);
-    
+
     return _ChartContainer(
       title: 'Cadence',
       icon: Icons.directions_run,
@@ -497,7 +512,7 @@ class CadenceChart extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          
+
           SizedBox(
             height: 150,
             child: LineChart(
@@ -525,14 +540,17 @@ class CadenceChart extends StatelessWidget {
                 maxY: 200,
                 lineBarsData: [
                   LineChartBarData(
-                    spots: cadenceData.map((d) => FlSpot(d.timeSeconds.toDouble(), (d.cadence! * 2).clamp(100, 200))).toList(),
+                    spots: cadenceData
+                        .map((d) => FlSpot(d.timeSeconds.toDouble(),
+                            (d.cadence! * 2).clamp(100, 200)))
+                        .toList(),
                     isCurved: false,
                     color: Colors.orange,
                     barWidth: 1.5,
                     dotData: const FlDotData(show: false),
                     belowBarData: BarAreaData(
                       show: true,
-                      color: Colors.orange.withOpacity(0.3),
+                      color: Colors.orange.withValues(alpha: 0.3),
                     ),
                   ),
                   // Optimal zone indicator (170-180)
@@ -542,7 +560,7 @@ class CadenceChart extends StatelessWidget {
                       FlSpot(duration.toDouble(), 175),
                     ],
                     isCurved: false,
-                    color: Colors.green.withOpacity(0.5),
+                    color: Colors.green.withValues(alpha: 0.5),
                     barWidth: 1,
                     dotData: const FlDotData(show: false),
                     dashArray: [8, 4],
@@ -556,9 +574,11 @@ class CadenceChart extends StatelessWidget {
             padding: const EdgeInsets.only(top: 8),
             child: Row(
               children: [
-                Container(width: 20, height: 2, color: Colors.green.withOpacity(0.5)),
+                Container(
+                    width: 20, height: 2, color: Colors.green.withValues(alpha: 0.5)),
                 const SizedBox(width: 8),
-                Text('Optimal: 170-180 spm', style: TextStyle(color: Colors.grey[500], fontSize: 11)),
+                Text('Optimal: 170-180 spm',
+                    style: TextStyle(color: Colors.grey[500], fontSize: 11)),
               ],
             ),
           ),
@@ -566,9 +586,9 @@ class CadenceChart extends StatelessWidget {
       ),
     );
   }
-  
+
   FlTitlesData _buildFullTimeTitles(int duration) {
-    final interval = duration > 0 ? duration / 4 :  60.0;
+    final interval = duration > 0 ? duration / 4 : 60.0;
     return FlTitlesData(
       leftTitles: AxisTitles(
         sideTitles: SideTitles(
@@ -593,7 +613,8 @@ class CadenceChart extends StatelessWidget {
           interval: interval,
           getTitlesWidget: (value, meta) {
             final minutes = value.toInt() ~/ 60;
-            return Text('${minutes}m', style: TextStyle(color: Colors.grey[500], fontSize: 10));
+            return Text('${minutes}m',
+                style: TextStyle(color: Colors.grey[500], fontSize: 10));
           },
         ),
       ),
@@ -609,27 +630,27 @@ class ElevationChart extends StatelessWidget {
   final List<DataPoint> data;
   final double elevationGain;
   final int totalDurationSeconds;
-  
+
   const ElevationChart({
     super.key,
     required this.data,
     required this.elevationGain,
     this.totalDurationSeconds = 0,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     final elevData = data.where((d) => d.elevation != null).toList();
     if (elevData.isEmpty) {
       return _buildEmptyState('No elevation data available');
     }
-    
-    final duration = totalDurationSeconds > 0 
-        ? totalDurationSeconds 
+
+    final duration = totalDurationSeconds > 0
+        ? totalDurationSeconds
         : (elevData.isNotEmpty ? elevData.last.timeSeconds : 0);
     final minElev = elevData.map((d) => d.elevation!).reduce(math.min);
     final maxElev = elevData.map((d) => d.elevation!).reduce(math.max);
-    
+
     return _ChartContainer(
       title: 'Elevation',
       icon: Icons.terrain,
@@ -649,15 +670,22 @@ class ElevationChart extends StatelessWidget {
               ),
               Row(
                 children: [
-                  _MetricDisplay(value: minElev.toStringAsFixed(0), unit: 'm', label: 'Min', color: Colors.teal[300]!),
+                  _MetricDisplay(
+                      value: minElev.toStringAsFixed(0),
+                      unit: 'm',
+                      label: 'Min',
+                      color: Colors.teal[300]!),
                   const SizedBox(width: 16),
-                  _MetricDisplay(value: maxElev.toStringAsFixed(0), unit: 'm', label: 'Max', color: Colors.teal[300]!),
+                  _MetricDisplay(
+                      value: maxElev.toStringAsFixed(0),
+                      unit: 'm',
+                      label: 'Max',
+                      color: Colors.teal[300]!),
                 ],
               ),
             ],
           ),
           const SizedBox(height: 16),
-          
           SizedBox(
             height: 150,
             child: LineChart(
@@ -671,7 +699,10 @@ class ElevationChart extends StatelessWidget {
                 maxY: maxElev + 5,
                 lineBarsData: [
                   LineChartBarData(
-                    spots: elevData.map((d) => FlSpot(d.timeSeconds.toDouble(), d.elevation!)).toList(),
+                    spots: elevData
+                        .map((d) =>
+                            FlSpot(d.timeSeconds.toDouble(), d.elevation!))
+                        .toList(),
                     isCurved: true,
                     curveSmoothness: 0.2,
                     color: Colors.teal,
@@ -680,7 +711,10 @@ class ElevationChart extends StatelessWidget {
                     belowBarData: BarAreaData(
                       show: true,
                       gradient: LinearGradient(
-                        colors: [Colors.teal.withOpacity(0.6), Colors.teal.withOpacity(0.2)],
+                        colors: [
+                          Colors.teal.withValues(alpha: 0.6),
+                          Colors.teal.withValues(alpha: 0.2)
+                        ],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                       ),
@@ -694,9 +728,9 @@ class ElevationChart extends StatelessWidget {
       ),
     );
   }
-  
+
   FlTitlesData _buildFullTimeTitles(int duration) {
-    final interval = duration > 0 ? duration / 4 :  60.0;
+    final interval = duration > 0 ? duration / 4 : 60.0;
     return FlTitlesData(
       leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
       bottomTitles: AxisTitles(
@@ -706,7 +740,8 @@ class ElevationChart extends StatelessWidget {
           interval: interval,
           getTitlesWidget: (value, meta) {
             final minutes = value.toInt() ~/ 60;
-            return Text('${minutes}m', style: TextStyle(color: Colors.grey[500], fontSize: 10));
+            return Text('${minutes}m',
+                style: TextStyle(color: Colors.grey[500], fontSize: 10));
           },
         ),
       ),
@@ -723,7 +758,7 @@ class VerticalOscillationChart extends StatelessWidget {
   final double? maxVO;
   final int totalDurationSeconds;
   final List<DataPoint>? data;
-  
+
   const VerticalOscillationChart({
     super.key,
     required this.avgVO,
@@ -731,7 +766,7 @@ class VerticalOscillationChart extends StatelessWidget {
     this.totalDurationSeconds = 0,
     this.data,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return _ChartContainer(
@@ -761,22 +796,24 @@ class VerticalOscillationChart extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          
+
           // Progress indicator showing efficiency
           _buildEfficiencyIndicator(avgVO),
-          
+
           const SizedBox(height: 8),
           Text(
-            avgVO < 8 ? 'Excellent - Very efficient running form' 
-                : avgVO < 10 ? 'Good - Efficient running'
-                : 'Focus on reducing vertical bounce',
+            avgVO < 8
+                ? 'Excellent - Very efficient running form'
+                : avgVO < 10
+                    ? 'Good - Efficient running'
+                    : 'Focus on reducing vertical bounce',
             style: TextStyle(color: Colors.grey[400], fontSize: 12),
           ),
         ],
       ),
     );
   }
-  
+
   Widget _buildEfficiencyIndicator(double value) {
     // Optimal range: 6-10cm
     final percentage = ((10 - value.clamp(4, 14)) / 6 * 100).clamp(0, 100);
@@ -812,8 +849,10 @@ class VerticalOscillationChart extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Optimal', style: TextStyle(color: Colors.grey[500], fontSize: 10)),
-            Text('High', style: TextStyle(color: Colors.grey[500], fontSize: 10)),
+            Text('Optimal',
+                style: TextStyle(color: Colors.grey[500], fontSize: 10)),
+            Text('High',
+                style: TextStyle(color: Colors.grey[500], fontSize: 10)),
           ],
         ),
       ],
@@ -828,7 +867,7 @@ class GroundContactTimeChart extends StatelessWidget {
   final double? maxGCT;
   final int totalDurationSeconds;
   final List<DataPoint>? data;
-  
+
   const GroundContactTimeChart({
     super.key,
     required this.avgGCT,
@@ -836,7 +875,7 @@ class GroundContactTimeChart extends StatelessWidget {
     this.totalDurationSeconds = 0,
     this.data,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return _ChartContainer(
@@ -866,26 +905,30 @@ class GroundContactTimeChart extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          
+
           // Efficiency bar
           _buildGCTIndicator(avgGCT),
-          
+
           const SizedBox(height: 8),
           Text(
-            avgGCT < 220 ? 'Excellent - Elite level GCT'
-                : avgGCT < 250 ? 'Good - Efficient ground contact'
-                : avgGCT < 280 ? 'Average - Room for improvement'
-                : 'Focus on quicker foot turnover',
+            avgGCT < 220
+                ? 'Excellent - Elite level GCT'
+                : avgGCT < 250
+                    ? 'Good - Efficient ground contact'
+                    : avgGCT < 280
+                        ? 'Average - Room for improvement'
+                        : 'Focus on quicker foot turnover',
             style: TextStyle(color: Colors.grey[400], fontSize: 12),
           ),
         ],
       ),
     );
   }
-  
+
   Widget _buildGCTIndicator(double value) {
     // Optimal: <250ms
-    final percentage = ((300 - value.clamp(180, 350)) / 170 * 100).clamp(0, 100);
+    final percentage =
+        ((300 - value.clamp(180, 350)) / 170 * 100).clamp(0, 100);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -916,7 +959,10 @@ class GroundContactTimeChart extends StatelessWidget {
                 child: Center(
                   child: Text(
                     '${avgGCT.toStringAsFixed(0)} ms',
-                    style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
@@ -927,8 +973,10 @@ class GroundContactTimeChart extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Fast (<220ms)', style: TextStyle(color: Colors.grey[500], fontSize: 10)),
-            Text('Slow (>280ms)', style: TextStyle(color: Colors.grey[500], fontSize: 10)),
+            Text('Fast (<220ms)',
+                style: TextStyle(color: Colors.grey[500], fontSize: 10)),
+            Text('Slow (>280ms)',
+                style: TextStyle(color: Colors.grey[500], fontSize: 10)),
           ],
         ),
       ],
@@ -943,7 +991,7 @@ class StrideLengthChart extends StatelessWidget {
   final double? maxStrideLength;
   final int totalDurationSeconds;
   final List<DataPoint>? data;
-  
+
   const StrideLengthChart({
     super.key,
     required this.avgStrideLength,
@@ -951,7 +999,7 @@ class StrideLengthChart extends StatelessWidget {
     this.totalDurationSeconds = 0,
     this.data,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return _ChartContainer(
@@ -981,14 +1029,12 @@ class StrideLengthChart extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          
           _buildStrideLengthIndicator(avgStrideLength),
-          
           const SizedBox(height: 8),
           Text(
-            avgStrideLength >= 1.0 && avgStrideLength <= 1.3 
+            avgStrideLength >= 1.0 && avgStrideLength <= 1.3
                 ? 'Optimal stride length for distance running'
-                : avgStrideLength < 1.0 
+                : avgStrideLength < 1.0
                     ? 'Consider increasing stride length slightly'
                     : 'May be overstriding - focus on cadence',
             style: TextStyle(color: Colors.grey[400], fontSize: 12),
@@ -997,7 +1043,7 @@ class StrideLengthChart extends StatelessWidget {
       ),
     );
   }
-  
+
   Widget _buildStrideLengthIndicator(double value) {
     return Container(
       height: 24,
@@ -1016,7 +1062,7 @@ class StrideLengthChart extends StatelessWidget {
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                color: Colors.green.withOpacity(0.3),
+                color: Colors.green.withValues(alpha: 0.3),
               ),
             ),
           ),
@@ -1047,13 +1093,13 @@ class StrideLengthChart extends StatelessWidget {
 class TrainingEffectChart extends StatelessWidget {
   final double aerobicEffect;
   final double anaerobicEffect;
-  
+
   const TrainingEffectChart({
     super.key,
     required this.aerobicEffect,
     required this.anaerobicEffect,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return _ChartContainer(
@@ -1065,11 +1111,13 @@ class TrainingEffectChart extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _buildTrainingEffectGauge('Aerobic', aerobicEffect, Colors.blue),
+                child: _buildTrainingEffectGauge(
+                    'Aerobic', aerobicEffect, Colors.blue),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: _buildTrainingEffectGauge('Anaerobic', anaerobicEffect, Colors.orange),
+                child: _buildTrainingEffectGauge(
+                    'Anaerobic', anaerobicEffect, Colors.orange),
               ),
             ],
           ),
@@ -1079,7 +1127,7 @@ class TrainingEffectChart extends StatelessWidget {
       ),
     );
   }
-  
+
   Widget _buildTrainingEffectGauge(String label, double value, Color color) {
     return Column(
       children: [
@@ -1125,7 +1173,7 @@ class TrainingEffectChart extends StatelessWidget {
       ],
     );
   }
-  
+
   String _getEffectLevel(double value) {
     if (value < 1) return 'Minor';
     if (value < 2) return 'Maintaining';
@@ -1133,11 +1181,12 @@ class TrainingEffectChart extends StatelessWidget {
     if (value < 4) return 'Highly Improving';
     return 'Overreaching';
   }
-  
+
   Widget _buildTrainingEffectDescription(double aerobic, double anaerobic) {
     String description;
     if (aerobic >= 3 && anaerobic >= 3) {
-      description = 'High-intensity balanced workout - excellent for overall fitness';
+      description =
+          'High-intensity balanced workout - excellent for overall fitness';
     } else if (aerobic >= 3) {
       description = 'Strong aerobic workout - building endurance base';
     } else if (anaerobic >= 3) {
@@ -1145,7 +1194,7 @@ class TrainingEffectChart extends StatelessWidget {
     } else {
       description = 'Moderate workout - maintaining fitness level';
     }
-    
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -1168,7 +1217,7 @@ class PowerChart extends StatelessWidget {
   final double? maxPower;
   final int totalDurationSeconds;
   final List<DataPoint>? data;
-  
+
   const PowerChart({
     super.key,
     required this.avgPower,
@@ -1176,7 +1225,7 @@ class PowerChart extends StatelessWidget {
     this.totalDurationSeconds = 0,
     this.data,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return _ChartContainer(
@@ -1206,14 +1255,14 @@ class PowerChart extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          
+
           // Power zones bar
           _buildPowerZoneBar(avgPower),
         ],
       ),
     );
   }
-  
+
   Widget _buildPowerZoneBar(double power) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1254,9 +1303,12 @@ class PowerChart extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Recovery', style: TextStyle(color: Colors.grey[500], fontSize: 10)),
-            Text('Threshold', style: TextStyle(color: Colors.grey[500], fontSize: 10)),
-            Text('Max', style: TextStyle(color: Colors.grey[500], fontSize: 10)),
+            Text('Recovery',
+                style: TextStyle(color: Colors.grey[500], fontSize: 10)),
+            Text('Threshold',
+                style: TextStyle(color: Colors.grey[500], fontSize: 10)),
+            Text('Max',
+                style: TextStyle(color: Colors.grey[500], fontSize: 10)),
           ],
         ),
       ],
@@ -1268,12 +1320,12 @@ class PowerChart extends StatelessWidget {
 
 class PerformanceConditionChart extends StatelessWidget {
   final int performanceCondition; // -20 to +20
-  
+
   const PerformanceConditionChart({
     super.key,
     required this.performanceCondition,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return _ChartContainer(
@@ -1286,7 +1338,9 @@ class PerformanceConditionChart extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                performanceCondition >= 0 ? '+$performanceCondition' : '$performanceCondition',
+                performanceCondition >= 0
+                    ? '+$performanceCondition'
+                    : '$performanceCondition',
                 style: TextStyle(
                   color: _getConditionColor(),
                   fontSize: 48,
@@ -1306,13 +1360,13 @@ class PerformanceConditionChart extends StatelessWidget {
       ),
     );
   }
-  
+
   Color _getConditionColor() {
     if (performanceCondition >= 5) return Colors.green;
     if (performanceCondition >= -5) return Colors.yellow;
     return Colors.red;
   }
-  
+
   String _getConditionDescription() {
     if (performanceCondition >= 10) return 'Feeling strong today!';
     if (performanceCondition >= 5) return 'Good condition';
@@ -1320,7 +1374,7 @@ class PerformanceConditionChart extends StatelessWidget {
     if (performanceCondition >= -10) return 'Below baseline';
     return 'Consider recovery';
   }
-  
+
   Widget _buildConditionScale() {
     return Column(
       children: [
@@ -1354,9 +1408,11 @@ class PerformanceConditionChart extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('-20', style: TextStyle(color: Colors.grey[500], fontSize: 10)),
+            Text('-20',
+                style: TextStyle(color: Colors.grey[500], fontSize: 10)),
             Text('0', style: TextStyle(color: Colors.grey[500], fontSize: 10)),
-            Text('+20', style: TextStyle(color: Colors.grey[500], fontSize: 10)),
+            Text('+20',
+                style: TextStyle(color: Colors.grey[500], fontSize: 10)),
           ],
         ),
       ],
@@ -1369,13 +1425,13 @@ class PerformanceConditionChart extends StatelessWidget {
 class StaminaChart extends StatelessWidget {
   final double staminaPercent; // 0-100
   final double potentialPercent; // 0-100
-  
+
   const StaminaChart({
     super.key,
     required this.staminaPercent,
     required this.potentialPercent,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return _ChartContainer(
@@ -1387,17 +1443,19 @@ class StaminaChart extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _buildStaminaGauge('Current', staminaPercent, Colors.lightGreen),
+                child: _buildStaminaGauge(
+                    'Current', staminaPercent, Colors.lightGreen),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: _buildStaminaGauge('Potential', potentialPercent, Colors.blue),
+                child: _buildStaminaGauge(
+                    'Potential', potentialPercent, Colors.blue),
               ),
             ],
           ),
           const SizedBox(height: 16),
           Text(
-            staminaPercent > 70 
+            staminaPercent > 70
                 ? 'High energy reserves - you can push harder'
                 : staminaPercent > 40
                     ? 'Moderate stamina - pace yourself'
@@ -1409,7 +1467,7 @@ class StaminaChart extends StatelessWidget {
       ),
     );
   }
-  
+
   Widget _buildStaminaGauge(String label, double percent, Color color) {
     return Column(
       children: [
@@ -1453,13 +1511,13 @@ class StaminaChart extends StatelessWidget {
 class BodyTemperatureChart extends StatelessWidget {
   final double coreTemp;
   final double? skinTemp;
-  
+
   const BodyTemperatureChart({
     super.key,
     required this.coreTemp,
     this.skinTemp,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return _ChartContainer(
@@ -1479,7 +1537,7 @@ class BodyTemperatureChart extends StatelessWidget {
           _buildTempScale(coreTemp),
           const SizedBox(height: 8),
           Text(
-            coreTemp < 38 
+            coreTemp < 38
                 ? 'Normal - Good thermoregulation'
                 : coreTemp < 39
                     ? 'Elevated - Consider cooling down'
@@ -1490,7 +1548,7 @@ class BodyTemperatureChart extends StatelessWidget {
       ),
     );
   }
-  
+
   Widget _buildTempDisplay(String label, double temp) {
     return Column(
       children: [
@@ -1506,14 +1564,14 @@ class BodyTemperatureChart extends StatelessWidget {
       ],
     );
   }
-  
+
   Color _getTempColor(double temp) {
     if (temp < 37.5) return Colors.blue;
     if (temp < 38.5) return Colors.yellow;
     if (temp < 39.5) return Colors.orange;
     return Colors.red;
   }
-  
+
   Widget _buildTempScale(double temp) {
     return Column(
       children: [
@@ -1522,7 +1580,13 @@ class BodyTemperatureChart extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(6),
             gradient: const LinearGradient(
-              colors: [Colors.blue, Colors.green, Colors.yellow, Colors.orange, Colors.red],
+              colors: [
+                Colors.blue,
+                Colors.green,
+                Colors.yellow,
+                Colors.orange,
+                Colors.red
+              ],
             ),
           ),
           child: Stack(
@@ -1547,9 +1611,12 @@ class BodyTemperatureChart extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('36°C', style: TextStyle(color: Colors.grey[500], fontSize: 10)),
-            Text('38°C', style: TextStyle(color: Colors.grey[500], fontSize: 10)),
-            Text('40°C', style: TextStyle(color: Colors.grey[500], fontSize: 10)),
+            Text('36°C',
+                style: TextStyle(color: Colors.grey[500], fontSize: 10)),
+            Text('38°C',
+                style: TextStyle(color: Colors.grey[500], fontSize: 10)),
+            Text('40°C',
+                style: TextStyle(color: Colors.grey[500], fontSize: 10)),
           ],
         ),
       ],
@@ -1563,19 +1630,21 @@ class RunWalkChart extends StatelessWidget {
   final int runningSeconds;
   final int walkingSeconds;
   final int totalSeconds;
-  
+
   const RunWalkChart({
     super.key,
     required this.runningSeconds,
     required this.walkingSeconds,
     required this.totalSeconds,
   });
-  
+
   @override
   Widget build(BuildContext context) {
-    final runPercent = totalSeconds > 0 ? (runningSeconds / totalSeconds * 100) : 0;
-    final walkPercent = totalSeconds > 0 ? (walkingSeconds / totalSeconds * 100) : 0;
-    
+    final runPercent =
+        totalSeconds > 0 ? (runningSeconds / totalSeconds * 100) : 0;
+    final walkPercent =
+        totalSeconds > 0 ? (walkingSeconds / totalSeconds * 100) : 0;
+
     return _ChartContainer(
       title: 'Run/Walk',
       icon: Icons.directions_walk,
@@ -1585,7 +1654,8 @@ class RunWalkChart extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _buildActivityBar('Running', runPercent.toDouble(), Colors.green, runningSeconds),
+                child: _buildActivityBar('Running', runPercent.toDouble(),
+                    Colors.green, runningSeconds),
               ),
             ],
           ),
@@ -1593,7 +1663,8 @@ class RunWalkChart extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _buildActivityBar('Walking', walkPercent.toDouble(), Colors.orange, walkingSeconds),
+                child: _buildActivityBar('Walking', walkPercent.toDouble(),
+                    Colors.orange, walkingSeconds),
               ),
             ],
           ),
@@ -1621,7 +1692,9 @@ class RunWalkChart extends StatelessWidget {
                   child: Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(15),
-                      color: walkingSeconds > 0 ? Colors.orange : Colors.transparent,
+                      color: walkingSeconds > 0
+                          ? Colors.orange
+                          : Colors.transparent,
                     ),
                   ),
                 ),
@@ -1632,8 +1705,9 @@ class RunWalkChart extends StatelessWidget {
       ),
     );
   }
-  
-  Widget _buildActivityBar(String label, double percent, Color color, int seconds) {
+
+  Widget _buildActivityBar(
+      String label, double percent, Color color, int seconds) {
     return Row(
       children: [
         Container(
@@ -1649,12 +1723,13 @@ class RunWalkChart extends StatelessWidget {
         const Spacer(),
         Text(
           '${_formatDuration(seconds)} (${percent.toStringAsFixed(1)}%)',
-          style: TextStyle(color: color, fontSize: 14, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              color: color, fontSize: 14, fontWeight: FontWeight.bold),
         ),
       ],
     );
   }
-  
+
   String _formatDuration(int seconds) {
     final m = seconds ~/ 60;
     final s = seconds % 60;
@@ -1666,16 +1741,16 @@ class RunWalkChart extends StatelessWidget {
 
 class TimeInHRZoneChart extends StatelessWidget {
   final Map<String, int> zoneSeconds; // Zone 1-5 with time in seconds
-  
+
   const TimeInHRZoneChart({
     super.key,
     required this.zoneSeconds,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     final total = zoneSeconds.values.fold(0, (a, b) => a + b);
-    
+
     return _ChartContainer(
       title: 'Time in Heart Rate Zone',
       icon: Icons.favorite_border,
@@ -1698,38 +1773,45 @@ class TimeInHRZoneChart extends StatelessWidget {
       ),
     );
   }
-  
+
   List<PieChartSectionData> _buildHRZoneSections(int total) {
     final colors = [
-      Colors.grey,      // Zone 1 - Recovery
-      Colors.blue,      // Zone 2 - Easy
-      Colors.green,     // Zone 3 - Aerobic
-      Colors.orange,    // Zone 4 - Threshold
-      Colors.red,       // Zone 5 - Max
+      Colors.grey, // Zone 1 - Recovery
+      Colors.blue, // Zone 2 - Easy
+      Colors.green, // Zone 3 - Aerobic
+      Colors.orange, // Zone 4 - Threshold
+      Colors.red, // Zone 5 - Max
     ];
-    
+
     final zones = ['Zone 1', 'Zone 2', 'Zone 3', 'Zone 4', 'Zone 5'];
-    
+
     return zones.asMap().entries.map((entry) {
       final index = entry.key;
       final zone = entry.value;
       final seconds = zoneSeconds[zone] ?? 0;
       final percent = total > 0 ? (seconds / total * 100) : 0;
-      
+
       return PieChartSectionData(
         color: colors[index],
         value: percent.toDouble(),
         title: percent > 5 ? '${percent.toStringAsFixed(0)}%' : '',
         radius: 40,
-        titleStyle: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+        titleStyle: const TextStyle(
+            color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
       );
     }).toList();
   }
-  
+
   Widget _buildZoneLegend() {
-    final colors = [Colors.grey, Colors.blue, Colors.green, Colors.orange, Colors.red];
+    final colors = [
+      Colors.grey,
+      Colors.blue,
+      Colors.green,
+      Colors.orange,
+      Colors.red
+    ];
     final labels = ['Recovery', 'Easy', 'Aerobic', 'Threshold', 'Max'];
-    
+
     return Wrap(
       spacing: 16,
       runSpacing: 8,
@@ -1738,15 +1820,20 @@ class TimeInHRZoneChart extends StatelessWidget {
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(width: 12, height: 12, decoration: BoxDecoration(color: colors[i], borderRadius: BorderRadius.circular(2))),
+            Container(
+                width: 12,
+                height: 12,
+                decoration: BoxDecoration(
+                    color: colors[i], borderRadius: BorderRadius.circular(2))),
             const SizedBox(width: 4),
-            Text('${labels[i]}: ${_formatDuration(seconds)}', style: TextStyle(color: Colors.grey[400], fontSize: 11)),
+            Text('${labels[i]}: ${_formatDuration(seconds)}',
+                style: TextStyle(color: Colors.grey[400], fontSize: 11)),
           ],
         );
       }),
     );
   }
-  
+
   String _formatDuration(int seconds) {
     final m = seconds ~/ 60;
     final s = seconds % 60;
@@ -1758,16 +1845,16 @@ class TimeInHRZoneChart extends StatelessWidget {
 
 class TimeInPowerZoneChart extends StatelessWidget {
   final Map<String, int> zoneSeconds; // Power zones with time in seconds
-  
+
   const TimeInPowerZoneChart({
     super.key,
     required this.zoneSeconds,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     final total = zoneSeconds.values.fold(0, (a, b) => a + b);
-    
+
     return _ChartContainer(
       title: 'Time in Power Zone',
       icon: Icons.flash_on,
@@ -1790,39 +1877,61 @@ class TimeInPowerZoneChart extends StatelessWidget {
       ),
     );
   }
-  
+
   List<PieChartSectionData> _buildPowerZoneSections(int total) {
     final colors = [
-      Colors.grey,       // Recovery
-      Colors.blue,       // Endurance
-      Colors.green,      // Tempo
-      Colors.yellow,     // Threshold
-      Colors.orange,     // VO2max
-      Colors.red,        // Anaerobic
+      Colors.grey, // Recovery
+      Colors.blue, // Endurance
+      Colors.green, // Tempo
+      Colors.yellow, // Threshold
+      Colors.orange, // VO2max
+      Colors.red, // Anaerobic
     ];
-    
-    final zones = ['Recovery', 'Endurance', 'Tempo', 'Threshold', 'VO2max', 'Anaerobic'];
-    
+
+    final zones = [
+      'Recovery',
+      'Endurance',
+      'Tempo',
+      'Threshold',
+      'VO2max',
+      'Anaerobic'
+    ];
+
     return zones.asMap().entries.map((entry) {
       final index = entry.key;
       final zone = entry.value;
       final seconds = zoneSeconds[zone] ?? 0;
       final percent = total > 0 ? (seconds / total * 100) : 0;
-      
+
       return PieChartSectionData(
         color: colors[index],
         value: percent.toDouble(),
         title: percent > 5 ? '${percent.toStringAsFixed(0)}%' : '',
         radius: 40,
-        titleStyle: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+        titleStyle: const TextStyle(
+            color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
       );
     }).toList();
   }
-  
+
   Widget _buildPowerZoneLegend() {
-    final colors = [Colors.grey, Colors.blue, Colors.green, Colors.yellow, Colors.orange, Colors.red];
-    final labels = ['Recovery', 'Endurance', 'Tempo', 'Threshold', 'VO2max', 'Anaerobic'];
-    
+    final colors = [
+      Colors.grey,
+      Colors.blue,
+      Colors.green,
+      Colors.yellow,
+      Colors.orange,
+      Colors.red
+    ];
+    final labels = [
+      'Recovery',
+      'Endurance',
+      'Tempo',
+      'Threshold',
+      'VO2max',
+      'Anaerobic'
+    ];
+
     return Wrap(
       spacing: 12,
       runSpacing: 8,
@@ -1831,15 +1940,20 @@ class TimeInPowerZoneChart extends StatelessWidget {
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(width: 12, height: 12, decoration: BoxDecoration(color: colors[i], borderRadius: BorderRadius.circular(2))),
+            Container(
+                width: 12,
+                height: 12,
+                decoration: BoxDecoration(
+                    color: colors[i], borderRadius: BorderRadius.circular(2))),
             const SizedBox(width: 4),
-            Text('${labels[i]}: ${_formatDuration(seconds)}', style: TextStyle(color: Colors.grey[400], fontSize: 10)),
+            Text('${labels[i]}: ${_formatDuration(seconds)}',
+                style: TextStyle(color: Colors.grey[400], fontSize: 10)),
           ],
         );
       }),
     );
   }
-  
+
   String _formatDuration(int seconds) {
     final m = seconds ~/ 60;
     final s = seconds % 60;
@@ -1854,14 +1968,14 @@ class _ChartContainer extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
   final Widget child;
-  
+
   const _ChartContainer({
     required this.title,
     required this.icon,
     required this.iconColor,
     required this.child,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -1901,7 +2015,7 @@ class _MetricDisplay extends StatelessWidget {
   final String label;
   final Color color;
   final bool isLarge;
-  
+
   const _MetricDisplay({
     required this.value,
     required this.unit,
@@ -1909,7 +2023,7 @@ class _MetricDisplay extends StatelessWidget {
     required this.color,
     this.isLarge = false,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -1931,7 +2045,7 @@ class _MetricDisplay extends StatelessWidget {
             Text(
               unit,
               style: TextStyle(
-                color: color.withOpacity(0.7),
+                color: color.withValues(alpha: 0.7),
                 fontSize: isLarge ? 14 : 12,
               ),
             ),
@@ -1978,7 +2092,7 @@ class CombinedMetricsChart extends StatelessWidget {
   final bool showPace;
   final bool showElevation;
   final int totalDurationSeconds;
-  
+
   const CombinedMetricsChart({
     super.key,
     required this.data,
@@ -1987,17 +2101,17 @@ class CombinedMetricsChart extends StatelessWidget {
     this.showElevation = true,
     this.totalDurationSeconds = 0,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     if (data.isEmpty) {
       return _buildEmptyState('No data available');
     }
-    
-    final duration = totalDurationSeconds > 0 
-        ? totalDurationSeconds 
+
+    final duration = totalDurationSeconds > 0
+        ? totalDurationSeconds
         : (data.isNotEmpty ? data.last.timeSeconds : 0);
-    
+
     return _ChartContainer(
       title: 'Activity Overview',
       icon: Icons.analytics,
@@ -2021,7 +2135,8 @@ class CombinedMetricsChart extends StatelessWidget {
               ),
             ),
             titlesData: FlTitlesData(
-              leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              leftTitles:
+                  const AxisTitles(sideTitles: SideTitles(showTitles: false)),
               bottomTitles: AxisTitles(
                 sideTitles: SideTitles(
                   showTitles: true,
@@ -2029,12 +2144,16 @@ class CombinedMetricsChart extends StatelessWidget {
                   interval: duration > 0 ? duration / 4 : 60,
                   getTitlesWidget: (value, meta) {
                     final minutes = value.toInt() ~/ 60;
-                    return Text('${minutes}m', style: TextStyle(color: Colors.grey[500], fontSize: 10));
+                    return Text('${minutes}m',
+                        style:
+                            TextStyle(color: Colors.grey[500], fontSize: 10));
                   },
                 ),
               ),
-              rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              rightTitles:
+                  const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              topTitles:
+                  const AxisTitles(sideTitles: SideTitles(showTitles: false)),
             ),
             borderData: FlBorderData(show: false),
             minX: 0,
@@ -2042,18 +2161,21 @@ class CombinedMetricsChart extends StatelessWidget {
             minY: 0,
             maxY: 100,
             lineBarsData: [
-              if (showHeartRate) _buildNormalizedLine(data, (d) => d.heartRate, Colors.red, 60, 200),
+              if (showHeartRate)
+                _buildNormalizedLine(
+                    data, (d) => d.heartRate, Colors.red, 60, 200),
               if (showPace) _buildNormalizedPaceLine(data, Colors.blue),
-              if (showElevation) _buildNormalizedElevationLine(data, Colors.teal),
+              if (showElevation)
+                _buildNormalizedElevationLine(data, Colors.teal),
             ],
           ),
         ),
       ),
     );
   }
-  
+
   LineChartBarData _buildNormalizedLine(
-    List<DataPoint> data, 
+    List<DataPoint> data,
     double? Function(DataPoint) getValue,
     Color color,
     double minVal,
@@ -2062,7 +2184,8 @@ class CombinedMetricsChart extends StatelessWidget {
     final validData = data.where((d) => getValue(d) != null).toList();
     return LineChartBarData(
       spots: validData.map((d) {
-        final normalized = ((getValue(d)! - minVal) / (maxVal - minVal) * 100).clamp(0, 100);
+        final normalized =
+            ((getValue(d)! - minVal) / (maxVal - minVal) * 100).clamp(0, 100);
         return FlSpot(d.timeSeconds.toDouble(), normalized.toDouble());
       }).toList(),
       isCurved: true,
@@ -2071,18 +2194,20 @@ class CombinedMetricsChart extends StatelessWidget {
       dotData: const FlDotData(show: false),
     );
   }
-  
+
   LineChartBarData _buildNormalizedPaceLine(List<DataPoint> data, Color color) {
-    final validData = data.where((d) => d.pace != null && d.pace! > 0 && d.pace! < 30).toList();
+    final validData = data
+        .where((d) => d.pace != null && d.pace! > 0 && d.pace! < 30)
+        .toList();
     if (validData.isEmpty) return LineChartBarData(spots: []);
-    
+
     final minPace = validData.map((d) => d.pace!).reduce(math.min);
     final maxPace = validData.map((d) => d.pace!).reduce(math.max);
-    
+
     return LineChartBarData(
       spots: validData.map((d) {
         // Invert: lower pace = higher on chart
-        final normalized = maxPace > minPace 
+        final normalized = maxPace > minPace
             ? ((maxPace - d.pace!) / (maxPace - minPace) * 100)
             : 50.0;
         return FlSpot(d.timeSeconds.toDouble(), normalized.clamp(0, 100));
@@ -2093,17 +2218,18 @@ class CombinedMetricsChart extends StatelessWidget {
       dotData: const FlDotData(show: false),
     );
   }
-  
-  LineChartBarData _buildNormalizedElevationLine(List<DataPoint> data, Color color) {
+
+  LineChartBarData _buildNormalizedElevationLine(
+      List<DataPoint> data, Color color) {
     final validData = data.where((d) => d.elevation != null).toList();
     if (validData.isEmpty) return LineChartBarData(spots: []);
-    
+
     final minElev = validData.map((d) => d.elevation!).reduce(math.min);
     final maxElev = validData.map((d) => d.elevation!).reduce(math.max);
-    
+
     return LineChartBarData(
       spots: validData.map((d) {
-        final normalized = maxElev > minElev 
+        final normalized = maxElev > minElev
             ? ((d.elevation! - minElev) / (maxElev - minElev) * 100)
             : 50.0;
         return FlSpot(d.timeSeconds.toDouble(), normalized.clamp(0, 100));
@@ -2112,7 +2238,7 @@ class CombinedMetricsChart extends StatelessWidget {
       color: color,
       barWidth: 2,
       dotData: const FlDotData(show: false),
-      belowBarData: BarAreaData(show: true, color: color.withOpacity(0.2)),
+      belowBarData: BarAreaData(show: true, color: color.withValues(alpha: 0.2)),
     );
   }
 }

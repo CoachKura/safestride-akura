@@ -2,6 +2,8 @@
 /// Create and edit structured workouts like Garmin Connect
 /// Supports: Warm-up, Run, Walk, Intervals, Recovery, Cool-down, Repeats
 
+library garmin_workout_builder_screen;
+
 import 'package:flutter/material.dart';
 import '../models/workout_step.dart';
 import '../services/workout_service.dart';
@@ -208,7 +210,7 @@ class _GarminWorkoutBuilderScreenState extends State<GarminWorkoutBuilderScreen>
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 2)),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 2)),
         ],
       ),
       child: Column(
@@ -265,7 +267,7 @@ class _GarminWorkoutBuilderScreenState extends State<GarminWorkoutBuilderScreen>
         borderRadius: BorderRadius.circular(8),
         border: Border(left: BorderSide(color: step.typeColor, width: 4)),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4, offset: const Offset(0, 2)),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4, offset: const Offset(0, 2)),
         ],
       ),
       child: Column(
@@ -289,7 +291,7 @@ class _GarminWorkoutBuilderScreenState extends State<GarminWorkoutBuilderScreen>
                 Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: step.typeColor.withOpacity(0.1),
+                    color: step.typeColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Icon(step.typeIcon, color: step.typeColor, size: 18),
@@ -333,7 +335,7 @@ class _GarminWorkoutBuilderScreenState extends State<GarminWorkoutBuilderScreen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: Colors.amber.withOpacity(0.2),
+              color: Colors.amber.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
@@ -647,9 +649,9 @@ class _GarminWorkoutBuilderScreenState extends State<GarminWorkoutBuilderScreen>
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: step.typeColor.withOpacity(0.1),
+          color: step.typeColor.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: step.typeColor.withOpacity(0.3)),
+          border: Border.all(color: step.typeColor.withValues(alpha: 0.3)),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -900,7 +902,7 @@ class _StepEditorDialogState extends State<_StepEditorDialog> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: widget.step.typeColor.withOpacity(0.1),
+              color: widget.step.typeColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(widget.step.typeIcon, color: widget.step.typeColor, size: 24),
@@ -1060,7 +1062,7 @@ class _StepEditorDialogState extends State<_StepEditorDialog> {
                 width: 50,
                 height: 50,
                 decoration: BoxDecoration(
-                  color: isSelected ? zoneColors[zone - 1] : zoneColors[zone - 1].withOpacity(0.2),
+                  color: isSelected ? zoneColors[zone - 1] : zoneColors[zone - 1].withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                     color: isSelected ? zoneColors[zone - 1] : Colors.grey[300]!,
@@ -1260,7 +1262,7 @@ class _RepeatConfigDialogState extends State<_RepeatConfigDialog> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.amber.withOpacity(0.1),
+              color: Colors.amber.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Icon(Icons.repeat, color: Colors.amber, size: 24),
@@ -1322,7 +1324,7 @@ class _RepeatConfigDialogState extends State<_RepeatConfigDialog> {
                       leading: Container(
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                          color: step.typeColor.withOpacity(0.1),
+                          color: step.typeColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Icon(step.typeIcon, color: step.typeColor, size: 20),
@@ -1406,9 +1408,9 @@ class _RepeatConfigDialogState extends State<_RepeatConfigDialog> {
                     width: 80,
                     padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
                     decoration: BoxDecoration(
-                      color: step.typeColor.withOpacity(0.1),
+                      color: step.typeColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: step.typeColor.withOpacity(0.3)),
+                      border: Border.all(color: step.typeColor.withValues(alpha: 0.3)),
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
