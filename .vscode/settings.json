@@ -1,0 +1,6 @@
+{
+  "mssql.enableSqlParser": false,
+  "files.associations": {
+    "database/**/*.sql": "sql"
+  }
+}
