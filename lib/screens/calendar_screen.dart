@@ -16,7 +16,7 @@ class CalendarScreen extends StatefulWidget {
   State<CalendarScreen> createState() => _CalendarScreenState();
 }
 
-class _CalendarScreenState extends State<CalendarScreen> {
+class _CalendarScreenState extends State<CalendarScreen> with AutomaticKeepAliveClientMixin {
   final CalendarService _calendarService = CalendarService();
 
   DateTime _focusedDay = DateTime.now();
@@ -31,9 +31,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
   bool _isLoading = true;
 
   @override
+  bool get wantKeepAlive => false; // Don't keep state alive - always refresh
+
+  @override
   void initState() {
     super.initState();
     _selectedDay = _focusedDay;
+    // Load workouts initially
     _loadWorkouts();
   }
 
@@ -41,13 +45,20 @@ class _CalendarScreenState extends State<CalendarScreen> {
     setState(() => _isLoading = true);
 
     try {
+      developer.log('📅 Loading calendar workouts for ${_focusedDay.toString().split(' ')[0]}');
+      
       // Load workouts for current month
       final workouts = await _calendarService.getWorkoutsForMonth(_focusedDay);
+      developer.log('📊 Loaded ${workouts.length} workouts from database');
 
       // Load today/tomorrow/yesterday
       final today = await _calendarService.getTodayWorkout();
       final tomorrow = await _calendarService.getTomorrowWorkout();
       final yesterday = await _calendarService.getYesterdayWorkout();
+
+      developer.log('📋 Today: ${today != null ? today.workout?.workoutName : "None"}');
+      developer.log('📋 Tomorrow: ${tomorrow != null ? tomorrow.workout?.workoutName : "None"}');
+      developer.log('📋 Yesterday: ${yesterday != null ? yesterday.workout?.workoutName : "None"}');
 
       // Organize workouts by date
       final Map<DateTime, List<WorkoutCalendarEntry>> workoutsByDate = {};
@@ -64,6 +75,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
         workoutsByDate[date]!.add(workout);
       }
 
+      developer.log('📅 Organized into ${workoutsByDate.length} dates');
+      for (var entry in workoutsByDate.entries) {
+        developer.log('  ${entry.key.toString().split(' ')[0]}: ${entry.value.length} workout(s)');
+      }
+
       setState(() {
         _workoutsByDate = workoutsByDate;
         _todayWorkout = today;
@@ -72,7 +88,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         _isLoading = false;
       });
     } catch (e) {
-      developer.log('Error loading workouts: $e');
+      developer.log('❌ Error loading workouts: $e');
       setState(() => _isLoading = false);
     }
   }
@@ -105,6 +121,23 @@ class _CalendarScreenState extends State<CalendarScreen> {
         foregroundColor: Colors.black87,
         elevation: 0,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh, color: Colors.blue),
+            tooltip: 'Refresh Calendar',
+            onPressed: () async {
+              developer.log('🔄 Manual refresh triggered');
+              await _loadWorkouts();
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('✅ Calendar refreshed!'),
+                    duration: Duration(seconds: 1),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              }
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
             onPressed: () {
@@ -402,21 +435,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
         },
       ),
     );
-  }
-
-  void _createNewWorkout() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => GarminWorkoutBuilderScreen(
-          scheduledDate: _selectedDay ?? DateTime.now(),
-        ),
-      ),
-    ).then((result) {
-      if (result != null) {
-        _loadWorkouts();
-      }
-    });
   }
 
   void _handleSkip(WorkoutCalendarEntry workout) {

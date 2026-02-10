@@ -372,8 +372,9 @@ class ClinicalDecisionRules {
     final currentPain = assessment['current_pain'] as String? ?? '';
 
     // Critical thresholds
-    if (ankleDorsi < 6.0 && currentPain.toLowerCase().contains('pain'))
+    if (ankleDorsi < 6.0 && currentPain.toLowerCase().contains('pain')) {
       return true;
+    }
     if (balance < 8) return true; // Severe instability
 
     return false;

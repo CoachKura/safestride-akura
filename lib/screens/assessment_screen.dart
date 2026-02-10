@@ -58,7 +58,7 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
       final userId = _supabase.auth.currentUser?.id;
       if (userId == null) throw 'User not authenticated';
 
-      await _supabase.from('aifri_assessments').insert({
+      await _supabase.from('AISRI_assessments').insert({
         'athlete_id': userId,
         'total_score': _totalScore,
         'mobility_score': _mobilityScore.round(),
@@ -73,9 +73,9 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
         'assessed_by': userId,
       });
 
-      // Update profile with current AIFRI score
+      // Update profile with current AISRI score
       await _supabase.from('profiles').update({
-        'current_aifri_score': _totalScore,
+        'current_AISRI_score': _totalScore,
       }).eq('id', userId);
 
       if (mounted) {
@@ -105,7 +105,7 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('AIFRI Assessment'),
+        title: const Text('AISRI Assessment'),
         backgroundColor: const Color(0xFF667EEA),
         foregroundColor: Colors.white,
       ),

@@ -399,7 +399,7 @@ class _EvaluationFormScreenState extends State<EvaluationFormScreen> {
       // Debug: Check calculator output
       developer.log('🎯 DEBUG: AISRI Calculator returned:');
       developer.log('Full scoreData: $scoreData');
-      developer.log('AISRI Score: ${scoreData['aifri_score']}');
+      developer.log('AISRI Score: ${scoreData['AISRI_score']}');
       developer.log('Risk Level: ${scoreData['risk_level']}');
       developer.log('Pillar Adaptability: ${scoreData['pillar_adaptability']}');
       developer.log('Pillar Injury Risk: ${scoreData['pillar_injury_risk']}');
@@ -408,13 +408,13 @@ class _EvaluationFormScreenState extends State<EvaluationFormScreen> {
       developer.log('Pillar Intensity: ${scoreData['pillar_intensity']}');
       developer.log('Pillar Consistency: ${scoreData['pillar_consistency']}');
 
-      if (scoreData['aifri_score'] == null) {
+      if (scoreData['AISRI_score'] == null) {
         throw Exception('AISRI calculation failed - score is null');
       }
 
       // Insert assessment with calculated scores
       await Supabase.instance.client
-          .from('aifri_assessments')
+          .from('AISRI_assessments')
           .insert({
             // User identification
             'user_id': userId,
@@ -478,8 +478,8 @@ class _EvaluationFormScreenState extends State<EvaluationFormScreen> {
             'primary_goal': _selectedPrimaryGoal,
 
             // AISRI Calculated Fields
-            'total_score': scoreData['aifri_score'],
-            'aifri_score': scoreData['aifri_score'],
+            'total_score': scoreData['AISRI_score'],
+            'AISRI_score': scoreData['AISRI_score'],
             'risk_level': scoreData['risk_level'],
             'score_calculated_at': DateTime.now().toIso8601String(),
             'pillar_adaptability': scoreData['pillar_adaptability'],
@@ -497,9 +497,9 @@ class _EvaluationFormScreenState extends State<EvaluationFormScreen> {
 
       developer.log('✅ Assessment saved successfully!');
 
-      // Update profile with current AIFRI score
+      // Update profile with current AISRI score
       await Supabase.instance.client.from('profiles').update(
-          {'current_aifri_score': scoreData['aifri_score']}).eq('id', userId);
+          {'current_AISRI_score': scoreData['AISRI_score']}).eq('id', userId);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -552,7 +552,7 @@ class _EvaluationFormScreenState extends State<EvaluationFormScreen> {
                 'target_race_distance': _selectedRaceDistance,
                 'target_race_date': _targetRaceDate.toIso8601String(),
               },
-              aistriScore: scoreData['aifri_score'],
+              aistriScore: scoreData['AISRI_score'],
               pillarScores: {
                 'Adaptability': scoreData['pillar_adaptability'],
                 'Injury Risk': scoreData['pillar_injury_risk'],

@@ -84,6 +84,9 @@ class CalendarService {
       // 2. Get actual GPS activities from gps_activities (Strava data)
       if (userId != null) {
         try {
+          developer.log('🔍 Querying gps_activities for user: $userId');
+          developer.log('📅 Date range: ${firstDay.toIso8601String()} to ${lastDay.toIso8601String()}');
+          
           final response = await _supabase
               .from('gps_activities')
               .select()
@@ -92,12 +95,15 @@ class CalendarService {
               .lte('start_time', lastDay.toIso8601String())
               .order('start_time', ascending: true);
 
+          developer.log('✅ GPS activities found: ${(response as List).length}');
+          
           // Convert GPS activities to WorkoutCalendarEntry
-          for (var activity in response as List) {
+          for (var activity in response) {
+            developer.log('  📍 Activity: ${activity['activity_type']} - ${activity['distance_meters']}m on ${activity['start_time']}');
             allWorkouts.add(WorkoutCalendarEntry.fromGpsActivity(activity));
           }
         } catch (e) {
-          developer.log('Note: No GPS activities found: $e');
+          developer.log('❌ Error loading GPS activities: $e');
         }
       }
 

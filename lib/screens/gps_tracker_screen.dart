@@ -197,8 +197,7 @@ class _GPSTrackerScreenState extends State<GPSTrackerScreen> {
     _timer?.cancel();
     _positionStream?.cancel();
 
-    // Save to database
-    await _saveActivity();
+    developer.log('🛑 Tracking stopped, showing completion dialog...');
 
     setState(() {
       _isTracking = false;
@@ -210,10 +209,28 @@ class _GPSTrackerScreenState extends State<GPSTrackerScreen> {
     }
   }
 
-  Future<void> _saveActivity() async {
+  Future<bool> _saveActivity() async {
     try {
       final userId = Supabase.instance.client.auth.currentUser?.id;
-      if (userId == null) return;
+      if (userId == null) {
+        developer.log('❌ SAVE FAILED: User not logged in');
+        developer.log('❌ Current user: ${Supabase.instance.client.auth.currentUser}');
+        developer.log('❌ Session: ${Supabase.instance.client.auth.currentSession}');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('❌ Cannot save: Please log in first'),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 4),
+            ),
+          );
+        }
+        return false;
+      }
+
+      developer.log('💾 Saving activity: ${_distance.toStringAsFixed(2)} km, $_duration seconds');
+      developer.log('👤 User ID: $userId');
+      developer.log('📦 Insert data: platform=manual, distance=${(_distance * 1000).toInt()}m, duration=$_duration sec');
 
       // Save activity and get the ID
       final activityResponse = await Supabase.instance.client
@@ -238,6 +255,7 @@ class _GPSTrackerScreenState extends State<GPSTrackerScreen> {
           .single();
 
       final activityId = activityResponse['id'] as String;
+      developer.log('✅ Activity saved with ID: $activityId');
 
       // Save all track points
       if (_trackPoints.isNotEmpty) {
@@ -262,26 +280,73 @@ class _GPSTrackerScreenState extends State<GPSTrackerScreen> {
         developer.log(
             '✅ Activity $activityId saved with ${_trackPoints.length} track points');
       }
-    } catch (e) {
-      developer.log('❌ Error saving activity: $e');
+
+      // Show success snackbar immediately
+      developer.log('✅✅✅ SUCCESS! Activity saved to database with ID: $activityId');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle, color: Colors.white, size: 20),
+                const SizedBox(width: 8),
+                Text('Workout saved! (${_distance.toStringAsFixed(2)} km)'),
+              ],
+            ),
+            duration: const Duration(seconds: 2),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+      return true;
+    } catch (e, stackTrace) {
+      developer.log('❌❌❌ SAVE FAILED!');
+      developer.log('❌ Error: $e');
+      developer.log('❌ Stack trace: $stackTrace');
+      developer.log('❌ User ID at error: ${Supabase.instance.client.auth.currentUser?.id}');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.error, color: Colors.white, size: 20),
+                const SizedBox(width: 8),
+                Expanded(child: Text('SAVE FAILED: $e')),
+              ],
+            ),
+            duration: const Duration(seconds: 5),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      return false;
     }
   }
 
   void _showCompletionDialog() {
     showDialog(
       context: context,
+      barrierDismissible: false, // User must tap a button
       builder: (context) => AlertDialog(
-        title: Row(
+        title: const Row(
           children: [
-            const Icon(Icons.check_circle, color: Colors.green, size: 32),
-            const SizedBox(width: 12),
-            const Text('Workout Complete!'),
+            Icon(Icons.check_circle_outline, color: Colors.blue, size: 32),
+            SizedBox(width: 12),
+            Text('Workout Complete!'),
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const Text(
+              'Great job! Ready to save this workout?',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 16),
             _buildDialogStat('Distance', '${_distance.toStringAsFixed(2)} km',
                 Icons.straighten),
             const SizedBox(height: 8),
@@ -310,22 +375,132 @@ class _GPSTrackerScreenState extends State<GPSTrackerScreen> {
                 _calories = 0;
               });
             },
-            child: const Text('Later'),
+            child: const Text('Discard'),
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
+          ElevatedButton.icon(
+            onPressed: () async {
+              // Show loading
+              Navigator.pop(context); // Close dialog first
+              
+              // Show saving indicator
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text(
-                      'Go to Calendar tab → Select today → View your workout analysis!'),
-                  duration: Duration(seconds: 4),
-                  backgroundColor: Colors.green,
+                  content: Row(
+                    children: [
+                      SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      ),
+                      SizedBox(width: 12),
+                      Text('Saving workout...'),
+                    ],
+                  ),
+                  duration: Duration(seconds: 2),
+                  backgroundColor: Colors.blue,
                 ),
               );
+
+              // Attempt to save
+              final saveSuccess = await _saveActivity();
+
+              if (mounted) {
+                if (saveSuccess) {
+                  // Show success message
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Row(
+                        children: [
+                          Icon(Icons.check_circle, color: Colors.white, size: 24),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              '✅ Workout saved! Tap "Calendar" tab to view.',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
+                      duration: Duration(seconds: 5),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                  
+                  // Clear data
+                  setState(() {
+                    _trackPoints.clear();
+                    _distance = 0;
+                    _duration = 0;
+                    _calories = 0;
+                  });
+                } else {
+                  // Show error and allow retry
+                  final retry = await showDialog<bool>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Row(
+                        children: [
+                          Icon(Icons.error, color: Colors.red, size: 32),
+                          SizedBox(width: 12),
+                          Text('Save Failed'),
+                        ],
+                      ),
+                      content: const Text(
+                        'Could not save workout to database. Check console logs for details.\n\nWould you like to try again?',
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, false),
+                          child: const Text('Cancel'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () => Navigator.pop(context, true),
+                          style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+                          child: const Text('Retry'),
+                        ),
+                      ],
+                    ),
+                  );
+                  
+                  if (retry == true && mounted) {
+                    // Retry save
+                    final retrySuccess = await _saveActivity();
+                    if (mounted) {
+                      if (retrySuccess) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('✅ Workout saved successfully!'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                        setState(() {
+                          _trackPoints.clear();
+                          _distance = 0;
+                          _duration = 0;
+                          _calories = 0;
+                        });
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('❌ Save failed again. Check logs.'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    }
+                  }
+                }
+              }
             },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-            child: const Text('View Full Analysis'),
+            icon: const Icon(Icons.save, size: 24),
+            label: const Text('Save Workout', style: TextStyle(fontSize: 16)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
           ),
         ],
       ),

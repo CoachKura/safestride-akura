@@ -1,14 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../services/calendar_service.dart';
+import '../services/aisri_calculator_service.dart';
+import '../services/training_phase_manager.dart';
+import '../services/ai_workout_generator_service.dart';
 import '../models/workout_calendar_entry.dart';
 import '../widgets/bottom_nav.dart';
+import '../widgets/aisri_dashboard_widget.dart';
 import '../theme/dashboard_colors.dart';
 import 'tracker_screen.dart';
-import 'logger_screen.dart';
+import 'workout_creator_screen.dart';
 import 'calendar_screen.dart';
 import 'profile_screen.dart' as profile;
 import 'assessment_screen.dart';
+import 'evaluation_form_screen.dart';
+import 'body_measurements_screen.dart';
+import 'injuries_screen.dart';
+import 'goals_screen.dart';
+import 'athlete_goals_screen.dart';
+import 'kura_coach_calendar_screen.dart';
+import 'admin_batch_generation_screen.dart';
+import 'start_run_screen.dart';
+import 'safety_gates_screen.dart';
+import 'workout_history_screen.dart';
+import 'structured_workout_list_screen.dart';
+import 'garmin_device_screen.dart';
 import 'dart:developer' as developer;
 
 class DashboardScreen extends StatefulWidget {
@@ -31,7 +47,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           onNavigate: (index) => setState(() => _currentIndex = index)),
       const CalendarScreen(),
       const TrackerScreen(),
-      const LoggerScreen(),
+      const WorkoutCreatorScreen(),
       const profile.ProfileScreen(),
     ];
   }
@@ -60,12 +76,17 @@ class _DashboardHome extends StatefulWidget {
 class _DashboardHomeState extends State<_DashboardHome> {
   final CalendarService _calendarService = CalendarService();
   String userName = 'Athlete';
-  double aifriScore = 0.0;
+  double AISRIScore = 0.0;
   int currentStreak = 0;
   double weeklyDistance = 0.0;
   bool isLoading = true;
   WorkoutCalendarEntry? todayWorkout;
   WorkoutCalendarEntry? tomorrowWorkout;
+  
+  // AISRI System Data
+  Map<String, dynamic>? _AISRIData;
+  Map<String, dynamic>? _trainingPhase;
+  final bool _showFullAISRI = false;
 
   // GPS Activity Data for Fitness Metrics
   int todaySteps = 0;
@@ -89,6 +110,7 @@ class _DashboardHomeState extends State<_DashboardHome> {
     super.initState();
     _loadUserData();
     _loadGPSActivityData();
+    _loadAISRIData(); // Load AISRI data for 6-pillar visualization
   }
 
   Future<void> _loadUserData() async {
@@ -99,7 +121,7 @@ class _DashboardHomeState extends State<_DashboardHome> {
             '⚠️ WARNING: No authenticated user found! Using mock data for testing...');
         setState(() {
           userName = 'KURA SATHYAMOORTHY';
-          aifriScore = 52.0;
+          AISRIScore = 52.0;
           pillarScores = {
             'adaptability': 65,
             'injury_risk': 45,
@@ -130,34 +152,34 @@ class _DashboardHomeState extends State<_DashboardHome> {
 
       developer.log('🔍 DEBUG: Profile response: $profileResponse');
 
-      // Fetch AIFRI score from latest assessment
-      final aifriResponse = await Supabase.instance.client
-          .from('aifri_assessments')
+      // Fetch AISRI score from latest assessment
+      final AISRIResponse = await Supabase.instance.client
+          .from('AISRI_assessments')
           .select(
-              'total_score, aifri_score, risk_level, pillar_adaptability, pillar_injury_risk, pillar_fatigue, pillar_recovery, pillar_intensity, pillar_consistency')
+              'total_score, AISRI_score, risk_level, pillar_adaptability, pillar_injury_risk, pillar_fatigue, pillar_recovery, pillar_intensity, pillar_consistency')
           .eq('user_id', userId)
           .order('created_at', ascending: false)
           .limit(1)
           .maybeSingle();
 
-      developer.log('🔍 DEBUG: AIFRI response: $aifriResponse');
+      developer.log('🔍 DEBUG: AISRI response: $AISRIResponse');
 
-      if (aifriResponse == null) {
+      if (AISRIResponse == null) {
         developer.log('⚠️ WARNING: No AISRI assessment found for user!');
       } else {
-        developer.log('✅ Total Score: ${aifriResponse['total_score']}');
-        developer.log('✅ AIFRI Score: ${aifriResponse['aifri_score']}');
-        developer.log('✅ Risk Level: ${aifriResponse['risk_level']}');
+        developer.log('✅ Total Score: ${AISRIResponse['total_score']}');
+        developer.log('✅ AISRI Score: ${AISRIResponse['AISRI_score']}');
+        developer.log('✅ Risk Level: ${AISRIResponse['risk_level']}');
         developer.log(
-            '✅ Pillar Adaptability: ${aifriResponse['pillar_adaptability']}');
+            '✅ Pillar Adaptability: ${AISRIResponse['pillar_adaptability']}');
         developer.log(
-            '✅ Pillar Injury Risk: ${aifriResponse['pillar_injury_risk']}');
-        developer.log('✅ Pillar Fatigue: ${aifriResponse['pillar_fatigue']}');
-        developer.log('✅ Pillar Recovery: ${aifriResponse['pillar_recovery']}');
+            '✅ Pillar Injury Risk: ${AISRIResponse['pillar_injury_risk']}');
+        developer.log('✅ Pillar Fatigue: ${AISRIResponse['pillar_fatigue']}');
+        developer.log('✅ Pillar Recovery: ${AISRIResponse['pillar_recovery']}');
         developer
-            .log('✅ Pillar Intensity: ${aifriResponse['pillar_intensity']}');
+            .log('✅ Pillar Intensity: ${AISRIResponse['pillar_intensity']}');
         developer.log(
-            '✅ Pillar Consistency: ${aifriResponse['pillar_consistency']}');
+            '✅ Pillar Consistency: ${AISRIResponse['pillar_consistency']}');
       }
 
       // Calculate current streak from GPS activities
@@ -178,20 +200,20 @@ class _DashboardHomeState extends State<_DashboardHome> {
 
       setState(() {
         userName = profileResponse?['name'] ?? 'Athlete';
-        // Use aifri_score if total_score is null
-        aifriScore =
-            ((aifriResponse?['total_score'] ?? aifriResponse?['aifri_score']) ??
+        // Use AISRI_score if total_score is null
+        AISRIScore =
+            ((AISRIResponse?['total_score'] ?? AISRIResponse?['AISRI_score']) ??
                     0.0)
                 .toDouble();
 
         // Update pillar scores
         pillarScores = {
-          'adaptability': aifriResponse?['pillar_adaptability'] ?? 0,
-          'injury_risk': aifriResponse?['pillar_injury_risk'] ?? 0,
-          'fatigue': aifriResponse?['pillar_fatigue'] ?? 0,
-          'recovery': aifriResponse?['pillar_recovery'] ?? 0,
-          'intensity': aifriResponse?['pillar_intensity'] ?? 0,
-          'consistency': aifriResponse?['pillar_consistency'] ?? 0,
+          'adaptability': AISRIResponse?['pillar_adaptability'] ?? 0,
+          'injury_risk': AISRIResponse?['pillar_injury_risk'] ?? 0,
+          'fatigue': AISRIResponse?['pillar_fatigue'] ?? 0,
+          'recovery': AISRIResponse?['pillar_recovery'] ?? 0,
+          'intensity': AISRIResponse?['pillar_intensity'] ?? 0,
+          'consistency': AISRIResponse?['pillar_consistency'] ?? 0,
         };
 
         currentStreak = _calculateStreakFromGPS(gpsActivitiesResponse);
@@ -199,7 +221,7 @@ class _DashboardHomeState extends State<_DashboardHome> {
         isLoading = false;
       });
 
-      developer.log('✅ Dashboard state updated! AIFRI Score: $aifriScore');
+      developer.log('✅ Dashboard state updated! AISRI Score: $AISRIScore');
       developer.log('✅ Pillar scores: $pillarScores');
     } catch (e, stackTrace) {
       developer.log('❌ ERROR loading user data: $e');
@@ -319,10 +341,138 @@ class _DashboardHomeState extends State<_DashboardHome> {
     }
   }
 
-  String _getAifriRiskLevel() {
-    if (aifriScore >= 70) return 'Low Risk';
-    if (aifriScore >= 40) return 'Moderate';
+  String _getAISRIRiskLevel() {
+    if (AISRIScore >= 70) return 'Low Risk';
+    if (AISRIScore >= 40) return 'Moderate';
     return 'High Risk';
+  }
+
+  Future<void> _loadAISRIData() async {
+    try {
+      final userId = Supabase.instance.client.auth.currentUser?.id;
+      if (userId == null) return;
+
+      // Fetch user profile for age and body metrics
+      final profileResponse = await Supabase.instance.client
+          .from('profiles')
+          .select('date_of_birth, weight_kg, height_cm')
+          .eq('id', userId)
+          .maybeSingle();
+
+      if (profileResponse == null) return;
+
+      // Calculate age
+      final dobStr = profileResponse['date_of_birth'];
+      if (dobStr == null) return;
+      
+      final dob = DateTime.parse(dobStr);
+      final age = DateTime.now().difference(dob).inDays ~/ 365;
+      final weightKg = profileResponse['weight_kg'] ?? 70.0;
+      final heightCm = profileResponse['height_cm'] ?? 170.0;
+
+      // Fetch recent workouts for load calculation
+      final thirtyDaysAgo = DateTime.now().subtract(const Duration(days: 30));
+      final workoutsResponse = await Supabase.instance.client
+          .from('workouts')
+          .select('distance_km, duration_minutes, created_at')
+          .eq('user_id', userId)
+          .gte('created_at', thirtyDaysAgo.toIso8601String())
+          .order('created_at', ascending: false);
+
+      // Calculate total lifetime km for phase tracking
+      final allWorkoutsResponse = await Supabase.instance.client
+          .from('workouts')
+          .select('distance_km')
+          .eq('user_id', userId);
+
+      final totalKm = (allWorkoutsResponse as List).fold<double>(
+          0.0, (sum, w) => sum + ((w['distance_km'] ?? 0.0) as num).toDouble());
+
+      // Fetch injury history
+      final injuriesResponse = await Supabase.instance.client
+          .from('injuries')
+          .select('injury_name, severity, created_at')
+          .eq('user_id', userId)
+          .order('created_at', ascending: false);
+
+      // Fetch latest assessment data (if available)
+      final assessmentResponse = await Supabase.instance.client
+          .from('AISRI_assessments')
+          .select('assessment_data')
+          .eq('user_id', userId)
+          .order('created_at', ascending: false)
+          .limit(1)
+          .maybeSingle();
+
+      // Fetch sleep data (placeholder - would come from health integration)
+      final sleepData = {
+        'hours': 7.5,
+        'quality': 8,
+      };
+
+      // Calculate AISRI score
+      final AISRIResult = AISRICalculatorService.calculateAISRIScore(
+        age: age,
+        weightKg: weightKg,
+        heightCm: heightCm,
+        recentWorkouts: {
+          'workouts': workoutsResponse,
+        },
+        injuryHistory: {
+          'injuries': injuriesResponse,
+        },
+        sleepData: sleepData,
+        assessmentData: assessmentResponse?['assessment_data'] ?? {},
+        subjectiveFeel: 7, // Default to 7/10
+      );
+
+      // Get current training phase
+      final trainingPhase = TrainingPhaseManager.getCurrentPhase(totalKm);
+
+      setState(() {
+        _AISRIData = AISRIResult;
+        _trainingPhase = trainingPhase;
+      });
+    } catch (e) {
+      developer.log('Error loading AISRI data: $e');
+    }
+  }
+
+  Future<void> _handleLogout() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Logout'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      try {
+        await Supabase.instance.client.auth.signOut();
+        if (mounted) {
+          // Navigate to login screen - you may need to adjust this route
+          Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error logging out: $e')),
+          );
+        }
+      }
+    }
   }
 
   @override
@@ -348,7 +498,7 @@ class _DashboardHomeState extends State<_DashboardHome> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Welcome Header
+              // Welcome Header with More Menu
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(24),
@@ -363,13 +513,299 @@ class _DashboardHomeState extends State<_DashboardHome> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Welcome back, $userName! 👋',
-                      style:
-                          Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Welcome back, $userName! 👋',
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineSmall
+                                ?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ),
+                        ),
+                        PopupMenuButton<String>(
+                          icon: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Icon(
+                              Icons.more_vert,
+                              color: Colors.white,
+                            ),
+                          ),
+                          color: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          onSelected: (value) {
+                            switch (value) {
+                              case 'profile':
+                                widget.onNavigate(4); // Navigate to Profile
+                                break;
+                              case 'workout_history':
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const WorkoutHistoryScreen(),
+                                  ),
+                                );
+                                break;
+                              case 'kura_coach_goals':
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const AthleteGoalsScreen(),
+                                  ),
+                                );
+                                break;
+                              case 'kura_coach_calendar':
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const KuraCoachCalendarScreen(),
+                                  ),
+                                );
+                                break;
+                              case 'structured_workouts':
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        StructuredWorkoutListScreen(),
+                                  ),
+                                );
+                                break;
+                              case 'admin_batch_generation':
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const AdminBatchGenerationScreen(),
+                                  ),
+                                );
+                                break;
+                              case 'garmin_device':
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const GarminDeviceScreen(),
+                                  ),
+                                );
+                                break;
+                              case 'assessment':
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const AssessmentScreen(),
+                                  ),
+                                );
+                                break;
+                              case 'evaluation':
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const EvaluationFormScreen(),
+                                  ),
+                                );
+                                break;
+                              case 'measurements':
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const BodyMeasurementsScreen(),
+                                  ),
+                                );
+                                break;
+                              case 'injuries':
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const InjuriesScreen(),
+                                  ),
+                                );
+                                break;
+                              case 'manual_training':
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const WorkoutCreatorScreen(),
+                                  ),
+                                );
+                                break;
+                              case 'logout':
+                                _handleLogout();
+                                break;
+                            }
+                          },
+                          itemBuilder: (context) => [
+                            const PopupMenuItem(
+                              value: 'profile',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.person, color: Colors.deepPurple),
+                                  SizedBox(width: 12),
+                                  Text('Profile'),
+                                ],
                               ),
+                            ),
+                            const PopupMenuItem(
+                              value: 'workout_history',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.history,
+                                      color: Colors.deepPurple),
+                                  SizedBox(width: 12),
+                                  Text('Workout History'),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuItem(
+                              value: 'kura_coach_goals',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.emoji_events,
+                                      color: Colors.blue),
+                                  SizedBox(width: 12),
+                                  Text('Kura Coach Goals',
+                                      style: TextStyle(fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuItem(
+                              value: 'kura_coach_calendar',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.calendar_month,
+                                      color: Colors.blue),
+                                  SizedBox(width: 12),
+                                  Text('Kura Coach Calendar',
+                                      style: TextStyle(fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuItem(
+                              value: 'structured_workouts',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.format_list_numbered,
+                                      color: Colors.blue),
+                                  SizedBox(width: 12),
+                                  Text('Structured Workouts',
+                                      style: TextStyle(fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuItem(
+                              value: 'manual_training',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.fitness_center,
+                                      color: Colors.green),
+                                  SizedBox(width: 12),
+                                  Text('Manual Training',
+                                      style: TextStyle(fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuDivider(),
+                            const PopupMenuItem(
+                              value: 'admin_batch_generation',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.admin_panel_settings,
+                                      color: Colors.purple),
+                                  SizedBox(width: 12),
+                                  Text('Admin: Generate Plans',
+                                      style: TextStyle(fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuItem(
+                              value: 'garmin_device',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.watch, color: Colors.deepPurple),
+                                  SizedBox(width: 12),
+                                  Text('Garmin Device'),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuDivider(),
+                            const PopupMenuItem(
+                              value: 'assessment',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.assignment,
+                                      color: Colors.deepPurple),
+                                  SizedBox(width: 12),
+                                  Text('Assessment'),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuItem(
+                              value: 'evaluation',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.checklist,
+                                      color: Colors.deepPurple),
+                                  SizedBox(width: 12),
+                                  Text('Evaluation Form'),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuItem(
+                              value: 'measurements',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.straighten,
+                                      color: Colors.deepPurple),
+                                  SizedBox(width: 12),
+                                  Text('Body Measurements'),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuItem(
+                              value: 'injuries',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.healing,
+                                      color: Colors.deepPurple),
+                                  SizedBox(width: 12),
+                                  Text('Injuries'),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuDivider(),
+                            const PopupMenuItem(
+                              value: 'logout',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.logout, color: Colors.red),
+                                  SizedBox(width: 12),
+                                  Text('Logout',
+                                      style: TextStyle(color: Colors.red)),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -384,7 +820,7 @@ class _DashboardHomeState extends State<_DashboardHome> {
               const SizedBox(height: 20),
 
               // Assessment Not Complete Reminder Card
-              if (aifriScore == 0.0)
+              if (AISRIScore == 0.0)
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(20),
@@ -453,8 +889,28 @@ class _DashboardHomeState extends State<_DashboardHome> {
                 const SizedBox(height: 20),
               ],
 
-              // AIFRI Score Card
-              if (aifriScore > 0.0)
+              // AISRI Dashboard Widget - Full 6-Pillar Visualization
+              if (_AISRIData != null && _trainingPhase != null) ...[
+                AISRIDashboardWidget(
+                  aisriData: _AISRIData!,
+                  trainingPhase: _trainingPhase!,
+                  onViewDetails: () {
+                    if (_AISRIData!['safety_gates'] != null) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SafetyGatesScreen(
+                            aisriData: _AISRIData!,
+                            safetyGates: _AISRIData!['safety_gates'],
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                ),
+                const SizedBox(height: 20),
+              ] else if (AISRIScore > 0.0) ...[
+                // Fallback to simple AISRI card if full data not available
                 InkWell(
                   onTap: () {
                     Navigator.push(
@@ -491,7 +947,7 @@ class _DashboardHomeState extends State<_DashboardHome> {
                                 color: Colors.white, size: 20),
                             const SizedBox(width: 8),
                             Text(
-                              'AIFRI Score',
+                              'AISRI Score',
                               style: Theme.of(context)
                                   .textTheme
                                   .titleMedium
@@ -504,7 +960,7 @@ class _DashboardHomeState extends State<_DashboardHome> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          aifriScore.toStringAsFixed(0),
+                          AISRIScore.toStringAsFixed(0),
                           style: Theme.of(context)
                               .textTheme
                               .displayLarge
@@ -516,7 +972,7 @@ class _DashboardHomeState extends State<_DashboardHome> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          _getAifriRiskLevel(),
+                          _getAISRIRiskLevel(),
                           style:
                               Theme.of(context).textTheme.titleLarge?.copyWith(
                                     color: Colors.white,
@@ -527,7 +983,8 @@ class _DashboardHomeState extends State<_DashboardHome> {
                     ),
                   ),
                 ),
-              const SizedBox(height: 20),
+                const SizedBox(height: 20),
+              ],
 
               // Fitness Metrics - Compact Circular Progress
               Container(
@@ -795,13 +1252,17 @@ class _DashboardHomeState extends State<_DashboardHome> {
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        // Navigate to calendar
-                        widget.onNavigate(1);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const StartRunScreen(),
+                          ),
+                        );
                       },
-                      icon: const Icon(Icons.calendar_today),
-                      label: const Text('View Calendar'),
+                      icon: const Icon(Icons.directions_run, size: 24),
+                      label: const Text('Start Run'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple,
+                        backgroundColor: Colors.blue,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
@@ -814,14 +1275,18 @@ class _DashboardHomeState extends State<_DashboardHome> {
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: () {
-                        // Navigate to tracker (evaluation)
-                        widget.onNavigate(2);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const EvaluationFormScreen(),
+                          ),
+                        );
                       },
-                      icon: Icon(Icons.assignment, color: Colors.deepPurple),
-                      label: Text('Start Evaluation',
+                      icon: const Icon(Icons.assignment, color: Colors.deepPurple),
+                      label: const Text('Start Evaluation',
                           style: TextStyle(color: Colors.deepPurple)),
                       style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Colors.deepPurple, width: 2),
+                        side: const BorderSide(color: Colors.deepPurple, width: 2),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -846,30 +1311,94 @@ class _DashboardHomeState extends State<_DashboardHome> {
                   Expanded(
                     child: _QuickAccessCard(
                       icon: Icons.fitness_center,
-                      label: 'AIFRI',
+                      label: 'AISRI',
                       subtitle: 'Assessment',
                       color: Colors.blue,
-                      onTap: () => widget.onNavigate(1),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _QuickAccessCard(
-                      icon: Icons.phone,
-                      label: 'AISRI',
-                      subtitle: 'Calculator',
-                      color: Colors.green,
-                      onTap: () => widget.onNavigate(1),
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AssessmentScreen(),
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: _QuickAccessCard(
                       icon: Icons.calculate,
+                      label: 'AISRI',
+                      subtitle: 'Calculator',
+                      color: Colors.green,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const EvaluationFormScreen(),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _QuickAccessCard(
+                      icon: Icons.phone,
                       label: 'Call',
                       subtitle: 'AISRI',
                       color: Colors.orange,
-                      onTap: () => widget.onNavigate(1),
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const EvaluationFormScreen(),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: _QuickAccessCard(
+                      icon: Icons.monitor_weight,
+                      label: 'Body',
+                      subtitle: 'Tracking',
+                      color: Colors.purple,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const BodyMeasurementsScreen(),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _QuickAccessCard(
+                      icon: Icons.healing,
+                      label: 'Injuries',
+                      subtitle: 'Log',
+                      color: Colors.red,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const InjuriesScreen(),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _QuickAccessCard(
+                      icon: Icons.emoji_events,
+                      label: 'Goals',
+                      subtitle: 'Dashboard',
+                      color: Colors.amber,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const GoalsScreen(),
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -1230,6 +1759,144 @@ class _DashboardHomeState extends State<_DashboardHome> {
           ],
         ],
       ),
+    );
+  }
+
+  Future<void> _showTodayWorkoutSuggestion() async {
+    try {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(color: Colors.white),
+        ),
+      );
+
+      final suggestion = await AIWorkoutGeneratorService.suggestTodayWorkout();
+      
+      if (mounted) {
+        Navigator.pop(context); // Close loading
+        
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Row(
+              children: [
+                const Icon(Icons.lightbulb, color: Colors.deepPurple),
+                const SizedBox(width: 8),
+                const Text('Today\'s Suggestion'),
+              ],
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    suggestion['type'],
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.deepPurple.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      suggestion['intensity'].toUpperCase(),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.deepPurple,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildSuggestionRow(Icons.straighten, 
+                      '${suggestion['suggested_distance']} km'),
+                  const SizedBox(height: 8),
+                  _buildSuggestionRow(Icons.timer, 
+                      '${suggestion['suggested_duration']} minutes'),
+                  const SizedBox(height: 8),
+                  _buildSuggestionRow(Icons.favorite, 
+                      '${suggestion['hr_zone_min']}-${suggestion['hr_zone_max']} bpm'),
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade50,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      suggestion['rationale'],
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.blue.shade900,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    suggestion['description'],
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey[700],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Close'),
+              ),
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pop(context);
+                  // Navigate to start run screen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const StartRunScreen(),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.play_arrow),
+                label: const Text('Start Workout'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple,
+                  foregroundColor: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        Navigator.pop(context); // Close loading
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error generating suggestion: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Widget _buildSuggestionRow(IconData icon, String text) {
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: Colors.grey[600]),
+        const SizedBox(width: 8),
+        Text(text, style: const TextStyle(fontSize: 14)),
+      ],
     );
   }
 }

@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io';
 import 'package:share_plus/share_plus.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
@@ -22,6 +23,8 @@ import '../services/assessment_report_generator.dart'
     show AssessmentReport, AssessmentReportGenerator, InjuryRisk, RoadmapPhase;
 import '../widgets/roadmap_timeline_widget.dart' show RoadmapTimelineWidget;
 import '../widgets/roadmap_timeline_widget.dart' as timeline;
+import 'athlete_goals_screen.dart';
+import '../services/kura_coach_service.dart';
 
 class AssessmentResultsScreen extends StatefulWidget {
   final Map<String, dynamic> assessmentData;
@@ -47,7 +50,7 @@ class _AssessmentResultsScreenState extends State<AssessmentResultsScreen>
   late AssessmentReport report;
   List<GaitPathology>? _gaitPathologies;
   AssessmentReport? _report;
-  bool isLoading = true;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -77,10 +80,6 @@ class _AssessmentResultsScreenState extends State<AssessmentResultsScreen>
           widget.assessmentData['goals'] ?? 'Improve running performance',
     );
     _report = report;
-
-    setState(() {
-      isLoading = false;
-    });
   }
 
   // Placeholder - replace with actual InjuryRiskAnalyzer call
@@ -91,13 +90,6 @@ class _AssessmentResultsScreenState extends State<AssessmentResultsScreen>
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('Analyzing Results...')),
-        body: const Center(child: CircularProgressIndicator()),
-      );
-    }
-
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -130,13 +122,43 @@ class _AssessmentResultsScreenState extends State<AssessmentResultsScreen>
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
+      body: Stack(
         children: [
-          _buildOverviewTab(),
-          _buildGaitAnalysisTab(),
-          _buildRoadmapTab(),
-          _buildFullReportTab(),
+          // Main content
+          TabBarView(
+            controller: _tabController,
+            children: [
+              _buildOverviewTab(),
+              _buildGaitAnalysisTab(),
+              _buildRoadmapTab(),
+              _buildFullReportTab(),
+            ],
+          ),
+          
+          // Loading overlay
+          if (_isLoading)
+            Container(
+              color: Colors.black54,
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                    SizedBox(height: 16),
+                    Text(
+                      'Generating your training protocol...',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
         ],
       ),
       bottomNavigationBar: Container(
@@ -215,6 +237,11 @@ class _AssessmentResultsScreenState extends State<AssessmentResultsScreen>
         children: [
           // AISRI Score Card
           _buildAISTRIScoreCard(),
+
+          const SizedBox(height: 24),
+
+          // Training Protocol Generation
+          _buildTrainingProtocolCard(),
 
           const SizedBox(height: 24),
 
@@ -1050,6 +1077,194 @@ class _AssessmentResultsScreenState extends State<AssessmentResultsScreen>
         );
       }
     }
+  }
+
+  Widget _buildTrainingProtocolCard() {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.fitness_center,
+                  color: Colors.blue[700],
+                  size: 28,
+                ),
+                const SizedBox(width: 12),
+                const Text(
+                  'Start Your Training Journey',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Based on your AISRI assessment, we can create a personalized training protocol tailored to your fitness level and goals.',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[700],
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _isLoading ? null : _generateTrainingProtocol,
+                icon: _isLoading
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                    : const Icon(Icons.auto_awesome),
+                label: Text(
+                  _isLoading ? 'Generating...' : 'Generate My Training Protocol',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue[700],
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _generateTrainingProtocol() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final userId = Supabase.instance.client.auth.currentUser?.id;
+      if (userId == null) {
+        throw Exception('User not authenticated');
+      }
+
+      // Get evaluation data from assessment
+      final evaluationData = {
+        'AISRI_score': widget.aistriScore,
+        'fitness_level': _determineFitnessLevel(widget.aistriScore.toDouble()),
+        'injury_risk': report.executiveSummary.overallRiskLevel,
+        'assessment_date': widget.assessmentData['created_at'] ?? DateTime.now().toIso8601String(),
+        'pillar_scores': {
+          'mobility': widget.pillarScores['Mobility'] ?? 0,
+          'stability': widget.pillarScores['Stability'] ?? 0,
+          'strength': widget.pillarScores['Strength'] ?? 0,
+          'power': widget.pillarScores['Power'] ?? 0,
+          'endurance': widget.pillarScores['Endurance'] ?? 0,
+        },
+      };
+
+      // Generate protocol using Kura Coach service
+      await KuraCoachService.generateProtocolFromEvaluation(
+        athleteId: userId,
+        evaluationData: evaluationData,
+      );
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      if (!mounted) return;
+
+      // Show success dialog
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.green),
+              SizedBox(width: 12),
+              Text('Protocol Generated!'),
+            ],
+          ),
+          content: Text(
+            'Your personalized training protocol has been created. '
+            'Let\'s set up your athlete profile and goals to get started.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Later'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _navigateToAthleteGoals();
+              },
+              child: Text('Set Up Profile'),
+            ),
+          ],
+        ),
+      );
+
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+
+      if (!mounted) return;
+
+      // Show error dialog
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Row(
+            children: [
+              Icon(Icons.error, color: Colors.red),
+              SizedBox(width: 12),
+              Text('Generation Failed'),
+            ],
+          ),
+          content: Text('Error: ${e.toString()}'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  String _determineFitnessLevel(double AISRIScore) {
+    if (AISRIScore >= 80) return 'advanced';
+    if (AISRIScore >= 60) return 'intermediate';
+    return 'beginner';
+  }
+
+  void _navigateToAthleteGoals() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AthleteGoalsScreen(),
+      ),
+    );
   }
 
   @override

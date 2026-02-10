@@ -8,6 +8,11 @@ import '../services/strava_protocol_service.dart';
 import '../services/workout_analysis_service.dart';
 import 'analysis_report_screen.dart';
 import 'login_screen.dart';
+import 'workout_creator_screen.dart';
+import 'body_measurements_screen.dart';
+import 'injuries_screen.dart';
+import 'goals_screen.dart';
+import 'start_run_screen.dart';
 import 'dart:developer' as developer;
 
 class ProfileScreen extends StatefulWidget {
@@ -867,6 +872,141 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ],
                     ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Training & Workouts Section
+                Text(
+                  'Training & Workouts',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.w500,
+                      ),
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Column(
+                    children: [
+                      _MenuItem(
+                        icon: Icons.directions_run,
+                        iconColor: Colors.blue,
+                        title: 'Start Run',
+                        subtitle: 'AI-powered run type selection',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const StartRunScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                      const Divider(height: 1),
+                      _MenuItem(
+                        icon: Icons.add_circle,
+                        iconColor: Colors.green,
+                        title: 'Create Workout',
+                        subtitle: 'Custom running, strength & rehab',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const WorkoutCreatorScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                      const Divider(height: 1),
+                      _MenuItem(
+                        icon: Icons.calendar_month,
+                        iconColor: Colors.purple,
+                        title: 'Training Calendar',
+                        subtitle: 'View scheduled workouts',
+                        onTap: () {
+                          // Navigate to calendar
+                        },
+                      ),
+                      const Divider(height: 1),
+                      _MenuItem(
+                        icon: Icons.history,
+                        iconColor: Colors.orange,
+                        title: 'Workout History',
+                        subtitle: 'Past activities & progress',
+                        onTap: () {
+                          // Navigate to history
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Health & Tracking Section
+                Text(
+                  'Health & Tracking',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.w500,
+                      ),
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Column(
+                    children: [
+                      _MenuItem(
+                        icon: Icons.monitor_weight,
+                        iconColor: Colors.purple,
+                        title: 'Body Measurements',
+                        subtitle: 'Track weight, BMI & composition',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const BodyMeasurementsScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                      const Divider(height: 1),
+                      _MenuItem(
+                        icon: Icons.healing,
+                        iconColor: Colors.red,
+                        title: 'Injury Management',
+                        subtitle: 'Log & track recovery',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const InjuriesScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                      const Divider(height: 1),
+                      _MenuItem(
+                        icon: Icons.flag,
+                        iconColor: Colors.amber,
+                        title: 'Goals Dashboard',
+                        subtitle: 'Set & achieve targets',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const GoalsScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 24),

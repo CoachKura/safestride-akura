@@ -32,8 +32,8 @@ class BottomNav extends StatelessWidget {
           label: 'Track',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.add_circle_outline),
-          label: 'Log',
+          icon: Icon(Icons.add_circle),
+          label: 'Create',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.person),

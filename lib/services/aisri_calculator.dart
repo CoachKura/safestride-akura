@@ -13,7 +13,7 @@ class AISRICalculator {
   /// Calculate AISRI score from assessment data
   ///
   /// Returns a map containing:
-  /// - aifri_score: Overall score (0-100)
+  /// - aisri_score: Overall score (0-100)
   /// - risk_level: 'Low', 'Moderate', or 'High'
   /// - pillar_scores: Map of individual pillar scores
   static Map<String, dynamic> calculateScore(Map<String, dynamic> assessment) {
@@ -46,7 +46,7 @@ class AISRICalculator {
     }
 
     return {
-      'aifri_score': totalScore,
+      'aisri_score': totalScore,
       'risk_level': riskLevel,
       'pillar_adaptability': adaptability,
       'pillar_injury_risk': injuryRisk,
