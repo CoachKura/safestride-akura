@@ -1,4 +1,4 @@
-﻿# ========================================
+# ========================================
 # SUPABASE SCHEMA DEPLOYMENT SCRIPT
 # ========================================
 
@@ -50,7 +50,7 @@ try {
     Write-Host "Tables created:" -ForegroundColor Cyan
     Write-Host "  profiles" -ForegroundColor White
     Write-Host "  athlete_coach_relationships" -ForegroundColor White
-    Write-Host "  aifri_assessments" -ForegroundColor White
+    Write-Host "  AISRI_assessments" -ForegroundColor White
     Write-Host "  workouts" -ForegroundColor White
     Write-Host "  training_plans" -ForegroundColor White
     Write-Host "  devices" -ForegroundColor White

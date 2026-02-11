@@ -260,7 +260,7 @@ You wanted exact timelines showing when athletes reach each milestone. We create
      MaterialPageRoute(
        builder: (context) => AssessmentResultsScreen(
          assessmentData: {...all fields...},
-         aistriScore: scoreData['aifri_score'],
+         aistriScore: scoreData['aisri_score'],
          pillarScores: {...6 pillars...},
        ),
      ),

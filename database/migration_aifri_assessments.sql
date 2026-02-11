@@ -1,11 +1,11 @@
--- Migration: Add AIFRI Assessments Table and Update Profiles
--- Description: Creates table for athlete evaluation form data and adds current_aifri_score to profiles
+-- Migration: Add AISRI Assessments Table and Update Profiles
+-- Description: Creates table for athlete evaluation form data and adds current_AISRI_score to profiles
 -- Date: February 3, 2026
 
 -- ============================================
--- 1. Create aifri_assessments table
+-- 1. Create AISRI_assessments table
 -- ============================================
-CREATE TABLE IF NOT EXISTS public.aifri_assessments (
+CREATE TABLE IF NOT EXISTS public.AISRI_assessments (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
     
@@ -59,40 +59,40 @@ CREATE TABLE IF NOT EXISTS public.aifri_assessments (
 );
 
 -- Add index for faster user lookups
-CREATE INDEX IF NOT EXISTS idx_aifri_assessments_user_id ON public.aifri_assessments(user_id);
+CREATE INDEX IF NOT EXISTS idx_AISRI_assessments_user_id ON public.AISRI_assessments(user_id);
 
 -- Add index for filtering by creation date
-CREATE INDEX IF NOT EXISTS idx_aifri_assessments_created_at ON public.aifri_assessments(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_AISRI_assessments_created_at ON public.AISRI_assessments(created_at DESC);
 
 -- ============================================
--- 2. Update profiles table to add current_aifri_score
+-- 2. Update profiles table to add current_AISRI_score
 -- ============================================
 ALTER TABLE public.profiles 
-ADD COLUMN IF NOT EXISTS current_aifri_score DECIMAL(5, 2) DEFAULT NULL CHECK (current_aifri_score IS NULL OR (current_aifri_score >= 0 AND current_aifri_score <= 100));
+ADD COLUMN IF NOT EXISTS current_AISRI_score DECIMAL(5, 2) DEFAULT NULL CHECK (current_AISRI_score IS NULL OR (current_AISRI_score >= 0 AND current_AISRI_score <= 100));
 
 -- ============================================
 -- 3. Enable Row Level Security (RLS)
 -- ============================================
-ALTER TABLE public.aifri_assessments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.AISRI_assessments ENABLE ROW LEVEL SECURITY;
 
 -- Policy: Users can view their own assessments
-CREATE POLICY "Users can view own assessments" ON public.aifri_assessments
+CREATE POLICY "Users can view own assessments" ON public.AISRI_assessments
     FOR SELECT USING (auth.uid() = user_id);
 
 -- Policy: Users can insert their own assessments
-CREATE POLICY "Users can insert own assessments" ON public.aifri_assessments
+CREATE POLICY "Users can insert own assessments" ON public.AISRI_assessments
     FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 -- Policy: Users can update their own assessments
-CREATE POLICY "Users can update own assessments" ON public.aifri_assessments
+CREATE POLICY "Users can update own assessments" ON public.AISRI_assessments
     FOR UPDATE USING (auth.uid() = user_id);
 
 -- Policy: Coaches can view assessments of their athletes (optional - for future coach feature)
--- CREATE POLICY "Coaches can view athlete assessments" ON public.aifri_assessments
+-- CREATE POLICY "Coaches can view athlete assessments" ON public.AISRI_assessments
 --     FOR SELECT USING (
 --         EXISTS (
 --             SELECT 1 FROM public.coach_athlete_relationships
---             WHERE coach_id = auth.uid() AND athlete_id = aifri_assessments.user_id
+--             WHERE coach_id = auth.uid() AND athlete_id = AISRI_assessments.user_id
 --         )
 --     );
 
@@ -108,19 +108,19 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Create trigger for auto-updating updated_at
-DROP TRIGGER IF EXISTS update_aifri_assessments_updated_at ON public.aifri_assessments;
-CREATE TRIGGER update_aifri_assessments_updated_at
-    BEFORE UPDATE ON public.aifri_assessments
+DROP TRIGGER IF EXISTS update_AISRI_assessments_updated_at ON public.AISRI_assessments;
+CREATE TRIGGER update_AISRI_assessments_updated_at
+    BEFORE UPDATE ON public.AISRI_assessments
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
 -- ============================================
 -- 5. Grant permissions
 -- ============================================
-GRANT SELECT, INSERT, UPDATE ON public.aifri_assessments TO authenticated;
+GRANT SELECT, INSERT, UPDATE ON public.AISRI_assessments TO authenticated;
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO authenticated;
 
 -- ============================================
 -- 6. Sample query to verify table structure
 -- ============================================
--- SELECT * FROM public.aifri_assessments WHERE user_id = auth.uid();
+-- SELECT * FROM public.AISRI_assessments WHERE user_id = auth.uid();

@@ -216,6 +216,14 @@ class StravaService {
       final activities = json.decode(response.body) as List;
       developer.log(
           'Fetched ${activities.length} activities from Strava (last 14 days)');
+      
+      // DEBUG: Log first activity details
+      if (activities.isNotEmpty) {
+        final firstActivity = activities.first;
+        developer.log('DEBUG: Most recent activity: ${firstActivity['name']} on ${firstActivity['start_date']}');
+        developer.log('DEBUG: Activity ID: ${firstActivity['id']}, Type: ${firstActivity['type']}');
+      }
+      
       int syncedCount = 0;
 
       // Import each activity as a workout
@@ -229,7 +237,10 @@ class StravaService {
               .eq('synced_from', 'strava')
               .maybeSingle();
 
-          if (existing != null) continue; // Skip if already imported
+          if (existing != null) {
+            developer.log('DEBUG: Skipping duplicate activity: ${activity['name']} (${activity['id']})');
+            continue; // Skip if already imported
+          }
 
           // Map Strava activity type to our activity types
           String workoutType = _mapStravaWorkoutType(activity['type']);
@@ -274,11 +285,13 @@ class StravaService {
           });
 
           syncedCount++;
+          developer.log('DEBUG: Successfully imported: ${activity['name']} (${activity['id']})');
         } catch (e) {
           developer.log('Error importing activity ${activity['id']}: $e');
         }
       }
 
+      developer.log('DEBUG: Sync complete - imported $syncedCount new activities');
       return syncedCount;
     } catch (e) {
       developer.log('Error syncing Strava activities: $e');

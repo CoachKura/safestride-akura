@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS profiles (
   gender TEXT,
   
   -- AISRI assessment columns
-  current_aifri_score INTEGER,
+  current_aisri_score INTEGER,
   aisri_score INTEGER,
   mobility_score INTEGER,
   strength_score INTEGER,
@@ -378,7 +378,7 @@ ON CONFLICT DO NOTHING;
 -- STEP 11: Create profile for user e1f2abfc-a1bb-4a85-b616-fec751de5dc3
 -- ========================================
 
-INSERT INTO profiles (id, role, name, full_name, current_aifri_score, aisri_score)
+INSERT INTO profiles (id, role, name, full_name, current_aisri_score, aisri_score)
 VALUES (
   'e1f2abfc-a1bb-4a85-b616-fec751de5dc3'::uuid,
   'athlete',
@@ -388,7 +388,7 @@ VALUES (
   60
 )
 ON CONFLICT (id) DO UPDATE SET
-  current_aifri_score = COALESCE(profiles.current_aifri_score, 60),
+  current_aisri_score = COALESCE(profiles.current_aisri_score, 60),
   aisri_score = COALESCE(profiles.aisri_score, 60);
 
 -- ========================================

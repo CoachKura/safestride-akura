@@ -17,7 +17,7 @@ A complete 6-step assessment form that collects baseline athlete data for AISRI 
 ✅ Progress indicator showing step X/6 with percentage  
 ✅ Multi-step form using PageView  
 ✅ Simplified AISRI score calculation  
-✅ Saves to Supabase `aifri_assessments` table  
+✅ Saves to Supabase `AISRI_assessments` table  
 ✅ Purple gradient theme matching app design  
 ✅ Loading state during submission  
 ✅ Auto-navigation to Dashboard after completion
@@ -28,7 +28,7 @@ A complete 6-step assessment form that collects baseline athlete data for AISRI 
 
 #### `lib/main.dart`
 - Created `AuthCheckScreen` widget that checks if user has completed assessment
-- Queries `aifri_assessments` table on app launch
+- Queries `AISRI_assessments` table on app launch
 - Routes authenticated users to:
   - **EvaluationFormScreen** if no assessment found
   - **DashboardScreen** if assessment completed
@@ -39,15 +39,15 @@ A complete 6-step assessment form that collects baseline athlete data for AISRI 
 
 ---
 
-### 3. **Database Schema** (`database/migration_aifri_assessments.sql`)
+### 3. **Database Schema** (`database/migration_AISRI_assessments.sql`)
 Complete SQL migration file including:
 
-✅ **Table Creation**: `aifri_assessments` with all 6-step fields  
+✅ **Table Creation**: `AISRI_assessments` with all 6-step fields  
 ✅ **Constraints**: Check constraints for valid data ranges  
 ✅ **Indexes**: Fast user lookups and date filtering  
 ✅ **RLS Policies**: Users can only view/edit their own assessments  
 ✅ **Triggers**: Auto-update `updated_at` timestamp  
-✅ **Profiles Update**: Adds `current_aifri_score` column  
+✅ **Profiles Update**: Adds `current_AISRI_score` column  
 
 ---
 
@@ -58,9 +58,9 @@ Run the SQL migration in your Supabase dashboard:
 
 ```bash
 1. Open Supabase Dashboard → SQL Editor
-2. Copy contents from: database/migration_aifri_assessments.sql
+2. Copy contents from: database/migration_AISRI_assessments.sql
 3. Click "Run" to execute the migration
-4. Verify table created: Tables → aifri_assessments
+4. Verify table created: Tables → AISRI_assessments
 ```
 
 ---
@@ -95,8 +95,8 @@ Check that data was saved correctly:
 
 ```sql
 -- In Supabase SQL Editor:
-SELECT * FROM aifri_assessments WHERE user_id = '[your-user-id]';
-SELECT current_aifri_score FROM profiles WHERE id = '[your-user-id]';
+SELECT * FROM AISRI_assessments WHERE user_id = '[your-user-id]';
+SELECT current_AISRI_score FROM profiles WHERE id = '[your-user-id]';
 ```
 
 ---
@@ -135,7 +135,7 @@ The following screens still display hardcoded data and need to be connected to t
 
 ### Dashboard Screen:
 - ❌ "Demo Athlete" text (should show real user name)
-- ❌ AIFRI score: 78 - Moderate (should show real score from database)
+- ❌ AISRI score: 78 - Moderate (should show real score from database)
 - ❌ Current Streak: 7 days (should calculate from workouts table)
 - ❌ This Week: 25.2 km (should sum from workouts table)
 
@@ -166,7 +166,7 @@ The following screens still display hardcoded data and need to be connected to t
 ### Phase 2: NEXT (Remove Demo Data)
 1. **Dashboard Screen**:
    - Fetch real user name from profiles table
-   - Display real AISRI score from aifri_assessments
+   - Display real AISRI score from AISRI_assessments
    - Calculate real streak and weekly distance from workouts table
 
 2. **Logger Screen**:
@@ -194,7 +194,7 @@ The following screens still display hardcoded data and need to be connected to t
 
 ### Already Created:
 ✅ `profiles` (existing)  
-✅ `aifri_assessments` (just created)
+✅ `AISRI_assessments` (just created)
 
 ### Still Need to Create:
 ❌ `workouts` table for storing logged workouts  
@@ -228,7 +228,7 @@ The following screens still display hardcoded data and need to be connected to t
 1. ✅ `lib/screens/evaluation_form_screen.dart` (NEW)
 2. ✅ `lib/main.dart` (UPDATED - navigation logic)
 3. ✅ `lib/screens/register_screen.dart` (UPDATED - post-registration flow)
-4. ✅ `database/migration_aifri_assessments.sql` (NEW)
+4. ✅ `database/migration_AISRI_assessments.sql` (NEW)
 
 ---
 

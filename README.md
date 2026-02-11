@@ -1,12 +1,12 @@
-﻿# 🏃 SafeStride by AKURA - Flutter Mobile App
+# ?? SafeStride by AKURA - Flutter Mobile App
 
 **Native Android & iOS mobile app for runner injury prevention and performance tracking**
 
-**✅ STATUS: AISRI Assessment + Strava Integration Complete & Ready for Testing**
+**? STATUS: AISRI Assessment + Strava Integration Complete & Ready for Testing**
 
 ---
 
-## 📱 WHAT IS THIS?
+## ?? WHAT IS THIS?
 
 SafeStride is a native mobile application built with Flutter that helps runners:
 - **Prevent injuries** through comprehensive biomechanics assessment (15 physical tests)
@@ -23,9 +23,9 @@ SafeStride is a native mobile application built with Flutter that helps runners:
 
 ---
 
-## 📦 WHAT'S INCLUDED
+## ?? WHAT'S INCLUDED
 
-### 🔧 Flutter Project
+### ?? Flutter Project
 - **20+ Dart source files** - Complete app with AISRI + Strava integration
 - **9 screens** - Login, Register, Dashboard, Tracker, Logger, History, Profile, **Evaluation Form**, **Assessment Results**, **Strava Connect** (NEW!)
 - **Advanced Services** - Gait Pathology Analyzer, Injury Risk Analyzer, Report Generator, **Strava API Service** (NEW!)
@@ -35,7 +35,7 @@ SafeStride is a native mobile application built with Flutter that helps runners:
 - **Bottom navigation** - Material Design UI
 - **Android & iOS config** - Ready for both platforms
 
-### 🎯 AISRI Assessment System
+### ?? AISRI Assessment System
 - **15 Physical Tests** - Ankle, knee, hip, core, shoulder, neck, cardio
 - **6 Pillar Scoring** - Adaptability, Injury Risk, Fatigue, Recovery, Intensity, Consistency
 - **Gait Analysis** - Detects bow legs, knock knees, overpronation, underpronation
@@ -43,7 +43,7 @@ SafeStride is a native mobile application built with Flutter that helps runners:
 - **Recovery Roadmap** - 4-phase personalized programs with week-by-week milestones
 - **Comprehensive Reports** - Exportable PDF reports with protocols
 
-### 🔗 Strava Integration (NEW!)
+### ?? Strava Integration (NEW!)
 - **OAuth Authentication** - Secure Strava account connection
 - **Automatic Activity Sync** - Last 12 weeks of running data
 - **Weekly Training Stats** - Pre-aggregated metrics for fast analysis
@@ -53,17 +53,17 @@ SafeStride is a native mobile application built with Flutter that helps runners:
 - **5 Database Tables** - Connections, athletes, activities, PBs, weekly stats
 - **Training Load Analysis** - Detect overtraining and fatigue patterns
 
-### 📚 Complete Documentation
+### ?? Complete Documentation
 
 **AISRI Assessment (17 docs):**
-- **READY_TO_TEST.md** - ⭐ **START HERE** - Complete testing guide with sample data
+- **READY_TO_TEST.md** - ? **START HERE** - Complete testing guide with sample data
 - **EVALUATION_FORM_COMPLETE.md** - 7-step assessment form implementation
 - **POST_ASSESSMENT_SYSTEM.md** - Architecture and service documentation
 - **BIOMECHANICS_REFERENCE.md** - Scientific explanations of ROM impact
 - **SUPABASE_SETUP_GUIDE.md** - Database migration and configuration
 
 **Strava Integration (5 docs):**
-- **STRAVA_SETUP_GUIDE.md** - ⭐ **START HERE FOR STRAVA** - Complete setup (75 min)
+- **STRAVA_SETUP_GUIDE.md** - ? **START HERE FOR STRAVA** - Complete setup (75 min)
 - **STRAVA_DATA_FLOW.md** - End-to-end data flow and storage
 - **STRAVA_DATABASE_GUIDE.md** - Schema and query examples
 - **STRAVA_QUICK_REFERENCE.md** - Quick commands and checklists
@@ -119,11 +119,11 @@ flutter run
 
 ---
 
-## 📖 DETAILED GUIDES
+## ?? DETAILED GUIDES
 
 For complete instructions, see the `docs/` folder:
 
-### 🪟 [Windows Setup Guide](docs/WINDOWS_SETUP_GUIDE.md) (27 KB)
+### ?? [Windows Setup Guide](docs/WINDOWS_SETUP_GUIDE.md) (27 KB)
 Complete installation guide covering:
 - Git, Flutter, Android Studio, VS Code installation
 - PATH configuration
@@ -135,7 +135,7 @@ Complete installation guide covering:
 
 **Start here if you're new to Flutter!**
 
-### ⚡ [Quick Start Checklist](docs/QUICK_START_CHECKLIST.md) (5.5 KB)
+### ? [Quick Start Checklist](docs/QUICK_START_CHECKLIST.md) (5.5 KB)
 Condensed 1-page checklist:
 - Installation steps with timeframes
 - Phone setup instructions
@@ -145,7 +145,7 @@ Condensed 1-page checklist:
 
 **Use this if you want to get running fast!**
 
-### 🔗 [Supabase Connection Guide](docs/SUPABASE_CONNECTION_GUIDE.md) (13 KB)
+### ?? [Supabase Connection Guide](docs/SUPABASE_CONNECTION_GUIDE.md) (13 KB)
 Backend configuration instructions:
 - Creating Supabase project
 - Getting API credentials
@@ -156,7 +156,7 @@ Backend configuration instructions:
 
 **Essential for connecting your app to the backend!**
 
-### 🏃 [Post-Assessment System](docs/POST_ASSESSMENT_SYSTEM.md) (14 KB) **NEW!**
+### ?? [Post-Assessment System](docs/POST_ASSESSMENT_SYSTEM.md) (14 KB) **NEW!**
 Comprehensive guide to the post-assessment intelligence system:
 - Gait pathology detection algorithms
 - Biomechanical analysis implementation
@@ -167,7 +167,7 @@ Comprehensive guide to the post-assessment intelligence system:
 
 **Learn how the advanced assessment analysis works!**
 
-### ⚡ [Post-Assessment Quick Start](docs/POST_ASSESSMENT_QUICK_START.md) (6 KB) **NEW!**
+### ? [Post-Assessment Quick Start](docs/POST_ASSESSMENT_QUICK_START.md) (6 KB) **NEW!**
 Fast integration guide for developers:
 - 5-minute integration steps
 - Code examples for each component
@@ -177,7 +177,7 @@ Fast integration guide for developers:
 
 **Get the post-assessment system running in 5 minutes!**
 
-### 🔬 [Biomechanics Reference](docs/BIOMECHANICS_REFERENCE.md) (45 KB) **NEW!**
+### ?? [Biomechanics Reference](docs/BIOMECHANICS_REFERENCE.md) (45 KB) **NEW!**
 Scientific reference guide:
 - Running gait cycle phases (4 phases with timing)
 - ROM standards and thresholds (ankle, hip, balance)
@@ -192,7 +192,7 @@ Scientific reference guide:
 
 **Deep dive into the science behind the assessments!**
 
-### 🔧 [Troubleshooting FAQ](docs/TROUBLESHOOTING_FAQ.md) (16 KB)
+### ?? [Troubleshooting FAQ](docs/TROUBLESHOOTING_FAQ.md) (16 KB)
 Solutions to common problems:
 - Installation issues
 - Flutter Doctor problems
@@ -398,7 +398,7 @@ dependencies:
 - [ ] App runs: Press F5 in VS Code, app opens on phone
 - [ ] Can register: Create new account in app
 - [ ] Can login: Login with credentials works
-- [ ] Dashboard loads: See AIFRI score placeholder
+- [ ] Dashboard loads: See AISRI score placeholder
 - [ ] GPS works: Tracker screen shows location (requires outdoor)
 - [ ] Can save workouts: Workouts appear in history
 - [ ] APK builds: `flutter build apk --release` succeeds
@@ -485,7 +485,7 @@ flutter build apk --release
 ### Tables (7 total)
 1. **profiles** - User information
 2. **athlete_coach_relationships** - Coach-athlete connections
-3. **aifri_assessments** - Fitness assessment scores
+3. **AISRI_assessments** - Fitness assessment scores
 4. **workouts** - Workout tracking data
 5. **training_plans** - Coach-created plans
 6. **devices** - Connected wearables
@@ -552,7 +552,7 @@ This project teaches:
 - [] Basic dashboard
 
 ### Phase 2 (Coming Soon)
-- [ ] AIFRI calculation algorithm
+- [ ] AISRI calculation algorithm
 - [ ] Coach dashboard
 - [ ] Athlete-coach connections
 - [ ] Training plan assignment

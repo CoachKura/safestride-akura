@@ -68,21 +68,32 @@
     </div>
 
     <script>
-        // Get the authorization code from URL
+        // Get the authorization code from URL (check both query params and hash)
         const urlParams = new URLSearchParams(window.location.search);
-        const code = urlParams.get('code');
-        const error = urlParams.get('error');
+        const hashParams = new URLSearchParams(window.location.hash.split('?')[1] || '');
+        
+        // Check both query string and hash for parameters
+        const code = urlParams.get('code') || hashParams.get('code');
+        const error = urlParams.get('error') || hashParams.get('error');
+        const scope = urlParams.get('scope') || hashParams.get('scope');
+        const state = urlParams.get('state') || hashParams.get('state');
+        
         const statusEl = document.getElementById('status');
         const errorEl = document.getElementById('error');
         const manualEl = document.getElementById('manual');
+
+        console.log('Callback received - Code:', code, 'Error:', error, 'Scope:', scope);
 
         if (error) {
             statusEl.textContent = 'Authorization failed';
             errorEl.textContent = 'Error: ' + error;
             errorEl.style.display = 'block';
         } else if (code) {
-            // Build the deep link URL
-            const appUrl = 'safestride://strava-callback?code=' + encodeURIComponent(code);
+            // Build the deep link URL with all parameters
+            let appUrl = 'safestride://strava-callback?code=' + encodeURIComponent(code);
+            if (scope) appUrl += '&scope=' + encodeURIComponent(scope);
+            if (state) appUrl += '&state=' + encodeURIComponent(state);
+            
             manualEl.href = appUrl;
             
             // Attempt automatic redirect
@@ -96,7 +107,7 @@
             }, 2000);
         } else {
             statusEl.textContent = 'Invalid callback';
-            errorEl.textContent = 'No authorization code received';
+            errorEl.textContent = 'No authorization code received. URL: ' + window.location.href;
             errorEl.style.display = 'block';
         }
     </script>

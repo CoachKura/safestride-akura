@@ -502,7 +502,7 @@ On your phone, you should see:
 1. **Login Screen** - SafeStride logo, email/password fields
 2. **Register Link** - Tap "Don't have an account? Register"
 3. **Register Screen** - Create new account
-4. **Dashboard** - After login, see AIFRI score, stats
+4. **Dashboard** - After login, see AISRI score, stats
 5. **Bottom Navigation** - Dashboard, Tracker, Logger, History, Profile tabs
 
 **Test these features**:
@@ -924,7 +924,7 @@ git log                        # View commit history
    - Password strength checker
 
 3. **Dashboard Screen** (`lib/screens/dashboard_screen.dart`)
-   - AIFRI score display
+   - AISRI score display
    - Recent workouts summary
    - Quick action buttons
    - Stats overview

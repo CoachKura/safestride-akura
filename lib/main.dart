@@ -9,9 +9,12 @@ import 'screens/login_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/evaluation_form_screen.dart';
 import 'screens/tracker_screen.dart';
+import 'screens/start_run_screen.dart';
 import 'screens/logger_screen.dart';
+import 'screens/workout_creator_screen.dart';
 import 'screens/history_screen.dart';
 import 'screens/profile_screen.dart';
+import 'theme/app_theme.dart';
 import 'dart:developer' as developer;
 
 void main() async {
@@ -96,20 +99,24 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Akura SafeStride',
+      title: 'AKURA SafeStride',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF667EEA),
-          brightness: Brightness.light,
-        ),
-        useMaterial3: true,
-      ),
+      
+      // Modern Dark Theme (Primary)
+      theme: AppTheme.darkTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.dark,
+      
+      // Optional: Enable light theme for bright sunlight conditions
+      // themeMode: ThemeMode.system, // Auto-switch based on device settings
+      
       home: const DashboardScreen(), // Direct access for testing
       routes: {
         '/dashboard': (context) => const DashboardScreen(),
         '/tracker': (context) => const TrackerScreen(),
+        '/start_run': (context) => const StartRunScreen(),
         '/logger': (context) => const LoggerScreen(),
+        '/workout_creator': (context) => const WorkoutCreatorScreen(),
         '/history': (context) => const HistoryScreen(),
         '/profile': (context) => const ProfileScreen(),
         '/login': (context) => const LoginScreen(),
@@ -146,7 +153,7 @@ class _AuthCheckScreenState extends State<AuthCheckScreen> {
 
       // Check if user has completed evaluation
       final assessmentResponse = await Supabase.instance.client
-          .from('aifri_assessments')
+          .from('aisri_assessments')
           .select('id')
           .eq('user_id', userId)
           .maybeSingle();

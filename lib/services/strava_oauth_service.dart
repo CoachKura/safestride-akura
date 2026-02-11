@@ -19,7 +19,7 @@ class StravaOAuthService {
   static const String _clientId = '162971';
   static const String _clientSecret =
       '6554eb9bb83f222a585e312c17420221313f85c1';
-  static const String _redirectUri = 'http://localhost';
+  static const String _redirectUri = 'https://akura.in/strava-callback.html';
   static const String _scope = 'read,activity:read_all';
   static const String _authorizeUrl = 'https://www.strava.com/oauth/authorize';
   static const String _tokenUrl = 'https://www.strava.com/oauth/token';

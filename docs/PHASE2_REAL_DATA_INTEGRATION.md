@@ -11,20 +11,20 @@ All demo/hardcoded data has been removed and replaced with real Supabase databas
 ### 1. **Dashboard Screen** (`lib/screens/dashboard_screen.dart`)
 **Changes:**
 - ✅ Removed hardcoded "Demo Athlete" → Now shows real user name from `profiles` table
-- ✅ Removed hardcoded AIFRI score (78) → Now shows real score from `aifri_assessments` table
+- ✅ Removed hardcoded AISRI score (78) → Now shows real score from `AISRI_assessments` table
 - ✅ Removed hardcoded streak (7 days) → Now calculates real streak from `workouts` table
 - ✅ Removed hardcoded weekly distance (25.2 km) → Now sums real distance from last 7 days
 - ✅ Added loading state while fetching data
 - ✅ Implemented streak calculation algorithm (consecutive workout days)
-- ✅ Dynamic risk level display based on AIFRI score
+- ✅ Dynamic risk level display based on AISRI score
 
 **Real Data Queries:**
 ```dart
 // User name from profiles
 SELECT name FROM profiles WHERE id = user_id
 
-// AIFRI score from latest assessment
-SELECT total_score FROM aifri_assessments 
+// AISRI score from latest assessment
+SELECT total_score FROM AISRI_assessments 
 WHERE user_id = user_id 
 ORDER BY created_at DESC LIMIT 1
 
@@ -134,7 +134,7 @@ CREATE TABLE workouts (
 
 1. **Dashboard**
    - Shows real user name
-   - Shows real AIFRI score
+   - Shows real AISRI score
    - Calculates real workout streak
    - Sums real weekly distance
    - Loading states
@@ -194,7 +194,7 @@ flutter run -d chrome
 1. Log in to existing account
 2. Dashboard should show:
    - ✅ YOUR actual name (not "Demo Athlete")
-   - ✅ YOUR AIFRI score (from evaluation form)
+   - ✅ YOUR AISRI score (from evaluation form)
    - ✅ Current streak: 0 days (if no workouts logged)
    - ✅ This Week: 0.0 km (if no workouts)
 
@@ -372,7 +372,7 @@ flutter run -d chrome
 **Solutions:**
 1. Log at least one workout via Logger screen
 2. Wait for page to reload (or navigate away and back)
-3. Check if AIFRI assessment is completed
+3. Check if AISRI assessment is completed
 4. Verify profiles table has user record
 
 ### Issue: "Workout won't save"
@@ -389,7 +389,7 @@ flutter run -d chrome
 
 All of these should work:
 - [ ] Dashboard shows YOUR real name
-- [ ] Dashboard shows YOUR AIFRI score
+- [ ] Dashboard shows YOUR AISRI score
 - [ ] Logger saves workouts to database
 - [ ] History lists ALL saved workouts
 - [ ] History summary calculates correct totals

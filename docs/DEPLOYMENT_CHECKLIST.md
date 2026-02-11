@@ -7,11 +7,11 @@
 1. **Open Supabase Dashboard**: https://app.supabase.com
 2. Navigate to: **SQL Editor** (left sidebar)
 3. Click: **New Query**
-4. **Copy** the entire contents from: `database/migration_aifri_assessments.sql`
+4. **Copy** the entire contents from: `database/migration_aisri_assessments.sql`
 5. **Paste** into SQL Editor
 6. Click: **Run** (or press Ctrl+Enter)
 7. **Verify** success message appears
-8. Navigate to: **Table Editor** → Confirm `aifri_assessments` table exists
+8. Navigate to: **Table Editor** → Confirm `aisri_assessments` table exists
 
 ---
 
@@ -79,11 +79,11 @@ Click: **Complete Assessment**
 #### C. Verify Data in Database
 
 1. **Supabase Dashboard** → **Table Editor**
-2. Select table: `aifri_assessments`
+2. Select table: `aisri_assessments`
 3. **Verify**: Your test data appears in the table
 4. **Check**: `total_score` column has calculated AISRI score
 5. Select table: `profiles`
-6. **Verify**: `current_aifri_score` matches assessment score
+6. **Verify**: `current_aisri_score` matches assessment score
 
 ---
 
@@ -113,8 +113,8 @@ Test that users can only see their own assessments:
 All of these should be ✅:
 
 - [ ] Database migration runs without errors
-- [ ] `aifri_assessments` table exists with correct columns
-- [ ] `profiles.current_aifri_score` column exists
+- [ ] `aisri_assessments` table exists with correct columns
+- [ ] `profiles.current_aisri_score` column exists
 - [ ] New user registration → redirects to evaluation form
 - [ ] Form validation works (try submitting empty fields)
 - [ ] All 6 steps can be completed
@@ -129,10 +129,10 @@ All of these should be ✅:
 
 ## 🐛 Troubleshooting
 
-### Issue: "Table aifri_assessments does not exist"
+### Issue: "Table aisri_assessments does not exist"
 **Solution**: Re-run the SQL migration in Supabase Dashboard
 
-### Issue: "Permission denied for table aifri_assessments"
+### Issue: "Permission denied for table aisri_assessments"
 **Solution**: Check RLS policies in migration file were applied correctly
 
 ### Issue: Form doesn't save / endless loading

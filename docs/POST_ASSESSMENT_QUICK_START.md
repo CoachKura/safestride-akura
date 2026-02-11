@@ -52,7 +52,7 @@ Navigator.pushReplacement(
         'previous_injuries': previousInjuriesController.text,
         'goals': goalsController.text,
       },
-      aistriScore: scoreData['aifri_score'],
+      aistriScore: scoreData['aisri_score'],
       pillarScores: {
         'Adaptability': scoreData['pillar_scores']['adaptability'],
         'Injury Risk': scoreData['pillar_scores']['injury_risk'],

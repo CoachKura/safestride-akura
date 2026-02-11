@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   timezone TEXT DEFAULT 'UTC',
   
   -- Athlete-specific fields
-  current_aifri_score INTEGER,
+  current_AISRI_score INTEGER,
   fitness_level TEXT CHECK (fitness_level IN ('beginner', 'intermediate', 'advanced', 'elite')),
   running_goals TEXT[],
   preferred_distances TEXT[], -- ['5K', '10K', 'Half Marathon', 'Marathon']
@@ -76,10 +76,10 @@ CREATE INDEX IF NOT EXISTS idx_relationships_status ON public.athlete_coach_rela
 CREATE INDEX IF NOT EXISTS idx_relationships_invitation_code ON public.athlete_coach_relationships(invitation_code);
 
 -- =====================================================
--- 3. AIFRI ASSESSMENTS TABLE
--- Stores AIFRI (AI-Fitness Risk Index) assessment results
+-- 3. AISRI ASSESSMENTS TABLE
+-- Stores AISRI (AI-Fitness Risk Index) assessment results
 -- =====================================================
-CREATE TABLE IF NOT EXISTS public.aifri_assessments (
+CREATE TABLE IF NOT EXISTS public.AISRI_assessments (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   athlete_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
   
@@ -105,9 +105,9 @@ CREATE TABLE IF NOT EXISTS public.aifri_assessments (
 );
 
 -- Add indexes
-CREATE INDEX IF NOT EXISTS idx_aifri_athlete ON public.aifri_assessments(athlete_id);
-CREATE INDEX IF NOT EXISTS idx_aifri_date ON public.aifri_assessments(assessment_date DESC);
-CREATE INDEX IF NOT EXISTS idx_aifri_score ON public.aifri_assessments(total_score DESC);
+CREATE INDEX IF NOT EXISTS idx_AISRI_athlete ON public.AISRI_assessments(athlete_id);
+CREATE INDEX IF NOT EXISTS idx_AISRI_date ON public.AISRI_assessments(assessment_date DESC);
+CREATE INDEX IF NOT EXISTS idx_AISRI_score ON public.AISRI_assessments(total_score DESC);
 
 -- =====================================================
 -- 4. WORKOUTS TABLE
@@ -229,7 +229,7 @@ CREATE TABLE IF NOT EXISTS public.notifications (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
   
-  type TEXT NOT NULL CHECK (type IN ('workout_assigned', 'coach_message', 'aifri_reminder', 'achievement', 'system')),
+  type TEXT NOT NULL CHECK (type IN ('workout_assigned', 'coach_message', 'AISRI_reminder', 'achievement', 'system')),
   title TEXT NOT NULL,
   message TEXT NOT NULL,
   action_url TEXT,
@@ -253,7 +253,7 @@ CREATE INDEX IF NOT EXISTS idx_notifications_created ON public.notifications(cre
 -- Enable RLS on all tables
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.athlete_coach_relationships ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.aifri_assessments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.AISRI_assessments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.workouts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.training_plans ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.devices ENABLE ROW LEVEL SECURITY;
@@ -357,32 +357,32 @@ CREATE POLICY "Coaches insert athletes workouts" ON public.workouts
   );
 
 -- =====================================================
--- AIFRI ASSESSMENTS POLICIES
+-- AISRI ASSESSMENTS POLICIES
 -- =====================================================
 
 -- Athletes can view their own assessments
-CREATE POLICY "Athletes view own assessments" ON public.aifri_assessments
+CREATE POLICY "Athletes view own assessments" ON public.AISRI_assessments
   FOR SELECT USING (athlete_id = auth.uid());
 
 -- Coaches can view their athletes' assessments
-CREATE POLICY "Coaches view athletes assessments" ON public.aifri_assessments
+CREATE POLICY "Coaches view athletes assessments" ON public.AISRI_assessments
   FOR SELECT USING (
     EXISTS (
       SELECT 1 FROM public.athlete_coach_relationships
       WHERE coach_id = auth.uid()
-      AND athlete_id = public.aifri_assessments.athlete_id
+      AND athlete_id = public.AISRI_assessments.athlete_id
       AND status = 'active'
     )
   );
 
 -- Coaches can insert assessments for their athletes
-CREATE POLICY "Coaches insert assessments" ON public.aifri_assessments
+CREATE POLICY "Coaches insert assessments" ON public.AISRI_assessments
   FOR INSERT WITH CHECK (
     assessed_by = auth.uid() AND
     EXISTS (
       SELECT 1 FROM public.athlete_coach_relationships
       WHERE coach_id = auth.uid()
-      AND athlete_id = public.aifri_assessments.athlete_id
+      AND athlete_id = public.AISRI_assessments.athlete_id
       AND status = 'active'
     )
   );
@@ -471,8 +471,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Calculate AIFRI score from components
-CREATE OR REPLACE FUNCTION calculate_aifri_total(
+-- Calculate AISRI score from components
+CREATE OR REPLACE FUNCTION calculate_AISRI_total(
   mobility INT,
   strength INT,
   endurance INT,
@@ -490,7 +490,7 @@ $$ LANGUAGE plpgsql;
 -- =====================================================
 
 -- Uncomment to insert test data:
--- INSERT INTO public.profiles (id, email, full_name, role, current_aifri_score, fitness_level)
+-- INSERT INTO public.profiles (id, email, full_name, role, current_AISRI_score, fitness_level)
 -- VALUES (
 --   gen_random_uuid(),
 --   'test.athlete@example.com',
