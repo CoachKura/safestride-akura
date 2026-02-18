@@ -80,11 +80,9 @@ CREATE INDEX IF NOT EXISTS idx_relationships_invitation_code ON public.athlete_c
 -- Stores AISRI (AI-Fitness Risk Index) assessment results
 -- =====================================================
 CREATE TABLE IF NOT EXISTS public.AISRI_assessments (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  athlete_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
-  
-  -- Assessment scores (0-100 scale)
-  total_score INTEGER NOT NULL CHECK (total_score >= 0 AND total_score <= 1000),
+  profile_id UUID NOT NULL REFERENCES auth.users(id),
+  intake_id  UUID REFERENCES aisri_intake_raw(id),
+  total_score DECIMAL(5,2) 0–100,
   mobility_score INTEGER CHECK (mobility_score >= 0 AND mobility_score <= 100),
   strength_score INTEGER CHECK (strength_score >= 0 AND strength_score <= 100),
   endurance_score INTEGER CHECK (endurance_score >= 0 AND endurance_score <= 100),
@@ -502,4 +500,4 @@ $$ LANGUAGE plpgsql;
 
 -- =====================================================
 -- END OF SCHEMA
--- =====================================================
+-- ==================================================

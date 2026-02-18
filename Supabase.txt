@@ -1,0 +1,5 @@
+https://bdisppaxbvygsspcuymb.supabase.co
+
+sb_publishable_BBjk8yeyQ2jgh5iFiQINUQ_mwU2FMnk
+
+postgresql://postgres:Akura@2026$@db.bdisppaxbvygsspcuymb.supabase.co:5432/postgres

@@ -5,7 +5,7 @@ import '../services/structured_workout_service.dart';
 import 'structured_workout_detail_screen.dart';
 
 class StructuredWorkoutListScreen extends StatefulWidget {
-  const StructuredWorkoutListScreen({Key? key}) : super(key: key);
+  const StructuredWorkoutListScreen({super.key});
 
   @override
   State<StructuredWorkoutListScreen> createState() =>

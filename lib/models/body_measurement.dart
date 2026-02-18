@@ -3,41 +3,41 @@
 class BodyMeasurement {
   final String id;
   final String userId;
-  
+
   // Core Measurements
   final double weightKg;
   final int heightCm;
-  
+
   // Calculated Metrics
   final double bmi;
   final String bmiCategory;
-  
+
   // Optional Body Composition
   final double? bodyFatPercentage;
   final double? muscleMassKg;
   final double? boneMassKg;
   final double? waterPercentage;
   final int? visceralFatRating;
-  
+
   // Body Measurements
   final double? chestCm;
   final double? waistCm;
   final double? hipsCm;
   final double? thighCm;
   final double? calfCm;
-  
+
   // Measurement Context
   final DateTime measurementDate;
   final DateTime? measurementTime;
   final String? measurementConditions;
-  
+
   // Device/Method
   final String? measuredBy;
   final String? deviceModel;
-  
+
   // Notes
   final String? notes;
-  
+
   // Metadata
   final DateTime createdAt;
   final DateTime? updatedAt;
@@ -71,9 +71,9 @@ class BodyMeasurement {
 
   // Helper getters
   String get formattedWeight => '${weightKg.toStringAsFixed(1)} kg';
-  String get formattedHeight => '${heightCm} cm';
+  String get formattedHeight => '$heightCm cm';
   String get formattedBMI => bmi.toStringAsFixed(1);
-  
+
   String get bmiCategoryDisplay {
     switch (bmiCategory) {
       case 'underweight':
@@ -104,15 +104,13 @@ class BodyMeasurement {
     }
   }
 
-  bool get hasBodyComposition => 
-    bodyFatPercentage != null || 
-    muscleMassKg != null || 
-    waterPercentage != null;
+  bool get hasBodyComposition =>
+      bodyFatPercentage != null ||
+      muscleMassKg != null ||
+      waterPercentage != null;
 
   bool get hasBodyMeasurements =>
-    chestCm != null || 
-    waistCm != null || 
-    hipsCm != null;
+      chestCm != null || waistCm != null || hipsCm != null;
 
   // Supabase JSON serialization
   factory BodyMeasurement.fromJson(Map<String, dynamic> json) {
@@ -142,15 +140,13 @@ class BodyMeasurement {
       waistCm: json['waist_cm'] != null
           ? (json['waist_cm'] as num).toDouble()
           : null,
-      hipsCm: json['hips_cm'] != null
-          ? (json['hips_cm'] as num).toDouble()
-          : null,
+      hipsCm:
+          json['hips_cm'] != null ? (json['hips_cm'] as num).toDouble() : null,
       thighCm: json['thigh_cm'] != null
           ? (json['thigh_cm'] as num).toDouble()
           : null,
-      calfCm: json['calf_cm'] != null
-          ? (json['calf_cm'] as num).toDouble()
-          : null,
+      calfCm:
+          json['calf_cm'] != null ? (json['calf_cm'] as num).toDouble() : null,
       measurementDate: DateTime.parse(json['measurement_date'] as String),
       measurementTime: json['measurement_time'] != null
           ? DateTime.parse('1970-01-01 ${json['measurement_time']}')
@@ -234,7 +230,8 @@ class BodyMeasurement {
       calfCm: calfCm ?? this.calfCm,
       measurementDate: measurementDate ?? this.measurementDate,
       measurementTime: measurementTime ?? this.measurementTime,
-      measurementConditions: measurementConditions ?? this.measurementConditions,
+      measurementConditions:
+          measurementConditions ?? this.measurementConditions,
       measuredBy: measuredBy ?? this.measuredBy,
       deviceModel: deviceModel ?? this.deviceModel,
       notes: notes ?? this.notes,

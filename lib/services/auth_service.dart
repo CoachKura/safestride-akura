@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer' as developer;
 
 class AuthService extends ChangeNotifier {
+  // Rate limit protection constants
+  static const String _lastSignupKey = 'last_signup_attempt';
+  static const int _minSignupInterval = 60; // seconds
+
   final _supabase = Supabase.instance.client;
   User? _user;
   bool _isLoading = false;
@@ -43,8 +48,26 @@ class AuthService extends ChangeNotifier {
   Future<String?> signUp(
       String email, String password, String fullName, String role) async {
     try {
+      // Check rate limit before attempting signup
+      final prefs = await SharedPreferences.getInstance();
+      final lastAttempt = prefs.getString(_lastSignupKey);
+
+      if (lastAttempt != null) {
+        final lastTime = DateTime.parse(lastAttempt);
+        final now = DateTime.now();
+        final diff = now.difference(lastTime).inSeconds;
+
+        if (diff < _minSignupInterval) {
+          final wait = _minSignupInterval - diff;
+          return 'Please wait $wait seconds before trying again';
+        }
+      }
+
       _isLoading = true;
       notifyListeners();
+
+      // Store attempt timestamp BEFORE making the call
+      await prefs.setString(_lastSignupKey, DateTime.now().toIso8601String());
 
       final response = await _supabase.auth.signUp(
         email: email,
@@ -59,6 +82,12 @@ class AuthService extends ChangeNotifier {
     } catch (e) {
       _isLoading = false;
       notifyListeners();
+
+      // User-friendly error for rate limits
+      if (e.toString().contains('429') ||
+          e.toString().toLowerCase().contains('rate limit')) {
+        return 'Too many signup attempts. Please wait 1 minute and try again.';
+      }
       return e.toString();
     }
   }

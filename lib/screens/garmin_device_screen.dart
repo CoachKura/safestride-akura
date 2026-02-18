@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../services/garmin_connect_service.dart';
-import 'package:intl/intl.dart';
 
 class GarminDeviceScreen extends StatefulWidget {
   const GarminDeviceScreen({super.key});
@@ -48,12 +47,14 @@ class _GarminDeviceScreenState extends State<GarminDeviceScreen> {
 
     try {
       List<Map<String, dynamic>> devices = [];
-      
+
       // Scan based on selected connection type
       if (_selectedConnectionType == 'bluetooth') {
-        devices = await GarminConnectService.scanBluetoothDevices(durationSeconds: 10);
+        devices = await GarminConnectService.scanBluetoothDevices(
+            durationSeconds: 10);
       } else if (_selectedConnectionType == 'wifi') {
-        devices = await GarminConnectService.scanWiFiDevices(durationSeconds: 10);
+        devices =
+            await GarminConnectService.scanWiFiDevices(durationSeconds: 10);
       } else {
         // Scan both
         devices = await GarminConnectService.scanForDevices(
@@ -61,7 +62,7 @@ class _GarminDeviceScreenState extends State<GarminDeviceScreen> {
           connectionType: 'both',
         );
       }
-      
+
       setState(() {
         _availableDevices = devices;
         _isScanning = false;
@@ -76,7 +77,8 @@ class _GarminDeviceScreenState extends State<GarminDeviceScreen> {
     }
   }
 
-  Future<void> _connectDevice(String deviceId, String deviceName, {String? connectionType, String? ipAddress}) async {
+  Future<void> _connectDevice(String deviceId, String deviceName,
+      {String? connectionType, String? ipAddress}) async {
     setState(() => _isConnecting = true);
 
     try {
@@ -85,10 +87,11 @@ class _GarminDeviceScreenState extends State<GarminDeviceScreen> {
         connectionType: connectionType ?? _selectedConnectionType,
         ipAddress: ipAddress,
       );
-      
+
       if (connected) {
         await _loadConnectedDevice();
-        _showMessage('Connected to $deviceName via ${connectionType ?? _selectedConnectionType}');
+        _showMessage(
+            'Connected to $deviceName via ${connectionType ?? _selectedConnectionType}');
         setState(() {
           _availableDevices = [];
         });
@@ -136,7 +139,7 @@ class _GarminDeviceScreenState extends State<GarminDeviceScreen> {
 
   Future<void> _syncData() async {
     _showMessage('Syncing workout data...');
-    
+
     try {
       final workouts = await GarminConnectService.syncHistoricalData(days: 7);
       _showMessage('Successfully synced ${workouts.length} workouts');
@@ -205,7 +208,9 @@ class _GarminDeviceScreenState extends State<GarminDeviceScreen> {
             ],
 
             // Setup Instructions
-            if (_connectedDevice == null && _availableDevices.isEmpty && !_isScanning) ...[
+            if (_connectedDevice == null &&
+                _availableDevices.isEmpty &&
+                !_isScanning) ...[
               _buildSetupInstructions(),
             ],
           ],
@@ -216,7 +221,8 @@ class _GarminDeviceScreenState extends State<GarminDeviceScreen> {
 
   Widget _buildConnectedDeviceCard() {
     final deviceName = _connectedDevice!['device_name'] ?? 'Garmin Device';
-    final deviceInfo = _connectedDevice!['device_info'] as Map<String, dynamic>?;
+    final deviceInfo =
+        _connectedDevice!['device_info'] as Map<String, dynamic>?;
 
     return Container(
       width: double.infinity,
@@ -273,7 +279,8 @@ class _GarminDeviceScreenState extends State<GarminDeviceScreen> {
               ),
               if (_batteryLevel != null)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(20),
@@ -420,12 +427,13 @@ class _GarminDeviceScreenState extends State<GarminDeviceScreen> {
           Text(
             'Choose connection type and scan for nearby devices',
             textAlign: TextAlign.center,
-            style: TextStyle( color: Colors.grey[600],
+            style: TextStyle(
+              color: Colors.grey[600],
               fontSize: 14,
             ),
           ),
           const SizedBox(height: 24),
-          
+
           // Connection Type Selector
           const Text(
             'Connection Type',
@@ -439,12 +447,13 @@ class _GarminDeviceScreenState extends State<GarminDeviceScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               _buildConnectionTypeChip('wifi', Icons.wifi, 'WiFi'),
-              _buildConnectionTypeChip('bluetooth', Icons.bluetooth, 'Bluetooth'),
+              _buildConnectionTypeChip(
+                  'bluetooth', Icons.bluetooth, 'Bluetooth'),
               _buildConnectionTypeChip('both', Icons.devices, 'Both'),
             ],
           ),
           const SizedBox(height: 24),
-          
+
           SizedBox(
             width: double.infinity,
             height: 56,
@@ -542,7 +551,8 @@ class _GarminDeviceScreenState extends State<GarminDeviceScreen> {
           children: [
             Text('Signal: ${signalStrength > 0 ? "Strong" : "Weak"}'),
             if (connectionType == 'wifi' && ipAddress != null)
-              Text('IP: $ipAddress', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+              Text('IP: $ipAddress',
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600])),
           ],
         ),
         trailing: _isConnecting
@@ -552,12 +562,14 @@ class _GarminDeviceScreenState extends State<GarminDeviceScreen> {
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
             : const Icon(Icons.chevron_right),
-        onTap: _isConnecting ? null : () => _connectDevice(
-          deviceId, 
-          deviceName,
-          connectionType: connectionType,
-          ipAddress: ipAddress,
-        ),
+        onTap: _isConnecting
+            ? null
+            : () => _connectDevice(
+                  deviceId,
+                  deviceName,
+                  connectionType: connectionType,
+                  ipAddress: ipAddress,
+                ),
       ),
     );
   }

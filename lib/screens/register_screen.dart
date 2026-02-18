@@ -107,18 +107,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   },
                 ),
                 const SizedBox(height: 24),
-                DropdownButtonFormField<String>(
-                  initialValue: _selectedRole,
-                  decoration: const InputDecoration(
-                    labelText: 'I am a...',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.people),
+                SizedBox(
+                  width: double.infinity,
+                  child: DropdownButtonFormField<String>(
+                    initialValue: _selectedRole,
+                    decoration: const InputDecoration(
+                      labelText: 'I am a...',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.people),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                    ),
+                    isExpanded: true, // Prevents overflow
+                    items: const [
+                      DropdownMenuItem(
+                          value: 'athlete', child: Text('Athlete')),
+                      DropdownMenuItem(value: 'coach', child: Text('Coach')),
+                    ],
+                    onChanged: (value) =>
+                        setState(() => _selectedRole = value!),
                   ),
-                  items: const [
-                    DropdownMenuItem(value: 'athlete', child: Text('Athlete')),
-                    DropdownMenuItem(value: 'coach', child: Text('Coach')),
-                  ],
-                  onChanged: (value) => setState(() => _selectedRole = value!),
                 ),
                 const SizedBox(height: 24),
                 Consumer<AuthService>(

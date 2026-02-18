@@ -25,12 +25,12 @@ class _KuraCoachWorkoutDetailScreenState
 
   // Zone colors matching calendar
   static const Map<String, Color> _zoneColors = {
-    'AR': Color(0xFF2196F3),  // Blue
-    'F': Color(0xFF00BCD4),   // Cyan
-    'EN': Color(0xFF009688),  // Teal
-    'TH': Color(0xFFFF9800),  // Orange
-    'P': Color(0xFFF44336),   // Red
-    'SP': Color(0xFF9C27B0),  // Purple
+    'AR': Color(0xFF2196F3), // Blue
+    'F': Color(0xFF00BCD4), // Cyan
+    'EN': Color(0xFF009688), // Teal
+    'TH': Color(0xFFFF9800), // Orange
+    'P': Color(0xFFF44336), // Red
+    'SP': Color(0xFF9C27B0), // Purple
   };
 
   @override
@@ -73,8 +73,7 @@ class _KuraCoachWorkoutDetailScreenState
     try {
       await _supabase
           .from('ai_workouts')
-          .update({'status': 'completed'})
-          .eq('id', widget.workoutId);
+          .update({'status': 'completed'}).eq('id', widget.workoutId);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -106,7 +105,8 @@ class _KuraCoachWorkoutDetailScreenState
         minChildSize: 0.5,
         maxChildSize: 0.95,
         expand: false,
-        builder: (context, scrollController) => _buildGarminInstructions(scrollController),
+        builder: (context, scrollController) =>
+            _buildGarminInstructions(scrollController),
       ),
     );
   }
@@ -115,7 +115,8 @@ class _KuraCoachWorkoutDetailScreenState
     if (_workout == null) return const SizedBox();
 
     final zone = _workout!['zone'] ?? 'N/A';
-    final structure = _workout!['workout_structure'] as Map<String, dynamic>? ?? {};
+    final structure =
+        _workout!['workout_structure'] as Map<String, dynamic>? ?? {};
     final warmup = structure['warmup'] as Map<String, dynamic>? ?? {};
     final intervals = structure['intervals'] as List? ?? [];
     final cooldown = structure['cooldown'] as Map<String, dynamic>? ?? {};
@@ -185,13 +186,12 @@ class _KuraCoachWorkoutDetailScreenState
             _buildInstructionStep(
               '4',
               'Add Interval Repeat Block',
-              'Repeat: ${intervals.length} times\n\n' +
-                  intervals.map((interval) {
-                    final work = interval['work'] as Map<String, dynamic>? ?? {};
-                    final rest = interval['rest'] as Map<String, dynamic>? ?? {};
-                    return '→ Work: ${work['duration_minutes']} min (HR ${work['hr_range']})\n' +
-                        '→ Rest: ${rest['duration_minutes']} min (HR ${rest['hr_range']})';
-                  }).join('\n\n'),
+              'Repeat: ${intervals.length} times\n\n${intervals.map((interval) {
+                final work = interval['work'] as Map<String, dynamic>? ?? {};
+                final rest = interval['rest'] as Map<String, dynamic>? ?? {};
+                return '→ Work: ${work['duration_minutes']} min (HR ${work['hr_range']})\n' +
+                    '→ Rest: ${rest['duration_minutes']} min (HR ${rest['hr_range']})';
+              }).join('\n\n')}',
               Icons.repeat,
             ),
 
@@ -392,7 +392,8 @@ class _KuraCoachWorkoutDetailScreenState
                 children: [
                   // Zone Badge
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.3),
                       borderRadius: BorderRadius.circular(20),
@@ -545,7 +546,8 @@ class _KuraCoachWorkoutDetailScreenState
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.check_circle, color: Colors.green, size: 24),
+                          Icon(Icons.check_circle,
+                              color: Colors.green, size: 24),
                           SizedBox(width: 8),
                           Text(
                             'Completed ✅',
@@ -600,7 +602,8 @@ class _KuraCoachWorkoutDetailScreenState
   }
 
   Widget _buildWorkoutTimeline() {
-    final structure = _workout!['workout_structure'] as Map<String, dynamic>? ?? {};
+    final structure =
+        _workout!['workout_structure'] as Map<String, dynamic>? ?? {};
     final warmup = structure['warmup'] as Map<String, dynamic>? ?? {};
     final intervals = structure['intervals'] as List? ?? [];
     final cooldown = structure['cooldown'] as Map<String, dynamic>? ?? {};

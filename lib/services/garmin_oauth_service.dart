@@ -1,4 +1,4 @@
-// lib/services/garmin_oauth_service.dart
+﻿// lib/services/garmin_oauth_service.dart
 //
 // Garmin Connect OAuth API Integration
 // Handles authentication, activity sync, and workout push
@@ -477,21 +477,21 @@ class GarminOAuthService {
       // Get activity count
       final activityCount = await _supabase
           .from('garmin_activities')
-          .select('id', const FetchOptions(count: CountOption.exact))
+          .select('*')
           .eq('athlete_id', userId);
 
       // Get device count
       final deviceCount = await _supabase
           .from('garmin_devices')
-          .select('id', const FetchOptions(count: CountOption.exact))
+          .select('*')
           .eq('athlete_id', userId)
           .eq('is_active', true);
 
       return {
         'connected': true,
         'last_sync': connection['last_sync_at'],
-        'activity_count': activityCount.count,
-        'device_count': deviceCount.count,
+        'activity_count': activityCount.length,
+        'device_count': deviceCount.length,
         'garmin_user_id': connection['garmin_user_id'],
       };
     } catch (e) {

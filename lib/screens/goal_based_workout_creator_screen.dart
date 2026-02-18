@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../services/ai_workout_generator_service.dart';
 import 'package:intl/intl.dart';
@@ -75,7 +75,7 @@ class _GoalBasedWorkoutCreatorScreenState
         currentWeeklyKm: _currentWeeklyKm,
         trainingDaysPerWeek: _trainingDaysPerWeek,
         fitnessLevel: _fitnessLevel,
-        aisriScore: _aisriScore,
+        AISRIScore: _aisriScore,
         targetRaceDate: _targetRaceDate?.toIso8601String(),
       );
 
@@ -120,7 +120,7 @@ class _GoalBasedWorkoutCreatorScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('✅ Workouts saved to calendar!'),
+            content: Text('âœ… Workouts saved to calendar!'),
             backgroundColor: Colors.green,
           ),
         );
@@ -751,7 +751,7 @@ class _GoalBasedWorkoutCreatorScreenState
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Text(
-          '${DateFormat('MMM dd').format(date)} • ${workout['distance_km'].toStringAsFixed(1)}km • ${workout['duration_minutes']}min',
+          '${DateFormat('MMM dd').format(date)} â€¢ ${workout['distance_km'].toStringAsFixed(1)}km â€¢ ${workout['duration_minutes']}min',
         ),
         trailing: Icon(
           _getIntensityIcon(workout['intensity']),

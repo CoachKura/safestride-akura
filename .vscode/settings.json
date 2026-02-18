@@ -1,6 +1,15 @@
 {
-  "mssql.enableSqlParser": false,
   "files.associations": {
-    "database/**/*.sql": "sql"
+    "*.sql": "sql",
+    "supabase/migrations/*.sql": "sql"
+  },
+  "editor.formatOnSave": true,
+  "[sql]": {
+    "editor.formatOnSave": true
+  },
+  "supabase.projectRef": "xzxnnswggwqtctcgpocr",
+  "[dart]": {
+    "editor.formatOnSave": true,
+    "editor.rulers": [80]
   }
 }

@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/structured_workout.dart';
 

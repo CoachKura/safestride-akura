@@ -1,0 +1,91 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Supabase: Create Migration",
+      "type": "shell",
+      "command": "npx",
+      "args": [
+        "supabase",
+        "migration",
+        "new",
+        "${input:migrationName}"
+      ],
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Supabase: Push Migrations",
+      "type": "shell",
+      "command": "npx",
+      "args": [
+        "supabase",
+        "db",
+        "push"
+      ],
+      "problemMatcher": [],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Supabase: Pull Schema",
+      "type": "shell",
+      "command": "npx",
+      "args": [
+        "supabase",
+        "db",
+        "pull"
+      ],
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Supabase: SQL Shell",
+      "type": "shell",
+      "command": "npx",
+      "args": [
+        "supabase",
+        "db",
+        "shell"
+      ],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Supabase: View Database",
+      "type": "shell",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "start",
+        "https://app.supabase.com/project/xzxnnswggwqtctcgpocr/editor"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Backup: Run Database Backup",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-File",
+        "${workspaceFolder}\\backup-database.ps1"
+      ],
+      "problemMatcher": [],
+      "group": "build"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "migrationName",
+      "type": "promptString",
+      "description": "Migration name (e.g., add_user_preferences)",
+      "default": "migration_name"
+    }
+  ]
+}

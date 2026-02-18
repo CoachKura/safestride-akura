@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'gps_data_fetcher.dart';
@@ -12,8 +13,17 @@ class StravaService {
   static final String clientId = dotenv.env['STRAVA_CLIENT_ID'] ?? '';
   static final String clientSecret = dotenv.env['STRAVA_CLIENT_SECRET'] ?? '';
 
-  // Production web callback that redirects to app (works everywhere)
-  static const String redirectUri = 'https://akura.in/strava-callback.html';
+  // Redirect URIs with environment and platform-aware defaults
+  // Prefer explicit env vars; fall back to Supabase auth callback to match Strava config
+  static final String _redirectWeb = dotenv.env['STRAVA_REDIRECT_URI_WEB'] ??
+      'https://xzxnnswggwqtctcgpocr.supabase.co/auth/v1/callback';
+  static final String _redirectApp = dotenv.env['STRAVA_REDIRECT_URI_APP'] ??
+      'https://xzxnnswggwqtctcgpocr.supabase.co/auth/v1/callback';
+  static final String redirectUri = (() {
+    final explicit = dotenv.env['STRAVA_REDIRECT_URI'];
+    if (explicit != null && explicit.isNotEmpty) return explicit;
+    return kIsWeb ? _redirectWeb : _redirectApp;
+  })();
 
   // Strava API endpoints
   static const String authUrl = 'https://www.strava.com/oauth/authorize';
@@ -32,6 +42,8 @@ class StravaService {
           '&redirect_uri=$redirectUri'
           '&approval_prompt=force'
           '&scope=activity:read_all,activity:read,profile:read_all');
+
+      developer.log('Strava OAuth URL: $authUri');
 
       // Try to launch with external application mode
       final launched = await launchUrl(
@@ -197,10 +209,11 @@ class StravaService {
       if (userId == null) return 0;
 
       // Get activities from the last 14 days to ensure we catch recent workouts
-      final after =
-          (DateTime.now().subtract(const Duration(days: 14)).millisecondsSinceEpoch ~/
-                  1000)
-              .toString();
+      final after = (DateTime.now()
+                  .subtract(const Duration(days: 14))
+                  .millisecondsSinceEpoch ~/
+              1000)
+          .toString();
 
       // Fetch activities from Strava API with date filter
       final response = await http.get(
@@ -216,14 +229,16 @@ class StravaService {
       final activities = json.decode(response.body) as List;
       developer.log(
           'Fetched ${activities.length} activities from Strava (last 14 days)');
-      
+
       // DEBUG: Log first activity details
       if (activities.isNotEmpty) {
         final firstActivity = activities.first;
-        developer.log('DEBUG: Most recent activity: ${firstActivity['name']} on ${firstActivity['start_date']}');
-        developer.log('DEBUG: Activity ID: ${firstActivity['id']}, Type: ${firstActivity['type']}');
+        developer.log(
+            'DEBUG: Most recent activity: ${firstActivity['name']} on ${firstActivity['start_date']}');
+        developer.log(
+            'DEBUG: Activity ID: ${firstActivity['id']}, Type: ${firstActivity['type']}');
       }
-      
+
       int syncedCount = 0;
 
       // Import each activity as a workout
@@ -238,7 +253,8 @@ class StravaService {
               .maybeSingle();
 
           if (existing != null) {
-            developer.log('DEBUG: Skipping duplicate activity: ${activity['name']} (${activity['id']})');
+            developer.log(
+                'DEBUG: Skipping duplicate activity: ${activity['name']} (${activity['id']})');
             continue; // Skip if already imported
           }
 
@@ -247,14 +263,16 @@ class StravaService {
 
           // Calculate average pace (min/km) from speed
           double? avgPace;
-          if (activity['average_speed'] != null && activity['average_speed'] > 0) {
+          if (activity['average_speed'] != null &&
+              activity['average_speed'] > 0) {
             // Convert m/s to min/km: (1000 / speed) / 60
             avgPace = (1000 / activity['average_speed']) / 60;
           }
 
           // Prepare GPS route data from polyline
           Map<String, dynamic>? routeData;
-          if (activity['map'] != null && activity['map']['summary_polyline'] != null) {
+          if (activity['map'] != null &&
+              activity['map']['summary_polyline'] != null) {
             routeData = {
               'polyline': activity['map']['summary_polyline'],
               'type': 'strava_polyline',
@@ -285,13 +303,15 @@ class StravaService {
           });
 
           syncedCount++;
-          developer.log('DEBUG: Successfully imported: ${activity['name']} (${activity['id']})');
+          developer.log(
+              'DEBUG: Successfully imported: ${activity['name']} (${activity['id']})');
         } catch (e) {
           developer.log('Error importing activity ${activity['id']}: $e');
         }
       }
 
-      developer.log('DEBUG: Sync complete - imported $syncedCount new activities');
+      developer
+          .log('DEBUG: Sync complete - imported $syncedCount new activities');
       return syncedCount;
     } catch (e) {
       developer.log('Error syncing Strava activities: $e');

@@ -16,7 +16,8 @@ class CalendarScreen extends StatefulWidget {
   State<CalendarScreen> createState() => _CalendarScreenState();
 }
 
-class _CalendarScreenState extends State<CalendarScreen> with AutomaticKeepAliveClientMixin {
+class _CalendarScreenState extends State<CalendarScreen>
+    with AutomaticKeepAliveClientMixin {
   final CalendarService _calendarService = CalendarService();
 
   DateTime _focusedDay = DateTime.now();
@@ -45,8 +46,9 @@ class _CalendarScreenState extends State<CalendarScreen> with AutomaticKeepAlive
     setState(() => _isLoading = true);
 
     try {
-      developer.log('📅 Loading calendar workouts for ${_focusedDay.toString().split(' ')[0]}');
-      
+      developer.log(
+          '📅 Loading calendar workouts for ${_focusedDay.toString().split(' ')[0]}');
+
       // Load workouts for current month
       final workouts = await _calendarService.getWorkoutsForMonth(_focusedDay);
       developer.log('📊 Loaded ${workouts.length} workouts from database');
@@ -56,9 +58,12 @@ class _CalendarScreenState extends State<CalendarScreen> with AutomaticKeepAlive
       final tomorrow = await _calendarService.getTomorrowWorkout();
       final yesterday = await _calendarService.getYesterdayWorkout();
 
-      developer.log('📋 Today: ${today != null ? today.workout?.workoutName : "None"}');
-      developer.log('📋 Tomorrow: ${tomorrow != null ? tomorrow.workout?.workoutName : "None"}');
-      developer.log('📋 Yesterday: ${yesterday != null ? yesterday.workout?.workoutName : "None"}');
+      developer.log(
+          '📋 Today: ${today != null ? today.workout.workoutName : "None"}');
+      developer.log(
+          '📋 Tomorrow: ${tomorrow != null ? tomorrow.workout.workoutName : "None"}');
+      developer.log(
+          '📋 Yesterday: ${yesterday != null ? yesterday.workout.workoutName : "None"}');
 
       // Organize workouts by date
       final Map<DateTime, List<WorkoutCalendarEntry>> workoutsByDate = {};
@@ -77,7 +82,8 @@ class _CalendarScreenState extends State<CalendarScreen> with AutomaticKeepAlive
 
       developer.log('📅 Organized into ${workoutsByDate.length} dates');
       for (var entry in workoutsByDate.entries) {
-        developer.log('  ${entry.key.toString().split(' ')[0]}: ${entry.value.length} workout(s)');
+        developer.log(
+            '  ${entry.key.toString().split(' ')[0]}: ${entry.value.length} workout(s)');
       }
 
       setState(() {
@@ -154,26 +160,26 @@ class _CalendarScreenState extends State<CalendarScreen> with AutomaticKeepAlive
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   child: Column(
-                  children: [
-                    // Today/Tomorrow/Yesterday Cards
-                    _buildQuickAccessCards(),
+                    children: [
+                      // Today/Tomorrow/Yesterday Cards
+                      _buildQuickAccessCards(),
 
-                    const SizedBox(height: 16),
+                      const SizedBox(height: 16),
 
-                    // Calendar Widget
-                    _buildCalendar(),
+                      // Calendar Widget
+                      _buildCalendar(),
 
-                    const SizedBox(height: 16),
+                      const SizedBox(height: 16),
 
-                    // Workouts for Selected Day
-                    _buildSelectedDayWorkouts(),
+                      // Workouts for Selected Day
+                      _buildSelectedDayWorkouts(),
 
-                    const SizedBox(height: 80),
-                  ],
-                ),
+                      const SizedBox(height: 80),
+                    ],
+                  ),
                 ),
               ),
-        ),
+      ),
       // Removed Create Workout button - workouts are synced from Strava/GPS
     );
   }

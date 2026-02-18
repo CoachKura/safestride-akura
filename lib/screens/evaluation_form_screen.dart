@@ -703,6 +703,39 @@ class _EvaluationFormScreenState extends State<EvaluationFormScreen> {
                       ),
                     ),
                   if (_currentStep > 0) const SizedBox(width: 12),
+                  // SKIP BUTTON - Shows only on Step 2
+                  if (_currentStep == 1) ...[
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: _isLoading
+                            ? null
+                            : () {
+                                // Navigate to Dashboard, skipping detailed assessment
+                                Navigator.of(context).pushNamedAndRemoveUntil(
+                                  '/dashboard',
+                                  (route) => false,
+                                );
+                              },
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          side:
+                              const BorderSide(color: Colors.orange, width: 2),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'Skip for Now',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.orange,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                  ],
                   Expanded(
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _nextStep,
