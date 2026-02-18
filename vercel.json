@@ -1,23 +1,10 @@
 ﻿{
   "version": 2,
-  "name": "safestride-aifri-dashboard",
-  "builds": [
-    {
-      "src": "public/**",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/public/$1"
-    },
-    {
-      "src": "/",
-      "dest": "/public/aisri-dashboard.html"
-    }
-  ],
-  "env": {
-    "SUPABASE_URL": "https://bdisppaxbvygsspcuymb.supabase.co"
-  }
+  "name": "aisri-training-builder",
+  "buildCommand": "",
+  "outputDirectory": "public",
+  "installCommand": "",
+  "framework": null,
+  "cleanUrls": true,
+  "trailingSlash": false
 }
