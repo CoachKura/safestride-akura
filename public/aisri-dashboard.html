@@ -1,0 +1,308 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AKURA AISRI - 6 Pillar Assessment</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen">
+    <!-- Header with Logo -->
+    <div class="container mx-auto px-6 py-8">
+        <div class="text-center mb-8">
+            <img src="https://www.genspark.ai/api/files/s/DrQ8Z168" alt="AKURA Logo" class="w-32 h-32 mx-auto mb-4">
+            <h1 class="text-4xl font-bold text-white mb-2">AKURA AISRI PERFORMANCE INDEX</h1>
+            <p class="text-gray-400 text-lg">Akura Injury & Safety Risk Index - 6 Pillar Assessment</p>
+        </div>
+
+        <!-- Main Dashboard -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
+            <!-- Left: 6-Pillar Donut Chart -->
+            <div class="bg-slate-800 rounded-2xl shadow-2xl p-8">
+                <h2 class="text-2xl font-bold text-white mb-6 text-center">6-Pillar Breakdown</h2>
+                <div class="relative">
+                    <canvas id="aisriDonutChart" width="400" height="400"></canvas>
+                    <!-- Center Score Display -->
+                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div class="text-center">
+                            <div id="totalScore" class="text-6xl font-bold text-white">78</div>
+                            <div id="riskLabel" class="text-xl font-semibold text-green-400 mt-2">LOW RISK</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Pillar Details -->
+            <div class="bg-slate-800 rounded-2xl shadow-2xl p-8">
+                <h2 class="text-2xl font-bold text-white mb-6">Pillar Scores</h2>
+                <div class="space-y-4">
+                    <!-- Running Performance -->
+                    <div class="bg-slate-700 rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-blue-900 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-running text-blue-400"></i>
+                                </div>
+                                <span class="text-white font-semibold">Running Performance</span>
+                            </div>
+                            <span class="text-2xl font-bold text-blue-400">75</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-400">Weight: 40%</span>
+                            <div class="w-32 h-2 bg-slate-600 rounded-full overflow-hidden">
+                                <div class="h-full bg-blue-400" style="width: 75%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Strength -->
+                    <div class="bg-slate-700 rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-orange-900 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-dumbbell text-orange-400"></i>
+                                </div>
+                                <span class="text-white font-semibold">Strength</span>
+                            </div>
+                            <span class="text-2xl font-bold text-orange-400">80</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-400">Weight: 15%</span>
+                            <div class="w-32 h-2 bg-slate-600 rounded-full overflow-hidden">
+                                <div class="h-full bg-orange-400" style="width: 80%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ROM (Range of Motion) -->
+                    <div class="bg-slate-700 rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-teal-900 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-compress-arrows-alt text-teal-400"></i>
+                                </div>
+                                <span class="text-white font-semibold">ROM (Range of Motion)</span>
+                            </div>
+                            <span class="text-2xl font-bold text-teal-400">70</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-400">Weight: 12%</span>
+                            <div class="w-32 h-2 bg-slate-600 rounded-full overflow-hidden">
+                                <div class="h-full bg-teal-400" style="width: 70%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Balance -->
+                    <div class="bg-slate-700 rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-green-900 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-balance-scale text-green-400"></i>
+                                </div>
+                                <span class="text-white font-semibold">Balance</span>
+                            </div>
+                            <span class="text-2xl font-bold text-green-400">85</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-400">Weight: 13%</span>
+                            <div class="w-32 h-2 bg-slate-600 rounded-full overflow-hidden">
+                                <div class="h-full bg-green-400" style="width: 85%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alignment (NEW!) -->
+                    <div class="bg-slate-700 rounded-lg p-4 border-2 border-cyan-500">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-cyan-900 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user-check text-cyan-400"></i>
+                                </div>
+                                <span class="text-white font-semibold">Alignment</span>
+                            </div>
+                            <span class="text-2xl font-bold text-cyan-400">72</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-400">Weight: 10%</span>
+                            <div class="w-32 h-2 bg-slate-600 rounded-full overflow-hidden">
+                                <div class="h-full bg-cyan-400" style="width: 72%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mobility -->
+                    <div class="bg-slate-700 rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-purple-900 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-atom text-purple-400"></i>
+                                </div>
+                                <span class="text-white font-semibold">Mobility</span>
+                            </div>
+                            <span class="text-2xl font-bold text-purple-400">65</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-400">Weight: 10%</span>
+                            <div class="w-32 h-2 bg-slate-600 rounded-full overflow-hidden">
+                                <div class="h-full bg-purple-400" style="width: 65%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="mt-6 grid grid-cols-2 gap-4">
+                    <button onclick="syncStrava()" class="bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center">
+                        <i class="fab fa-strava mr-2"></i>
+                        Sync Strava
+                    </button>
+                    <button onclick="generateProgram()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center">
+                        <i class="fas fa-calendar-alt mr-2"></i>
+                        Get Program
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Training Zones -->
+        <div class="bg-slate-800 rounded-2xl shadow-2xl p-8 mt-8 max-w-7xl mx-auto">
+            <h2 class="text-2xl font-bold text-white mb-6">Allowed Training Zones</h2>
+            <div class="grid grid-cols-6 gap-4">
+                <div class="bg-blue-100 text-blue-800 rounded-lg p-4 text-center">
+                    <i class="fas fa-check-circle text-2xl mb-2"></i>
+                    <p class="font-bold">AR</p>
+                    <p class="text-xs mt-1">50-60% HR</p>
+                </div>
+                <div class="bg-blue-200 text-blue-900 rounded-lg p-4 text-center">
+                    <i class="fas fa-check-circle text-2xl mb-2"></i>
+                    <p class="font-bold">F</p>
+                    <p class="text-xs mt-1">60-70% HR</p>
+                </div>
+                <div class="bg-green-200 text-green-900 rounded-lg p-4 text-center">
+                    <i class="fas fa-check-circle text-2xl mb-2"></i>
+                    <p class="font-bold">EN</p>
+                    <p class="text-xs mt-1">70-80% HR</p>
+                </div>
+                <div class="bg-yellow-200 text-yellow-900 rounded-lg p-4 text-center">
+                    <i class="fas fa-check-circle text-2xl mb-2"></i>
+                    <p class="font-bold">TH</p>
+                    <p class="text-xs mt-1">80-87% HR</p>
+                </div>
+                <div class="bg-gray-300 text-gray-600 rounded-lg p-4 text-center opacity-50">
+                    <i class="fas fa-lock text-2xl mb-2"></i>
+                    <p class="font-bold">P</p>
+                    <p class="text-xs mt-1">87-95% HR</p>
+                </div>
+                <div class="bg-gray-300 text-gray-600 rounded-lg p-4 text-center opacity-50">
+                    <i class="fas fa-lock text-2xl mb-2"></i>
+                    <p class="font-bold">SP</p>
+                    <p class="text-xs mt-1">95-100% HR</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/aisri-engine.js"></script>
+    <script>
+        // Sample data matching your image
+        const pillarData = {
+            running: 75,
+            strength: 80,
+            rom: 70,
+            balance: 85,
+            alignment: 72,
+            mobility: 65
+        };
+
+        // Calculate total AISRI score
+        const weights = { running: 0.40, strength: 0.15, rom: 0.12, balance: 0.13, alignment: 0.10, mobility: 0.10 };
+        const totalScore = Math.round(
+            pillarData.running * weights.running +
+            pillarData.strength * weights.strength +
+            pillarData.rom * weights.rom +
+            pillarData.balance * weights.balance +
+            pillarData.alignment * weights.alignment +
+            pillarData.mobility * weights.mobility
+        );
+
+        document.getElementById('totalScore').textContent = totalScore;
+
+        // Create donut chart
+        const ctx = document.getElementById('aisriDonutChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: [
+                    'Running (40%)',
+                    'Strength (15%)',
+                    'ROM (12%)',
+                    'Balance (13%)',
+                    'Alignment (10%)',
+                    'Mobility (10%)'
+                ],
+                datasets: [{
+                    data: [
+                        pillarData.running * weights.running,
+                        pillarData.strength * weights.strength,
+                        pillarData.rom * weights.rom,
+                        pillarData.balance * weights.balance,
+                        pillarData.alignment * weights.alignment,
+                        pillarData.mobility * weights.mobility
+                    ],
+                    backgroundColor: [
+                        '#1e3a8a', // Running - dark blue
+                        '#ea580c', // Strength - orange
+                        '#0d9488', // ROM - teal
+                        '#16a34a', // Balance - green
+                        '#0891b2', // Alignment - cyan
+                        '#9333ea'  // Mobility - purple
+                    ],
+                    borderWidth: 4,
+                    borderColor: '#1e293b',
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                        labels: {
+                            color: '#ffffff',
+                            font: { size: 12 },
+                            padding: 15
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const pillarNames = ['Running', 'Strength', 'ROM', 'Balance', 'Alignment', 'Mobility'];
+                                const scores = [75, 80, 70, 85, 72, 65];
+                                const percentages = [40, 15, 12, 13, 10, 10];
+                                return pillarNames[context.dataIndex] + ': ' + 
+                                       scores[context.dataIndex] + '/100 (' + 
+                                       percentages[context.dataIndex] + '% weight)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        function syncStrava() {
+            alert(' Strava sync will calculate Running pillar from your recent activities!');
+        }
+
+        function generateProgram() {
+            alert(' Generating personalized 12-week training program based on AISRI score ' + totalScore);
+        }
+    </script>
+</body>
+</html>
