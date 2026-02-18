@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AISRI AI Training Plan Builder | Akura</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <!-- jsPDF for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- AISRI Core Files -->
+    <script src="js/aisri-engine-v2.js"></script>
+    <script src="js/aisri-ml-analyzer.js"></script>
+    <script src="js/ai-training-generator.js"></script>
+    
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .step-indicator {
+            transition: all 0.3s ease;
+        }
+        .step-indicator.active {
+            transform: scale(1.1);
+        }
+        .hidden {
+            display: none !important;
+        }
+        .pillar-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .pillar-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .zone-badge {
+            position: relative;
+            overflow: hidden;
+        }
+        .zone-badge.locked::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+        }
+        .zone-badge.locked i {
+            position: relative;
+            z-index: 1;
+        }
+        .insight-card {
+            border-left: 4px solid;
+            animation: slideIn 0.5s ease;
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        .workout-day {
+            border-left: 3px solid #667eea;
+            transition: all 0.2s ease;
+        }
+        .workout-day:hover {
+            border-left-width: 5px;
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="gradient-bg text-white py-6 shadow-lg">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold flex items-center gap-3">
+                        <i class="fas fa-brain"></i>
+                        AISRI AI Training Plan Builder
+                    </h1>
+                    <p class="text-purple-100 mt-1">AI-Powered Injury Risk Assessment & Personalized Training</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm text-purple-200">Powered by</div>
+                    <div class="text-xl font-bold">AKURA</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Progress Steps -->
+    <div class="bg-white shadow-md py-6">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-center gap-8">
+                <!-- Step 1 -->
+                <div class="flex items-center gap-3 step-indicator active" id="step-1-indicator">
+                    <div class="w-12 h-12 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold text-lg">
+                        1
+                    </div>
+                    <div>
+                        <div class="font-semibold text-gray-800">Connect Devices</div>
+                        <div class="text-sm text-gray-500">Sync your data</div>
+                    </div>
+                </div>
+                <div class="w-16 h-1 bg-gray-300" id="progress-bar-1"></div>
+                
+                <!-- Step 2 -->
+                <div class="flex items-center gap-3 step-indicator" id="step-2-indicator">
+                    <div class="w-12 h-12 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold text-lg">
+                        2
+                    </div>
+                    <div>
+                        <div class="font-semibold text-gray-800">AI Analysis</div>
+                        <div class="text-sm text-gray-500">AISRI score & insights</div>
+                    </div>
+                </div>
+                <div class="w-16 h-1 bg-gray-300" id="progress-bar-2"></div>
+                
+                <!-- Step 3 -->
+                <div class="flex items-center gap-3 step-indicator" id="step-3-indicator">
+                    <div class="w-12 h-12 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold text-lg">
+                        3
+                    </div>
+                    <div>
+                        <div class="font-semibold text-gray-800">Training Plan</div>
+                        <div class="text-sm text-gray-500">12-week program</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        
+        <!-- STEP 1: Connect Devices -->
+        <section id="section-1" class="mb-8">
+            <div class="bg-white rounded-lg shadow-lg p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                    <i class="fas fa-plug text-purple-600"></i>
+                    Step 1: Connect Your Devices
+                </h2>
+                
+                <div class="grid md:grid-cols-2 gap-6 mb-8">
+                    <!-- Strava Card -->
+                    <div class="border-2 border-gray-200 rounded-lg p-6 hover:border-purple-400 transition">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="w-16 h-16 bg-orange-500 rounded-lg flex items-center justify-center">
+                                <i class="fab fa-strava text-white text-3xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800">Strava</h3>
+                                <p class="text-sm text-gray-500">Connect your Strava account</p>
+                            </div>
+                        </div>
+                        <button onclick="connectStrava()" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-lg transition">
+                            <i class="fab fa-strava mr-2"></i>
+                            Connect Strava
+                        </button>
+                        <div id="strava-status" class="mt-3 text-sm text-gray-600"></div>
+                    </div>
+                    
+                    <!-- Garmin Card -->
+                    <div class="border-2 border-gray-200 rounded-lg p-6 hover:border-purple-400 transition">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="w-16 h-16 bg-blue-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-watch text-white text-3xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800">Garmin Connect</h3>
+                                <p class="text-sm text-gray-500">Connect your Garmin device</p>
+                            </div>
+                        </div>
+                        <button onclick="connectGarmin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition">
+                            <i class="fas fa-watch mr-2"></i>
+                            Connect Garmin
+                        </button>
+                        <div id="garmin-status" class="mt-3 text-sm text-gray-600"></div>
+                    </div>
+                </div>
+
+                <!-- Manual Input Option -->
+                <div class="border-t pt-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                        <i class="fas fa-keyboard text-gray-600 mr-2"></i>
+                        Or Enter Assessment Scores Manually
+                    </h3>
+                    <div class="grid md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Running (Auto from device)</label>
+                            <input type="number" id="running-score" min="0" max="100" class="w-full px-4 py-2 border rounded-lg" placeholder="Auto-calculated" disabled>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Strength</label>
+                            <input type="number" id="strength-score" min="0" max="100" class="w-full px-4 py-2 border rounded-lg" placeholder="0-100">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Range of Motion</label>
+                            <input type="number" id="rom-score" min="0" max="100" class="w-full px-4 py-2 border rounded-lg" placeholder="0-100">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Balance</label>
+                            <input type="number" id="balance-score" min="0" max="100" class="w-full px-4 py-2 border rounded-lg" placeholder="0-100">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Alignment</label>
+                            <input type="number" id="alignment-score" min="0" max="100" class="w-full px-4 py-2 border rounded-lg" placeholder="0-100">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Mobility</label>
+                            <input type="number" id="mobility-score" min="0" max="100" class="w-full px-4 py-2 border rounded-lg" placeholder="0-100">
+                        </div>
+                    </div>
+                    
+                    <!-- Athlete Info -->
+                    <div class="grid md:grid-cols-4 gap-4 mt-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Age</label>
+                            <input type="number" id="athlete-age" min="18" max="100" class="w-full px-4 py-2 border rounded-lg" placeholder="30">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Resting HR (bpm)</label>
+                            <input type="number" id="resting-hr" min="30" max="100" class="w-full px-4 py-2 border rounded-lg" placeholder="55">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Total Distance (km)</label>
+                            <input type="number" id="total-distance" min="0" class="w-full px-4 py-2 border rounded-lg" placeholder="1200">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Athlete Name</label>
+                            <input type="text" id="athlete-name" class="w-full px-4 py-2 border rounded-lg" placeholder="John Doe">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-end">
+                    <button onclick="proceedToAnalysis()" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-8 py-3 rounded-lg transition flex items-center gap-2">
+                        Continue to Analysis
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 2: AI Analysis Results -->
+        <section id="section-2" class="mb-8 hidden">
+            <div class="bg-white rounded-lg shadow-lg p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                    <i class="fas fa-chart-pie text-purple-600"></i>
+                    Step 2: Your AISRI Analysis
+                </h2>
+
+                <!-- AISRI Score Display -->
+                <div class="bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-lg p-8 mb-8 text-center">
+                    <div class="text-6xl font-bold mb-2" id="aisri-score-display">--</div>
+                    <div class="text-2xl font-semibold mb-1" id="risk-category-display">Calculating...</div>
+                    <div class="text-purple-100" id="risk-description">Please wait while we analyze your data</div>
+                </div>
+
+                <!-- 6-Pillar Donut Chart -->
+                <div class="grid md:grid-cols-2 gap-8 mb-8">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">6-Pillar Breakdown</h3>
+                        <canvas id="pillar-chart" width="400" height="400"></canvas>
+                    </div>
+                    
+                    <!-- Pillar Scores -->
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">Pillar Details</h3>
+                        <div class="space-y-3" id="pillar-details">
+                            <!-- Dynamic content -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Training Zones -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">
+                        <i class="fas fa-unlock-alt text-green-600 mr-2"></i>
+                        Your Training Zones
+                    </h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3" id="training-zones">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+
+                <!-- ML Insights -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">
+                        <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
+                        AI Insights & Recommendations
+                    </h3>
+                    <div class="space-y-3" id="ml-insights">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+
+                <!-- Heart Rate Zones -->
+                <div class="bg-gray-50 rounded-lg p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">
+                        <i class="fas fa-heartbeat text-red-500 mr-2"></i>
+                        Your Heart Rate Zones
+                    </h3>
+                    <div class="grid md:grid-cols-5 gap-3" id="hr-zones">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-between">
+                    <button onclick="goToStep(1)" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold px-8 py-3 rounded-lg transition flex items-center gap-2">
+                        <i class="fas fa-arrow-left"></i>
+                        Back
+                    </button>
+                    <button onclick="proceedToTrainingPlan()" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-8 py-3 rounded-lg transition flex items-center gap-2">
+                        Generate Training Plan
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 3: Training Plan -->
+        <section id="section-3" class="mb-8 hidden">
+            <div class="bg-white rounded-lg shadow-lg p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                    <i class="fas fa-calendar-alt text-purple-600"></i>
+                    Step 3: Your 12-Week Training Plan
+                </h2>
+
+                <!-- Plan Header -->
+                <div class="bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-lg p-6 mb-8">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-2xl font-bold mb-2" id="plan-title">Personalized Training Program</h3>
+                            <p class="text-green-100" id="plan-description">Generated based on your AISRI score and current fitness level</p>
+                        </div>
+                        <button onclick="exportPlanToPDF()" class="bg-white text-green-600 hover:bg-green-50 font-semibold px-6 py-3 rounded-lg transition flex items-center gap-2">
+                            <i class="fas fa-file-pdf"></i>
+                            Export PDF
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Week Selector -->
+                <div class="mb-6 flex gap-2 flex-wrap" id="week-selector">
+                    <!-- Dynamic content -->
+                </div>
+
+                <!-- Weekly Schedule -->
+                <div id="weekly-schedule">
+                    <!-- Dynamic content -->
+                </div>
+
+                <div class="mt-8 flex justify-between">
+                    <button onclick="goToStep(2)" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold px-8 py-3 rounded-lg transition flex items-center gap-2">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Analysis
+                    </button>
+                    <button onclick="savePlanToDatabase()" class="bg-green-600 hover:bg-green-700 text-white font-semibold px-8 py-3 rounded-lg transition flex items-center gap-2">
+                        <i class="fas fa-save"></i>
+                        Save Plan
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 mt-16">
+        <div class="container mx-auto px-4 text-center">
+            <div class="text-2xl font-bold mb-2">AKURA</div>
+            <p class="text-gray-400 mb-4">AI-Powered Injury Risk Assessment & Training</p>
+            <div class="flex justify-center gap-6 text-sm text-gray-400">
+                <a href="#" class="hover:text-white transition">Privacy Policy</a>
+                <a href="#" class="hover:text-white transition">Terms of Service</a>
+                <a href="#" class="hover:text-white transition">Contact</a>
+            </div>
+            <div class="mt-4 text-sm text-gray-500">
+                © 2026 Akura. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ============================================================================
+        // CONFIGURATION
+        // ============================================================================
+        
+        const SUPABASE_URL = 'https://bdisppaxbvygsspcuymb.supabase.co';
+        const SUPABASE_ANON_KEY = 'your-anon-key-here'; // TODO: Add your key
+        
+        const STRAVA_CLIENT_ID = '162971';
+        const STRAVA_REDIRECT_URI = window.location.href.split('?')[0];
+        
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Initialize AISRI components
+        const mlAnalyzer = new AISRIMLAnalyzer();
+        const aisriEngine = new AISRIEngine();
+        let trainingGenerator = null;
+        
+        // State
+        let currentStep = 1;
+        let athleteData = {};
+        let analysisResults = {};
+        let trainingPlan = null;
+        let currentWeek = 1;
+
+        // ============================================================================
+        // STEP 1: DEVICE CONNECTION
+        // ============================================================================
+        
+        function connectStrava() {
+            const authUrl = `https://www.strava.com/oauth/authorize?client_id=${STRAVA_CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(STRAVA_REDIRECT_URI)}&scope=activity:read_all`;
+            window.location.href = authUrl;
+        }
+        
+        function connectGarmin() {
+            alert('Garmin Connect integration coming soon! For now, please use manual input or Strava.');
+        }
+        
+        // Check for Strava OAuth callback
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            
+            if (code) {
+                handleStravaCallback(code);
+            }
+        });
+        
+        async function handleStravaCallback(code) {
+            document.getElementById('strava-status').innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Connecting to Strava...';
+            
+            // TODO: Exchange code for access token via your backend
+            // For demo purposes, we'll simulate success
+            setTimeout(() => {
+                document.getElementById('strava-status').innerHTML = '<i class="fas fa-check-circle text-green-600 mr-2"></i>Connected! Fetching your data...';
+                
+                // Simulate fetching Strava data
+                setTimeout(() => {
+                    athleteData.stravaConnected = true;
+                    athleteData.activities = generateMockStravaData();
+                    
+                    // Auto-calculate Running pillar
+                    const runningScore = mlAnalyzer.calculateRunningPillar(athleteData.activities);
+                    document.getElementById('running-score').value = Math.round(runningScore);
+                    document.getElementById('running-score').classList.add('bg-green-50', 'border-green-500');
+                    
+                    document.getElementById('strava-status').innerHTML = '<i class="fas fa-check-circle text-green-600 mr-2"></i>Connected! Running pillar auto-calculated: ' + Math.round(runningScore) + '/100';
+                }, 1500);
+            }, 1000);
+        }
+        
+        function generateMockStravaData() {
+            // Mock Strava data for demonstration
+            return {
+                hrv: {
+                    current: 58,
+                    baseline: 55,
+                    trend: 'improving'
+                },
+                recovery: {
+                    score: 75,
+                    status: 'good'
+                },
+                trainingLoad: {
+                    acute: 520,
+                    chronic: 480,
+                    ratio: 1.08
+                },
+                sleep: {
+                    averageHours: 7.5,
+                    quality: 0.82
+                },
+                feel: {
+                    average: 7.5
+                },
+                activities: [
+                    { distance: 10, pace: 5.5, date: '2026-02-17' },
+                    { distance: 8, pace: 5.3, date: '2026-02-15' },
+                    { distance: 15, pace: 5.8, date: '2026-02-13' }
+                ],
+                weeklyDistance: 45,
+                consistency: 0.85
+            };
+        }
+
+        // ============================================================================
+        // STEP 1 → STEP 2 TRANSITION
+        // ============================================================================
+        
+        function proceedToAnalysis() {
+            // Gather all input data
+            athleteData.name = document.getElementById('athlete-name').value || 'Athlete';
+            athleteData.age = parseInt(document.getElementById('athlete-age').value) || 30;
+            athleteData.restingHR = parseInt(document.getElementById('resting-hr').value) || 55;
+            athleteData.totalDistance = parseInt(document.getElementById('total-distance').value) || 1200;
+            
+            athleteData.pillars = {
+                running: parseInt(document.getElementById('running-score').value) || 0,
+                strength: parseInt(document.getElementById('strength-score').value) || 0,
+                rom: parseInt(document.getElementById('rom-score').value) || 0,
+                balance: parseInt(document.getElementById('balance-score').value) || 0,
+                alignment: parseInt(document.getElementById('alignment-score').value) || 0,
+                mobility: parseInt(document.getElementById('mobility-score').value) || 0
+            };
+            
+            // Validate
+            const hasAllPillars = Object.values(athleteData.pillars).every(score => score > 0);
+            if (!hasAllPillars) {
+                alert('Please enter all 6 pillar scores to continue.');
+                return;
+            }
+            
+            // Run ML analysis
+            if (athleteData.activities) {
+                const mlResults = mlAnalyzer.analyzeAthlete(athleteData.activities);
+                athleteData.mlInsights = mlResults.insights;
+                athleteData.patterns = mlResults.patterns;
+            }
+            
+            // Calculate AISRI
+            analysisResults = aisriEngine.calculateAISRI(athleteData.pillars);
+            analysisResults.hrZones = aisriEngine.calculateHRZones(athleteData.age, athleteData.restingHR);
+            analysisResults.trainingPhase = aisriEngine.determineTrainingPhase(athleteData.totalDistance, analysisResults.score);
+            
+            // Check safety gates
+            analysisResults.powerGatePassed = aisriEngine.checkPowerZoneSafetyGate({
+                aisriScore: analysisResults.score,
+                romScore: athleteData.pillars.rom,
+                injuryFreeWeeks: 12,
+                foundationWeeks: 8
+            });
+            
+            analysisResults.speedGatePassed = aisriEngine.checkSpeedZoneSafetyGate({
+                aisriScore: analysisResults.score,
+                runningScore: athleteData.pillars.running,
+                strengthScore: athleteData.pillars.strength,
+                romScore: athleteData.pillars.rom,
+                balanceScore: athleteData.pillars.balance,
+                powerTrainingWeeks: 15
+            });
+            
+            analysisResults.allowedZones = aisriEngine.getAllowedZones(
+                analysisResults.score,
+                analysisResults.powerGatePassed,
+                analysisResults.speedGatePassed
+            );
+            
+            // Display results
+            displayAnalysisResults();
+            
+            // Move to step 2
+            goToStep(2);
+        }
+
+        // ============================================================================
+        // STEP 2: DISPLAY ANALYSIS
+        // ============================================================================
+        
+        function displayAnalysisResults() {
+            // AISRI Score
+            document.getElementById('aisri-score-display').textContent = analysisResults.score;
+            document.getElementById('risk-category-display').textContent = analysisResults.category;
+            
+            const descriptions = {
+                'Critical Risk': 'High injury risk - Focus on foundation and recovery',
+                'High Risk': 'Elevated risk - Build strength and stability',
+                'Medium Risk': 'Moderate risk - Progressive training recommended',
+                'Low Risk': 'Good condition - Can handle moderate intensity',
+                'Very Low Risk': 'Excellent condition - Ready for high-intensity training'
+            };
+            document.getElementById('risk-description').textContent = descriptions[analysisResults.category] || '';
+            
+            // Pillar Chart
+            createPillarChart();
+            
+            // Pillar Details
+            displayPillarDetails();
+            
+            // Training Zones
+            displayTrainingZones();
+            
+            // ML Insights
+            displayMLInsights();
+            
+            // HR Zones
+            displayHRZones();
+        }
+        
+        function createPillarChart() {
+            const ctx = document.getElementById('pillar-chart').getContext('2d');
+            
+            // Destroy existing chart if any
+            if (window.pillarChartInstance) {
+                window.pillarChartInstance.destroy();
+            }
+            
+            window.pillarChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Running (40%)', 'Strength (15%)', 'ROM (12%)', 'Balance (13%)', 'Alignment (10%)', 'Mobility (10%)'],
+                    datasets: [{
+                        data: [
+                            athleteData.pillars.running * 0.40,
+                            athleteData.pillars.strength * 0.15,
+                            athleteData.pillars.rom * 0.12,
+                            athleteData.pillars.balance * 0.13,
+                            athleteData.pillars.alignment * 0.10,
+                            athleteData.pillars.mobility * 0.10
+                        ],
+                        backgroundColor: [
+                            '#3B82F6', // blue
+                            '#10B981', // green
+                            '#F59E0B', // amber
+                            '#8B5CF6', // purple
+                            '#EC4899', // pink
+                            '#06B6D4'  // cyan
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 15,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = Math.round(context.parsed);
+                                    return label + ': ' + value + '/100';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function displayPillarDetails() {
+            const pillars = [
+                { name: 'Running', score: athleteData.pillars.running, weight: 40, color: 'blue', icon: 'fa-running' },
+                { name: 'Strength', score: athleteData.pillars.strength, weight: 15, color: 'green', icon: 'fa-dumbbell' },
+                { name: 'Range of Motion', score: athleteData.pillars.rom, weight: 12, color: 'amber', icon: 'fa-expand' },
+                { name: 'Balance', score: athleteData.pillars.balance, weight: 13, color: 'purple', icon: 'fa-balance-scale' },
+                { name: 'Alignment', score: athleteData.pillars.alignment, weight: 10, color: 'pink', icon: 'fa-arrows-alt-v' },
+                { name: 'Mobility', score: athleteData.pillars.mobility, weight: 10, color: 'cyan', icon: 'fa-wave-square' }
+            ];
+            
+            const html = pillars.map(p => {
+                const colorClass = {
+                    'blue': 'bg-blue-100 text-blue-800',
+                    'green': 'bg-green-100 text-green-800',
+                    'amber': 'bg-amber-100 text-amber-800',
+                    'purple': 'bg-purple-100 text-purple-800',
+                    'pink': 'bg-pink-100 text-pink-800',
+                    'cyan': 'bg-cyan-100 text-cyan-800'
+                }[p.color];
+                
+                return `
+                    <div class="pillar-card bg-gray-50 rounded-lg p-4 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 ${colorClass} rounded-full flex items-center justify-center">
+                                <i class="fas ${p.icon}"></i>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-gray-800">${p.name}</div>
+                                <div class="text-sm text-gray-500">${p.weight}% weight</div>
+                            </div>
+                        </div>
+                        <div class="text-2xl font-bold text-gray-800">${p.score}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('pillar-details').innerHTML = html;
+        }
+        
+        function displayTrainingZones() {
+            const zones = [
+                { code: 'AR', name: 'Active Recovery', color: 'bg-green-100 text-green-800', icon: 'fa-spa' },
+                { code: 'F', name: 'Foundation', color: 'bg-blue-100 text-blue-800', icon: 'fa-layer-group' },
+                { code: 'EN', name: 'Endurance', color: 'bg-indigo-100 text-indigo-800', icon: 'fa-hiking' },
+                { code: 'TH', name: 'Threshold', color: 'bg-purple-100 text-purple-800', icon: 'fa-tachometer-alt' },
+                { code: 'P', name: 'Power', color: 'bg-orange-100 text-orange-800', icon: 'fa-bolt' },
+                { code: 'SP', name: 'Speed', color: 'bg-red-100 text-red-800', icon: 'fa-rocket' }
+            ];
+            
+            const html = zones.map(z => {
+                const isAllowed = analysisResults.allowedZones.includes(z.code);
+                const locked = !isAllowed;
+                
+                return `
+                    <div class="zone-badge ${locked ? 'locked opacity-50' : ''} ${z.color} rounded-lg p-4 text-center relative">
+                        <i class="fas ${z.icon} text-2xl mb-2"></i>
+                        <div class="font-semibold">${z.code}</div>
+                        <div class="text-xs">${z.name}</div>
+                        ${locked ? '<i class="fas fa-lock absolute top-2 right-2 text-gray-600"></i>' : '<i class="fas fa-check-circle absolute top-2 right-2 text-green-600"></i>'}
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('training-zones').innerHTML = html;
+        }
+        
+        function displayMLInsights() {
+            if (!athleteData.mlInsights || athleteData.mlInsights.length === 0) {
+                document.getElementById('ml-insights').innerHTML = '<p class="text-gray-500">No ML insights available. Connect a device to get personalized recommendations.</p>';
+                return;
+            }
+            
+            const typeColors = {
+                'success': 'border-green-500 bg-green-50',
+                'warning': 'border-yellow-500 bg-yellow-50',
+                'info': 'border-blue-500 bg-blue-50',
+                'danger': 'border-red-500 bg-red-50'
+            };
+            
+            const typeIcons = {
+                'success': 'fa-check-circle text-green-600',
+                'warning': 'fa-exclamation-triangle text-yellow-600',
+                'info': 'fa-info-circle text-blue-600',
+                'danger': 'fa-times-circle text-red-600'
+            };
+            
+            const html = athleteData.mlInsights.map(insight => {
+                const colorClass = typeColors[insight.type] || typeColors.info;
+                const iconClass = typeIcons[insight.type] || typeIcons.info;
+                
+                return `
+                    <div class="insight-card ${colorClass} rounded-lg p-4">
+                        <div class="flex items-start gap-3">
+                            <i class="fas ${iconClass} text-xl mt-1"></i>
+                            <div class="flex-1">
+                                <div class="font-semibold text-gray-800 mb-1">${insight.title}</div>
+                                <div class="text-sm text-gray-700">${insight.message}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('ml-insights').innerHTML = html;
+        }
+        
+        function displayHRZones() {
+            const zones = analysisResults.hrZones;
+            const zoneNames = ['Zone 1', 'Zone 2', 'Zone 3', 'Zone 4', 'Zone 5'];
+            const zoneColors = ['bg-green-100 text-green-800', 'bg-blue-100 text-blue-800', 'bg-yellow-100 text-yellow-800', 'bg-orange-100 text-orange-800', 'bg-red-100 text-red-800'];
+            
+            const html = zoneNames.map((name, i) => {
+                const zone = zones[`zone${i+1}`];
+                return `
+                    <div class="${zoneColors[i]} rounded-lg p-4 text-center">
+                        <div class="font-semibold mb-1">${name}</div>
+                        <div class="text-2xl font-bold">${zone.min}-${zone.max}</div>
+                        <div class="text-xs">bpm</div>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('hr-zones').innerHTML = html;
+        }
+
+        // ============================================================================
+        // STEP 2 → STEP 3 TRANSITION
+        // ============================================================================
+        
+        function proceedToTrainingPlan() {
+            // Initialize training generator
+            trainingGenerator = new AITrainingProgramGenerator(aisriEngine);
+            
+            // Generate 12-week plan
+            trainingPlan = trainingGenerator.generateProgram({
+                name: athleteData.name,
+                age: athleteData.age,
+                restingHR: athleteData.restingHR,
+                aisriScore: analysisResults.score,
+                pillars: athleteData.pillars,
+                allowedZones: analysisResults.allowedZones,
+                hrZones: analysisResults.hrZones,
+                totalDistance: athleteData.totalDistance,
+                trainingPhase: analysisResults.trainingPhase
+            });
+            
+            // Display plan
+            displayTrainingPlan();
+            
+            // Move to step 3
+            goToStep(3);
+        }
+
+        // ============================================================================
+        // STEP 3: DISPLAY TRAINING PLAN
+        // ============================================================================
+        
+        function displayTrainingPlan() {
+            // Plan title and description
+            document.getElementById('plan-title').textContent = `${athleteData.name}'s Training Plan`;
+            document.getElementById('plan-description').textContent = `12-week program for ${analysisResults.category} (AISRI: ${analysisResults.score}/100)`;
+            
+            // Week selector
+            createWeekSelector();
+            
+            // Display first week
+            displayWeek(1);
+        }
+        
+        function createWeekSelector() {
+            const html = Array.from({length: 12}, (_, i) => {
+                const weekNum = i + 1;
+                return `
+                    <button onclick="displayWeek(${weekNum})" 
+                            class="week-btn px-4 py-2 rounded-lg font-semibold transition ${weekNum === 1 ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}"
+                            id="week-btn-${weekNum}">
+                        Week ${weekNum}
+                    </button>
+                `;
+            }).join('');
+            
+            document.getElementById('week-selector').innerHTML = html;
+        }
+        
+        function displayWeek(weekNum) {
+            currentWeek = weekNum;
+            
+            // Update button states
+            document.querySelectorAll('.week-btn').forEach(btn => {
+                btn.classList.remove('bg-purple-600', 'text-white');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            });
+            document.getElementById(`week-btn-${weekNum}`).classList.remove('bg-gray-200', 'text-gray-700');
+            document.getElementById(`week-btn-${weekNum}`).classList.add('bg-purple-600', 'text-white');
+            
+            // Get week data
+            const week = trainingPlan.weeks[weekNum - 1];
+            
+            // Display schedule
+            const html = `
+                <div class="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg p-6 mb-6">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">Week ${weekNum}: ${week.theme}</h3>
+                    <p class="text-gray-600 mb-4">${week.description || 'Progressive training for optimal adaptation'}</p>
+                    <div class="flex gap-4 text-sm">
+                        <div class="bg-white rounded px-3 py-2">
+                            <span class="text-gray-600">Total Distance:</span>
+                            <span class="font-semibold ml-2">${week.totalDistance} km</span>
+                        </div>
+                        <div class="bg-white rounded px-3 py-2">
+                            <span class="text-gray-600">Workouts:</span>
+                            <span class="font-semibold ml-2">${week.days.length} days</span>
+                        </div>
+                        <div class="bg-white rounded px-3 py-2">
+                            <span class="text-gray-600">Focus:</span>
+                            <span class="font-semibold ml-2">${week.focus || 'Build & Recover'}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    ${week.days.map(day => createDayCard(day)).join('')}
+                </div>
+                
+                ${week.notes ? `
+                    <div class="mt-6 bg-blue-50 border-l-4 border-blue-500 rounded-lg p-4">
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-info-circle text-blue-600 text-xl"></i>
+                            <div>
+                                <div class="font-semibold text-blue-900 mb-1">Week Notes</div>
+                                <div class="text-sm text-blue-800">${week.notes}</div>
+                            </div>
+                        </div>
+                    </div>
+                ` : ''}
+            `;
+            
+            document.getElementById('weekly-schedule').innerHTML = html;
+        }
+        
+        function createDayCard(day) {
+            const zoneColors = {
+                'AR': 'bg-green-500',
+                'F': 'bg-blue-500',
+                'EN': 'bg-indigo-500',
+                'TH': 'bg-purple-500',
+                'P': 'bg-orange-500',
+                'SP': 'bg-red-500'
+            };
+            
+            const zoneColor = zoneColors[day.zone] || 'bg-gray-500';
+            
+            return `
+                <div class="workout-day bg-white rounded-lg p-6 shadow-sm">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 ${zoneColor} rounded-lg flex items-center justify-center text-white font-bold text-lg">
+                                ${day.day}
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-bold text-gray-800">${day.name}</h4>
+                                <div class="flex gap-2 mt-1">
+                                    <span class="${zoneColor} text-white text-xs px-2 py-1 rounded font-semibold">${day.zone}</span>
+                                    ${day.distance ? `<span class="bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded">${day.distance} km</span>` : ''}
+                                    ${day.duration ? `<span class="bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded">${day.duration}</span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        ${day.hrZone ? `
+                            <div class="text-right">
+                                <div class="text-sm text-gray-500">HR Zone</div>
+                                <div class="text-lg font-bold text-gray-800">${day.hrZone}</div>
+                            </div>
+                        ` : ''}
+                    </div>
+                    <p class="text-gray-600 mb-3">${day.description}</p>
+                    ${day.notes ? `
+                        <div class="bg-yellow-50 border border-yellow-200 rounded p-3 text-sm text-yellow-800">
+                            <i class="fas fa-exclamation-circle mr-2"></i>${day.notes}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        // ============================================================================
+        // PDF EXPORT
+        // ============================================================================
+        
+        function exportPlanToPDF() {
+            alert('PDF export feature will generate a downloadable training plan. Implementation requires jsPDF configuration.');
+            
+            // TODO: Implement full PDF export
+            // const { jsPDF } = window.jspdf;
+            // const doc = new jsPDF();
+            // ... add content ...
+            // doc.save(`${athleteData.name}-training-plan.pdf`);
+        }
+
+        // ============================================================================
+        // SAVE TO DATABASE
+        // ============================================================================
+        
+        async function savePlanToDatabase() {
+            try {
+                const { data, error } = await supabase
+                    .from('training_plans')
+                    .insert([
+                        {
+                            athlete_name: athleteData.name,
+                            aisri_score: analysisResults.score,
+                            risk_category: analysisResults.category,
+                            pillar_scores: athleteData.pillars,
+                            training_plan: trainingPlan,
+                            created_at: new Date().toISOString()
+                        }
+                    ]);
+                
+                if (error) throw error;
+                
+                alert('Training plan saved successfully!');
+            } catch (error) {
+                console.error('Error saving plan:', error);
+                alert('Failed to save plan. Please try again.');
+            }
+        }
+
+        // ============================================================================
+        // NAVIGATION
+        // ============================================================================
+        
+        function goToStep(step) {
+            // Hide all sections
+            document.getElementById('section-1').classList.add('hidden');
+            document.getElementById('section-2').classList.add('hidden');
+            document.getElementById('section-3').classList.add('hidden');
+            
+            // Show target section
+            document.getElementById(`section-${step}`).classList.remove('hidden');
+            
+            // Update step indicators
+            updateStepIndicators(step);
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            currentStep = step;
+        }
+        
+        function updateStepIndicators(activeStep) {
+            for (let i = 1; i <= 3; i++) {
+                const indicator = document.getElementById(`step-${i}-indicator`);
+                const circle = indicator.querySelector('.w-12');
+                
+                if (i < activeStep) {
+                    // Completed
+                    circle.classList.remove('bg-gray-300', 'text-gray-600', 'bg-purple-600');
+                    circle.classList.add('bg-green-600', 'text-white');
+                    indicator.classList.add('active');
+                } else if (i === activeStep) {
+                    // Active
+                    circle.classList.remove('bg-gray-300', 'text-gray-600', 'bg-green-600');
+                    circle.classList.add('bg-purple-600', 'text-white');
+                    indicator.classList.add('active');
+                } else {
+                    // Inactive
+                    circle.classList.remove('bg-purple-600', 'text-white', 'bg-green-600');
+                    circle.classList.add('bg-gray-300', 'text-gray-600');
+                    indicator.classList.remove('active');
+                }
+            }
+            
+            // Update progress bars
+            for (let i = 1; i <= 2; i++) {
+                const bar = document.getElementById(`progress-bar-${i}`);
+                if (i < activeStep) {
+                    bar.classList.remove('bg-gray-300');
+                    bar.classList.add('bg-green-600');
+                } else {
+                    bar.classList.remove('bg-green-600');
+                    bar.classList.add('bg-gray-300');
+                }
+            }
+        }
+
+        // ============================================================================
+        // INITIALIZATION
+        // ============================================================================
+        
+        console.log('AISRI AI Training Plan Builder loaded successfully');
+        console.log('ML Analyzer:', mlAnalyzer);
+        console.log('AISRI Engine:', aisriEngine);
+    </script>
+</body>
+</html>
