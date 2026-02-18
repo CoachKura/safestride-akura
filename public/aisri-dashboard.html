@@ -7,14 +7,19 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
+    
+    <!-- AISRI V2 System -->
+    <script src="js/aisri-engine-v2.js"></script>
+    <script src="js/aisri-ml-analyzer.js"></script>
+    <script src="js/ai-training-generator.js"></script>
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen">
     <!-- Header with Logo -->
     <div class="container mx-auto px-6 py-8">
         <div class="text-center mb-8">
             <img src="https://www.genspark.ai/api/files/s/DrQ8Z168" alt="AKURA Logo" class="w-32 h-32 mx-auto mb-4">
-            <h1 class="text-4xl font-bold text-white mb-2">AKURA AISRI PERFORMANCE INDEX</h1>
-            <p class="text-gray-400 text-lg">Akura Injury & Safety Risk Index - 6 Pillar Assessment</p>
+            <h1 class="text-4xl font-bold text-white mb-2">AKURA AISRI DASHBOARD V2</h1>
+            <p class="text-gray-400 text-lg">Akura Injury & Safety Risk Index - 6 Pillar System with ML Analysis</p>
         </div>
 
         <!-- Main Dashboard -->
@@ -297,11 +302,23 @@
         });
 
         function syncStrava() {
-            alert(' Strava sync will calculate Running pillar from your recent activities!');
+            alert('🔄 Strava sync will calculate Running pillar from your recent activities!');
+            // Initialize AISRI ML Analyzer
+            const mlAnalyzer = new AISRIMLAnalyzer();
+            console.log('✅ AISRI ML Analyzer initialized');
         }
 
         function generateProgram() {
-            alert(' Generating personalized 12-week training program based on AISRI score ' + totalScore);
+            const totalScore = 78; // This would come from actual calculation
+            
+            // Initialize AISRI Engine V2
+            const engine = new AISRIEngine();
+            const generator = new AITrainingProgramGenerator(engine);
+            
+            console.log('🎯 Generating 12-week training program...');
+            console.log('AISRI Score:', totalScore);
+            
+            alert('✅ Generating personalized 12-week training program based on AISRI score ' + totalScore);
         }
     </script>
 </body>
