@@ -12,8 +12,5 @@
       "src": "/(.*)",
       "dest": "/$1"
     }
-  ],
-  "buildCommand": null,
-  "outputDirectory": ".",
-  "deploymentTrigger": "2026-02-18T10:00:00Z"
+  ]
 }
