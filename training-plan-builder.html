@@ -639,7 +639,7 @@
             "🔵 Starting Strava OAuth with code:",
             code.substring(0, 10) + "...",
           );
-          
+
           // Generate consistent athlete ID to use for both OAuth and sync
           const athleteId = `athlete_${Date.now()}`;
           console.log("🔵 Generated athlete ID:", athleteId);
@@ -680,7 +680,7 @@
           const { data: syncData, error: syncError } =
             await supabaseClient.functions.invoke("strava-sync-activities", {
               body: {
-                athleteId: athleteId,  // Use same athleteId from OAuth
+                athleteId: athleteId, // Use same athleteId from OAuth
                 daysBack: 30,
               },
             });
@@ -1087,7 +1087,7 @@
 
         const html = zones
           .map((z) => {
-            const isAllowed = analysisResults.allowedZones.includes(z.code);
+            const isAllowed = analysisResults.allowedZones?.includes(z.code) ?? false;
             const locked = !isAllowed;
 
             return `
