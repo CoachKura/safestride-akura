@@ -1483,6 +1483,36 @@
 
       function displayHRZones() {
         const zones = analysisResults.hrZones;
+
+        // Safety check: ensure zones exist
+        if (!zones || typeof zones !== "object") {
+          console.warn("⚠️ HR Zones not available, using default values");
+          const age = athleteData.age || 30;
+          const maxHR = 220 - age;
+          // Create default zones if calculateHRZones failed
+          const defaultZones = {
+            zone1: {
+              min: Math.round(maxHR * 0.5),
+              max: Math.round(maxHR * 0.6),
+            },
+            zone2: {
+              min: Math.round(maxHR * 0.6),
+              max: Math.round(maxHR * 0.7),
+            },
+            zone3: {
+              min: Math.round(maxHR * 0.7),
+              max: Math.round(maxHR * 0.8),
+            },
+            zone4: {
+              min: Math.round(maxHR * 0.8),
+              max: Math.round(maxHR * 0.9),
+            },
+            zone5: { min: Math.round(maxHR * 0.9), max: maxHR },
+          };
+          analysisResults.hrZones = defaultZones;
+        }
+
+        const finalZones = analysisResults.hrZones;
         const zoneNames = ["Zone 1", "Zone 2", "Zone 3", "Zone 4", "Zone 5"];
         const zoneColors = [
           "bg-green-100 text-green-800",
@@ -1494,7 +1524,16 @@
 
         const html = zoneNames
           .map((name, i) => {
-            const zone = zones[`zone${i + 1}`];
+            const zone = finalZones[`zone${i + 1}`];
+            if (!zone || !zone.min || !zone.max) {
+              return `
+                    <div class="${zoneColors[i]} rounded-lg p-4 text-center">
+                        <div class="font-semibold mb-1">${name}</div>
+                        <div class="text-2xl font-bold">N/A</div>
+                        <div class="text-xs">Zone unavailable</div>
+                    </div>
+                `;
+            }
             return `
                     <div class="${zoneColors[i]} rounded-lg p-4 text-center">
                         <div class="font-semibold mb-1">${name}</div>
