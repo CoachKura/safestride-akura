@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Athlete Dashboard - AKURA SafeStride</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+      .gradient-bg {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+      .card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 24px;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+      }
+      .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+      }
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        width: 250px;
+        background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 24px;
+        z-index: 10;
+      }
+      .main-content {
+        margin-left: 250px;
+        padding: 24px;
+      }
+      .nav-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        margin-bottom: 8px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .nav-item:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+      .nav-item.active {
+        background: rgba(255, 255, 255, 0.2);
+      }
+      @media (max-width: 768px) {
+        .sidebar {
+          transform: translateX(-100%);
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .main-content {
+          margin-left: 0;
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50">
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="mb-8">
+        <div class="flex items-center mb-6">
+          <div
+            class="w-12 h-12 bg-white rounded-full flex items-center justify-center mr-3"
+          >
+            <i class="fas fa-running text-purple-600 text-xl"></i>
+          </div>
+          <div>
+            <h2 class="font-bold text-lg">AKURA</h2>
+            <p class="text-xs text-purple-200">SafeStride</p>
+          </div>
+        </div>
+        <div class="bg-white bg-opacity-10 rounded-lg p-3 mb-4">
+          <p class="text-sm font-semibold" id="userName">Loading...</p>
+          <p class="text-xs text-purple-200" id="userRole">Athlete</p>
+        </div>
+      </div>
+
+      <nav>
+        <div class="nav-item active" onclick="showSection('dashboard')">
+          <i class="fas fa-home w-6"></i>
+          <span>Dashboard</span>
+        </div>
+        <div class="nav-item" onclick="showSection('training')">
+          <i class="fas fa-calendar-alt w-6"></i>
+          <span>Training Plan</span>
+        </div>
+        <div class="nav-item" onclick="showSection('strava')">
+          <i class="fab fa-strava w-6"></i>
+          <span>Strava Integration</span>
+        </div>
+        <div class="nav-item" onclick="showSection('aisri')">
+          <i class="fas fa-chart-line w-6"></i>
+          <span>AISRI Score</span>
+        </div>
+        <div class="nav-item" onclick="showSection('profile')">
+          <i class="fas fa-user w-6"></i>
+          <span>Profile</span>
+        </div>
+        <div class="nav-item" onclick="logout()">
+          <i class="fas fa-sign-out-alt w-6"></i>
+          <span>Logout</span>
+        </div>
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-8">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-800">
+            <span id="greeting">Good Morning</span>,
+            <span id="headerName">Athlete</span>!
+          </h1>
+          <p class="text-gray-600 mt-1">Welcome to your training dashboard</p>
+        </div>
+        <button
+          class="md:hidden bg-purple-600 text-white px-4 py-2 rounded-lg"
+          onclick="toggleSidebar()"
+        >
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+
+      <!-- Dashboard Section -->
+      <div id="section-dashboard" class="section">
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div class="card">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-gray-500 text-sm mb-1">AISRI Score</p>
+                <h3 class="text-3xl font-bold text-purple-600" id="aisriScore">
+                  --
+                </h3>
+                <p class="text-xs text-gray-500 mt-1" id="riskCategory">
+                  Loading...
+                </p>
+              </div>
+              <div
+                class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center"
+              >
+                <i class="fas fa-shield-alt text-purple-600 text-xl"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-gray-500 text-sm mb-1">Total Distance</p>
+                <h3 class="text-3xl font-bold text-blue-600" id="totalDistance">
+                  -- km
+                </h3>
+                <p class="text-xs text-gray-500 mt-1">All-time</p>
+              </div>
+              <div
+                class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center"
+              >
+                <i class="fas fa-route text-blue-600 text-xl"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-gray-500 text-sm mb-1">Activities</p>
+                <h3
+                  class="text-3xl font-bold text-green-600"
+                  id="activityCount"
+                >
+                  --
+                </h3>
+                <p class="text-xs text-gray-500 mt-1">Total runs</p>
+              </div>
+              <div
+                class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center"
+              >
+                <i class="fas fa-running text-green-600 text-xl"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-gray-500 text-sm mb-1">Strava Status</p>
+                <h3 class="text-lg font-bold" id="stravaStatus">
+                  <span class="text-orange-600">Not Connected</span>
+                </h3>
+                <p class="text-xs text-gray-500 mt-1" id="stravaDetails">
+                  Connect now
+                </p>
+              </div>
+              <div
+                class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center"
+              >
+                <i class="fab fa-strava text-orange-600 text-xl"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div class="card cursor-pointer" onclick="showSection('training')">
+            <div class="text-center">
+              <div
+                class="w-16 h-16 gradient-bg rounded-full flex items-center justify-center mx-auto mb-4"
+              >
+                <i class="fas fa-calendar-plus text-white text-2xl"></i>
+              </div>
+              <h3 class="font-bold text-gray-800 mb-2">
+                Training Plan Builder
+              </h3>
+              <p class="text-sm text-gray-600">
+                Create personalized training plans with AI
+              </p>
+            </div>
+          </div>
+
+          <div class="card cursor-pointer" onclick="connectStrava()">
+            <div class="text-center">
+              <div
+                class="w-16 h-16 bg-orange-600 rounded-full flex items-center justify-center mx-auto mb-4"
+              >
+                <i class="fab fa-strava text-white text-2xl"></i>
+              </div>
+              <h3 class="font-bold text-gray-800 mb-2">Connect Strava</h3>
+              <p class="text-sm text-gray-600">
+                Sync your activities and get AI insights
+              </p>
+            </div>
+          </div>
+
+          <div class="card cursor-pointer" onclick="showSection('aisri')">
+            <div class="text-center">
+              <div
+                class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4"
+              >
+                <i class="fas fa-chart-bar text-white text-2xl"></i>
+              </div>
+              <h3 class="font-bold text-gray-800 mb-2">View AISRI Analysis</h3>
+              <p class="text-sm text-gray-600">
+                Detailed injury risk assessment
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card">
+          <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+            <i class="fas fa-clock mr-2 text-purple-600"></i>
+            Recent Activities
+          </h3>
+          <div id="recentActivities">
+            <p class="text-gray-500 text-center py-8">
+              Connect Strava to see your recent activities
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Training Section -->
+      <div id="section-training" class="section hidden">
+        <div class="card">
+          <h2 class="text-2xl font-bold text-gray-800 mb-4">
+            AI Training Plan Builder
+          </h2>
+          <p class="text-gray-600 mb-6">Opening training plan builder...</p>
+          <iframe
+            src="/training-plan-builder.html"
+            class="w-full"
+            style="height: calc(100vh - 200px); border: none"
+            id="trainingFrame"
+          ></iframe>
+        </div>
+      </div>
+
+      <!-- Strava Section -->
+      <div id="section-strava" class="section hidden">
+        <div class="card">
+          <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+            <i class="fab fa-strava mr-3 text-orange-600"></i>
+            Strava Integration
+          </h2>
+          <div id="stravaConnectionStatus"></div>
+        </div>
+      </div>
+
+      <!-- AISRI Section -->
+      <div id="section-aisri" class="section hidden">
+        <div class="card">
+          <h2 class="text-2xl font-bold text-gray-800 mb-4">
+            AISRI Injury Risk Score
+          </h2>
+          <p class="text-gray-600">
+            Detailed AISRI analysis will be displayed here.
+          </p>
+        </div>
+      </div>
+
+      <!-- Profile Section -->
+      <div id="section-profile" class="section hidden">
+        <div class="card">
+          <h2 class="text-2xl font-bold text-gray-800 mb-4">
+            Profile Settings
+          </h2>
+          <div id="profileInfo"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Supabase Configuration
+      const SUPABASE_URL = "https://bdisppaxbvygsspcuymb.supabase.co";
+      const SUPABASE_ANON_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkaXNwcGF4YnZ5Z3NzcGN1eW1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzcxMjcxMzEsImV4cCI6MjA1MjcwMzEzMX0.n9_qU_5X5VZnzMj5YLqn3Kz3v2g9Y3k8X1Y4_3_0_0";
+      const STRAVA_CLIENT_ID = "162971";
+      const REDIRECT_URI = window.location.origin;
+
+      const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      // Check authentication
+      const currentUser =
+        localStorage.getItem("akura_user") ||
+        sessionStorage.getItem("akura_user");
+      if (!currentUser) {
+        window.location.href = "/login.html";
+      }
+
+      const user = JSON.parse(currentUser);
+
+      // Check if user is athlete
+      if (user.role_name !== "athlete") {
+        window.location.href = `/${user.role_name}-dashboard.html`;
+      }
+
+      // Initialize dashboard
+      document.addEventListener("DOMContentLoaded", () => {
+        initializeDashboard();
+      });
+
+      function initializeDashboard() {
+        // Set user name
+        document.getElementById("userName").textContent = user.full_name;
+        document.getElementById("headerName").textContent =
+          user.full_name.split(" ")[0];
+
+        // Set greeting based on time
+        const hour = new Date().getHours();
+        const greeting =
+          hour < 12
+            ? "Good Morning"
+            : hour < 18
+              ? "Good Afternoon"
+              : "Good Evening";
+        document.getElementById("greeting").textContent = greeting;
+
+        // Load dashboard data
+        loadDashboardData();
+      }
+
+      async function loadDashboardData() {
+        try {
+          // Check Strava connection
+          const { data: stravaData, error: stravaError } = await supabase
+            .from("strava_connections")
+            .select("*")
+            .eq("athlete_id", user.user_id)
+            .single();
+
+          if (stravaData && !stravaError) {
+            // Strava is connected
+            document.getElementById("stravaStatus").innerHTML =
+              '<span class="text-green-600">Connected</span>';
+            document.getElementById("stravaDetails").textContent =
+              "Last synced today";
+
+            // Load Strava statistics
+            await loadStravaStats();
+          } else {
+            // Not connected
+            document.getElementById("stravaStatus").innerHTML =
+              '<span class="text-orange-600">Not Connected</span>';
+            document.getElementById("stravaDetails").textContent =
+              "Click to connect";
+          }
+
+          // Load AISRI score
+          await loadAISRIScore();
+        } catch (err) {
+          console.error("Error loading dashboard data:", err);
+        }
+      }
+
+      async function loadStravaStats() {
+        try {
+          // Get activities count and total distance
+          const { data: activities, error } = await supabase
+            .from("strava_activities")
+            .select("activity_data")
+            .eq("athlete_id", user.user_id);
+
+          if (activities && !error) {
+            document.getElementById("activityCount").textContent =
+              activities.length;
+
+            // Calculate total distance
+            const totalDistance = activities.reduce((sum, act) => {
+              return sum + (act.activity_data?.distance || 0);
+            }, 0);
+
+            document.getElementById("totalDistance").textContent =
+              (totalDistance / 1000).toFixed(1) + " km";
+
+            // Show recent activities
+            displayRecentActivities(activities.slice(0, 5));
+          }
+        } catch (err) {
+          console.error("Error loading Strava stats:", err);
+        }
+      }
+
+      async function loadAISRIScore() {
+        try {
+          const { data: aisriData, error } = await supabase
+            .from("aisri_scores")
+            .select("*")
+            .eq("athlete_id", user.user_id)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .single();
+
+          if (aisriData && !error) {
+            document.getElementById("aisriScore").textContent =
+              aisriData.total_score.toFixed(1);
+            document.getElementById("riskCategory").textContent =
+              aisriData.risk_category;
+          } else {
+            document.getElementById("aisriScore").textContent = "--";
+            document.getElementById("riskCategory").textContent = "No data yet";
+          }
+        } catch (err) {
+          console.error("Error loading AISRI score:", err);
+          document.getElementById("aisriScore").textContent = "--";
+          document.getElementById("riskCategory").textContent = "No data yet";
+        }
+      }
+
+      function displayRecentActivities(activities) {
+        const container = document.getElementById("recentActivities");
+
+        if (!activities || activities.length === 0) {
+          container.innerHTML =
+            '<p class="text-gray-500 text-center py-8">No recent activities found</p>';
+          return;
+        }
+
+        let html = '<div class="space-y-3">';
+        activities.forEach((act, index) => {
+          const actData = act.activity_data;
+          const date = new Date(actData.start_date).toLocaleDateString();
+          const distance = (actData.distance / 1000).toFixed(2);
+
+          html += `
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-running text-purple-600"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-800">${actData.name || "Run"}</p>
+                                <p class="text-sm text-gray-500">${date} • ${distance} km</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-400"></i>
+                    </div>
+                `;
+        });
+        html += "</div>";
+
+        container.innerHTML = html;
+      }
+
+      function connectStrava() {
+        const stravaAuthUrl = `https://www.strava.com/oauth/authorize?client_id=${STRAVA_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI + "/training-plan-builder.html")}&response_type=code&scope=activity:read_all`;
+        window.location.href = stravaAuthUrl;
+      }
+
+      function showSection(sectionName) {
+        // Hide all sections
+        document.querySelectorAll(".section").forEach((section) => {
+          section.classList.add("hidden");
+        });
+
+        // Remove active class from all nav items
+        document.querySelectorAll(".nav-item").forEach((item) => {
+          item.classList.remove("active");
+        });
+
+        // Show selected section
+        document
+          .getElementById(`section-${sectionName}`)
+          .classList.remove("hidden");
+
+        // Add active class to clicked nav item
+        event.target.closest(".nav-item").classList.add("active");
+      }
+
+      function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("open");
+      }
+
+      function logout() {
+        localStorage.removeItem("akura_user");
+        sessionStorage.removeItem("akura_user");
+        window.location.href = "/login.html";
+      }
+    </script>
+  </body>
+</html>
