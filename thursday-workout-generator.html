@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thursday Workout Generator - AKURA AISRI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @media print {
+            .no-print { display: none; }
+            body { background: white; padding: 20px; }
+            .print-section { page-break-inside: avoid; }
+        }
+        .pulse-animation {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <!-- Header -->
+        <div class="text-center mb-8 no-print">
+            <img src="https://www.genspark.ai/api/files/s/DrQ8Z168" alt="AKURA Logo" class="w-24 h-24 mx-auto mb-4">
+            <h1 class="text-4xl font-bold text-white mb-2">Thursday Workout Generator</h1>
+            <p class="text-gray-300 text-lg">AKURA AISRI - Instant Personalized Workouts</p>
+            <p class="text-gray-400 text-sm mt-2">Based on 6-Pillar Assessment System</p>
+        </div>
+
+        <!-- Input Card -->
+        <div id="inputCard" class="bg-white rounded-2xl shadow-2xl p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                <i class="fas fa-clipboard-list text-indigo-600 mr-3"></i>
+                Athlete Assessment
+            </h2>
+
+            <!-- Athlete Info -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Athlete Name</label>
+                    <input type="text" id="athleteName" placeholder="John Doe" 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Age</label>
+                    <input type="number" id="age" placeholder="30" min="15" max="80" 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Resting HR (bpm)</label>
+                    <input type="number" id="restingHR" placeholder="60" min="40" max="100" 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                </div>
+            </div>
+
+            <!-- 6 Pillar Scores -->
+            <h3 class="text-lg font-bold text-gray-700 mb-4 mt-6">6-Pillar AISRI Scores (0-100)</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Running Performance (40%) -->
+                <div class="bg-blue-50 rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="font-semibold text-blue-900 flex items-center">
+                            <i class="fas fa-running text-blue-600 mr-2"></i>
+                            Running Performance
+                        </label>
+                        <span class="text-xs text-blue-700 font-bold">40% weight</span>
+                    </div>
+                    <input type="number" id="running" value="75" min="0" max="100" 
+                           oninput="updateAISRI()"
+                           class="w-full px-4 py-2 border-2 border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+
+                <!-- Strength (15%) -->
+                <div class="bg-orange-50 rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="font-semibold text-orange-900 flex items-center">
+                            <i class="fas fa-dumbbell text-orange-600 mr-2"></i>
+                            Strength
+                        </label>
+                        <span class="text-xs text-orange-700 font-bold">15% weight</span>
+                    </div>
+                    <input type="number" id="strength" value="80" min="0" max="100" 
+                           oninput="updateAISRI()"
+                           class="w-full px-4 py-2 border-2 border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                </div>
+
+                <!-- ROM (12%) -->
+                <div class="bg-teal-50 rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="font-semibold text-teal-900 flex items-center">
+                            <i class="fas fa-compress-arrows-alt text-teal-600 mr-2"></i>
+                            ROM (Range of Motion)
+                        </label>
+                        <span class="text-xs text-teal-700 font-bold">12% weight</span>
+                    </div>
+                    <input type="number" id="rom" value="70" min="0" max="100" 
+                           oninput="updateAISRI()"
+                           class="w-full px-4 py-2 border-2 border-teal-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent">
+                </div>
+
+                <!-- Balance (13%) -->
+                <div class="bg-green-50 rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="font-semibold text-green-900 flex items-center">
+                            <i class="fas fa-balance-scale text-green-600 mr-2"></i>
+                            Balance
+                        </label>
+                        <span class="text-xs text-green-700 font-bold">13% weight</span>
+                    </div>
+                    <input type="number" id="balance" value="85" min="0" max="100" 
+                           oninput="updateAISRI()"
+                           class="w-full px-4 py-2 border-2 border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                </div>
+
+                <!-- Alignment (10%) -->
+                <div class="bg-cyan-50 rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="font-semibold text-cyan-900 flex items-center">
+                            <i class="fas fa-user-check text-cyan-600 mr-2"></i>
+                            Alignment
+                        </label>
+                        <span class="text-xs text-cyan-700 font-bold">10% weight</span>
+                    </div>
+                    <input type="number" id="alignment" value="72" min="0" max="100" 
+                           oninput="updateAISRI()"
+                           class="w-full px-4 py-2 border-2 border-cyan-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                </div>
+
+                <!-- Mobility (10%) -->
+                <div class="bg-purple-50 rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="font-semibold text-purple-900 flex items-center">
+                            <i class="fas fa-atom text-purple-600 mr-2"></i>
+                            Mobility
+                        </label>
+                        <span class="text-xs text-purple-700 font-bold">10% weight</span>
+                    </div>
+                    <input type="number" id="mobility" value="65" min="0" max="100" 
+                           oninput="updateAISRI()"
+                           class="w-full px-4 py-2 border-2 border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                </div>
+            </div>
+
+            <!-- AISRI Score Display -->
+            <div class="mt-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-6 text-center">
+                <p class="text-white text-sm font-semibold mb-2">CALCULATED AISRI SCORE</p>
+                <div class="text-6xl font-bold text-white mb-2" id="aisriScore">78</div>
+                <div class="text-xl font-semibold mb-2" id="riskLabel">LOW RISK</div>
+                <div class="text-sm text-white opacity-90" id="allowedZones">Allowed Zones: AR, F, EN, TH, P</div>
+            </div>
+
+            <!-- Generate Button -->
+            <button onclick="generateWorkout()" 
+                    class="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-6 rounded-xl transition-all transform hover:scale-105 shadow-lg flex items-center justify-center text-lg no-print">
+                <i class="fas fa-magic mr-3"></i>
+                Generate Thursday Workout
+            </button>
+        </div>
+
+        <!-- Workout Output -->
+        <div id="workoutOutput" class="hidden">
+            <!-- Print Header -->
+            <div class="hidden print:block mb-6">
+                <div class="text-center mb-4">
+                    <h1 class="text-3xl font-bold mb-2">AKURA AISRI - Thursday Workout</h1>
+                    <p class="text-gray-600">Personalized Training Program</p>
+                </div>
+            </div>
+
+            <!-- Athlete Summary Card -->
+            <div class="bg-white rounded-2xl shadow-2xl p-8 mb-6 print-section">
+                <div class="flex items-center justify-between mb-6 no-print">
+                    <h2 class="text-3xl font-bold text-gray-800 flex items-center">
+                        <i class="fas fa-user-athlete text-indigo-600 mr-3"></i>
+                        Athlete Profile
+                    </h2>
+                    <button onclick="window.print()" 
+                            class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors flex items-center">
+                        <i class="fas fa-print mr-2"></i>
+                        Print Workout
+                    </button>
+                </div>
+
+                <h2 class="text-2xl font-bold text-gray-800 mb-4 hidden print:block">Athlete Profile</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">Name</p>
+                        <p class="text-lg font-bold text-gray-800" id="output_name">-</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">Age</p>
+                        <p class="text-lg font-bold text-gray-800" id="output_age">-</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">AISRI Score</p>
+                        <p class="text-2xl font-bold" id="output_score">-</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">Risk Category</p>
+                        <p class="text-lg font-bold" id="output_risk">-</p>
+                    </div>
+                    <div class="md:col-span-2">
+                        <p class="text-sm text-gray-600 mb-2">Allowed Training Zones</p>
+                        <div id="output_zones" class="flex flex-wrap gap-2">
+                            <!-- Zone badges will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Thursday Workout Card -->
+            <div class="bg-white rounded-2xl shadow-2xl p-8 mb-6 print-section">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-calendar-day text-yellow-600 mr-3"></i>
+                    Thursday Workout
+                </h2>
+
+                <div id="workoutDetails" class="space-y-6">
+                    <!-- Workout details will be inserted here -->
+                </div>
+            </div>
+
+            <!-- Heart Rate Zones Card -->
+            <div class="bg-white rounded-2xl shadow-2xl p-8 mb-6 print-section">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-heartbeat text-red-600 mr-3"></i>
+                    Personal Heart Rate Zones
+                </h2>
+
+                <div id="hrZonesTable" class="overflow-x-auto">
+                    <!-- HR zones table will be inserted here -->
+                </div>
+            </div>
+
+            <!-- Safety Notes Card -->
+            <div class="bg-yellow-50 border-l-4 border-yellow-500 rounded-lg p-6 mb-6 print-section">
+                <h3 class="font-bold text-yellow-900 mb-3 flex items-center">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    Safety Guidelines
+                </h3>
+                <div id="safetyNotes" class="space-y-2 text-sm text-yellow-800">
+                    <!-- Safety notes will be inserted here -->
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="text-center text-gray-400 text-sm mt-8 no-print">
+                <p>Generated by AKURA AISRI System | Coach Kura</p>
+                <p class="mt-2">Date: <span id="generationDate"></span></p>
+            </div>
+
+            <!-- New Workout Button -->
+            <button onclick="resetForm()" 
+                    class="w-full mt-6 bg-gray-600 hover:bg-gray-700 text-white font-bold py-4 px-6 rounded-xl transition-all transform hover:scale-105 shadow-lg flex items-center justify-center text-lg no-print">
+                <i class="fas fa-redo mr-3"></i>
+                Generate New Workout
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // AISRI Engine - 6 Pillar Weights
+        const WEIGHTS = {
+            running: 0.40,      // 40%
+            strength: 0.15,     // 15%
+            rom: 0.12,          // 12%
+            balance: 0.13,      // 13%
+            alignment: 0.10,    // 10%
+            mobility: 0.10      // 10%
+        };
+
+        // Risk Categories
+        const RISK_CATEGORIES = [
+            { min: 85, max: 100, label: 'Very Low Risk', color: 'text-green-600', zones: ['AR', 'F', 'EN', 'TH', 'P', 'SP'] },
+            { min: 70, max: 84, label: 'Low Risk', color: 'text-green-500', zones: ['AR', 'F', 'EN', 'TH', 'P'] },
+            { min: 55, max: 69, label: 'Medium Risk', color: 'text-yellow-600', zones: ['AR', 'F', 'EN', 'TH'] },
+            { min: 40, max: 54, label: 'High Risk', color: 'text-orange-600', zones: ['AR', 'F', 'EN'] },
+            { min: 0, max: 39, label: 'Critical Risk', color: 'text-red-600', zones: ['AR', 'F'] }
+        ];
+
+        // Training Zones
+        const ZONES = {
+            AR: { name: 'Active Recovery', hrPercent: { min: 50, max: 60 }, color: 'bg-blue-100 text-blue-800' },
+            F: { name: 'Foundation', hrPercent: { min: 60, max: 70 }, color: 'bg-blue-200 text-blue-900' },
+            EN: { name: 'Endurance', hrPercent: { min: 70, max: 80 }, color: 'bg-green-200 text-green-900' },
+            TH: { name: 'Threshold', hrPercent: { min: 80, max: 87 }, color: 'bg-yellow-200 text-yellow-900' },
+            P: { name: 'Power', hrPercent: { min: 87, max: 95 }, color: 'bg-orange-200 text-orange-900' },
+            SP: { name: 'Speed', hrPercent: { min: 95, max: 100 }, color: 'bg-red-200 text-red-900' }
+        };
+
+        // Calculate AISRI Score
+        function calculateAISRI() {
+            const running = parseFloat(document.getElementById('running').value) || 0;
+            const strength = parseFloat(document.getElementById('strength').value) || 0;
+            const rom = parseFloat(document.getElementById('rom').value) || 0;
+            const balance = parseFloat(document.getElementById('balance').value) || 0;
+            const alignment = parseFloat(document.getElementById('alignment').value) || 0;
+            const mobility = parseFloat(document.getElementById('mobility').value) || 0;
+
+            const total = 
+                running * WEIGHTS.running +
+                strength * WEIGHTS.strength +
+                rom * WEIGHTS.rom +
+                balance * WEIGHTS.balance +
+                alignment * WEIGHTS.alignment +
+                mobility * WEIGHTS.mobility;
+
+            return Math.round(total);
+        }
+
+        // Get Risk Category
+        function getRiskCategory(score) {
+            return RISK_CATEGORIES.find(cat => score >= cat.min && score <= cat.max) || RISK_CATEGORIES[4];
+        }
+
+        // Calculate HR Zones
+        function calculateHRZones(age, restingHR) {
+            const maxHR = 220 - age;
+            const hrReserve = maxHR - restingHR;
+            
+            const zones = {};
+            for (const [code, zone] of Object.entries(ZONES)) {
+                const minHR = Math.round(restingHR + (hrReserve * zone.hrPercent.min / 100));
+                const maxHR_zone = Math.round(restingHR + (hrReserve * zone.hrPercent.max / 100));
+                zones[code] = {
+                    ...zone,
+                    min: minHR,
+                    max: maxHR_zone
+                };
+            }
+            return zones;
+        }
+
+        // Update AISRI Display
+        function updateAISRI() {
+            const score = calculateAISRI();
+            const riskCategory = getRiskCategory(score);
+            
+            document.getElementById('aisriScore').textContent = score;
+            document.getElementById('riskLabel').textContent = riskCategory.label;
+            document.getElementById('riskLabel').className = `text-xl font-semibold mb-2 ${riskCategory.color}`;
+            document.getElementById('allowedZones').textContent = `Allowed Zones: ${riskCategory.zones.join(', ')}`;
+        }
+
+        // Generate Thursday Workout
+        function generateWorkout() {
+            // Validate inputs
+            const name = document.getElementById('athleteName').value || 'Athlete';
+            const age = parseInt(document.getElementById('age').value);
+            const restingHR = parseInt(document.getElementById('restingHR').value);
+
+            if (!age || age < 15 || age > 80) {
+                alert('Please enter a valid age (15-80)');
+                return;
+            }
+            if (!restingHR || restingHR < 40 || restingHR > 100) {
+                alert('Please enter a valid resting heart rate (40-100 bpm)');
+                return;
+            }
+
+            // Calculate scores
+            const aisriScore = calculateAISRI();
+            const riskCategory = getRiskCategory(aisriScore);
+            const hrZones = calculateHRZones(age, restingHR);
+
+            // Generate workout based on AISRI score
+            const workout = generateThursdayWorkout(aisriScore, riskCategory.zones, hrZones);
+
+            // Display output
+            displayWorkoutOutput(name, age, aisriScore, riskCategory, hrZones, workout);
+
+            // Show output, hide input
+            document.getElementById('inputCard').classList.add('hidden');
+            document.getElementById('workoutOutput').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Generate Thursday-Specific Workout
+        function generateThursdayWorkout(score, allowedZones, hrZones) {
+            let workout = {
+                type: '',
+                zone: '',
+                duration: '',
+                description: '',
+                structure: [],
+                notes: []
+            };
+
+            if (score >= 70) {
+                // Low/Very Low Risk - Threshold or Tempo Run
+                if (allowedZones.includes('TH')) {
+                    workout.type = 'Threshold/Tempo Run';
+                    workout.zone = 'TH';
+                    workout.duration = '50-60 minutes';
+                    workout.description = 'Comfortably hard sustained effort to improve lactate threshold';
+                    workout.structure = [
+                        '10 min warm-up (F zone)',
+                        '30-40 min tempo at threshold pace (TH zone)',
+                        '10 min cool-down (F zone)'
+                    ];
+                    workout.notes = [
+                        'Maintain consistent effort throughout tempo portion',
+                        'Should feel "comfortably hard" - can speak 1-2 words',
+                        'HR should stabilize in TH zone after first 5 minutes'
+                    ];
+                } else {
+                    workout.type = 'Extended Endurance Run';
+                    workout.zone = 'EN';
+                    workout.duration = '50-70 minutes';
+                    workout.description = 'Steady aerobic effort to build endurance capacity';
+                    workout.structure = [
+                        '10 min easy warm-up (F zone)',
+                        '40-50 min steady state (EN zone)',
+                        '10 min easy cool-down (F zone)'
+                    ];
+                    workout.notes = [
+                        'Maintain conversational pace throughout',
+                        'Focus on rhythm and breathing'
+                    ];
+                }
+            } else if (score >= 55) {
+                // Medium Risk - Moderate Endurance
+                workout.type = 'Moderate Endurance Run';
+                workout.zone = 'EN';
+                workout.duration = '40-50 minutes';
+                workout.description = 'Steady aerobic development at controlled intensity';
+                workout.structure = [
+                    '10 min easy warm-up (F zone)',
+                    '25-30 min steady (EN zone)',
+                    '5-10 min easy cool-down (F zone)'
+                ];
+                workout.notes = [
+                    'Keep effort controlled and consistent',
+                    'Should be able to maintain a conversation',
+                    'Monitor HR to stay in EN zone'
+                ];
+            } else if (score >= 40) {
+                // High Risk - Easy Endurance
+                workout.type = 'Easy Endurance Run';
+                workout.zone = 'EN/F';
+                workout.duration = '30-40 minutes';
+                workout.description = 'Light aerobic effort with focus on form and consistency';
+                workout.structure = [
+                    '5-10 min easy warm-up (F zone)',
+                    '20-25 min easy effort (EN/F zone boundary)',
+                    '5 min cool-down (F zone)'
+                ];
+                workout.notes = [
+                    'Keep intensity conservative',
+                    'Focus on running form and cadence',
+                    'Stop immediately if any pain or discomfort'
+                ];
+            } else {
+                // Critical Risk - Foundation Building Only
+                workout.type = 'Foundation Walk/Run';
+                workout.zone = 'F';
+                workout.duration = '30 minutes';
+                workout.description = 'Very easy effort focusing on movement quality and recovery';
+                workout.structure = [
+                    '10 min easy walk/jog (F zone)',
+                    '15 min walk/run intervals as tolerated',
+                    '5 min easy cool-down walk'
+                ];
+                workout.notes = [
+                    '⚠️ CRITICAL RISK: Focus on recovery and base building',
+                    'Walk breaks are encouraged and necessary',
+                    'Do not push through any discomfort',
+                    'Consider consulting with a coach or physical therapist'
+                ];
+            }
+
+            return workout;
+        }
+
+        // Display Workout Output
+        function displayWorkoutOutput(name, age, score, riskCategory, hrZones, workout) {
+            // Athlete Profile
+            document.getElementById('output_name').textContent = name;
+            document.getElementById('output_age').textContent = `${age} years`;
+            document.getElementById('output_score').textContent = score;
+            document.getElementById('output_score').className = `text-2xl font-bold ${riskCategory.color}`;
+            document.getElementById('output_risk').textContent = riskCategory.label;
+            document.getElementById('output_risk').className = `text-lg font-bold ${riskCategory.color}`;
+
+            // Zone Badges
+            const zonesHTML = riskCategory.zones.map(zone => {
+                const zoneInfo = ZONES[zone];
+                return `<span class="${zoneInfo.color} px-3 py-1 rounded-full text-sm font-semibold">${zone}</span>`;
+            }).join('');
+            document.getElementById('output_zones').innerHTML = zonesHTML;
+
+            // Workout Details
+            const workoutHTML = `
+                <div class="bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-xl p-6 border-2 border-yellow-300">
+                    <div class="flex items-start justify-between mb-4">
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-800 mb-2">${workout.type}</h3>
+                            <p class="text-gray-700 mb-2">${workout.description}</p>
+                            <div class="flex items-center gap-4 mt-3">
+                                <span class="${ZONES[workout.zone].color} px-4 py-2 rounded-lg font-bold text-sm">
+                                    Zone: ${workout.zone} (${hrZones[workout.zone].min}-${hrZones[workout.zone].max} bpm)
+                                </span>
+                                <span class="bg-gray-100 px-4 py-2 rounded-lg font-semibold text-sm text-gray-700">
+                                    <i class="far fa-clock mr-1"></i> ${workout.duration}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6">
+                        <h4 class="font-bold text-gray-800 mb-3 flex items-center">
+                            <i class="fas fa-list-ol mr-2 text-indigo-600"></i>
+                            Workout Structure
+                        </h4>
+                        <ol class="space-y-2">
+                            ${workout.structure.map((step, i) => `
+                                <li class="flex items-start">
+                                    <span class="flex-shrink-0 w-6 h-6 bg-indigo-600 text-white rounded-full flex items-center justify-center text-xs font-bold mr-3 mt-0.5">${i + 1}</span>
+                                    <span class="text-gray-800">${step}</span>
+                                </li>
+                            `).join('')}
+                        </ol>
+                    </div>
+
+                    <div class="mt-6">
+                        <h4 class="font-bold text-gray-800 mb-3 flex items-center">
+                            <i class="fas fa-lightbulb mr-2 text-yellow-600"></i>
+                            Key Points
+                        </h4>
+                        <ul class="space-y-2">
+                            ${workout.notes.map(note => `
+                                <li class="flex items-start text-gray-700">
+                                    <i class="fas fa-check-circle text-green-600 mr-2 mt-1"></i>
+                                    <span>${note}</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+            document.getElementById('workoutDetails').innerHTML = workoutHTML;
+
+            // HR Zones Table
+            const zonesTableHTML = `
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="text-left py-3 px-4 font-bold text-gray-700">Zone</th>
+                            <th class="text-left py-3 px-4 font-bold text-gray-700">Name</th>
+                            <th class="text-left py-3 px-4 font-bold text-gray-700">Heart Rate Range</th>
+                            <th class="text-left py-3 px-4 font-bold text-gray-700">% Max HR</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${riskCategory.zones.map(zone => `
+                            <tr class="border-b border-gray-200">
+                                <td class="py-3 px-4">
+                                    <span class="${ZONES[zone].color} px-3 py-1 rounded-full text-sm font-bold">${zone}</span>
+                                </td>
+                                <td class="py-3 px-4 font-semibold text-gray-800">${hrZones[zone].name}</td>
+                                <td class="py-3 px-4 text-gray-700 font-mono font-bold">${hrZones[zone].min} - ${hrZones[zone].max} bpm</td>
+                                <td class="py-3 px-4 text-gray-600">${hrZones[zone].hrPercent.min}% - ${hrZones[zone].hrPercent.max}%</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            document.getElementById('hrZonesTable').innerHTML = zonesTableHTML;
+
+            // Safety Notes
+            const safetyNotesHTML = [
+                '<i class="fas fa-shield-alt mr-2"></i><strong>Warm-up and cool-down are mandatory</strong> - Never skip these critical phases',
+                '<i class="fas fa-tachometer-alt mr-2"></i><strong>Monitor your heart rate</strong> - Stay within prescribed zones',
+                '<i class="fas fa-hand-paper mr-2"></i><strong>Stop immediately if you experience:</strong> chest pain, dizziness, unusual shortness of breath, or joint/muscle pain',
+                '<i class="fas fa-water mr-2"></i><strong>Hydration</strong> - Drink water before, during, and after your workout',
+                '<i class="fas fa-bed mr-2"></i><strong>Recovery</strong> - Ensure adequate sleep and rest between sessions',
+                score < 55 ? '<i class="fas fa-exclamation-triangle mr-2"></i><strong>High/Critical Risk</strong> - Consider consulting with a coach or medical professional before intense training' : ''
+            ].filter(note => note).map(note => `<p>${note}</p>`).join('');
+            document.getElementById('safetyNotes').innerHTML = safetyNotesHTML;
+
+            // Generation Date
+            document.getElementById('generationDate').textContent = new Date().toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        // Reset Form
+        function resetForm() {
+            document.getElementById('inputCard').classList.remove('hidden');
+            document.getElementById('workoutOutput').classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Initialize
+        updateAISRI();
+    </script>
+</body>
+</html>

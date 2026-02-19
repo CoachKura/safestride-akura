@@ -240,6 +240,194 @@
             </div>
           </div>
 
+          <!-- Athlete Profile Section (shown after Strava connection) -->
+          <div id="athlete-profile-section" class="hidden border-t pt-6 mt-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">
+              <i class="fas fa-user-athlete text-gray-600 mr-2"></i>
+              Your Athlete Profile
+            </h3>
+
+            <div
+              class="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-6 mb-6"
+            >
+              <div class="flex flex-col md:flex-row items-center gap-6">
+                <!-- Athlete Avatar and Info -->
+                <div class="text-center">
+                  <div class="relative inline-block">
+                    <img
+                      id="athlete-avatar"
+                      src=""
+                      alt="Athlete"
+                      class="w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover"
+                      onerror="
+                        this.src =
+                          'https://ui-avatars.com/api/?name=Athlete&size=128&background=667eea&color=fff&bold=true'
+                      "
+                    />
+                    <div
+                      class="absolute -bottom-2 -right-2 bg-orange-500 rounded-full p-2"
+                    >
+                      <i class="fab fa-strava text-white text-xl"></i>
+                    </div>
+                  </div>
+
+                  <!-- AISRI Score Below Avatar -->
+                  <div
+                    class="mt-4 bg-white rounded-lg shadow-md p-4 min-w-[200px]"
+                  >
+                    <div
+                      class="text-sm text-gray-600 font-semibold uppercase tracking-wide mb-1"
+                    >
+                      AISRI Score
+                    </div>
+                    <div
+                      id="athlete-aisri-score"
+                      class="text-4xl font-bold text-purple-600"
+                    >
+                      --
+                    </div>
+                    <div
+                      id="athlete-risk-category"
+                      class="text-sm text-gray-500 mt-1"
+                    >
+                      Calculating...
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Athlete Stats -->
+                <div class="flex-1 grid md:grid-cols-2 gap-4">
+                  <div class="bg-white rounded-lg p-4 shadow-sm">
+                    <div class="flex items-center gap-3">
+                      <div
+                        class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center"
+                      >
+                        <i class="fas fa-user text-orange-600 text-xl"></i>
+                      </div>
+                      <div>
+                        <div class="text-sm text-gray-500">Athlete</div>
+                        <div
+                          id="athlete-name"
+                          class="text-lg font-bold text-gray-800"
+                        >
+                          --
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="bg-white rounded-lg p-4 shadow-sm">
+                    <div class="flex items-center gap-3">
+                      <div
+                        class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center"
+                      >
+                        <i class="fas fa-road text-blue-600 text-xl"></i>
+                      </div>
+                      <div>
+                        <div class="text-sm text-gray-500">Total Distance</div>
+                        <div
+                          id="athlete-total-distance"
+                          class="text-lg font-bold text-gray-800"
+                        >
+                          -- km
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="bg-white rounded-lg p-4 shadow-sm">
+                    <div class="flex items-center gap-3">
+                      <div
+                        class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center"
+                      >
+                        <i
+                          class="fas fa-shoe-prints text-green-600 text-xl"
+                        ></i>
+                      </div>
+                      <div>
+                        <div class="text-sm text-gray-500">
+                          Activities Synced
+                        </div>
+                        <div
+                          id="athlete-activities-count"
+                          class="text-lg font-bold text-gray-800"
+                        >
+                          0
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="bg-white rounded-lg p-4 shadow-sm">
+                    <div class="flex items-center gap-3">
+                      <div
+                        class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center"
+                      >
+                        <i class="fas fa-trophy text-purple-600 text-xl"></i>
+                      </div>
+                      <div>
+                        <div class="text-sm text-gray-500">Personal Bests</div>
+                        <div
+                          id="athlete-pbs-count"
+                          class="text-lg font-bold text-gray-800"
+                        >
+                          0
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Personal Bests Table -->
+            <div class="bg-white rounded-lg shadow-sm p-6">
+              <h4
+                class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2"
+              >
+                <i class="fas fa-trophy text-yellow-500"></i>
+                Personal Bests
+              </h4>
+
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                  <thead>
+                    <tr class="border-b-2 border-gray-200">
+                      <th
+                        class="text-left py-3 px-4 font-semibold text-gray-700"
+                      >
+                        Distance
+                      </th>
+                      <th
+                        class="text-left py-3 px-4 font-semibold text-gray-700"
+                      >
+                        Time
+                      </th>
+                      <th
+                        class="text-left py-3 px-4 font-semibold text-gray-700"
+                      >
+                        Pace
+                      </th>
+                      <th
+                        class="text-left py-3 px-4 font-semibold text-gray-700"
+                      >
+                        Date
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody id="personal-bests-table">
+                    <tr>
+                      <td colspan="4" class="text-center py-8 text-gray-500">
+                        <i class="fas fa-spinner fa-spin mr-2"></i>
+                        Loading personal bests...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
           <!-- Manual Input Option -->
           <div class="border-t pt-6">
             <h3 class="text-lg font-semibold text-gray-800 mb-4">
@@ -681,7 +869,7 @@
             await supabaseClient.functions.invoke("strava-sync-activities", {
               body: {
                 athleteId: athleteId, // Use same athleteId from OAuth
-                daysBack: 30,
+                daysBack: null, // Fetch ALL historical data from day 1
               },
             });
 
@@ -730,6 +918,12 @@
 
           // Store connection info for future use
           athleteData.stravaConnectionId = oauthData.connectionId;
+          athleteData.personalBests = syncData.personalBests || {};
+          athleteData.totalDistance = syncData.totalDistance || 0;
+          athleteData.athleteProfile = syncData.athleteProfile || {};
+
+          // Display Athlete Profile Section
+          displayAthleteProfile(syncData);
           athleteData.stravaAthlete = oauthData.athlete;
         } catch (error) {
           console.error("Strava connection error:", error);
@@ -737,6 +931,145 @@
             '<i class="fas fa-times-circle text-red-600 mr-2"></i>Error: ' +
             error.message;
           alert("Failed to connect to Strava: " + error.message);
+        }
+      }
+
+      function displayAthleteProfile(syncData) {
+        console.log("🎨 Displaying athlete profile:", syncData);
+
+        // Show the profile section
+        document
+          .getElementById("athlete-profile-section")
+          .classList.remove("hidden");
+
+        // Get athlete data
+        const profile = syncData.athleteProfile || {};
+        const personalBests = syncData.personalBests || {};
+        const totalDistance = syncData.totalDistance || 0;
+        const aisriScore = syncData.aisriScore || {};
+
+        // Populate athlete name and avatar
+        const athleteName =
+          profile.firstname && profile.lastname
+            ? `${profile.firstname} ${profile.lastname}`
+            : profile.username || "Athlete";
+        document.getElementById("athlete-name").textContent = athleteName;
+
+        // Set avatar (use Strava profile pic if available)
+        if (profile.profile) {
+          document.getElementById("athlete-avatar").src = profile.profile;
+        }
+
+        // Display AISRI Score
+        const totalScore = aisriScore.totalScore || 0;
+        const riskCategory = aisriScore.riskCategory || "Calculating...";
+        document.getElementById("athlete-aisri-score").textContent = totalScore;
+        document.getElementById("athlete-risk-category").textContent =
+          riskCategory;
+
+        // Set score color based on risk
+        const scoreElement = document.getElementById("athlete-aisri-score");
+        scoreElement.classList.remove(
+          "text-purple-600",
+          "text-red-600",
+          "text-yellow-600",
+          "text-green-600",
+        );
+        if (totalScore >= 85) scoreElement.classList.add("text-green-600");
+        else if (totalScore >= 70) scoreElement.classList.add("text-blue-600");
+        else if (totalScore >= 55)
+          scoreElement.classList.add("text-yellow-600");
+        else scoreElement.classList.add("text-red-600");
+
+        // Display total distance
+        document.getElementById("athlete-total-distance").textContent =
+          `${totalDistance.toFixed(2)} km`;
+
+        // Display activities count
+        document.getElementById("athlete-activities-count").textContent =
+          syncData.activitiesProcessed || 0;
+
+        // Count non-null personal bests
+        const pbCount = Object.values(personalBests).filter(
+          (pb) => pb !== null,
+        ).length;
+        document.getElementById("athlete-pbs-count").textContent = pbCount;
+
+        // Display personal bests table
+        displayPersonalBestsTable(personalBests);
+      }
+
+      function displayPersonalBestsTable(personalBests) {
+        const tbody = document.getElementById("personal-bests-table");
+        tbody.innerHTML = "";
+
+        // Order of distances to display
+        const distances = [
+          "100m",
+          "200m",
+          "400m",
+          "800m",
+          "1km",
+          "1mile",
+          "5km",
+          "10km",
+          "15km",
+          "Half Marathon",
+          "20 Miler",
+          "Marathon",
+          "Longest Distance",
+        ];
+
+        let hasAnyPB = false;
+
+        distances.forEach((distance) => {
+          const pb = personalBests[distance];
+
+          if (pb && distance === "Longest Distance") {
+            // Special handling for longest distance
+            const row = document.createElement("tr");
+            row.className = "border-b hover:bg-gray-50 transition";
+            row.innerHTML = `
+              <td class="py-3 px-4">
+                <span class="font-semibold text-purple-600">
+                  <i class="fas fa-crown text-yellow-500 mr-1"></i>
+                  ${distance}
+                </span>
+              </td>
+              <td class="py-3 px-4">${pb.distance}</td>
+              <td class="py-3 px-4">--</td>
+              <td class="py-3 px-4 text-gray-500">${pb.date || "--"}</td>
+            `;
+            tbody.appendChild(row);
+            hasAnyPB = true;
+          } else if (pb) {
+            // Regular distance PB
+            const row = document.createElement("tr");
+            row.className = "border-b hover:bg-gray-50 transition";
+            row.innerHTML = `
+              <td class="py-3 px-4 font-semibold">${distance}</td>
+              <td class="py-3 px-4">
+                <span class="text-blue-600 font-mono">${pb.time}</span>
+              </td>
+              <td class="py-3 px-4">
+                <span class="text-gray-600 font-mono">${pb.pace}</span>
+              </td>
+              <td class="py-3 px-4 text-gray-500">${pb.date || "--"}</td>
+            `;
+            tbody.appendChild(row);
+            hasAnyPB = true;
+          }
+        });
+
+        if (!hasAnyPB) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="4" class="text-center py-8 text-gray-500">
+                <i class="fas fa-info-circle mr-2"></i>
+                No personal bests found. Complete some runs to set your records!
+              </td>
+            </tr>
+          `;
         }
       }
 
@@ -1087,7 +1420,8 @@
 
         const html = zones
           .map((z) => {
-            const isAllowed = analysisResults.allowedZones?.includes(z.code) ?? false;
+            const isAllowed =
+              analysisResults.allowedZones?.includes(z.code) ?? false;
             const locked = !isAllowed;
 
             return `
