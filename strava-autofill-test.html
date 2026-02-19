@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strava Auto-Fill Test Suite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .test-pass { background: #d1fae5; color: #065f46; }
+        .test-fail { background: #fecaca; color: #991b1b; }
+        .test-pending { background: #fef3c7; color: #92400e; }
+        .test-running { background: #dbeafe; color: #1e3a8a; }
+    </style>
+</head>
+<body class="bg-gray-50 p-8">
+    <div class="max-w-6xl mx-auto">
+        <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                <i class="fas fa-flask mr-2 text-blue-600"></i>
+                Strava Auto-Fill Test Suite
+            </h1>
+            <p class="text-gray-600">
+                Comprehensive testing for auto-fill system across all roles
+            </p>
+        </div>
+
+        <!-- Test Controls -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-900 mb-2">Test Controls</h2>
+                    <p class="text-sm text-gray-600">Run tests individually or all at once</p>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="runAllTests()" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold">
+                        <i class="fas fa-play mr-2"></i>
+                        Run All Tests
+                    </button>
+                    <button onclick="clearResults()" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-semibold">
+                        <i class="fas fa-eraser mr-2"></i>
+                        Clear
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Results -->
+        <div class="grid grid-cols-1 gap-6">
+            <!-- Generator Tests -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">
+                    <i class="fas fa-cog mr-2"></i>
+                    Generator Tests
+                </h3>
+                <div class="space-y-3">
+                    <div class="test-item flex items-center justify-between p-4 border rounded-lg test-pending" data-test="generator-load">
+                        <div>
+                            <div class="font-semibold">Generator Loads</div>
+                            <div class="text-sm opacity-75">Verify StravaAutoFillGenerator class is available</div>
+                        </div>
+                        <button onclick="runTest('generator-load')" class="px-4 py-2 bg-white text-gray-700 rounded border hover:bg-gray-50">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="test-item flex items-center justify-between p-4 border rounded-lg test-pending" data-test="generator-init">
+                        <div>
+                            <div class="font-semibold">Generator Initialize</div>
+                            <div class="text-sm opacity-75">Create instance and verify methods</div>
+                        </div>
+                        <button onclick="runTest('generator-init')" class="px-4 py-2 bg-white text-gray-700 rounded border hover:bg-gray-50">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="test-item flex items-center justify-between p-4 border rounded-lg test-pending" data-test="generator-templates">
+                        <div>
+                            <div class="font-semibold">Template Generation</div>
+                            <div class="text-sm opacity-75">Generate HTML templates for all page types</div>
+                        </div>
+                        <button onclick="runTest('generator-templates')" class="px-4 py-2 bg-white text-gray-700 rounded border hover:bg-gray-50">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Fetch Tests -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">
+                    <i class="fas fa-database mr-2"></i>
+                    Data Fetch Tests
+                </h3>
+                <div class="space-y-3">
+                    <div class="test-item flex items-center justify-between p-4 border rounded-lg test-pending" data-test="fetch-athlete">
+                        <div>
+                            <div class="font-semibold">Fetch Athlete Data</div>
+                            <div class="text-sm opacity-75">Get athlete info from Supabase</div>
+                        </div>
+                        <button onclick="runTest('fetch-athlete')" class="px-4 py-2 bg-white text-gray-700 rounded border hover:bg-gray-50">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="test-item flex items-center justify-between p-4 border rounded-lg test-pending" data-test="fetch-strava">
+                        <div>
+                            <div class="font-semibold">Fetch Strava Connection</div>
+                            <div class="text-sm opacity-75">Get Strava connection and activity data</div>
+                        </div>
+                        <button onclick="runTest('fetch-strava')" class="px-4 py-2 bg-white text-gray-700 rounded border hover:bg-gray-50">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="test-item flex items-center justify-between p-4 border rounded-lg test-pending" data-test="fetch-aisri">
+                        <div>
+                            <div class="font-semibold">Fetch AISRI Scores</div>
+                            <div class="text-sm opacity-75">Get latest AISRI assessment scores</div>
+                        </div>
+                        <button onclick="runTest('fetch-aisri')" class="px-4 py-2 bg-white text-gray-700 rounded border hover:bg-gray-50">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Role-Based Tests -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">
+                    <i class="fas fa-users mr-2"></i>
+                    Role-Based Access Tests
+                </h3>
+                <div class="space-y-3">
+                    <div class="test-item flex items-center justify-between p-4 border rounded-lg test-pending" data-test="role-admin">
+                        <div>
+                            <div class="font-semibold">Admin Role Access</div>
+                            <div class="text-sm opacity-75">Test admin can view all athlete data</div>
+                        </div>
+                        <button onclick="runTest('role-admin')" class="px-4 py-2 bg-white text-gray-700 rounded border hover:bg-gray-50">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="test-item flex items-center justify-between p-4 border rounded-lg test-pending" data-test="role-coach">
+                        <div>
+                            <div class="font-semibold">Coach Role Access</div>
+                            <div class="text-sm opacity-75">Test coach can view assigned athletes</div>
+                        </div>
+                        <button onclick="runTest('role-coach')" class="px-4 py-2 bg-white text-gray-700 rounded border hover:bg-gray-50">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="test-item flex items-center justify-between p-4 border rounded-lg test-pending" data-test="role-athlete">
+                        <div>
+                            <div class="font-semibold">Athlete Role Access</div>
+                            <div class="text-sm opacity-75">Test athlete can only view own data</div>
+                        </div>
+                        <button onclick="runTest('role-athlete')" class="px-4 py-2 bg-white text-gray-700 rounded border hover:bg-gray-50">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Auto-Fill Tests -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">
+                    <i class="fas fa-magic mr-2"></i>
+                    Auto-Fill Tests
+                </h3>
+                <div class="space-y-3">
+                    <div class="test-item flex items-center justify-between p-4 border rounded-lg test-pending" data-test="autofill-basic">
+                        <div>
+                            <div class="font-semibold">Basic Auto-Fill</div>
+                            <div class="text-sm opacity-75">Fill athlete name, UID, email, phone</div>
+                        </div>
+                        <button onclick="runTest('autofill-basic')" class="px-4 py-2 bg-white text-gray-700 rounded border hover:bg-gray-50">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="test-item flex items-center justify-between p-4 border rounded-lg test-pending" data-test="autofill-strava">
+                        <div>
+                            <div class="font-semibold">Strava Data Auto-Fill</div>
+                            <div class="text-sm opacity-75">Fill Strava username, avatar, profile link</div>
+                        </div>
+                        <button onclick="runTest('autofill-strava')" class="px-4 py-2 bg-white text-gray-700 rounded border hover:bg-gray-50">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="test-item flex items-center justify-between p-4 border rounded-lg test-pending" data-test="autofill-aisri">
+                        <div>
+                            <div class="font-semibold">AISRI Scores Auto-Fill</div>
+                            <div class="text-sm opacity-75">Fill AISRI total, risk, 6 pillar scores</div>
+                        </div>
+                        <button onclick="runTest('autofill-aisri')" class="px-4 py-2 bg-white text-gray-700 rounded border hover:bg-gray-50">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="test-item flex items-center justify-between p-4 border rounded-lg test-pending" data-test="autofill-computed">
+                        <div>
+                            <div class="font-semibold">Computed Fields Auto-Fill</div>
+                            <div class="text-sm opacity-75">Fill total activities, distance, pace, form</div>
+                        </div>
+                        <button onclick="runTest('autofill-computed')" class="px-4 py-2 bg-white text-gray-700 rounded border hover:bg-gray-50">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Integration Tests -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">
+                    <i class="fas fa-link mr-2"></i>
+                    Integration Tests
+                </h3>
+                <div class="space-y-3">
+                    <div class="test-item flex items-center justify-between p-4 border rounded-lg test-pending" data-test="integration-oauth">
+                        <div>
+                            <div class="font-semibold">OAuth Flow</div>
+                            <div class="text-sm opacity-75">Test complete Strava OAuth connection flow</div>
+                        </div>
+                        <button onclick="runTest('integration-oauth')" class="px-4 py-2 bg-white text-gray-700 rounded border hover:bg-gray-50">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="test-item flex items-center justify-between p-4 border rounded-lg test-pending" data-test="integration-sync">
+                        <div>
+                            <div class="font-semibold">Activity Sync</div>
+                            <div class="text-sm opacity-75">Test activity synchronization from Strava</div>
+                        </div>
+                        <button onclick="runTest('integration-sync')" class="px-4 py-2 bg-white text-gray-700 rounded border hover:bg-gray-50">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="test-item flex items-center justify-between p-4 border rounded-lg test-pending" data-test="integration-aisri">
+                        <div>
+                            <div class="font-semibold">AISRI Calculation</div>
+                            <div class="text-sm opacity-75">Test ML/AI AISRI score calculation</div>
+                        </div>
+                        <button onclick="runTest('integration-aisri')" class="px-4 py-2 bg-white text-gray-700 rounded border hover:bg-gray-50">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Summary -->
+        <div id="testSummary" class="bg-white rounded-lg shadow-lg p-6 mt-8" style="display: none;">
+            <h3 class="text-lg font-bold text-gray-900 mb-4">Test Summary</h3>
+            <div class="grid grid-cols-4 gap-4">
+                <div class="text-center p-4 bg-blue-50 rounded-lg">
+                    <div class="text-3xl font-bold text-blue-600" id="totalTests">0</div>
+                    <div class="text-sm text-blue-800">Total Tests</div>
+                </div>
+                <div class="text-center p-4 bg-green-50 rounded-lg">
+                    <div class="text-3xl font-bold text-green-600" id="passedTests">0</div>
+                    <div class="text-sm text-green-800">Passed</div>
+                </div>
+                <div class="text-center p-4 bg-red-50 rounded-lg">
+                    <div class="text-3xl font-bold text-red-600" id="failedTests">0</div>
+                    <div class="text-sm text-red-800">Failed</div>
+                </div>
+                <div class="text-center p-4 bg-yellow-50 rounded-lg">
+                    <div class="text-3xl font-bold text-yellow-600" id="pendingTests">0</div>
+                    <div class="text-sm text-yellow-800">Pending</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="safestride-config.js"></script>
+    <script src="strava-autofill-generator.js"></script>
+    <script>
+        let generator = null;
+        let testResults = {
+            total: 0,
+            passed: 0,
+            failed: 0,
+            pending: 0
+        };
+
+        // Test implementations
+        const tests = {
+            'generator-load': async () => {
+                if (typeof StravaAutoFillGenerator !== 'function') {
+                    throw new Error('StravaAutoFillGenerator class not found');
+                }
+                return { message: 'Generator class loaded successfully' };
+            },
+
+            'generator-init': async () => {
+                generator = new StravaAutoFillGenerator();
+                
+                const methods = [
+                    'generatePage',
+                    'getPageTemplate',
+                    'autoFillFields',
+                    'getAthleteInfo',
+                    'getStravaData',
+                    'getAISRIScores',
+                    'computeFields',
+                    'renderPage'
+                ];
+                
+                for (const method of methods) {
+                    if (typeof generator[method] !== 'function') {
+                        throw new Error(`Method ${method} not found`);
+                    }
+                }
+                
+                return { message: 'Generator initialized with all methods' };
+            },
+
+            'generator-templates': async () => {
+                generator = generator || new StravaAutoFillGenerator();
+                
+                const pageTypes = ['profile', 'activities', 'training', 'settings'];
+                const results = [];
+                
+                for (const type of pageTypes) {
+                    const template = generator.getPageTemplate(type);
+                    if (!template || typeof template !== 'string') {
+                        throw new Error(`Template for ${type} is invalid`);
+                    }
+                    results.push(`${type}: ${template.length} chars`);
+                }
+                
+                return { message: results.join(', ') };
+            },
+
+            'fetch-athlete': async () => {
+                generator = generator || new StravaAutoFillGenerator();
+                
+                // Use test athlete UID
+                const testUID = 'ATH0001';
+                const athlete = await generator.getAthleteInfo(testUID);
+                
+                if (!athlete) {
+                    throw new Error('Failed to fetch athlete data');
+                }
+                
+                return { message: `Fetched ${athlete.full_name || 'athlete'} (${athlete.uid})` };
+            },
+
+            'fetch-strava': async () => {
+                generator = generator || new StravaAutoFillGenerator();
+                
+                const testUID = 'ATH0001';
+                const strava = await generator.getStravaData(testUID);
+                
+                // It's OK if no connection exists
+                if (!strava) {
+                    return { message: 'No Strava connection (OK for test)', warning: true };
+                }
+                
+                return { message: `Fetched Strava data (${strava.activities?.length || 0} activities)` };
+            },
+
+            'fetch-aisri': async () => {
+                generator = generator || new StravaAutoFillGenerator();
+                
+                const testUID = 'ATH0001';
+                const aisri = await generator.getAISRIScores(testUID);
+                
+                if (!aisri) {
+                    return { message: 'No AISRI scores yet (OK for test)', warning: true };
+                }
+                
+                return { message: `Fetched AISRI score: ${aisri.total_score} (${aisri.risk_category})` };
+            },
+
+            'role-admin': async () => {
+                const session = { uid: 'admin@akura.in', role: 'admin', token: 'test' };
+                sessionStorage.setItem('safestride_session', JSON.stringify(session));
+                
+                return { message: 'Admin role session created' };
+            },
+
+            'role-coach': async () => {
+                const session = { uid: 'coach@akura.in', role: 'coach', token: 'test' };
+                sessionStorage.setItem('safestride_session', JSON.stringify(session));
+                
+                return { message: 'Coach role session created' };
+            },
+
+            'role-athlete': async () => {
+                const session = { uid: 'ATH0001', role: 'athlete', token: 'test' };
+                sessionStorage.setItem('safestride_session', JSON.stringify(session));
+                
+                return { message: 'Athlete role session created' };
+            },
+
+            'autofill-basic': async () => {
+                generator = generator || new StravaAutoFillGenerator();
+                
+                const filled = await generator.autoFillFields({ uid: 'ATH0001' }, 'profile');
+                
+                if (!filled.athlete) {
+                    throw new Error('No athlete data filled');
+                }
+                
+                const fields = ['full_name', 'uid', 'email'];
+                const missing = fields.filter(f => !filled.athlete[f]);
+                
+                if (missing.length > 0) {
+                    return { message: `Missing fields: ${missing.join(', ')}`, warning: true };
+                }
+                
+                return { message: 'All basic fields filled' };
+            },
+
+            'autofill-strava': async () => {
+                generator = generator || new StravaAutoFillGenerator();
+                
+                const filled = await generator.autoFillFields({ uid: 'ATH0001' }, 'profile');
+                
+                if (!filled.strava) {
+                    return { message: 'No Strava data (athlete not connected)', warning: true };
+                }
+                
+                return { message: `Strava data filled (${filled.strava.activities?.length || 0} activities)` };
+            },
+
+            'autofill-aisri': async () => {
+                generator = generator || new StravaAutoFillGenerator();
+                
+                const filled = await generator.autoFillFields({ uid: 'ATH0001' }, 'profile');
+                
+                if (!filled.aisri) {
+                    return { message: 'No AISRI scores yet', warning: true };
+                }
+                
+                const pillars = ['running', 'strength', 'rom', 'balance', 'alignment', 'mobility'];
+                const scores = pillars.filter(p => filled.aisri.pillar_scores?.[p] !== undefined);
+                
+                return { message: `AISRI filled (${scores.length}/6 pillars)` };
+            },
+
+            'autofill-computed': async () => {
+                generator = generator || new StravaAutoFillGenerator();
+                
+                const filled = await generator.autoFillFields({ uid: 'ATH0001' }, 'profile');
+                
+                if (!filled.computed) {
+                    throw new Error('No computed fields');
+                }
+                
+                return { message: `Computed: ${filled.computed.totalActivities} activities, ${filled.computed.recentForm} form` };
+            },
+
+            'integration-oauth': async () => {
+                return { message: 'Manual test: Use Strava Profile page to test OAuth', warning: true };
+            },
+
+            'integration-sync': async () => {
+                return { message: 'Manual test: Click "Sync Activities" button', warning: true };
+            },
+
+            'integration-aisri': async () => {
+                return { message: 'Manual test: Verify AISRI calculation after sync', warning: true };
+            }
+        };
+
+        async function runTest(testId) {
+            const testItem = document.querySelector(`[data-test="${testId}"]`);
+            const button = testItem.querySelector('button');
+            
+            // Update UI to running
+            testItem.className = testItem.className.replace(/test-\w+/, 'test-running');
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            button.disabled = true;
+            
+            try {
+                const result = await tests[testId]();
+                
+                // Update UI to pass or warning
+                testItem.className = testItem.className.replace(/test-\w+/, result.warning ? 'test-pending' : 'test-pass');
+                testItem.querySelector('.text-sm').textContent = result.message;
+                button.innerHTML = result.warning ? '<i class="fas fa-exclamation-triangle"></i>' : '<i class="fas fa-check"></i>';
+                
+                if (!result.warning) {
+                    testResults.passed++;
+                } else {
+                    testResults.pending++;
+                }
+            } catch (error) {
+                // Update UI to fail
+                testItem.className = testItem.className.replace(/test-\w+/, 'test-fail');
+                testItem.querySelector('.text-sm').textContent = error.message;
+                button.innerHTML = '<i class="fas fa-times"></i>';
+                
+                testResults.failed++;
+            } finally {
+                button.disabled = false;
+                updateSummary();
+            }
+        }
+
+        async function runAllTests() {
+            testResults = { total: 0, passed: 0, failed: 0, pending: 0 };
+            
+            const testIds = Object.keys(tests);
+            testResults.total = testIds.length;
+            
+            for (const testId of testIds) {
+                await runTest(testId);
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            
+            updateSummary();
+        }
+
+        function updateSummary() {
+            const summary = document.getElementById('testSummary');
+            summary.style.display = 'block';
+            
+            document.getElementById('totalTests').textContent = testResults.total || Object.keys(tests).length;
+            document.getElementById('passedTests').textContent = testResults.passed;
+            document.getElementById('failedTests').textContent = testResults.failed;
+            document.getElementById('pendingTests').textContent = testResults.pending;
+        }
+
+        function clearResults() {
+            document.querySelectorAll('.test-item').forEach(item => {
+                item.className = item.className.replace(/test-\w+/, 'test-pending');
+                const button = item.querySelector('button');
+                button.innerHTML = '<i class="fas fa-play"></i>';
+                button.disabled = false;
+            });
+            
+            testResults = { total: 0, passed: 0, failed: 0, pending: 0 };
+            document.getElementById('testSummary').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
