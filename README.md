@@ -70,13 +70,23 @@ SafeStride is a comprehensive athlete management portal that integrates with Str
 - **Real-time sync** status
 - **Token refresh** handling
 
-#### 4. Strava Auto-Fill System ⭐ NEW
+#### 4. Strava Auto-Fill System ⭐
 - **Programmatic page generation** from HTML templates
 - **Auto-fills all fields**: name, email, stats, scores, activities
 - **Role-based UI** elements (Admin red, Coach blue, Athlete green)
 - **Real-time data fetching** from Supabase
 - **Computed fields**: total activities, distance, pace, form
 - **Strava profile page** with complete athlete data
+
+#### 4.5. Strava Dashboard ⭐ NEW
+- **Real Strava Assets**: Authentic CloudFront CSS/JS from production Strava
+- **AISRI Score Card**: 6-pillar breakdown with animated progress bars
+- **Recent Activities**: Last 5 activities with icons, distance, duration
+- **Training Zones**: 6 zones (AR, F, EN, TH, P, SP) with unlock requirements
+- **Performance Trends**: Weekly distance, pace, recovery scores
+- **ML/AI Insights**: Training load alerts, recovery status, injury risk
+- **Quick Stats**: Total activities, distance, time, average pace
+- **Role-Based UI**: Visual badges and color-coding by user role
 
 #### 5. ML/AI AISRI Engine
 - **Per-activity analysis**: Training Load, Recovery, Performance, Fatigue
@@ -153,10 +163,12 @@ webapp/
 │   ├── dashboard.html               # Athlete dashboard
 │   ├── coach-dashboard.html         # Coach management
 │   ├── strava-profile.html          # Auto-fill profile page ⭐
+│   ├── strava-dashboard.html        # Real Strava dashboard ⭐ NEW
+│   ├── strava-dashboard.js          # Dashboard logic ⭐ NEW
 │   ├── strava-callback.html         # OAuth callback ⭐
 │   ├── training-plan-builder.html   # Training planner
 │   ├── test-autofill.html           # Test suite ⭐
-│   ├── config.js                    # Configuration ⭐
+│   ├── config.js                    # Configuration (with Strava assets) ⭐
 │   ├── strava-autofill-generator.js # Auto-fill engine ⭐
 │   ├── aisri-ml-analyzer.js         # ML scoring
 │   └── sql/                         # SQL scripts
@@ -175,6 +187,7 @@ webapp/
 │
 ├── docs/                            # Documentation
 │   ├── COMPLETE_PROJECT_STATUS_2026-02-19.md
+│   ├── STRAVA_DASHBOARD_INTEGRATION_GUIDE.md  ⭐ NEW
 │   ├── STRAVA_AUTOFILL_SETUP_GUIDE.md
 │   ├── STRAVA_AUTOFILL_IMPLEMENTATION_SUMMARY.md
 │   └── STRAVA_AUTOFILL_VISUAL_GUIDE.md
