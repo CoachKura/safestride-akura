@@ -670,6 +670,8 @@
           document.getElementById("strava-status").innerHTML =
             '<i class="fas fa-check-circle text-green-600 mr-2"></i>Connected! Analyzing your activities...';
 
+          console.log("🔵 OAuth successful, athlete ID:", oauthData.athlete.id);
+
           // Step 2: Sync activities and calculate AISRI scores
           const { data: syncData, error: syncError } =
             await supabaseClient.functions.invoke("strava-sync-activities", {
@@ -679,9 +681,27 @@
               },
             });
 
+          console.log("🔵 Sync Response:", {
+            data: syncData,
+            error: syncError,
+          });
+
           if (syncError) {
-            console.error("Sync error:", syncError);
-            throw new Error(syncError.message || "Failed to sync activities");
+            console.error("❌ Sync error details:", syncError);
+            // Try to extract the actual error message from the Edge Function
+            const errorMsg =
+              syncData?.error ||
+              syncError.message ||
+              "Failed to sync activities";
+            console.error("❌ Extracted error:", errorMsg);
+            throw new Error(errorMsg);
+          }
+
+          if (!syncData || !syncData.success) {
+            const errorMsg =
+              syncData?.error || "Sync failed - no data returned";
+            console.error("❌ Sync failed:", errorMsg);
+            throw new Error(errorMsg);
           }
 
           // Step 3: Update UI with real data
