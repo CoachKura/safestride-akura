@@ -15,13 +15,26 @@ const SAFESTRIDE_CONFIG = {
     
     // Strava OAuth Configuration
     strava: {
-        clientId: 'your-strava-client-id',
-        clientSecret: 'your-strava-client-secret', // Only used in edge functions
+        clientId: '162971',
+        clientSecret: '6554eb9bb83f222a585e312c17420221313f85c1', // Only used in edge functions
         redirectUri: window.location.origin + '/public/strava-callback.html',
         authorizeUrl: 'https://www.strava.com/oauth/authorize',
         tokenUrl: 'https://www.strava.com/oauth/token',
         apiUrl: 'https://www.strava.com/api/v3',
-        scope: 'read,activity:read_all,profile:read_all'
+        scope: 'read,activity:read_all,profile:read_all',
+        // Real Strava Dashboard Assets (updated from actual dashboard)
+        assets: {
+            css: [
+                'https://d3nn82uaxijpm6.cloudfront.net/assets/strava-app-icons-61713d2ac89d70bdf7e4204f1ae8854a00b8c7a16f0de25b14610202104b5275.css',
+                'https://d3nn82uaxijpm6.cloudfront.net/assets/strava-orion-040b2969ab017ba28840da8b0e661b38da3379ee9d91f970ca24c73839677a1d.css',
+                'https://d3nn82uaxijpm6.cloudfront.net/assets/dashboard/show-3b0a095c10e536e0812031f0422e4e219079f3df9034b020540f0b8cba965d42.css'
+            ],
+            js: [
+                'https://d3nn82uaxijpm6.cloudfront.net/packs/js/runtime-d5723e3ff5db5c0f8ca4.js',
+                'https://d3nn82uaxijpm6.cloudfront.net/packs/js/vendor-d5723e3ff5db5c0f8ca4.js',
+                'https://d3nn82uaxijpm6.cloudfront.net/packs/js/strava_with_framework-33e9ac57a03761457da7.js'
+            ]
+        }
     },
     
     // Feature Flags
