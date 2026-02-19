@@ -68,6 +68,11 @@ ALTER TABLE strava_connections ENABLE ROW LEVEL SECURITY;
 ALTER TABLE strava_activities ENABLE ROW LEVEL SECURITY;
 ALTER TABLE aisri_scores ENABLE ROW LEVEL SECURITY;
 
+-- Drop existing policies if they exist (makes migration idempotent)
+DROP POLICY IF EXISTS "Allow all operations on strava_connections" ON strava_connections;
+DROP POLICY IF EXISTS "Allow all operations on strava_activities" ON strava_activities;
+DROP POLICY IF EXISTS "Allow all operations on aisri_scores" ON aisri_scores;
+
 -- Allow public access (adjust based on your security needs)
 CREATE POLICY "Allow all operations on strava_connections" ON strava_connections FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow all operations on strava_activities" ON strava_activities FOR ALL USING (true) WITH CHECK (true);
