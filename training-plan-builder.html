@@ -639,13 +639,17 @@
             "🔵 Starting Strava OAuth with code:",
             code.substring(0, 10) + "...",
           );
+          
+          // Generate consistent athlete ID to use for both OAuth and sync
+          const athleteId = `athlete_${Date.now()}`;
+          console.log("🔵 Generated athlete ID:", athleteId);
 
           // Step 1: Exchange authorization code for access token
           const { data: oauthData, error: oauthError } =
             await supabaseClient.functions.invoke("strava-oauth", {
               body: {
                 code: code,
-                athleteId: `athlete_${Date.now()}`,
+                athleteId: athleteId,
               },
             });
 
@@ -670,13 +674,13 @@
           document.getElementById("strava-status").innerHTML =
             '<i class="fas fa-check-circle text-green-600 mr-2"></i>Connected! Analyzing your activities...';
 
-          console.log("🔵 OAuth successful, athlete ID:", oauthData.athlete.id);
+          console.log("🔵 OAuth successful, using athlete ID:", athleteId);
 
           // Step 2: Sync activities and calculate AISRI scores
           const { data: syncData, error: syncError } =
             await supabaseClient.functions.invoke("strava-sync-activities", {
               body: {
-                athleteId: oauthData.athlete.id.toString(),
+                athleteId: athleteId,  // Use same athleteId from OAuth
                 daysBack: 30,
               },
             });
