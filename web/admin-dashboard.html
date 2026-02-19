@@ -1,0 +1,41 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - AKURA SafeStride</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen flex items-center justify-center">
+        <div class="text-center">
+            <div class="gradient-bg text-white w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <i class="fas fa-cog text-3xl"></i>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Admin Dashboard</h1>
+            <p class="text-gray-600 mb-6">Welcome, Administrator!</p>
+            <p class="text-gray-500 mb-8">Admin dashboard features coming soon...</p>
+            <button onclick="logout()" class="gradient-bg text-white px-6 py-3 rounded-lg hover:opacity-90 transition">
+                <i class="fas fa-sign-out-alt mr-2"></i>Logout
+            </button>
+        </div>
+    </div>
+    <script>
+        const currentUser = localStorage.getItem('akura_user') || sessionStorage.getItem('akura_user');
+        if (!currentUser) window.location.href = '/login.html';
+        const user = JSON.parse(currentUser);
+        if (user.role_name !== 'admin') window.location.href = /-dashboard.html;
+        function logout() {
+            localStorage.removeItem('akura_user');
+            sessionStorage.removeItem('akura_user');
+            window.location.href = '/login.html';
+        }
+    </script>
+</body>
+</html>
