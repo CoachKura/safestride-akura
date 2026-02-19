@@ -574,15 +574,17 @@
     <script src="https://d3nn82uaxijpm6.cloudfront.net/packs/js/runtime-d5723e3ff5db5c0f8ca4.js"></script>
     <script src="https://d3nn82uaxijpm6.cloudfront.net/packs/js/vendor-d5723e3ff5db5c0f8ca4.js"></script>
 
+    <!-- Configuration -->
+    <script src="safestride-config.js"></script>
+    
     <!-- Auto-Fill Generator -->
     <script src="strava-autofill-generator.js"></script>
 
     <script>
-      // Configuration
-      const SUPABASE_URL = "https://bdisppaxbvygsspcuymb.supabase.co";
-      const SUPABASE_KEY =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkaXNwcGF4YnZ5Z3NzcGN1eW1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY4MjM4OTEsImV4cCI6MjA1MjM5OTg5MX0.4vYk5u3AijkkNMB0JxFy0t2dNUPPGS8BnpWCym_hl_w";
-      const STRAVA_CLIENT_ID = "162971";
+      // Use configuration from config file
+      const SUPABASE_URL = SAFESTRIDE_CONFIG.supabase.url;
+      const SUPABASE_KEY = SAFESTRIDE_CONFIG.supabase.anonKey;
+      const STRAVA_CLIENT_ID = SAFESTRIDE_CONFIG.strava.clientId;
 
       let currentSession = null;
       let generator = null;
