@@ -1,0 +1,994 @@
+<!doctype html>
+<html class="logged-in" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SafeStride - Strava Profile</title>
+
+    <!-- Strava Assets -->
+    <link
+      rel="stylesheet"
+      href="https://d3nn82uaxijpm6.cloudfront.net/assets/strava-app-icons-7d41623e38c3a1a0947c9b1f49e22497.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://d3nn82uaxijpm6.cloudfront.net/assets/application-81dcdbd7f0c3e7a1a36e4090f5c1b3c1.css"
+    />
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --strava-orange: #fc4c02;
+        --strava-orange-hover: #e34402;
+      }
+
+      .role-badge {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: bold;
+        z-index: 1000;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        font-size: 14px;
+      }
+
+      .role-admin {
+        background: #dc2626;
+      }
+      .role-coach {
+        background: #2563eb;
+      }
+      .role-athlete {
+        background: #16a34a;
+      }
+
+      .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s;
+      }
+
+      .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .pillar-score {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        transition: background 0.2s;
+      }
+
+      .pillar-score:hover {
+        background: #e9ecef;
+      }
+
+      .score-bar {
+        height: 10px;
+        background: #e9ecef;
+        border-radius: 5px;
+        overflow: hidden;
+        flex-grow: 1;
+        margin: 0 16px;
+        position: relative;
+      }
+
+      .score-fill {
+        height: 100%;
+        transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 5px;
+      }
+
+      .score-value {
+        min-width: 48px;
+        text-align: right;
+        font-weight: bold;
+        font-size: 16px;
+      }
+
+      .strava-connect-btn {
+        background: var(--strava-orange);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: background 0.2s;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .strava-connect-btn:hover {
+        background: var(--strava-orange-hover);
+      }
+
+      .loading-skeleton {
+        animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        background: linear-gradient(
+          90deg,
+          #f0f0f0 25%,
+          #e0e0e0 50%,
+          #f0f0f0 75%
+        );
+        background-size: 200% 100%;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+
+      .activity-item {
+        display: flex;
+        align-items: center;
+        padding: 16px;
+        border-bottom: 1px solid #e5e7eb;
+        transition: background 0.2s;
+      }
+
+      .activity-item:hover {
+        background: #f9fafb;
+      }
+
+      .activity-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        margin-right: 16px;
+      }
+
+      .risk-badge {
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .risk-low {
+        background: #d1fae5;
+        color: #065f46;
+      }
+      .risk-medium {
+        background: #fef3c7;
+        color: #92400e;
+      }
+      .risk-high {
+        background: #fed7aa;
+        color: #9a3412;
+      }
+      .risk-critical {
+        background: #fecaca;
+        color: #991b1b;
+      }
+
+      .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+      }
+
+      .metric-item {
+        text-align: center;
+        padding: 16px;
+        background: #f9fafb;
+        border-radius: 8px;
+      }
+
+      .metric-value {
+        font-size: 32px;
+        font-weight: bold;
+        color: #111827;
+        margin-bottom: 4px;
+      }
+
+      .metric-label {
+        font-size: 14px;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50">
+    <!-- Role Badge (will be auto-filled) -->
+    <div id="roleBadge" class="role-badge role-athlete" style="display: none">
+      <i class="fas fa-user mr-2"></i>
+      <span id="roleText">Athlete</span>
+    </div>
+
+    <!-- Header -->
+    <header
+      class="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm"
+    >
+      <div class="max-w-7xl mx-auto px-4 py-4">
+        <div class="flex items-center justify-between">
+          <!-- Profile Info -->
+          <div class="flex items-center space-x-4">
+            <img
+              id="profileAvatar"
+              src="/assets/default-avatar.png"
+              alt="Profile"
+              class="w-14 h-14 rounded-full border-2 border-gray-200 loading-skeleton"
+            />
+            <div>
+              <h1 id="athleteName" class="text-xl font-bold text-gray-900">
+                Loading...
+              </h1>
+              <p id="athleteUID" class="text-sm text-gray-600">---</p>
+            </div>
+          </div>
+
+          <!-- Navigation -->
+          <nav class="hidden md:flex space-x-6">
+            <a
+              href="dashboard.html"
+              class="text-gray-700 hover:text-gray-900 transition flex items-center gap-2"
+            >
+              <i class="fas fa-chart-line"></i> Dashboard
+            </a>
+            <a
+              href="training-plan-builder.html"
+              class="text-gray-700 hover:text-gray-900 transition flex items-center gap-2"
+            >
+              <i class="fas fa-dumbbell"></i> Training
+            </a>
+            <a
+              href="strava-profile.html"
+              class="text-orange-600 font-semibold flex items-center gap-2"
+            >
+              <i class="fab fa-strava"></i> Strava Profile
+            </a>
+            <button
+              onclick="logout()"
+              class="text-red-600 hover:text-red-700 transition flex items-center gap-2"
+            >
+              <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+          </nav>
+
+          <!-- Mobile Menu Button -->
+          <button onclick="toggleMobileMenu()" class="md:hidden text-gray-700">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+      <!-- AISRI Score Card -->
+      <div class="stat-card mb-8">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900 mb-1">AISRI Score</h2>
+            <p class="text-sm text-gray-600">
+              Athletic Injury & Safety Risk Index
+            </p>
+          </div>
+          <div class="text-right">
+            <div id="aisriTotal" class="text-5xl font-bold text-gray-900 mb-2">
+              --
+            </div>
+            <div class="text-sm text-gray-600">
+              Risk:
+              <span id="aisriRisk" class="risk-badge risk-low">Loading...</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Six Pillars -->
+        <div class="space-y-3">
+          <div class="pillar-score">
+            <span class="font-semibold text-gray-700" style="min-width: 120px">
+              <i class="fas fa-running mr-2 text-blue-500"></i>Running
+            </span>
+            <div class="score-bar">
+              <div
+                id="runningBar"
+                class="score-fill bg-gradient-to-r from-blue-400 to-blue-600"
+                style="width: 0%"
+              ></div>
+            </div>
+            <span id="runningScore" class="score-value text-blue-600">--</span>
+          </div>
+
+          <div class="pillar-score">
+            <span class="font-semibold text-gray-700" style="min-width: 120px">
+              <i class="fas fa-dumbbell mr-2 text-purple-500"></i>Strength
+            </span>
+            <div class="score-bar">
+              <div
+                id="strengthBar"
+                class="score-fill bg-gradient-to-r from-purple-400 to-purple-600"
+                style="width: 0%"
+              ></div>
+            </div>
+            <span id="strengthScore" class="score-value text-purple-600"
+              >--</span
+            >
+          </div>
+
+          <div class="pillar-score">
+            <span class="font-semibold text-gray-700" style="min-width: 120px">
+              <i class="fas fa-arrows-alt mr-2 text-green-500"></i>ROM
+            </span>
+            <div class="score-bar">
+              <div
+                id="romBar"
+                class="score-fill bg-gradient-to-r from-green-400 to-green-600"
+                style="width: 0%"
+              ></div>
+            </div>
+            <span id="romScore" class="score-value text-green-600">--</span>
+          </div>
+
+          <div class="pillar-score">
+            <span class="font-semibold text-gray-700" style="min-width: 120px">
+              <i class="fas fa-balance-scale mr-2 text-yellow-500"></i>Balance
+            </span>
+            <div class="score-bar">
+              <div
+                id="balanceBar"
+                class="score-fill bg-gradient-to-r from-yellow-400 to-yellow-600"
+                style="width: 0%"
+              ></div>
+            </div>
+            <span id="balanceScore" class="score-value text-yellow-600"
+              >--</span
+            >
+          </div>
+
+          <div class="pillar-score">
+            <span class="font-semibold text-gray-700" style="min-width: 120px">
+              <i class="fas fa-align-center mr-2 text-orange-500"></i>Alignment
+            </span>
+            <div class="score-bar">
+              <div
+                id="alignmentBar"
+                class="score-fill bg-gradient-to-r from-orange-400 to-orange-600"
+                style="width: 0%"
+              ></div>
+            </div>
+            <span id="alignmentScore" class="score-value text-orange-600"
+              >--</span
+            >
+          </div>
+
+          <div class="pillar-score">
+            <span class="font-semibold text-gray-700" style="min-width: 120px">
+              <i class="fas fa-walking mr-2 text-pink-500"></i>Mobility
+            </span>
+            <div class="score-bar">
+              <div
+                id="mobilityBar"
+                class="score-fill bg-gradient-to-r from-pink-400 to-pink-600"
+                style="width: 0%"
+              ></div>
+            </div>
+            <span id="mobilityScore" class="score-value text-pink-600">--</span>
+          </div>
+        </div>
+
+        <div class="mt-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
+          <p class="text-sm text-blue-800">
+            <i class="fas fa-info-circle mr-2"></i>
+            <strong>Note:</strong> Your AISRI score is calculated from six key
+            pillars. A higher score indicates better readiness and lower injury
+            risk.
+          </p>
+        </div>
+      </div>
+
+      <!-- Activity Stats Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="stat-card">
+          <div class="metric-item">
+            <div id="totalActivities" class="metric-value">--</div>
+            <div class="metric-label">Total Activities</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="metric-item">
+            <div id="totalDistance" class="metric-value">
+              -- <span class="text-lg">km</span>
+            </div>
+            <div class="metric-label">Total Distance</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="metric-item">
+            <div id="averagePace" class="metric-value">--:--</div>
+            <div class="metric-label">Average Pace</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="metric-item">
+            <div id="recentForm" class="metric-value text-2xl">Loading...</div>
+            <div class="metric-label">Recent Form</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Strava Connection Card -->
+      <div class="stat-card mb-8">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+            <i class="fab fa-strava text-orange-600 text-2xl"></i>
+            Strava Connection
+          </h3>
+          <div id="connectionStatus" class="text-sm">
+            <span class="inline-flex items-center gap-2 text-gray-600">
+              <i class="fas fa-circle-notch fa-spin"></i> Checking...
+            </span>
+          </div>
+        </div>
+
+        <div id="stravaConnected" style="display: none">
+          <div
+            class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+          >
+            <div class="flex items-center space-x-4">
+              <img
+                id="stravaAvatar"
+                src="/assets/default-avatar.png"
+                alt="Strava"
+                class="w-20 h-20 rounded-full border-2 border-orange-500"
+              />
+              <div>
+                <div
+                  id="stravaUsername"
+                  class="text-lg font-semibold text-gray-900"
+                >
+                  --
+                </div>
+                <a
+                  id="stravaProfileLink"
+                  href="#"
+                  target="_blank"
+                  class="text-sm text-orange-600 hover:text-orange-700 flex items-center gap-1"
+                >
+                  <i class="fas fa-external-link-alt"></i> View on Strava
+                </a>
+                <div class="text-xs text-gray-500 mt-1">
+                  Last synced: <span id="lastSync">Never</span>
+                </div>
+              </div>
+            </div>
+            <div class="flex gap-3">
+              <button onclick="syncStrava()" class="strava-connect-btn">
+                <i class="fas fa-sync-alt"></i>
+                Sync Activities
+              </button>
+              <button
+                onclick="disconnectStrava()"
+                class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+              >
+                <i class="fas fa-unlink"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="stravaNotConnected" style="display: none">
+          <div class="text-center py-8">
+            <div class="text-6xl text-gray-300 mb-4">
+              <i class="fab fa-strava"></i>
+            </div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-2">
+              Connect Your Strava Account
+            </h4>
+            <p class="text-gray-600 mb-6 max-w-md mx-auto">
+              Sync your running activities to get personalized AISRI scores,
+              training insights, and ML-powered performance analysis.
+            </p>
+            <button
+              onclick="connectStrava()"
+              class="strava-connect-btn text-lg px-8 py-4"
+            >
+              <i class="fab fa-strava text-2xl"></i>
+              Connect with Strava
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activities -->
+      <div class="stat-card">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-bold text-gray-900">Recent Activities</h3>
+          <button
+            onclick="loadMoreActivities()"
+            class="text-sm text-orange-600 hover:text-orange-700"
+          >
+            Load More
+          </button>
+        </div>
+
+        <div id="activitiesList">
+          <div class="text-center py-8 text-gray-500">
+            <i class="fas fa-circle-notch fa-spin text-2xl mb-2"></i>
+            <p>Loading activities...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Info -->
+      <div class="stat-card mt-8">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">
+          Contact Information
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-600 mb-2">
+              <i class="fas fa-envelope mr-2"></i>Email
+            </label>
+            <div id="athleteEmail" class="text-gray-900 font-medium text-lg">
+              Loading...
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-600 mb-2">
+              <i class="fas fa-phone mr-2"></i>Phone
+            </label>
+            <div id="athletePhone" class="text-gray-900 font-medium text-lg">
+              Loading...
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Strava Assets -->
+    <script src="https://d3nn82uaxijpm6.cloudfront.net/packs/js/runtime-d5723e3ff5db5c0f8ca4.js"></script>
+    <script src="https://d3nn82uaxijpm6.cloudfront.net/packs/js/vendor-d5723e3ff5db5c0f8ca4.js"></script>
+
+    <!-- Auto-Fill Generator -->
+    <script src="strava-autofill-generator.js"></script>
+
+    <script>
+      // Configuration
+      const SUPABASE_URL = "https://bdisppaxbvygsspcuymb.supabase.co";
+      const SUPABASE_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkaXNwcGF4YnZ5Z3NzcGN1eW1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY4MjM4OTEsImV4cCI6MjA1MjM5OTg5MX0.4vYk5u3AijkkNMB0JxFy0t2dNUPPGS8BnpWCym_hl_w";
+      const STRAVA_CLIENT_ID = "162971";
+
+      let currentSession = null;
+      let generator = null;
+
+      // Initialize on page load
+      document.addEventListener("DOMContentLoaded", async () => {
+        // Check authentication
+        currentSession = JSON.parse(
+          sessionStorage.getItem("safestride_session") || "{}",
+        );
+        if (!currentSession.uid || !currentSession.token) {
+          window.location.href = "login.html";
+          return;
+        }
+
+        // Show role badge
+        showRoleBadge(currentSession.role);
+
+        // Initialize generator
+        generator = new StravaAutoFillGenerator();
+
+        // Load all data
+        await loadAthleteData();
+        await loadStravaConnection();
+        await loadAISRIScores();
+        await loadRecentActivities();
+      });
+
+      function showRoleBadge(role) {
+        const badge = document.getElementById("roleBadge");
+        const roleText = document.getElementById("roleText");
+
+        badge.className = "role-badge";
+
+        if (role === "admin") {
+          badge.classList.add("role-admin");
+          roleText.innerHTML = '<i class="fas fa-crown mr-2"></i>Admin';
+        } else if (role === "coach") {
+          badge.classList.add("role-coach");
+          roleText.innerHTML = '<i class="fas fa-user-tie mr-2"></i>Coach';
+        } else {
+          badge.classList.add("role-athlete");
+          roleText.innerHTML = '<i class="fas fa-running mr-2"></i>Athlete';
+        }
+
+        badge.style.display = "block";
+      }
+
+      async function loadAthleteData() {
+        try {
+          const response = await fetch(
+            `${SUPABASE_URL}/rest/v1/profiles?uid=eq.${currentSession.uid}&select=*`,
+            {
+              headers: {
+                apikey: SUPABASE_KEY,
+                Authorization: `Bearer ${currentSession.token}`,
+              },
+            },
+          );
+
+          if (response.ok) {
+            const profiles = await response.json();
+            const athlete = profiles[0];
+
+            if (athlete) {
+              document.getElementById("athleteName").textContent =
+                athlete.full_name || "Athlete";
+              document.getElementById("athleteUID").textContent =
+                athlete.uid || "---";
+              document.getElementById("athleteEmail").textContent =
+                athlete.email || "Not provided";
+              document.getElementById("athletePhone").textContent =
+                athlete.phone || "Not provided";
+
+              if (athlete.avatar_url) {
+                document.getElementById("profileAvatar").src =
+                  athlete.avatar_url;
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Error loading athlete data:", error);
+        }
+      }
+
+      async function loadStravaConnection() {
+        try {
+          const response = await fetch(
+            `${SUPABASE_URL}/rest/v1/strava_connections?athlete_id=eq.${currentSession.uid}&select=*`,
+            {
+              headers: {
+                apikey: SUPABASE_KEY,
+                Authorization: `Bearer ${currentSession.token}`,
+              },
+            },
+          );
+
+          const statusEl = document.getElementById("connectionStatus");
+
+          if (response.ok) {
+            const connections = await response.json();
+
+            if (connections.length > 0) {
+              const conn = connections[0];
+
+              // Show connected state
+              document.getElementById("stravaConnected").style.display =
+                "block";
+              document.getElementById("stravaNotConnected").style.display =
+                "none";
+
+              // Update connection info
+              const athleteData = conn.athlete_data || {};
+              document.getElementById("stravaUsername").textContent =
+                athleteData.username ||
+                `${athleteData.firstname || ""} ${athleteData.lastname || ""}`.trim() ||
+                "Strava Athlete";
+              document.getElementById("stravaProfileLink").href =
+                athleteData.profile ||
+                `https://www.strava.com/athletes/${conn.strava_athlete_id}`;
+
+              if (athleteData.profile_medium) {
+                document.getElementById("stravaAvatar").src =
+                  athleteData.profile_medium;
+              }
+
+              if (conn.updated_at) {
+                document.getElementById("lastSync").textContent = new Date(
+                  conn.updated_at,
+                ).toLocaleString();
+              }
+
+              statusEl.innerHTML =
+                '<span class="inline-flex items-center gap-2 text-green-600"><i class="fas fa-check-circle"></i> Connected</span>';
+            } else {
+              // Show not connected state
+              document.getElementById("stravaConnected").style.display = "none";
+              document.getElementById("stravaNotConnected").style.display =
+                "block";
+              statusEl.innerHTML =
+                '<span class="inline-flex items-center gap-2 text-gray-600"><i class="fas fa-times-circle"></i> Not Connected</span>';
+            }
+          }
+        } catch (error) {
+          console.error("Error loading Strava connection:", error);
+        }
+      }
+
+      async function loadAISRIScores() {
+        try {
+          const response = await fetch(
+            `${SUPABASE_URL}/rest/v1/aisri_scores?athlete_id=eq.${currentSession.uid}&order=assessment_date.desc&limit=1`,
+            {
+              headers: {
+                apikey: SUPABASE_KEY,
+                Authorization: `Bearer ${currentSession.token}`,
+              },
+            },
+          );
+
+          if (response.ok) {
+            const scores = await response.json();
+            const aisri = scores[0];
+
+            if (aisri) {
+              // Update total score
+              document.getElementById("aisriTotal").textContent =
+                aisri.total_score || 0;
+
+              // Update risk badge
+              const riskBadge = document.getElementById("aisriRisk");
+              const risk = aisri.risk_category || "Unknown";
+              riskBadge.textContent = risk;
+              riskBadge.className = "risk-badge";
+
+              if (risk === "Low") riskBadge.classList.add("risk-low");
+              else if (risk === "Medium")
+                riskBadge.classList.add("risk-medium");
+              else if (risk === "High") riskBadge.classList.add("risk-high");
+              else if (risk === "Critical")
+                riskBadge.classList.add("risk-critical");
+
+              // Update pillar scores with animation
+              const pillars = aisri.pillar_scores || {};
+              updatePillarScore("running", pillars.running || 0);
+              updatePillarScore("strength", pillars.strength || 0);
+              updatePillarScore("rom", pillars.rom || 0);
+              updatePillarScore("balance", pillars.balance || 0);
+              updatePillarScore("alignment", pillars.alignment || 0);
+              updatePillarScore("mobility", pillars.mobility || 0);
+
+              // Update form
+              const totalScore = aisri.total_score || 0;
+              let form = "Poor";
+              if (totalScore >= 75) form = "Excellent";
+              else if (totalScore >= 55) form = "Good";
+              else if (totalScore >= 35) form = "Fair";
+              document.getElementById("recentForm").textContent = form;
+            } else {
+              // No scores yet
+              document.getElementById("aisriTotal").textContent = "--";
+              document.getElementById("aisriRisk").textContent = "No data";
+              document.getElementById("recentForm").textContent = "No data";
+            }
+          }
+        } catch (error) {
+          console.error("Error loading AISRI scores:", error);
+        }
+      }
+
+      function updatePillarScore(pillar, score) {
+        const scoreEl = document.getElementById(`${pillar}Score`);
+        const barEl = document.getElementById(`${pillar}Bar`);
+
+        if (scoreEl && barEl) {
+          scoreEl.textContent = score;
+
+          // Animate bar
+          setTimeout(() => {
+            barEl.style.width = `${score}%`;
+          }, 100);
+        }
+      }
+
+      async function loadRecentActivities() {
+        try {
+          const response = await fetch(
+            `${SUPABASE_URL}/rest/v1/strava_activities?athlete_id=eq.${currentSession.uid}&order=created_at.desc&limit=10`,
+            {
+              headers: {
+                apikey: SUPABASE_KEY,
+                Authorization: `Bearer ${currentSession.token}`,
+              },
+            },
+          );
+
+          const listEl = document.getElementById("activitiesList");
+
+          if (response.ok) {
+            const activities = await response.json();
+
+            if (activities.length === 0) {
+              listEl.innerHTML = `
+                            <div class="text-center py-8 text-gray-500">
+                                <i class="fas fa-running text-4xl mb-2"></i>
+                                <p>No activities yet. Connect Strava and sync your activities!</p>
+                            </div>
+                        `;
+              return;
+            }
+
+            // Calculate totals
+            let totalDist = 0;
+            let totalTime = 0;
+
+            listEl.innerHTML = activities
+              .map((activity) => {
+                const data = activity.activity_data || {};
+                const distance = (data.distance || 0) / 1000; // km
+                const time = (data.moving_time || 0) / 60; // minutes
+
+                totalDist += distance;
+                totalTime += time;
+
+                const type = data.type || "Run";
+                const date = new Date(data.start_date || activity.created_at);
+
+                return `
+                            <div class="activity-item">
+                                <div class="activity-icon bg-orange-100 text-orange-600">
+                                    <i class="fas fa-running"></i>
+                                </div>
+                                <div class="flex-grow">
+                                    <div class="font-semibold text-gray-900">${data.name || type}</div>
+                                    <div class="text-sm text-gray-600">
+                                        ${distance.toFixed(2)} km • ${Math.round(time)} min • ${date.toLocaleDateString()}
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-sm font-semibold text-gray-900">
+                                        AISRI: ${activity.aisri_score?.total || "--"}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+              })
+              .join("");
+
+            // Update stats
+            document.getElementById("totalActivities").textContent =
+              activities.length;
+            document.getElementById("totalDistance").innerHTML =
+              `${totalDist.toFixed(1)} <span class="text-lg">km</span>`;
+
+            if (totalDist > 0 && totalTime > 0) {
+              const pace = totalTime / totalDist;
+              const paceMin = Math.floor(pace);
+              const paceSec = Math.round((pace - paceMin) * 60);
+              document.getElementById("averagePace").textContent =
+                `${paceMin}:${paceSec.toString().padStart(2, "0")}`;
+            }
+          } else {
+            listEl.innerHTML =
+              '<div class="text-center py-8 text-gray-500">Failed to load activities</div>';
+          }
+        } catch (error) {
+          console.error("Error loading activities:", error);
+          document.getElementById("activitiesList").innerHTML =
+            '<div class="text-center py-8 text-gray-500">Error loading activities</div>';
+        }
+      }
+
+      function connectStrava() {
+        const redirectUri = encodeURIComponent(
+          `${window.location.origin}/strava-callback.html`,
+        );
+        const scope = "read,activity:read_all,profile:read_all";
+        const state = currentSession.uid;
+
+        window.location.href = `https://www.strava.com/oauth/authorize?client_id=${STRAVA_CLIENT_ID}&response_type=code&redirect_uri=${redirectUri}&approval_prompt=force&scope=${scope}&state=${state}`;
+      }
+
+      async function syncStrava() {
+        const btn = event.target.closest("button");
+        const originalHtml = btn.innerHTML;
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Syncing...';
+
+        try {
+          const response = await fetch(
+            `${SUPABASE_URL}/functions/v1/strava-sync-activities`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${currentSession.token}`,
+              },
+              body: JSON.stringify({ athlete_id: currentSession.uid }),
+            },
+          );
+
+          if (response.ok) {
+            alert("✅ Activities synced successfully!");
+            await loadAISRIScores();
+            await loadRecentActivities();
+          } else {
+            const error = await response.json();
+            alert("❌ Failed to sync: " + (error.message || "Unknown error"));
+          }
+        } catch (error) {
+          console.error("Sync error:", error);
+          alert("❌ Error syncing activities");
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = originalHtml;
+        }
+      }
+
+      async function disconnectStrava() {
+        if (
+          !confirm(
+            "Are you sure you want to disconnect Strava? Your activity data will be preserved.",
+          )
+        ) {
+          return;
+        }
+
+        try {
+          const response = await fetch(
+            `${SUPABASE_URL}/rest/v1/strava_connections?athlete_id=eq.${currentSession.uid}`,
+            {
+              method: "DELETE",
+              headers: {
+                apikey: SUPABASE_KEY,
+                Authorization: `Bearer ${currentSession.token}`,
+              },
+            },
+          );
+
+          if (response.ok) {
+            alert("✅ Strava disconnected");
+            await loadStravaConnection();
+          } else {
+            alert("❌ Failed to disconnect");
+          }
+        } catch (error) {
+          console.error("Disconnect error:", error);
+          alert("❌ Error disconnecting");
+        }
+      }
+
+      function loadMoreActivities() {
+        alert("Load more functionality coming soon!");
+      }
+
+      function toggleMobileMenu() {
+        alert("Mobile menu coming soon!");
+      }
+
+      function logout() {
+        if (confirm("Are you sure you want to logout?")) {
+          sessionStorage.clear();
+          window.location.href = "login.html";
+        }
+      }
+    </script>
+  </body>
+</html>
