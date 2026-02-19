@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thursday Workout Generator - AKURA AISRI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @media print {
+            .no-print { display: none; }
+            .workout-card { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-6 no-print">
+        <div class="max-w-7xl mx-auto px-4">
+            <h1 class="text-3xl font-bold">⚡ URGENT: Thursday Workout Generator</h1>
+            <p class="text-blue-100 mt-2">6-Pillar AISRI-Based Workout Prescriptions</p>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        
+        <!-- Quick Input Form -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8 no-print">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-user-plus text-blue-600 mr-2"></i>Generate Workout
+            </h2>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Left Column: Athlete Info -->
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-3">Athlete Information</h3>
+                    
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Athlete Name</label>
+                            <input type="text" id="athleteName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="e.g., Priya Sharma">
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Age</label>
+                                <input type="number" id="age" class="w-full px-4 py-2 border border-gray-300 rounded-lg" value="30">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Resting HR (bpm)</label>
+                                <input type="number" id="restingHR" class="w-full px-4 py-2 border border-gray-300 rounded-lg" value="55">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Previous Workout (Last Session)</label>
+                            <textarea id="previousWorkout" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="e.g., Tuesday: 8km easy run @ 6:15/km, felt good, HR avg 145"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: 6-Pillar AISRI Scores -->
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-3">6-Pillar AISRI Scores (0-100)</h3>
+                    
+                    <div class="space-y-3">
+                        <div class="flex items-center space-x-3">
+                            <label class="w-32 text-sm font-medium text-gray-700">🏃 Running (40%)</label>
+                            <input type="number" id="runningScore" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg" min="0" max="100" value="75">
+                            <span id="runningVal" class="w-12 text-right font-semibold text-blue-600">75</span>
+                        </div>
+                        
+                        <div class="flex items-center space-x-3">
+                            <label class="w-32 text-sm font-medium text-gray-700">💪 Strength (15%)</label>
+                            <input type="number" id="strengthScore" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg" min="0" max="100" value="70">
+                            <span id="strengthVal" class="w-12 text-right font-semibold text-orange-600">70</span>
+                        </div>
+                        
+                        <div class="flex items-center space-x-3">
+                            <label class="w-32 text-sm font-medium text-gray-700">🤸 ROM (12%)</label>
+                            <input type="number" id="romScore" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg" min="0" max="100" value="72">
+                            <span id="romVal" class="w-12 text-right font-semibold text-teal-600">72</span>
+                        </div>
+                        
+                        <div class="flex items-center space-x-3">
+                            <label class="w-32 text-sm font-medium text-gray-700">⚖️ Balance (13%)</label>
+                            <input type="number" id="balanceScore" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg" min="0" max="100" value="78">
+                            <span id="balanceVal" class="w-12 text-right font-semibold text-green-600">78</span>
+                        </div>
+                        
+                        <div class="flex items-center space-x-3">
+                            <label class="w-32 text-sm font-medium text-gray-700">📐 Alignment (10%)</label>
+                            <input type="number" id="alignmentScore" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg" min="0" max="100" value="74">
+                            <span id="alignmentVal" class="w-12 text-right font-semibold text-cyan-600">74</span>
+                        </div>
+                        
+                        <div class="flex items-center space-x-3">
+                            <label class="w-32 text-sm font-medium text-gray-700">🧘 Mobility (10%)</label>
+                            <input type="number" id="mobilityScore" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg" min="0" max="100" value="68">
+                            <span id="mobilityVal" class="w-12 text-right font-semibold text-purple-600">68</span>
+                        </div>
+
+                        <div class="pt-3 border-t-2 border-gray-200">
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg font-bold text-gray-800">Total AISRI Score:</span>
+                                <span id="totalAISRI" class="text-3xl font-bold text-blue-600">74</span>
+                            </div>
+                            <div class="flex justify-between items-center mt-2">
+                                <span class="text-sm font-medium text-gray-600">Risk Category:</span>
+                                <span id="riskCategory" class="px-4 py-1 rounded-full text-white font-semibold bg-yellow-500">Medium Risk</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 flex space-x-4">
+                <button onclick="generateWorkout()" class="flex-1 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 font-bold text-lg shadow-lg">
+                    <i class="fas fa-magic mr-2"></i>Generate Thursday Workout
+                </button>
+                <button onclick="printWorkout()" class="px-8 py-4 bg-gray-600 text-white rounded-xl hover:bg-gray-700 font-semibold">
+                    <i class="fas fa-print mr-2"></i>Print
+                </button>
+            </div>
+        </div>
+
+        <!-- Generated Workout Output -->
+        <div id="workoutOutput" class="hidden">
+            <!-- Content will be injected here -->
+        </div>
+
+    </main>
+
+    <script>
+        // Update display values and calculate AISRI in real-time
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            if (input.id.includes('Score')) {
+                input.addEventListener('input', function() {
+                    const pillar = this.id.replace('Score', '');
+                    const valSpan = document.getElementById(pillar + 'Val');
+                    if (valSpan) valSpan.textContent = this.value;
+                    calculateAISRI();
+                });
+            }
+        });
+
+        function calculateAISRI() {
+            const running = parseFloat(document.getElementById('runningScore').value) || 0;
+            const strength = parseFloat(document.getElementById('strengthScore').value) || 0;
+            const rom = parseFloat(document.getElementById('romScore').value) || 0;
+            const balance = parseFloat(document.getElementById('balanceScore').value) || 0;
+            const alignment = parseFloat(document.getElementById('alignmentScore').value) || 0;
+            const mobility = parseFloat(document.getElementById('mobilityScore').value) || 0;
+
+            const total = Math.round(
+                running * 0.40 +
+                strength * 0.15 +
+                rom * 0.12 +
+                balance * 0.13 +
+                alignment * 0.10 +
+                mobility * 0.10
+            );
+
+            document.getElementById('totalAISRI').textContent = total;
+
+            // Update risk category
+            const riskBadge = document.getElementById('riskCategory');
+            let riskText, riskColor;
+
+            if (total >= 85) {
+                riskText = 'Very Low Risk';
+                riskColor = 'bg-green-600';
+            } else if (total >= 70) {
+                riskText = 'Low Risk';
+                riskColor = 'bg-green-500';
+            } else if (total >= 55) {
+                riskText = 'Medium Risk';
+                riskColor = 'bg-yellow-500';
+            } else if (total >= 40) {
+                riskText = 'High Risk';
+                riskColor = 'bg-orange-500';
+            } else {
+                riskText = 'Critical Risk';
+                riskColor = 'bg-red-600';
+            }
+
+            riskBadge.textContent = riskText;
+            riskBadge.className = `px-4 py-1 rounded-full text-white font-semibold ${riskColor}`;
+
+            return total;
+        }
+
+        function generateWorkout() {
+            const athleteName = document.getElementById('athleteName').value || 'Athlete';
+            const age = parseInt(document.getElementById('age').value) || 30;
+            const restingHR = parseInt(document.getElementById('restingHR').value) || 60;
+            const previousWorkout = document.getElementById('previousWorkout').value || 'No previous workout data';
+            
+            const running = parseFloat(document.getElementById('runningScore').value) || 0;
+            const strength = parseFloat(document.getElementById('strengthScore').value) || 0;
+            const rom = parseFloat(document.getElementById('romScore').value) || 0;
+            const balance = parseFloat(document.getElementById('balanceScore').value) || 0;
+            const alignment = parseFloat(document.getElementById('alignmentScore').value) || 0;
+            const mobility = parseFloat(document.getElementById('mobilityScore').value) || 0;
+
+            const aisriScore = calculateAISRI();
+
+            // Calculate HR zones
+            const maxHR = 220 - age;
+            const hrReserve = maxHR - restingHR;
+
+            const zones = {
+                AR: { min: Math.round(restingHR + hrReserve * 0.50), max: Math.round(restingHR + hrReserve * 0.60) },
+                F: { min: Math.round(restingHR + hrReserve * 0.60), max: Math.round(restingHR + hrReserve * 0.70) },
+                EN: { min: Math.round(restingHR + hrReserve * 0.70), max: Math.round(restingHR + hrReserve * 0.80) },
+                TH: { min: Math.round(restingHR + hrReserve * 0.80), max: Math.round(restingHR + hrReserve * 0.87) },
+                P: { min: Math.round(restingHR + hrReserve * 0.87), max: Math.round(restingHR + hrReserve * 0.95) },
+                SP: { min: Math.round(restingHR + hrReserve * 0.95), max: maxHR }
+            };
+
+            // Determine workout type based on AISRI score
+            let workout = generateThursdayWorkout(aisriScore, zones, { running, strength, rom, balance, alignment, mobility });
+
+            // Display workout
+            displayWorkout(athleteName, aisriScore, workout, zones, previousWorkout);
+        }
+
+        function generateThursdayWorkout(aisriScore, zones, pillars) {
+            let workout = {
+                type: '',
+                zone: '',
+                duration: '',
+                structure: {},
+                description: '',
+                notes: [],
+                focus: []
+            };
+
+            // Thursday = Tempo/Intervals day (based on AISRI)
+            if (aisriScore >= 85) {
+                // Elite: Speed Work
+                workout.type = 'Speed Intervals (SP Zone)';
+                workout.zone = 'SP';
+                workout.duration = '45-50 min total';
+                workout.structure = {
+                    warmup: '15 min easy jog + 4x100m strides',
+                    main: '6x400m @ 95-100% max HR, 90sec recovery jog between',
+                    cooldown: '10 min easy + dynamic stretching'
+                };
+                workout.description = 'High-intensity speed work. Focus on form and explosiveness.';
+                workout.notes.push('⚡ Short, intense efforts');
+                workout.notes.push('✋ Stop if form breaks down');
+                workout.notes.push('💧 Hydrate well before session');
+                workout.focus = ['Speed', 'Neuromuscular power', 'Running economy'];
+
+            } else if (aisriScore >= 70) {
+                // Low Risk: Power Intervals
+                workout.type = 'Power Intervals (P Zone)';
+                workout.zone = 'P';
+                workout.duration = '45-55 min total';
+                workout.structure = {
+                    warmup: '10 min easy + 3x100m strides',
+                    main: '5x1km @ 87-95% max HR, 2 min recovery jog between',
+                    cooldown: '10 min easy + stretching'
+                };
+                workout.description = 'Sustained hard efforts to build speed endurance.';
+                workout.notes.push('💪 Hard but controlled pace');
+                workout.notes.push('📊 Aim for even splits across all 5 intervals');
+                workout.notes.push('⚠️ If pillars show weakness, reduce to 4x1km');
+                workout.focus = ['Speed endurance', 'Lactate tolerance', 'Mental toughness'];
+
+            } else if (aisriScore >= 55) {
+                // Medium Risk: Tempo Run
+                workout.type = 'Tempo Run (TH Zone)';
+                workout.zone = 'TH';
+                workout.duration = '45-55 min total';
+                workout.structure = {
+                    warmup: '10 min easy',
+                    main: '20-25 min @ threshold pace (80-87% max HR)',
+                    cooldown: '10 min easy + stretching'
+                };
+                workout.description = '"Comfortably hard" pace - can speak a few words but not hold conversation.';
+                workout.notes.push('🎯 Find sustainable pace - avoid going too hard too soon');
+                workout.notes.push('💬 Can speak 2-3 words at a time');
+                workout.notes.push('⚖️ Focus on balance and alignment during effort');
+                workout.focus = ['Lactate threshold', 'Aerobic capacity', 'Pacing discipline'];
+
+            } else if (aisriScore >= 40) {
+                // High Risk: Endurance Intervals
+                workout.type = 'Endurance Intervals (EN Zone)';
+                workout.zone = 'EN';
+                workout.duration = '45-50 min total';
+                workout.structure = {
+                    warmup: '10 min easy',
+                    main: '4x8 min @ 70-80% max HR, 2 min easy jog recovery',
+                    cooldown: '10 min easy + stretching'
+                };
+                workout.description = 'Build aerobic capacity with controlled efforts. Stay conversational.';
+                workout.notes.push('💚 Keep intensity moderate - no heroics');
+                workout.notes.push('🗣️ Should be able to speak in sentences');
+                workout.notes.push('🚨 If strength/ROM scores low (<70), reduce to 3x8 min');
+                workout.focus = ['Aerobic endurance', 'Consistency', 'Recovery practice'];
+
+            } else {
+                // Critical Risk: Foundation with Pick-ups
+                workout.type = 'Foundation Run with Pick-ups (F Zone)';
+                workout.zone = 'F';
+                workout.duration = '40-45 min total';
+                workout.structure = {
+                    warmup: '10 min easy',
+                    main: '25 min easy pace with 6x30sec pick-ups (60-70% HR), 90sec easy between',
+                    cooldown: '5-10 min easy + stretching'
+                };
+                workout.description = 'Easy conversational pace with short, controlled accelerations.';
+                workout.notes.push('🛡️ CRITICAL: Focus on injury prevention');
+                workout.notes.push('🐢 Keep overall effort EASY');
+                workout.notes.push('⚠️ Pick-ups should feel smooth, not hard');
+                workout.notes.push('🚨 If any pain/discomfort, skip pick-ups and just run easy');
+                workout.focus = ['Aerobic base', 'Running mechanics', 'Gradual progression'];
+            }
+
+            // Add pillar-specific modifications
+            if (pillars.strength < 60) {
+                workout.notes.push('💪 ADD: 10 min strength circuit after run (plank, squats, glute bridges)');
+            }
+            if (pillars.rom < 60 || pillars.mobility < 60) {
+                workout.notes.push('🤸 ADD: 15 min foam rolling + dynamic stretching post-run');
+            }
+            if (pillars.balance < 60) {
+                workout.notes.push('⚖️ ADD: 5 min single-leg balance drills (eyes open/closed)');
+            }
+            if (pillars.alignment < 60) {
+                workout.notes.push('📐 FOCUS: Running form - posture, cadence, foot strike');
+            }
+
+            return workout;
+        }
+
+        function displayWorkout(athleteName, aisriScore, workout, zones, previousWorkout) {
+            const date = new Date();
+            const thursday = new Date(date.setDate(date.getDate() + (4 - date.getDay() + 7) % 7));
+            const dateStr = thursday.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+            const hrRange = zones[workout.zone];
+            const hrRangeStr = `${hrRange.min}-${hrRange.max} bpm`;
+
+            const html = `
+                <div class="bg-white rounded-xl shadow-lg p-8 workout-card">
+                    <div class="border-b-4 border-blue-600 pb-4 mb-6">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h2 class="text-3xl font-bold text-gray-800">${athleteName}</h2>
+                                <p class="text-lg text-gray-600 mt-1">Thursday Workout - ${dateStr}</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-4xl font-bold text-blue-600">${aisriScore}</div>
+                                <div class="text-sm text-gray-600">AISRI Score</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Previous Workout -->
+                    <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                        <h3 class="text-sm font-semibold text-gray-700 mb-2">📝 Previous Workout:</h3>
+                        <p class="text-gray-600">${previousWorkout}</p>
+                    </div>
+
+                    <!-- Main Workout -->
+                    <div class="mb-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-2xl font-bold text-gray-800">
+                                <i class="fas fa-running text-blue-600 mr-2"></i>${workout.type}
+                            </h3>
+                            <span class="px-4 py-2 bg-blue-100 text-blue-800 rounded-full font-bold">
+                                Zone ${workout.zone}: ${hrRangeStr}
+                            </span>
+                        </div>
+
+                        <div class="bg-blue-50 border-l-4 border-blue-600 p-4 mb-4">
+                            <p class="text-gray-700 font-medium">${workout.description}</p>
+                            <p class="text-sm text-gray-600 mt-2"><strong>Duration:</strong> ${workout.duration}</p>
+                        </div>
+
+                        <!-- Workout Structure -->
+                        <div class="grid md:grid-cols-3 gap-4 mb-6">
+                            <div class="bg-green-50 rounded-lg p-4">
+                                <div class="text-sm font-semibold text-green-700 mb-2">1️⃣ WARM-UP</div>
+                                <p class="text-sm text-gray-700">${workout.structure.warmup}</p>
+                            </div>
+                            <div class="bg-orange-50 rounded-lg p-4">
+                                <div class="text-sm font-semibold text-orange-700 mb-2">2️⃣ MAIN SET</div>
+                                <p class="text-sm text-gray-700">${workout.structure.main}</p>
+                            </div>
+                            <div class="bg-purple-50 rounded-lg p-4">
+                                <div class="text-sm font-semibold text-purple-700 mb-2">3️⃣ COOL-DOWN</div>
+                                <p class="text-sm text-gray-700">${workout.structure.cooldown}</p>
+                            </div>
+                        </div>
+
+                        <!-- Focus Areas -->
+                        <div class="mb-4">
+                            <h4 class="text-lg font-semibold text-gray-800 mb-2">🎯 Focus Areas:</h4>
+                            <div class="flex flex-wrap gap-2">
+                                ${workout.focus.map(f => `<span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">${f}</span>`).join('')}
+                            </div>
+                        </div>
+
+                        <!-- Important Notes -->
+                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                            <h4 class="text-lg font-semibold text-yellow-800 mb-3">⚠️ Important Notes:</h4>
+                            <ul class="space-y-2">
+                                ${workout.notes.map(note => `<li class="text-sm text-gray-700">${note}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- HR Zone Reference -->
+                    <div class="border-t pt-4">
+                        <h4 class="text-sm font-semibold text-gray-700 mb-3">💓 Your Heart Rate Zones:</h4>
+                        <div class="grid grid-cols-3 md:grid-cols-6 gap-2 text-xs">
+                            <div class="text-center p-2 bg-blue-50 rounded">
+                                <div class="font-bold">AR</div>
+                                <div>${zones.AR.min}-${zones.AR.max}</div>
+                            </div>
+                            <div class="text-center p-2 bg-green-50 rounded">
+                                <div class="font-bold">F</div>
+                                <div>${zones.F.min}-${zones.F.max}</div>
+                            </div>
+                            <div class="text-center p-2 bg-yellow-50 rounded">
+                                <div class="font-bold">EN</div>
+                                <div>${zones.EN.min}-${zones.EN.max}</div>
+                            </div>
+                            <div class="text-center p-2 bg-orange-50 rounded">
+                                <div class="font-bold">TH</div>
+                                <div>${zones.TH.min}-${zones.TH.max}</div>
+                            </div>
+                            <div class="text-center p-2 bg-red-50 rounded">
+                                <div class="font-bold">P</div>
+                                <div>${zones.P.min}-${zones.P.max}</div>
+                            </div>
+                            <div class="text-center p-2 bg-red-100 rounded">
+                                <div class="font-bold">SP</div>
+                                <div>${zones.SP.min}-${zones.SP.max}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Coach Signature -->
+                    <div class="mt-6 pt-4 border-t text-right">
+                        <p class="text-sm text-gray-600">Generated by AKURA AISRI System</p>
+                        <p class="text-xs text-gray-500">Coach Kura | ${new Date().toLocaleString()}</p>
+                    </div>
+                </div>
+            `;
+
+            const output = document.getElementById('workoutOutput');
+            output.innerHTML = html;
+            output.classList.remove('hidden');
+
+            // Scroll to workout
+            output.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function printWorkout() {
+            window.print();
+        }
+
+        // Initialize AISRI calculation on load
+        calculateAISRI();
+    </script>
+
+</body>
+</html>

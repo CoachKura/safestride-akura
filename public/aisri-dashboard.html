@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AISRI Dashboard - SafeStride</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-100">
+    <!-- Navigation -->
+    <nav class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-heartbeat text-3xl"></i>
+                    <div>
+                        <h1 class="text-2xl font-bold">Safe Stride</h1>
+                        <p class="text-sm text-blue-100">AISRI Performance Dashboard</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span id="connectionStatus" class="px-3 py-1 rounded-full bg-yellow-500 text-white text-sm">
+                        <i class="fas fa-circle-notch fa-spin mr-1"></i> Connecting...
+                    </span>
+                    <button onclick="window.location.href='/calculator.html'" class="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition">
+                        <i class="fas fa-calculator mr-2"></i>
+                        Calculator
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto p-6">
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-semibold">Total Athletes</p>
+                        <p class="text-3xl font-bold text-gray-800" id="totalAthletes">0</p>
+                    </div>
+                    <i class="fas fa-users text-4xl text-blue-500"></i>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-semibold">Low Risk</p>
+                        <p class="text-3xl font-bold text-green-600" id="lowRisk">0</p>
+                    </div>
+                    <i class="fas fa-check-circle text-4xl text-green-500"></i>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-semibold">Medium Risk</p>
+                        <p class="text-3xl font-bold text-yellow-600" id="mediumRisk">0</p>
+                    </div>
+                    <i class="fas fa-exclamation-circle text-4xl text-yellow-500"></i>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-semibold">High/Critical</p>
+                        <p class="text-3xl font-bold text-red-600" id="highRisk">0</p>
+                    </div>
+                    <i class="fas fa-exclamation-triangle text-4xl text-red-500"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Athletes List -->
+            <div class="lg:col-span-2 bg-white rounded-lg shadow-lg">
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-xl font-bold text-gray-800">
+                            <i class="fas fa-list mr-2"></i>
+                            Athletes Dashboard
+                        </h2>
+                        <div class="flex items-center space-x-2">
+                            <input type="text" id="searchBox" placeholder="Search athletes..." 
+                                   class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                   onkeyup="filterAthletes()">
+                            <select id="riskFilter" onchange="filterAthletes()" 
+                                    class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="all">All Risk Levels</option>
+                                <option value="Low Risk">Low Risk</option>
+                                <option value="Medium Risk">Medium Risk</option>
+                                <option value="High Risk">High Risk</option>
+                                <option value="Critical Risk">Critical Risk</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50 border-b border-gray-200">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Athlete</th>
+                                <th class="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase">AISRI</th>
+                                <th class="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase">Risk</th>
+                                <th class="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase">Zones</th>
+                                <th class="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase">Execution</th>
+                                <th class="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="athleteTableBody" class="divide-y divide-gray-200">
+                            <tr>
+                                <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                                    <i class="fas fa-circle-notch fa-spin text-3xl mb-3"></i>
+                                    <p>Loading athletes...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Right Sidebar -->
+            <div class="space-y-6">
+                <!-- Risk Distribution Chart -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">
+                        <i class="fas fa-chart-pie mr-2"></i>
+                        Risk Distribution
+                    </h3>
+                    <canvas id="riskChart"></canvas>
+                </div>
+
+                <!-- Training Zones Legend -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">
+                        <i class="fas fa-running mr-2"></i>
+                        Training Zones
+                    </h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex items-center justify-between p-2 bg-blue-50 rounded">
+                            <span class="font-semibold">AR</span>
+                            <span class="text-gray-600">Active Recovery (50-60%)</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2 bg-sky-50 rounded">
+                            <span class="font-semibold">F</span>
+                            <span class="text-gray-600">Foundation (60-70%)</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2 bg-cyan-50 rounded">
+                            <span class="font-semibold">EN</span>
+                            <span class="text-gray-600">Endurance (70-80%)</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2 bg-orange-50 rounded">
+                            <span class="font-semibold">TH</span>
+                            <span class="text-gray-600">Threshold (80-87%)</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2 bg-red-50 rounded">
+                            <span class="font-semibold">P</span>
+                            <span class="text-gray-600">Power (87-95%)</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2 bg-pink-50 rounded">
+                            <span class="font-semibold">SP</span>
+                            <span class="text-gray-600">Speed (95-100%)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-lg p-6 text-white">
+                    <h3 class="text-lg font-bold mb-4">
+                        <i class="fas fa-bolt mr-2"></i>
+                        Quick Actions
+                    </h3>
+                    <div class="space-y-2">
+                        <button onclick="window.location.href='/calculator.html'" 
+                                class="w-full bg-white text-blue-600 px-4 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
+                            <i class="fas fa-calculator mr-2"></i>
+                            Calculate AISRI
+                        </button>
+                        <button onclick="exportData()" 
+                                class="w-full bg-white/20 text-white px-4 py-3 rounded-lg font-semibold hover:bg-white/30 transition">
+                            <i class="fas fa-download mr-2"></i>
+                            Export Data
+                        </button>
+                        <button onclick="refreshData()" 
+                                class="w-full bg-white/20 text-white px-4 py-3 rounded-lg font-semibold hover:bg-white/30 transition">
+                            <i class="fas fa-sync-alt mr-2"></i>
+                            Refresh Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Athlete Detail Modal -->
+    <div id="athleteModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-2xl font-bold text-gray-800" id="modalAthleteName">Athlete Details</h2>
+                    <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="modalContent" class="p-6">
+                <!-- Dynamic content will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://bdisppaxbvygsspcuymb.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_BBjk8yeyQ2jgh5iFiQINUQ_mwU2FMnk';
+        
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        let athletesData = [];
+        let riskChartInstance = null;
+
+        // Load athletes data
+        async function loadAthletes() {
+            try {
+                document.getElementById('connectionStatus').innerHTML = 
+                    '<i class="fas fa-circle-notch fa-spin mr-1"></i> Loading...';
+                document.getElementById('connectionStatus').className = 
+                    'px-3 py-1 rounded-full bg-yellow-500 text-white text-sm';
+
+                const { data, error } = await supabase
+                    .from('aisri_athlete_dashboard')
+                    .select('*')
+                    .order('aisri_score', { ascending: true });
+
+                if (error) throw error;
+
+                athletesData = data || [];
+                
+                displayAthletes(athletesData);
+                updateStats(athletesData);
+                updateRiskChart(athletesData);
+
+                document.getElementById('connectionStatus').innerHTML = 
+                    '<i class="fas fa-check-circle mr-1"></i> Connected';
+                document.getElementById('connectionStatus').className = 
+                    'px-3 py-1 rounded-full bg-green-500 text-white text-sm';
+
+            } catch (error) {
+                console.error('Error loading athletes:', error);
+                document.getElementById('connectionStatus').innerHTML = 
+                    '<i class="fas fa-exclamation-circle mr-1"></i> Error';
+                document.getElementById('connectionStatus').className = 
+                    'px-3 py-1 rounded-full bg-red-500 text-white text-sm';
+                
+                document.getElementById('athleteTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-6 py-8 text-center text-red-600">
+                            <i class="fas fa-exclamation-triangle text-3xl mb-3"></i>
+                            <p class="font-semibold">Failed to load athletes</p>
+                            <p class="text-sm text-gray-500">${error.message}</p>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        function displayAthletes(athletes) {
+            if (!athletes || athletes.length === 0) {
+                document.getElementById('athleteTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                            <i class="fas fa-inbox text-3xl mb-3"></i>
+                            <p>No athletes found</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const tbody = document.getElementById('athleteTableBody');
+            tbody.innerHTML = athletes.map(athlete => {
+                const riskBadge = getRiskBadge(athlete.risk_category);
+                const zones = (athlete.allowed_zones || []).join(', ') || 'AR, F';
+                const execution = athlete.execution_quality_percent || 'N/A';
+                
+                return `
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-6 py-4">
+                            <div>
+                                <p class="font-semibold text-gray-800">${athlete.athlete_name || 'Unknown'}</p>
+                                <p class="text-sm text-gray-500">${athlete.email || ''}</p>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="text-2xl font-bold text-blue-600">${athlete.aisri_score || 0}</span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            ${riskBadge}
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="text-sm font-mono text-gray-700">${zones}</span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="text-sm font-semibold ${execution === 'N/A' ? 'text-gray-400' : 'text-green-600'}">
+                                ${execution}${execution !== 'N/A' ? '%' : ''}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <button onclick='showAthleteDetail(${JSON.stringify(athlete).replace(/'/g, "\\'")})'
+                                    class="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm transition">
+                                <i class="fas fa-eye mr-1"></i> View
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function getRiskBadge(category) {
+            const badges = {
+                'Low Risk': '<span class="px-3 py-1 rounded-full bg-green-100 text-green-800 text-xs font-semibold"><i class="fas fa-check-circle mr-1"></i>Low Risk</span>',
+                'Medium Risk': '<span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 text-xs font-semibold"><i class="fas fa-exclamation-circle mr-1"></i>Medium</span>',
+                'High Risk': '<span class="px-3 py-1 rounded-full bg-orange-100 text-orange-800 text-xs font-semibold"><i class="fas fa-exclamation-triangle mr-1"></i>High</span>',
+                'Critical Risk': '<span class="px-3 py-1 rounded-full bg-red-100 text-red-800 text-xs font-semibold"><i class="fas fa-times-circle mr-1"></i>Critical</span>'
+            };
+            return badges[category] || badges['Medium Risk'];
+        }
+
+        function updateStats(athletes) {
+            document.getElementById('totalAthletes').textContent = athletes.length;
+            
+            const lowRisk = athletes.filter(a => a.risk_category === 'Low Risk').length;
+            const mediumRisk = athletes.filter(a => a.risk_category === 'Medium Risk').length;
+            const highRisk = athletes.filter(a => a.risk_category === 'High Risk' || a.risk_category === 'Critical Risk').length;
+            
+            document.getElementById('lowRisk').textContent = lowRisk;
+            document.getElementById('mediumRisk').textContent = mediumRisk;
+            document.getElementById('highRisk').textContent = highRisk;
+        }
+
+        function updateRiskChart(athletes) {
+            const lowRisk = athletes.filter(a => a.risk_category === 'Low Risk').length;
+            const mediumRisk = athletes.filter(a => a.risk_category === 'Medium Risk').length;
+            const highRisk = athletes.filter(a => a.risk_category === 'High Risk').length;
+            const criticalRisk = athletes.filter(a => a.risk_category === 'Critical Risk').length;
+
+            const ctx = document.getElementById('riskChart');
+            
+            if (riskChartInstance) {
+                riskChartInstance.destroy();
+            }
+
+            riskChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Low Risk', 'Medium Risk', 'High Risk', 'Critical Risk'],
+                    datasets: [{
+                        data: [lowRisk, mediumRisk, highRisk, criticalRisk],
+                        backgroundColor: [
+                            'rgb(34, 197, 94)',
+                            'rgb(234, 179, 8)',
+                            'rgb(249, 115, 22)',
+                            'rgb(239, 68, 68)'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function filterAthletes() {
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+            const riskFilter = document.getElementById('riskFilter').value;
+            
+            let filtered = athletesData;
+            
+            if (searchTerm) {
+                filtered = filtered.filter(a => 
+                    (a.athlete_name || '').toLowerCase().includes(searchTerm) ||
+                    (a.email || '').toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            if (riskFilter !== 'all') {
+                filtered = filtered.filter(a => a.risk_category === riskFilter);
+            }
+            
+            displayAthletes(filtered);
+        }
+
+        function showAthleteDetail(athlete) {
+            document.getElementById('modalAthleteName').textContent = athlete.athlete_name || 'Unknown Athlete';
+            
+            const zones = (athlete.allowed_zones || ['AR', 'F']).join(', ');
+            const execution = athlete.execution_quality_percent || 'N/A';
+            
+            document.getElementById('modalContent').innerHTML = `
+                <div class="space-y-6">
+                    <!-- AISRI Score Card -->
+                    <div class="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg p-6 text-white">
+                        <div class="text-center">
+                            <p class="text-sm opacity-90 mb-2">AISRI Score</p>
+                            <p class="text-6xl font-bold mb-2">${athlete.aisri_score || 0}</p>
+                            <p class="text-xl">${athlete.risk_category || 'Unknown Risk'}</p>
+                        </div>
+                    </div>
+
+                    <!-- 5 Pillar Scores -->
+                    <div class="grid grid-cols-5 gap-4">
+                        <div class="text-center p-4 bg-blue-50 rounded-lg">
+                            <i class="fas fa-running text-2xl text-blue-600 mb-2"></i>
+                            <p class="text-2xl font-bold text-blue-600">${athlete.running_performance_score || 0}</p>
+                            <p class="text-xs text-gray-600">Running</p>
+                        </div>
+                        <div class="text-center p-4 bg-red-50 rounded-lg">
+                            <i class="fas fa-dumbbell text-2xl text-red-600 mb-2"></i>
+                            <p class="text-2xl font-bold text-red-600">${athlete.strength_score || 0}</p>
+                            <p class="text-xs text-gray-600">Strength</p>
+                        </div>
+                        <div class="text-center p-4 bg-green-50 rounded-lg">
+                            <i class="fas fa-arrows-alt text-2xl text-green-600 mb-2"></i>
+                            <p class="text-2xl font-bold text-green-600">${athlete.rom_score || 0}</p>
+                            <p class="text-xs text-gray-600">ROM</p>
+                        </div>
+                        <div class="text-center p-4 bg-yellow-50 rounded-lg">
+                            <i class="fas fa-balance-scale text-2xl text-yellow-600 mb-2"></i>
+                            <p class="text-2xl font-bold text-yellow-600">${athlete.balance_score || 0}</p>
+                            <p class="text-xs text-gray-600">Balance</p>
+                        </div>
+                        <div class="text-center p-4 bg-purple-50 rounded-lg">
+                            <i class="fas fa-child text-2xl text-purple-600 mb-2"></i>
+                            <p class="text-2xl font-bold text-purple-600">${athlete.mobility_score || 0}</p>
+                            <p class="text-xs text-gray-600">Mobility</p>
+                        </div>
+                    </div>
+
+                    <!-- Training Info -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <p class="text-sm text-gray-600 mb-1">Allowed Zones</p>
+                            <p class="text-lg font-semibold text-gray-800">${zones}</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <p class="text-sm text-gray-600 mb-1">Current Phase</p>
+                            <p class="text-lg font-semibold text-gray-800">${athlete.current_phase || 'Not Set'}</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <p class="text-sm text-gray-600 mb-1">Execution Quality</p>
+                            <p class="text-lg font-semibold text-gray-800">${execution}${execution !== 'N/A' ? '%' : ''}</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <p class="text-sm text-gray-600 mb-1">Sessions (7 days)</p>
+                            <p class="text-lg font-semibold text-gray-800">${athlete.sessions_last_7_days || 0}</p>
+                        </div>
+                    </div>
+
+                    <!-- Demographics -->
+                    <div class="border-t pt-4">
+                        <h3 class="font-bold text-gray-800 mb-3">Athlete Information</h3>
+                        <div class="grid grid-cols-2 gap-3 text-sm">
+                            <div><span class="text-gray-600">Email:</span> <span class="font-semibold">${athlete.email || 'N/A'}</span></div>
+                            <div><span class="text-gray-600">Age:</span> <span class="font-semibold">${athlete.age || 'N/A'}</span></div>
+                            <div><span class="text-gray-600">Gender:</span> <span class="font-semibold">${athlete.gender || 'N/A'}</span></div>
+                            <div><span class="text-gray-600">Last Assessment:</span> <span class="font-semibold">${athlete.last_aisri_assessment ? new Date(athlete.last_aisri_assessment).toLocaleDateString() : 'N/A'}</span></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('athleteModal').classList.remove('hidden');
+            document.getElementById('athleteModal').classList.add('flex');
+        }
+
+        function closeModal() {
+            document.getElementById('athleteModal').classList.add('hidden');
+            document.getElementById('athleteModal').classList.remove('flex');
+        }
+
+        function exportData() {
+            const csv = athletesData.map(a => {
+                return [
+                    a.athlete_name,
+                    a.email,
+                    a.aisri_score,
+                    a.risk_category,
+                    (a.allowed_zones || []).join(';'),
+                    a.execution_quality_percent || '',
+                    a.age,
+                    a.gender
+                ].join(',');
+            }).join('\n');
+            
+            const header = 'Name,Email,AISRI Score,Risk Category,Zones,Execution %,Age,Gender\n';
+            const blob = new Blob([header + csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `aisri_export_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+        }
+
+        function refreshData() {
+            loadAthletes();
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            loadAthletes();
+            setInterval(loadAthletes, 30000); // Refresh every 30 seconds
+        });
+
+        // Close modal on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AISRI SQL Deployment - SafeStride</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+    <div class="max-w-5xl mx-auto p-8">
+        <div class="bg-white rounded-lg shadow-lg p-8 mb-6">
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-database text-blue-600 mr-3"></i>
+                AISRI Database Deployment
+            </h1>
+            <p class="text-gray-600 mb-6">
+                Complete SQL scripts for AISRI system deployment. Copy and paste into Supabase SQL Editor.
+            </p>
+
+            <!-- Progress -->
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+                <div class="flex items-center">
+                    <i class="fas fa-info-circle text-blue-500 mr-3"></i>
+                    <div>
+                        <p class="font-semibold text-blue-800">Deployment Timeline</p>
+                        <p class="text-blue-700 text-sm">Step 1: Schema (5 min) → Step 2: Data Import (3 min) → Total: ~8 minutes</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 1: Schema -->
+        <div class="bg-white rounded-lg shadow-lg p-8 mb-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-bold text-gray-800">
+                    <span class="bg-blue-500 text-white px-3 py-1 rounded-full mr-3">1</span>
+                    Deploy Database Schema
+                </h2>
+                <span class="text-sm text-gray-500">~5 minutes</span>
+            </div>
+
+            <div class="mb-4">
+                <h3 class="font-semibold text-gray-700 mb-2">What this creates:</h3>
+                <ul class="list-disc list-inside text-gray-600 space-y-1">
+                    <li>5 tables: aisri_scores, training_zones, biomechanical_assessments, training_sessions, safety_gates</li>
+                    <li>3 functions: calculate_aisri_score, get_allowed_zones, get_risk_category</li>
+                    <li>1 view: aisri_athlete_dashboard</li>
+                    <li>6 training zones pre-loaded (AR, F, EN, TH, P, SP)</li>
+                </ul>
+            </div>
+
+            <div class="mb-4">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="font-semibold text-gray-700">SQL File:</h3>
+                    <button onclick="copySchema()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center">
+                        <i class="fas fa-copy mr-2"></i>
+                        Copy Schema SQL
+                    </button>
+                </div>
+                <a href="/sql/02_aisri_complete_schema.sql" target="_blank" class="text-blue-600 hover:text-blue-800 flex items-center">
+                    <i class="fas fa-download mr-2"></i>
+                    Download 02_aisri_complete_schema.sql (20KB)
+                </a>
+            </div>
+
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
+                <h3 class="font-semibold text-gray-700 mb-2">Instructions:</h3>
+                <ol class="list-decimal list-inside text-gray-600 space-y-2">
+                    <li>Open Supabase SQL Editor: <a href="https://supabase.com/dashboard/project/bdisppaxbvygsspcuymb/sql/new" target="_blank" class="text-blue-600 underline">Click here</a></li>
+                    <li>Click "Copy Schema SQL" button above (or download file)</li>
+                    <li>Paste the entire SQL into Supabase SQL Editor</li>
+                    <li>Click "Run" button (or press Ctrl+Enter)</li>
+                    <li>Wait ~10 seconds for completion</li>
+                </ol>
+            </div>
+
+            <div class="bg-green-50 border-l-4 border-green-500 p-4">
+                <h3 class="font-semibold text-green-800 mb-2">Expected Success Message:</h3>
+                <pre class="text-sm text-green-700 font-mono">✅ AISRI COMPLETE SCHEMA CREATED!
+Tables Created: 5
+Functions Created: 3
+Views Created: 1
+Training Zones Loaded: 6</pre>
+            </div>
+        </div>
+
+        <!-- STEP 2: Import Data -->
+        <div class="bg-white rounded-lg shadow-lg p-8 mb-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-bold text-gray-800">
+                    <span class="bg-blue-500 text-white px-3 py-1 rounded-full mr-3">2</span>
+                    Import AISRI Scores
+                </h2>
+                <span class="text-sm text-gray-500">~3 minutes</span>
+            </div>
+
+            <div class="mb-4">
+                <h3 class="font-semibold text-gray-700 mb-2">What this imports:</h3>
+                <ul class="list-disc list-inside text-gray-600 space-y-1">
+                    <li>AISRI scores for all 10 athletes</li>
+                    <li>Risk categories (2 Low, 4 Medium, 3 High, 1 Critical)</li>
+                    <li>Training zone assignments</li>
+                    <li>20 safety gates (2 per athlete)</li>
+                </ul>
+            </div>
+
+            <div class="mb-4">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="font-semibold text-gray-700">SQL File:</h3>
+                    <button onclick="copyImport()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center">
+                        <i class="fas fa-copy mr-2"></i>
+                        Copy Import SQL
+                    </button>
+                </div>
+                <a href="/sql/03_import_aisri_scores.sql" target="_blank" class="text-blue-600 hover:text-blue-800 flex items-center">
+                    <i class="fas fa-download mr-2"></i>
+                    Download 03_import_aisri_scores.sql (18KB)
+                </a>
+            </div>
+
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
+                <h3 class="font-semibold text-gray-700 mb-2">Instructions:</h3>
+                <ol class="list-decimal list-inside text-gray-600 space-y-2">
+                    <li>In Supabase, click "New Query" (start fresh)</li>
+                    <li>Click "Copy Import SQL" button above (or download file)</li>
+                    <li>Paste the entire SQL into Supabase SQL Editor</li>
+                    <li>Click "Run" button</li>
+                    <li>Wait ~5 seconds for completion</li>
+                </ol>
+            </div>
+
+            <div class="bg-green-50 border-l-4 border-green-500 p-4">
+                <h3 class="font-semibold text-green-800 mb-2">Expected Success Message:</h3>
+                <pre class="text-sm text-green-700 font-mono">✅ ALL 10 ATHLETES HAVE AISRI SCORES!
+Athletes with AISRI Scores: 10
+Risk Distribution: 2 Low, 4 Medium, 3 High, 1 Critical
+Safety Gates Initialized: 20</pre>
+            </div>
+        </div>
+
+        <!-- Verification -->
+        <div class="bg-white rounded-lg shadow-lg p-8 mb-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-check-circle text-green-600 mr-3"></i>
+                Verification Queries
+            </h2>
+
+            <p class="text-gray-600 mb-4">Run these queries in Supabase to verify everything deployed correctly:</p>
+
+            <div class="space-y-4">
+                <div>
+                    <h3 class="font-semibold text-gray-700 mb-2">1. Check AISRI Scores:</h3>
+                    <div class="bg-gray-800 text-green-400 p-4 rounded-lg font-mono text-sm overflow-x-auto">
+                        <pre>SELECT 
+  athlete_name,
+  aisri_score,
+  risk_category,
+  array_to_string(allowed_zones, ', ') as zones,
+  current_phase
+FROM public.aisri_athlete_dashboard
+ORDER BY aisri_score ASC;</pre>
+                    </div>
+                    <button onclick="copyVerify1()" class="mt-2 text-blue-600 hover:text-blue-800 text-sm">
+                        <i class="fas fa-copy mr-1"></i> Copy Query
+                    </button>
+                </div>
+
+                <div>
+                    <h3 class="font-semibold text-gray-700 mb-2">2. Check Training Zones:</h3>
+                    <div class="bg-gray-800 text-green-400 p-4 rounded-lg font-mono text-sm overflow-x-auto">
+                        <pre>SELECT zone_code, zone_name, 
+       hr_min_percent || '-' || hr_max_percent || '% max HR' as hr_range,
+       min_aisri_score
+FROM public.training_zones
+ORDER BY sort_order;</pre>
+                    </div>
+                    <button onclick="copyVerify2()" class="mt-2 text-blue-600 hover:text-blue-800 text-sm">
+                        <i class="fas fa-copy mr-1"></i> Copy Query
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Next Steps -->
+        <div class="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-lg p-8 text-white">
+            <h2 class="text-2xl font-bold mb-4">
+                <i class="fas fa-rocket mr-3"></i>
+                What's Next?
+            </h2>
+            <p class="mb-4">After deploying the database, I'll build these web tools for you:</p>
+            <ul class="space-y-2 mb-6">
+                <li class="flex items-center">
+                    <i class="fas fa-calculator mr-3"></i>
+                    <span><strong>Phase B:</strong> AISRI Calculator Tool (10 min)</span>
+                </li>
+                <li class="flex items-center">
+                    <i class="fas fa-chart-line mr-3"></i>
+                    <span><strong>Phase C:</strong> Training Zone System (Already built in DB!)</span>
+                </li>
+                <li class="flex items-center">
+                    <i class="fas fa-clipboard-list mr-3"></i>
+                    <span><strong>Phase D:</strong> Assessment Forms (10 min)</span>
+                </li>
+                <li class="flex items-center">
+                    <i class="fas fa-tachometer-alt mr-3"></i>
+                    <span><strong>Phase E:</strong> Complete AISRI Dashboard (15 min)</span>
+                </li>
+            </ul>
+            <div class="bg-white/20 rounded-lg p-4">
+                <p class="font-semibold mb-2">After you complete Steps 1 & 2 above, reply with:</p>
+                <p class="font-mono text-lg">✅ Database deployed - Build web tools</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center text-gray-500 mt-8 text-sm">
+            <p>SafeStride AISRI System v1.0 | Deployment Guide</p>
+            <p class="mt-2">Supabase Project: bdisppaxbvygsspcuymb</p>
+        </div>
+    </div>
+
+    <script>
+        async function copySchema() {
+            try {
+                const response = await fetch('/sql/02_aisri_complete_schema.sql');
+                const text = await response.text();
+                await navigator.clipboard.writeText(text);
+                alert('✅ Schema SQL copied to clipboard! Now paste it in Supabase SQL Editor.');
+            } catch (err) {
+                alert('❌ Failed to copy. Please download the file instead.');
+            }
+        }
+
+        async function copyImport() {
+            try {
+                const response = await fetch('/sql/03_import_aisri_scores.sql');
+                const text = await response.text();
+                await navigator.clipboard.writeText(text);
+                alert('✅ Import SQL copied to clipboard! Now paste it in Supabase SQL Editor.');
+            } catch (err) {
+                alert('❌ Failed to copy. Please download the file instead.');
+            }
+        }
+
+        function copyVerify1() {
+            const query = `SELECT 
+  athlete_name,
+  aisri_score,
+  risk_category,
+  array_to_string(allowed_zones, ', ') as zones,
+  current_phase
+FROM public.aisri_athlete_dashboard
+ORDER BY aisri_score ASC;`;
+            navigator.clipboard.writeText(query);
+            alert('✅ Query copied! Paste in Supabase SQL Editor.');
+        }
+
+        function copyVerify2() {
+            const query = `SELECT zone_code, zone_name, 
+       hr_min_percent || '-' || hr_max_percent || '% max HR' as hr_range,
+       min_aisri_score
+FROM public.training_zones
+ORDER BY sort_order;`;
+            navigator.clipboard.writeText(query);
+            alert('✅ Query copied! Paste in Supabase SQL Editor.');
+        }
+    </script>
+</body>
+</html>

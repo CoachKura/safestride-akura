@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AISRI Assessment Form - SafeStride</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+    <div class="max-w-4xl mx-auto p-6">
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-lg p-8 mb-6">
+            <div class="text-center">
+                <i class="fas fa-clipboard-check text-5xl text-blue-600 mb-4"></i>
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">AISRI Assessment Form</h1>
+                <p class="text-gray-600">Complete assessment to calculate your Injury & Safety Risk Index</p>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="mt-6">
+                <div class="flex justify-between text-sm text-gray-600 mb-2">
+                    <span>Progress</span>
+                    <span><span id="progressPercent">0</span>% Complete</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-3">
+                    <div id="progressBar" class="bg-blue-600 h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <form id="aisriForm" class="space-y-6">
+            <!-- Personal Information -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-user text-blue-600 mr-3"></i>
+                    Personal Information
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Full Name *</label>
+                        <input type="text" name="full_name" required
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Email *</label>
+                        <input type="email" name="email" required
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Age *</label>
+                        <input type="number" name="age" min="1" max="120" required
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Gender *</label>
+                        <select name="gender" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Select...</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Running Background -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-running text-blue-600 mr-3"></i>
+                    Running Background
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Experience (years) *</label>
+                        <select name="running_experience_years" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Select...</option>
+                            <option value="0">< 6 months</option>
+                            <option value="0.5">6 months - 1 year</option>
+                            <option value="1.5">1-2 years</option>
+                            <option value="3.5">2-5 years</option>
+                            <option value="7.5">5-10 years</option>
+                            <option value="10">10+ years</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Weekly Mileage (km) *</label>
+                        <select name="weekly_mileage_km" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Select...</option>
+                            <option value="10">0-20 km</option>
+                            <option value="30">21-40 km</option>
+                            <option value="50">41-60 km</option>
+                            <option value="75">61-80 km</option>
+                            <option value="100">80+ km</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Training Goals</label>
+                    <textarea name="training_goals" rows="2"
+                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              placeholder="E.g., Complete a half marathon, improve pace, prevent injuries..."></textarea>
+                </div>
+            </div>
+
+            <!-- Current Injuries -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-band-aid text-red-600 mr-3"></i>
+                    Current Injuries & Pain
+                </h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Current Injuries</label>
+                        <textarea name="previous_injuries" rows="2"
+                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  placeholder="List any current or recent injuries (e.g., Knee pain, Plantar fasciitis, etc.)"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Pain Level (0-10)</label>
+                        <input type="range" name="pain_level" min="0" max="10" value="0" 
+                               class="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                               oninput="document.getElementById('painValue').textContent = this.value">
+                        <div class="flex justify-between text-sm text-gray-600 mt-2">
+                            <span>No Pain (0)</span>
+                            <span class="font-bold text-lg" id="painValue">0</span>
+                            <span>Worst Pain (10)</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Medical History</label>
+                        <textarea name="medical_history" rows="2"
+                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  placeholder="Any relevant medical conditions (e.g., Asthma, Thyroid, etc.)"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AISRI 5 Pillars Self-Assessment -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-chart-bar text-blue-600 mr-3"></i>
+                    AISRI 5 Pillars Self-Assessment
+                </h2>
+                <p class="text-sm text-gray-600 mb-6">Rate yourself 0-100 on each pillar (0 = Very Poor, 100 = Excellent)</p>
+
+                <!-- Running Performance -->
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="font-semibold text-gray-700">
+                            <i class="fas fa-running text-blue-600 mr-2"></i>
+                            Running Performance (40% weight)
+                        </label>
+                        <span class="text-2xl font-bold text-blue-600" id="runningScore">50</span>
+                    </div>
+                    <input type="range" name="running_performance_score" min="0" max="100" value="50"
+                           class="w-full h-3 bg-blue-200 rounded-lg appearance-none cursor-pointer"
+                           oninput="updateScore('running', this.value); updateProgress()">
+                    <p class="text-xs text-gray-500 mt-2">Pace consistency, endurance, VO2 max, recovery rate</p>
+                </div>
+
+                <!-- Strength -->
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="font-semibold text-gray-700">
+                            <i class="fas fa-dumbbell text-red-600 mr-2"></i>
+                            Strength (20% weight)
+                        </label>
+                        <span class="text-2xl font-bold text-red-600" id="strengthScore">50</span>
+                    </div>
+                    <input type="range" name="strength_score" min="0" max="100" value="50"
+                           class="w-full h-3 bg-red-200 rounded-lg appearance-none cursor-pointer"
+                           oninput="updateScore('strength', this.value); updateProgress()">
+                    <p class="text-xs text-gray-500 mt-2">Core stability, leg strength, single-leg balance</p>
+                </div>
+
+                <!-- ROM -->
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="font-semibold text-gray-700">
+                            <i class="fas fa-arrows-alt text-green-600 mr-2"></i>
+                            Range of Motion (15% weight)
+                        </label>
+                        <span class="text-2xl font-bold text-green-600" id="romScore">50</span>
+                    </div>
+                    <input type="range" name="rom_score" min="0" max="100" value="50"
+                           class="w-full h-3 bg-green-200 rounded-lg appearance-none cursor-pointer"
+                           oninput="updateScore('rom', this.value); updateProgress()">
+                    <p class="text-xs text-gray-500 mt-2">Ankle dorsiflexion, hip flexion, hamstring flexibility</p>
+                </div>
+
+                <!-- Balance -->
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="font-semibold text-gray-700">
+                            <i class="fas fa-balance-scale text-yellow-600 mr-2"></i>
+                            Balance (15% weight)
+                        </label>
+                        <span class="text-2xl font-bold text-yellow-600" id="balanceScore">50</span>
+                    </div>
+                    <input type="range" name="balance_score" min="0" max="100" value="50"
+                           class="w-full h-3 bg-yellow-200 rounded-lg appearance-none cursor-pointer"
+                           oninput="updateScore('balance', this.value); updateProgress()">
+                    <p class="text-xs text-gray-500 mt-2">Single-leg balance (eyes open/closed), stability</p>
+                </div>
+
+                <!-- Mobility -->
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="font-semibold text-gray-700">
+                            <i class="fas fa-child text-purple-600 mr-2"></i>
+                            Mobility (10% weight)
+                        </label>
+                        <span class="text-2xl font-bold text-purple-600" id="mobilityScore">50</span>
+                    </div>
+                    <input type="range" name="mobility_score" min="0" max="100" value="50"
+                           class="w-full h-3 bg-purple-200 rounded-lg appearance-none cursor-pointer"
+                           oninput="updateScore('mobility', this.value); updateProgress()">
+                    <p class="text-xs text-gray-500 mt-2">Joint mobility, functional movement, dynamic flexibility</p>
+                </div>
+            </div>
+
+            <!-- AISRI Result Preview -->
+            <div class="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-lg p-8 text-white">
+                <div class="text-center">
+                    <p class="text-sm opacity-90 mb-2">Your Estimated AISRI Score</p>
+                    <p class="text-6xl font-bold mb-2" id="aisriResult">50</p>
+                    <p class="text-xl mb-4" id="riskCategory">Medium Risk</p>
+                    <p class="text-sm opacity-90">Allowed Training Zones: <span id="allowedZones" class="font-semibold">AR, F, EN</span></p>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-lg transition text-lg">
+                    <i class="fas fa-paper-plane mr-2"></i>
+                    Submit Assessment
+                </button>
+                <p class="text-center text-sm text-gray-500 mt-3">
+                    Your data will be saved and you'll receive personalized training recommendations
+                </p>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function updateScore(pillar, value) {
+            document.getElementById(pillar + 'Score').textContent = value;
+            calculateAISRI();
+        }
+
+        function calculateAISRI() {
+            const running = parseInt(document.querySelector('[name="running_performance_score"]').value);
+            const strength = parseInt(document.querySelector('[name="strength_score"]').value);
+            const rom = parseInt(document.querySelector('[name="rom_score"]').value);
+            const balance = parseInt(document.querySelector('[name="balance_score"]').value);
+            const mobility = parseInt(document.querySelector('[name="mobility_score"]').value);
+
+            const aisri = Math.round((running * 0.40) + (strength * 0.20) + (rom * 0.15) + (balance * 0.15) + (mobility * 0.10));
+            
+            document.getElementById('aisriResult').textContent = aisri;
+
+            // Update risk category
+            let category, zones;
+            if (aisri >= 75) {
+                category = 'Low Risk';
+                zones = 'AR, F, EN, TH, P';
+            } else if (aisri >= 55) {
+                category = 'Medium Risk';
+                zones = 'AR, F, EN, TH';
+            } else if (aisri >= 40) {
+                category = 'High Risk';
+                zones = 'AR, F, EN';
+            } else {
+                category = 'Critical Risk';
+                zones = 'AR, F';
+            }
+
+            document.getElementById('riskCategory').textContent = category;
+            document.getElementById('allowedZones').textContent = zones;
+        }
+
+        function updateProgress() {
+            const form = document.getElementById('aisriForm');
+            const inputs = form.querySelectorAll('input[required], select[required], textarea');
+            let filled = 0;
+            inputs.forEach(input => {
+                if (input.value) filled++;
+            });
+            const percent = Math.round((filled / inputs.length) * 100);
+            document.getElementById('progressPercent').textContent = percent;
+            document.getElementById('progressBar').style.width = percent + '%';
+        }
+
+        document.getElementById('aisriForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            
+            // Save to localStorage (in real app, would send to Supabase)
+            localStorage.setItem('aisri_assessment_' + Date.now(), JSON.stringify({
+                ...data,
+                submitted_at: new Date().toISOString()
+            }));
+            
+            alert('✅ Assessment Submitted!\n\nYour AISRI score: ' + document.getElementById('aisriResult').textContent + 
+                  '\nRisk Level: ' + document.getElementById('riskCategory').textContent +
+                  '\n\nThank you for completing the assessment. A coach will review your results soon.');
+            
+            // Redirect to dashboard
+            window.location.href = '/aisri-dashboard.html';
+        });
+
+        // Initialize
+        calculateAISRI();
+        updateProgress();
+
+        // Update progress on input
+        document.getElementById('aisriForm').addEventListener('input', updateProgress);
+    </script>
+</body>
+</html>

@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Athlete Assessment & Training Schedule - AKURA AISRI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <style>
+        .expand-row {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .expand-row:hover {
+            background-color: #f3f4f6;
+        }
+        .expanded-details {
+            background-color: #f9fafb;
+            border-left: 4px solid #3b82f6;
+        }
+        @media print {
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-6 no-print">
+        <div class="max-w-7xl mx-auto px-4">
+            <h1 class="text-3xl font-bold">
+                <i class="fas fa-clipboard-check mr-2"></i>Athlete Assessment & Training Schedule
+            </h1>
+            <p class="text-blue-100 mt-2">Upload CSV → Auto-Generate Training Plans</p>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        
+        <!-- CSV Upload Section -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8 no-print">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-file-upload text-blue-600 mr-2"></i>Upload Google Form Responses (CSV)
+            </h2>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Select CSV File from Google Forms
+                </label>
+                <input type="file" id="csvFile" accept=".csv" class="block w-full text-sm text-gray-500 file:mr-4 file:py-3 file:px-6 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+            </div>
+
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4">
+                <h3 class="text-sm font-semibold text-blue-900 mb-2">📋 CSV Format Requirements:</h3>
+                <p class="text-sm text-blue-800 mb-2">Your Google Form CSV should have these columns:</p>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs text-blue-700">
+                    <div>✓ Name</div>
+                    <div>✓ Age</div>
+                    <div>✓ Resting HR</div>
+                    <div>✓ Email</div>
+                    <div>✓ Running Score</div>
+                    <div>✓ Strength Score</div>
+                    <div>✓ ROM Score</div>
+                    <div>✓ Balance Score</div>
+                    <div>✓ Alignment Score</div>
+                    <div>✓ Mobility Score</div>
+                    <div>✓ Previous Workout</div>
+                    <div>✓ Injury History</div>
+                </div>
+            </div>
+
+            <button onclick="downloadSampleCSV()" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 mr-4">
+                <i class="fas fa-download mr-2"></i>Download Sample CSV
+            </button>
+
+            <div id="uploadStatus" class="mt-4 hidden">
+                <!-- Upload status will show here -->
+            </div>
+        </div>
+
+        <!-- Athletes Table -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8" id="athletesTable" style="display: none;">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-gray-800">
+                    <i class="fas fa-users text-blue-600 mr-2"></i>Athletes Overview
+                </h2>
+                <div class="space-x-2">
+                    <button onclick="generateAllWorkouts()" class="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                        <i class="fas fa-magic mr-2"></i>Generate All Workouts
+                    </button>
+                    <button onclick="printSchedule()" class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
+                        <i class="fas fa-print mr-2"></i>Print Schedule
+                    </button>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Age</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">AISRI Score</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Risk</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thursday Workout</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="athletesTableBody" class="bg-white divide-y divide-gray-200">
+                        <!-- Rows will be injected here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Expanded Athlete Details (Hidden by default) -->
+        <div id="athleteDetails" style="display: none;">
+            <!-- Details will be injected here -->
+        </div>
+
+    </main>
+
+    <script>
+        let athletesData = [];
+
+        // Handle CSV file upload
+        document.getElementById('csvFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const status = document.getElementById('uploadStatus');
+            status.className = 'mt-4 p-4 bg-blue-50 border-l-4 border-blue-500 rounded';
+            status.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing CSV file...';
+            status.classList.remove('hidden');
+
+            Papa.parse(file, {
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    athletesData = processCSVData(results.data);
+                    
+                    if (athletesData.length > 0) {
+                        status.className = 'mt-4 p-4 bg-green-50 border-l-4 border-green-500 rounded';
+                        status.innerHTML = `<i class="fas fa-check-circle mr-2"></i>✅ Successfully loaded ${athletesData.length} athletes!`;
+                        
+                        displayAthletesTable();
+                    } else {
+                        status.className = 'mt-4 p-4 bg-red-50 border-l-4 border-red-500 rounded';
+                        status.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>❌ No valid data found in CSV. Please check format.';
+                    }
+                },
+                error: function(error) {
+                    status.className = 'mt-4 p-4 bg-red-50 border-l-4 border-red-500 rounded';
+                    status.innerHTML = `<i class="fas fa-times-circle mr-2"></i>❌ Error reading CSV: ${error.message}`;
+                }
+            });
+        });
+
+        function processCSVData(data) {
+            return data.map((row, index) => {
+                // Map CSV columns to athlete data (flexible column names)
+                const name = row['Name'] || row['Athlete Name'] || row['name'] || row['Full Name'] || 'Athlete ' + (index + 1);
+                const age = parseInt(row['Age'] || row['age'] || 30);
+                const restingHR = parseInt(row['Resting HR'] || row['Resting HR (bpm)'] || row['restingHR'] || 60);
+                const email = row['Email'] || row['email'] || '';
+                
+                // 6-Pillar scores
+                const running = parseFloat(row['Running Performance'] || row['Running'] || row['running_score'] || 50);
+                const strength = parseFloat(row['Strength'] || row['strength_score'] || 50);
+                const rom = parseFloat(row['ROM'] || row['Range of Motion'] || row['rom_score'] || 50);
+                const balance = parseFloat(row['Balance'] || row['balance_score'] || 50);
+                const alignment = parseFloat(row['Alignment'] || row['alignment_score'] || 50);
+                const mobility = parseFloat(row['Mobility'] || row['mobility_score'] || 50);
+
+                // Additional info
+                const previousWorkout = row['Previous Workout'] || row['Last Workout'] || row['previous_workout'] || 'Not provided';
+                const injuryHistory = row['Injury History'] || row['Injuries'] || row['injury_history'] || 'None reported';
+
+                // Calculate AISRI score
+                const aisriScore = Math.round(
+                    running * 0.40 +
+                    strength * 0.15 +
+                    rom * 0.12 +
+                    balance * 0.13 +
+                    alignment * 0.10 +
+                    mobility * 0.10
+                );
+
+                // Determine risk category
+                let riskCategory, riskColor;
+                if (aisriScore >= 85) {
+                    riskCategory = 'Very Low';
+                    riskColor = 'bg-green-600';
+                } else if (aisriScore >= 70) {
+                    riskCategory = 'Low';
+                    riskColor = 'bg-green-500';
+                } else if (aisriScore >= 55) {
+                    riskCategory = 'Medium';
+                    riskColor = 'bg-yellow-500';
+                } else if (aisriScore >= 40) {
+                    riskCategory = 'High';
+                    riskColor = 'bg-orange-500';
+                } else {
+                    riskCategory = 'Critical';
+                    riskColor = 'bg-red-600';
+                }
+
+                // Determine Thursday workout
+                let workoutType;
+                if (aisriScore >= 85) workoutType = 'Speed Intervals (SP)';
+                else if (aisriScore >= 70) workoutType = 'Power Intervals (P)';
+                else if (aisriScore >= 55) workoutType = 'Tempo Run (TH)';
+                else if (aisriScore >= 40) workoutType = 'Endurance Intervals (EN)';
+                else workoutType = 'Foundation Run (F)';
+
+                return {
+                    id: index + 1,
+                    name,
+                    age,
+                    restingHR,
+                    email,
+                    pillars: { running, strength, rom, balance, alignment, mobility },
+                    aisriScore,
+                    riskCategory,
+                    riskColor,
+                    workoutType,
+                    previousWorkout,
+                    injuryHistory
+                };
+            }).filter(athlete => athlete.name && athlete.aisriScore);
+        }
+
+        function displayAthletesTable() {
+            const tableBody = document.getElementById('athletesTableBody');
+            const table = document.getElementById('athletesTable');
+            
+            tableBody.innerHTML = '';
+            
+            athletesData.forEach(athlete => {
+                const row = document.createElement('tr');
+                row.className = 'expand-row';
+                row.onclick = () => toggleAthleteDetails(athlete.id);
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${athlete.id}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">${athlete.name}</div>
+                        <div class="text-xs text-gray-500">${athlete.email}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${athlete.age}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-lg font-bold text-blue-600">${athlete.aisriScore}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full text-white ${athlete.riskColor}">
+                            ${athlete.riskCategory}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-900">${athlete.workoutType}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <button onclick="event.stopPropagation(); viewDetails(${athlete.id})" class="text-blue-600 hover:text-blue-900 mr-3">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                        <button onclick="event.stopPropagation(); generateWorkout(${athlete.id})" class="text-green-600 hover:text-green-900">
+                            <i class="fas fa-running"></i> Generate
+                        </button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+            
+            table.style.display = 'block';
+        }
+
+        function toggleAthleteDetails(athleteId) {
+            const detailsDiv = document.getElementById('athleteDetails');
+            const athlete = athletesData.find(a => a.id === athleteId);
+            
+            if (!athlete) return;
+
+            // Calculate HR zones
+            const maxHR = 220 - athlete.age;
+            const hrReserve = maxHR - athlete.restingHR;
+            const zones = {
+                AR: { min: Math.round(athlete.restingHR + hrReserve * 0.50), max: Math.round(athlete.restingHR + hrReserve * 0.60) },
+                F: { min: Math.round(athlete.restingHR + hrReserve * 0.60), max: Math.round(athlete.restingHR + hrReserve * 0.70) },
+                EN: { min: Math.round(athlete.restingHR + hrReserve * 0.70), max: Math.round(athlete.restingHR + hrReserve * 0.80) },
+                TH: { min: Math.round(athlete.restingHR + hrReserve * 0.80), max: Math.round(athlete.restingHR + hrReserve * 0.87) },
+                P: { min: Math.round(athlete.restingHR + hrReserve * 0.87), max: Math.round(athlete.restingHR + hrReserve * 0.95) },
+                SP: { min: Math.round(athlete.restingHR + hrReserve * 0.95), max: maxHR }
+            };
+
+            detailsDiv.innerHTML = `
+                <div class="bg-white rounded-xl shadow-lg p-8 expanded-details">
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <h2 class="text-3xl font-bold text-gray-800">${athlete.name}</h2>
+                            <p class="text-gray-600 mt-1">Age: ${athlete.age} | Resting HR: ${athlete.restingHR} bpm | ${athlete.email}</p>
+                        </div>
+                        <button onclick="closeDetails()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400">
+                            <i class="fas fa-times mr-2"></i>Close
+                        </button>
+                    </div>
+
+                    <!-- AISRI Score Card -->
+                    <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-6 text-white mb-6">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="text-sm opacity-90">CALCULATED AISRI SCORE</div>
+                                <div class="text-6xl font-bold mt-2">${athlete.aisriScore}</div>
+                                <div class="text-xl mt-2 font-semibold">${athlete.riskCategory} Risk</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm opacity-90">Allowed Zones</div>
+                                <div class="text-2xl font-bold mt-2">${getAllowedZones(athlete.aisriScore)}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 6-Pillar Breakdown -->
+                    <div class="mb-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">6-Pillar AISRI Scores</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+                                <div class="text-sm text-blue-700 font-medium">🏃 Running</div>
+                                <div class="text-2xl font-bold text-blue-600 mt-1">${athlete.pillars.running}</div>
+                                <div class="text-xs text-blue-600">40% weight</div>
+                            </div>
+                            <div class="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-500">
+                                <div class="text-sm text-orange-700 font-medium">💪 Strength</div>
+                                <div class="text-2xl font-bold text-orange-600 mt-1">${athlete.pillars.strength}</div>
+                                <div class="text-xs text-orange-600">15% weight</div>
+                            </div>
+                            <div class="bg-teal-50 p-4 rounded-lg border-l-4 border-teal-500">
+                                <div class="text-sm text-teal-700 font-medium">🤸 ROM</div>
+                                <div class="text-2xl font-bold text-teal-600 mt-1">${athlete.pillars.rom}</div>
+                                <div class="text-xs text-teal-600">12% weight</div>
+                            </div>
+                            <div class="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
+                                <div class="text-sm text-green-700 font-medium">⚖️ Balance</div>
+                                <div class="text-2xl font-bold text-green-600 mt-1">${athlete.pillars.balance}</div>
+                                <div class="text-xs text-green-600">13% weight</div>
+                            </div>
+                            <div class="bg-cyan-50 p-4 rounded-lg border-l-4 border-cyan-500">
+                                <div class="text-sm text-cyan-700 font-medium">📐 Alignment</div>
+                                <div class="text-2xl font-bold text-cyan-600 mt-1">${athlete.pillars.alignment}</div>
+                                <div class="text-xs text-cyan-600">10% weight</div>
+                            </div>
+                            <div class="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-500">
+                                <div class="text-sm text-purple-700 font-medium">🧘 Mobility</div>
+                                <div class="text-2xl font-bold text-purple-600 mt-1">${athlete.pillars.mobility}</div>
+                                <div class="text-xs text-purple-600">10% weight</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Heart Rate Zones -->
+                    <div class="mb-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">💓 Heart Rate Zones</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-6 gap-3">
+                            <div class="bg-blue-50 p-3 rounded-lg text-center">
+                                <div class="font-bold text-blue-700">AR</div>
+                                <div class="text-sm text-blue-600">${zones.AR.min}-${zones.AR.max}</div>
+                                <div class="text-xs text-gray-600">50-60%</div>
+                            </div>
+                            <div class="bg-green-50 p-3 rounded-lg text-center">
+                                <div class="font-bold text-green-700">F</div>
+                                <div class="text-sm text-green-600">${zones.F.min}-${zones.F.max}</div>
+                                <div class="text-xs text-gray-600">60-70%</div>
+                            </div>
+                            <div class="bg-yellow-50 p-3 rounded-lg text-center">
+                                <div class="font-bold text-yellow-700">EN</div>
+                                <div class="text-sm text-yellow-600">${zones.EN.min}-${zones.EN.max}</div>
+                                <div class="text-xs text-gray-600">70-80%</div>
+                            </div>
+                            <div class="bg-orange-50 p-3 rounded-lg text-center">
+                                <div class="font-bold text-orange-700">TH</div>
+                                <div class="text-sm text-orange-600">${zones.TH.min}-${zones.TH.max}</div>
+                                <div class="text-xs text-gray-600">80-87%</div>
+                            </div>
+                            <div class="bg-red-50 p-3 rounded-lg text-center">
+                                <div class="font-bold text-red-700">P</div>
+                                <div class="text-sm text-red-600">${zones.P.min}-${zones.P.max}</div>
+                                <div class="text-xs text-gray-600">87-95%</div>
+                            </div>
+                            <div class="bg-red-100 p-3 rounded-lg text-center">
+                                <div class="font-bold text-red-800">SP</div>
+                                <div class="text-sm text-red-700">${zones.SP.min}-${zones.SP.max}</div>
+                                <div class="text-xs text-gray-600">95-100%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Previous Workout & Injury History -->
+                    <div class="grid md:grid-cols-2 gap-4 mb-6">
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h4 class="font-semibold text-gray-700 mb-2">📝 Previous Workout</h4>
+                            <p class="text-sm text-gray-600">${athlete.previousWorkout}</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h4 class="font-semibold text-gray-700 mb-2">🏥 Injury History</h4>
+                            <p class="text-sm text-gray-600">${athlete.injuryHistory}</p>
+                        </div>
+                    </div>
+
+                    <!-- Thursday Workout Recommendation -->
+                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4">
+                        <h4 class="font-bold text-blue-900 mb-2">🏃 Thursday Workout Recommendation</h4>
+                        <p class="text-blue-800 font-semibold text-lg">${athlete.workoutType}</p>
+                        <button onclick="generateWorkout(${athlete.id})" class="mt-3 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                            <i class="fas fa-magic mr-2"></i>Generate Full Workout Details
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            detailsDiv.style.display = 'block';
+            detailsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function getAllowedZones(aisriScore) {
+            if (aisriScore >= 85) return 'AR, F, EN, TH, P, SP';
+            if (aisriScore >= 70) return 'AR, F, EN, TH, P';
+            if (aisriScore >= 55) return 'AR, F, EN, TH';
+            if (aisriScore >= 40) return 'AR, F, EN';
+            return 'AR, F';
+        }
+
+        function closeDetails() {
+            document.getElementById('athleteDetails').style.display = 'none';
+        }
+
+        function viewDetails(athleteId) {
+            toggleAthleteDetails(athleteId);
+        }
+
+        function generateWorkout(athleteId) {
+            const athlete = athletesData.find(a => a.id === athleteId);
+            if (!athlete) return;
+
+            // Open in new window with workout generator
+            const params = new URLSearchParams({
+                name: athlete.name,
+                age: athlete.age,
+                restingHR: athlete.restingHR,
+                running: athlete.pillars.running,
+                strength: athlete.pillars.strength,
+                rom: athlete.pillars.rom,
+                balance: athlete.pillars.balance,
+                alignment: athlete.pillars.alignment,
+                mobility: athlete.pillars.mobility,
+                previousWorkout: athlete.previousWorkout
+            });
+
+            // For now, alert the user (you can integrate with thursday-workout-generator.html)
+            alert(`Generating workout for ${athlete.name}...\nAISRI Score: ${athlete.aisriScore}\nWorkout Type: ${athlete.workoutType}\n\nThis will open in the workout generator.`);
+            
+            // TODO: Open thursday-workout-generator.html with pre-filled data
+            // window.open('thursday-workout-generator.html?' + params.toString(), '_blank');
+        }
+
+        function generateAllWorkouts() {
+            if (athletesData.length === 0) {
+                alert('No athletes loaded. Please upload CSV first.');
+                return;
+            }
+
+            let report = `AKURA AISRI - All Athletes Training Schedule\n`;
+            report += `Generated: ${new Date().toLocaleString()}\n`;
+            report += `Total Athletes: ${athletesData.length}\n\n`;
+            report += `═══════════════════════════════════════════════════════════════\n\n`;
+
+            athletesData.forEach(athlete => {
+                report += `${athlete.id}. ${athlete.name}\n`;
+                report += `   AISRI: ${athlete.aisriScore}/100 (${athlete.riskCategory} Risk)\n`;
+                report += `   Thursday Workout: ${athlete.workoutType}\n`;
+                report += `   Age: ${athlete.age} | Resting HR: ${athlete.restingHR} bpm\n`;
+                report += `   6 Pillars: R:${athlete.pillars.running} S:${athlete.pillars.strength} ROM:${athlete.pillars.rom} B:${athlete.pillars.balance} A:${athlete.pillars.alignment} M:${athlete.pillars.mobility}\n`;
+                report += `\n`;
+            });
+
+            // Create downloadable text file
+            const blob = new Blob([report], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `AKURA_Training_Schedule_${new Date().toISOString().split('T')[0]}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            alert(`✅ Training schedule generated for all ${athletesData.length} athletes!`);
+        }
+
+        function printSchedule() {
+            window.print();
+        }
+
+        function downloadSampleCSV() {
+            const sampleCSV = `Name,Age,Resting HR,Email,Running Performance,Strength,ROM,Balance,Alignment,Mobility,Previous Workout,Injury History
+Priya Sharma,30,55,priya@example.com,80,72,75,78,74,70,Tuesday: 8km @ 6:15/km,None
+Arun Patel,38,65,arun@example.com,58,48,52,54,50,48,Tuesday: 5km @ 7:15/km,Knee pain 2023
+Deepa Menon,29,52,deepa@example.com,92,88,90,92,90,88,Tuesday: 10km @ 5:45/km,None
+Rajesh Naidu,42,72,rajesh@example.com,40,35,38,35,36,38,Tuesday: 3km walk,Heel spur
+Kavya Reddy,35,58,kavya@example.com,72,68,70,72,68,65,Tuesday: 7km @ 6:30/km,None`;
+
+            const blob = new Blob([sampleCSV], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'AKURA_Sample_Athletes.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+
+</body>
+</html>
