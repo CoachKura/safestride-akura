@@ -635,6 +635,11 @@
           '<i class="fas fa-spinner fa-spin mr-2"></i>Connecting to Strava...';
 
         try {
+          console.log(
+            "🔵 Starting Strava OAuth with code:",
+            code.substring(0, 10) + "...",
+          );
+
           // Step 1: Exchange authorization code for access token
           const { data: oauthData, error: oauthError } =
             await supabaseClient.functions.invoke("strava-oauth", {
@@ -644,11 +649,22 @@
               },
             });
 
+          console.log("🔵 OAuth Response:", {
+            data: oauthData,
+            error: oauthError,
+          });
+
           if (oauthError) {
-            console.error("OAuth error:", oauthError);
-            throw new Error(
-              oauthError.message || "Failed to connect to Strava",
-            );
+            console.error("❌ OAuth error details:", oauthError);
+            const errorMsg = oauthError.message || JSON.stringify(oauthError);
+            throw new Error(errorMsg);
+          }
+
+          if (!oauthData || !oauthData.success) {
+            const errorMsg =
+              oauthData?.error || "OAuth failed - no data returned";
+            console.error("❌ OAuth failed:", errorMsg);
+            throw new Error(errorMsg);
           }
 
           document.getElementById("strava-status").innerHTML =
