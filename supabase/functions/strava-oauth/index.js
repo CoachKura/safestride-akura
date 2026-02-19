@@ -7,8 +7,9 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const STRAVA_CLIENT_ID = "162971";
-const STRAVA_CLIENT_SECRET = "6554eb9bb83f222a585e312c17420221313f85c1";
+// Load credentials from environment variables (set via: supabase secrets set)
+const STRAVA_CLIENT_ID = Deno.env.get("STRAVA_CLIENT_ID") ?? "";
+const STRAVA_CLIENT_SECRET = Deno.env.get("STRAVA_CLIENT_SECRET") ?? "";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
