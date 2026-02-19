@@ -1483,23 +1483,35 @@
 
       function displayHRZones() {
         const zones = analysisResults.hrZones;
-        
+
         // Safety check: ensure zones exist
-        if (!zones || typeof zones !== 'object') {
-          console.warn('⚠️ HR Zones not available, using default values');
+        if (!zones || typeof zones !== "object") {
+          console.warn("⚠️ HR Zones not available, using default values");
           const age = athleteData.age || 30;
           const maxHR = 220 - age;
           // Create default zones if calculateHRZones failed
           const defaultZones = {
-            zone1: { min: Math.round(maxHR * 0.50), max: Math.round(maxHR * 0.60) },
-            zone2: { min: Math.round(maxHR * 0.60), max: Math.round(maxHR * 0.70) },
-            zone3: { min: Math.round(maxHR * 0.70), max: Math.round(maxHR * 0.80) },
-            zone4: { min: Math.round(maxHR * 0.80), max: Math.round(maxHR * 0.90) },
-            zone5: { min: Math.round(maxHR * 0.90), max: maxHR }
+            zone1: {
+              min: Math.round(maxHR * 0.5),
+              max: Math.round(maxHR * 0.6),
+            },
+            zone2: {
+              min: Math.round(maxHR * 0.6),
+              max: Math.round(maxHR * 0.7),
+            },
+            zone3: {
+              min: Math.round(maxHR * 0.7),
+              max: Math.round(maxHR * 0.8),
+            },
+            zone4: {
+              min: Math.round(maxHR * 0.8),
+              max: Math.round(maxHR * 0.9),
+            },
+            zone5: { min: Math.round(maxHR * 0.9), max: maxHR },
           };
           analysisResults.hrZones = defaultZones;
         }
-        
+
         const finalZones = analysisResults.hrZones;
         const zoneNames = ["Zone 1", "Zone 2", "Zone 3", "Zone 4", "Zone 5"];
         const zoneColors = [
