@@ -588,7 +588,7 @@
       const STRAVA_REDIRECT_URI = window.location.href.split("?")[0];
 
       // Initialize Supabase client
-      const supabase = window.supabase.createClient(
+      const supabaseClient = window.supabase.createClient(
         SUPABASE_URL,
         SUPABASE_ANON_KEY,
       );
@@ -634,33 +634,70 @@
         document.getElementById("strava-status").innerHTML =
           '<i class="fas fa-spinner fa-spin mr-2"></i>Connecting to Strava...';
 
-        // TODO: Exchange code for access token via your backend
-        // For demo purposes, we'll simulate success
-        setTimeout(() => {
-          document.getElementById("strava-status").innerHTML =
-            '<i class="fas fa-check-circle text-green-600 mr-2"></i>Connected! Fetching your data...';
+        try {
+          // Step 1: Exchange authorization code for access token
+          const { data: oauthData, error: oauthError } =
+            await supabaseClient.functions.invoke("strava-oauth", {
+              body: {
+                code: code,
+                athleteId: `athlete_${Date.now()}`,
+              },
+            });
 
-          // Simulate fetching Strava data
-          setTimeout(() => {
-            athleteData.stravaConnected = true;
-            athleteData.activities = generateMockStravaData();
-
-            // Auto-calculate Running pillar
-            const runningScore = mlAnalyzer.calculateRunningPillar(
-              athleteData.activities,
+          if (oauthError) {
+            console.error("OAuth error:", oauthError);
+            throw new Error(
+              oauthError.message || "Failed to connect to Strava",
             );
-            document.getElementById("running-score").value =
-              Math.round(runningScore);
-            document
-              .getElementById("running-score")
-              .classList.add("bg-green-50", "border-green-500");
+          }
 
-            document.getElementById("strava-status").innerHTML =
-              '<i class="fas fa-check-circle text-green-600 mr-2"></i>Connected! Running pillar auto-calculated: ' +
-              Math.round(runningScore) +
-              "/100";
-          }, 1500);
-        }, 1000);
+          document.getElementById("strava-status").innerHTML =
+            '<i class="fas fa-check-circle text-green-600 mr-2"></i>Connected! Analyzing your activities...';
+
+          // Step 2: Sync activities and calculate AISRI scores
+          const { data: syncData, error: syncError } =
+            await supabaseClient.functions.invoke("strava-sync-activities", {
+              body: {
+                athleteId: oauthData.athlete.id.toString(),
+                daysBack: 30,
+              },
+            });
+
+          if (syncError) {
+            console.error("Sync error:", syncError);
+            throw new Error(syncError.message || "Failed to sync activities");
+          }
+
+          // Step 3: Update UI with real data
+          athleteData.stravaConnected = true;
+          athleteData.activities = syncData.activities || [];
+
+          // Use the ML-calculated Running pillar score from backend
+          const runningScore =
+            syncData.aisriScore?.pillar_scores?.running ||
+            syncData.runningScore ||
+            75; // fallback
+
+          document.getElementById("running-score").value =
+            Math.round(runningScore);
+          document
+            .getElementById("running-score")
+            .classList.add("bg-green-50", "border-green-500");
+
+          document.getElementById("strava-status").innerHTML =
+            '<i class="fas fa-check-circle text-green-600 mr-2"></i>Connected! ' +
+            `${syncData.activitiesProcessed || 0} activities analyzed. Running pillar: ${Math.round(runningScore)}/100`;
+
+          // Store connection info for future use
+          athleteData.stravaConnectionId = oauthData.connectionId;
+          athleteData.stravaAthlete = oauthData.athlete;
+        } catch (error) {
+          console.error("Strava connection error:", error);
+          document.getElementById("strava-status").innerHTML =
+            '<i class="fas fa-times-circle text-red-600 mr-2"></i>Error: ' +
+            error.message;
+          alert("Failed to connect to Strava: " + error.message);
+        }
       }
 
       function generateMockStravaData() {
@@ -1296,16 +1333,18 @@
 
       async function savePlanToDatabase() {
         try {
-          const { data, error } = await supabase.from("training_plans").insert([
-            {
-              athlete_name: athleteData.name,
-              aisri_score: analysisResults.score,
-              risk_category: analysisResults.category,
-              pillar_scores: athleteData.pillars,
-              training_plan: trainingPlan,
-              created_at: new Date().toISOString(),
-            },
-          ]);
+          const { data, error } = await supabaseClient
+            .from("training_plans")
+            .insert([
+              {
+                athlete_name: athleteData.name,
+                aisri_score: analysisResults.score,
+                risk_category: analysisResults.category,
+                pillar_scores: athleteData.pillars,
+                training_plan: trainingPlan,
+                created_at: new Date().toISOString(),
+              },
+            ]);
 
           if (error) throw error;
 
