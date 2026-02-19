@@ -1,58 +1,105 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AISRI Training System - Redirecting...</title>
-    <meta http-equiv="refresh" content="0;url=training-plan-builder.html" />
-    <style>
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 100vh;
-        margin: 0;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-      }
-      .container {
-        text-align: center;
-      }
-      .spinner {
-        border: 4px solid rgba(255, 255, 255, 0.3);
-        border-top: 4px solid white;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        animation: spin 1s linear infinite;
-        margin: 20px auto;
-      }
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
-        100% {
-          transform: rotate(360deg);
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <div class="spinner"></div>
-      <h1>AISRI Training Plan Builder</h1>
-      <p>Redirecting...</p>
-      <p>
-        <a
-          href="training-plan-builder.html"
-          style="color: white; text-decoration: underline"
-          >Click here if not redirected automatically</a
-        >
-      </p>
-    </div>
-    <script>
-      window.location.href = "training-plan-builder.html";
-    </script>
-  </body>
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="SafeStride - Your personal running coach with Strava integration, workout builder, and advanced analytics">
+  <meta name="keywords" content="running, fitness, strava, workout, training, coach">
+  <meta name="author" content="SafeStride">
+
+  <!-- iOS PWA Icons -->
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/Icon-192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/Icon-192.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="icons/Icon-192.png">
+  
+  <!-- iOS Splash Screens -->
+  <meta name="apple-mobile-web-app-orientations" content="portrait">
+  <link rel="apple-touch-startup-image" href="icons/Icon-512.png">
+
+  <!-- Theme color for browsers -->
+  <meta name="theme-color" content="#4CAF50">
+  <meta name="msapplication-navbutton-color" content="#4CAF50">
+  <meta name="msapplication-TileColor" content="#1a1a2e">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/Icon-192.png">
+
+  <!-- iOS PWA support (NOT deprecated for iOS PWAs) -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="SafeStride">
+
+  <!-- Android PWA support -->
+  <meta name="mobile-web-app-capable" content="yes">
+
+  <title>SafeStride - Running Coach</title>
+  <link rel="manifest" href="manifest.json">
+  
+  <!-- Preload critical resources -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  
+  <style>
+    /* Loading screen while Flutter initializes */
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      flex-direction: column;
+    }
+    .loading-text {
+      color: #4CAF50;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 24px;
+      font-weight: 600;
+      margin-top: 20px;
+    }
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(76, 175, 80, 0.3);
+      border-top: 4px solid #4CAF50;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading indicator shown while Flutter loads -->
+  <div class="loading" id="loading">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">SafeStride</div>
+  </div>
+  
+  <script>
+    // Hide loading screen when Flutter is ready
+    window.addEventListener('flutter-first-frame', function() {
+      document.getElementById('loading').style.display = 'none';
+    });
+  </script>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
 </html>

@@ -1,0 +1,679 @@
+﻿<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Coach Dashboard - AKURA SafeStride</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+      .gradient-bg {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+      .status-badge {
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .status-low {
+        background: #d4edda;
+        color: #155724;
+      }
+      .status-medium {
+        background: #fff3cd;
+        color: #856404;
+      }
+      .status-high {
+        background: #f8d7da;
+        color: #721c24;
+      }
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+      }
+      .modal-content {
+        position: relative;
+        background: white;
+        max-width: 600px;
+        margin: 50px auto;
+        border-radius: 16px;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="gradient-bg text-white shadow-lg">
+      <div class="container mx-auto px-6 py-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <i class="fas fa-running text-2xl"></i>
+            <div>
+              <h1 class="text-xl font-bold">AKURA SafeStride</h1>
+              <p class="text-sm opacity-90">Coach Dashboard</p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-6">
+            <span id="coachName" class="text-sm font-semibold"></span>
+            <button
+              onclick="logout()"
+              class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition"
+            >
+              <i class="fas fa-sign-out-alt mr-2"></i>Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-6 py-8">
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <div class="flex items-center justify-between mb-2">
+            <i class="fas fa-users text-3xl text-purple-600"></i>
+            <span id="totalAthletes" class="text-3xl font-bold text-gray-800"
+              >0</span
+            >
+          </div>
+          <p class="text-gray-600 text-sm font-semibold">Total Athletes</p>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <div class="flex items-center justify-between mb-2">
+            <i class="fas fa-check-circle text-3xl text-green-600"></i>
+            <span id="activeAthletes" class="text-3xl font-bold text-gray-800"
+              >0</span
+            >
+          </div>
+          <p class="text-gray-600 text-sm font-semibold">Active This Week</p>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <div class="flex items-center justify-between mb-2">
+            <i class="fas fa-link text-3xl text-blue-600"></i>
+            <span id="connectedDevices" class="text-3xl font-bold text-gray-800"
+              >0</span
+            >
+          </div>
+          <p class="text-gray-600 text-sm font-semibold">Strava Connected</p>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <div class="flex items-center justify-between mb-2">
+            <i class="fas fa-exclamation-triangle text-3xl text-red-600"></i>
+            <span id="highRiskCount" class="text-3xl font-bold text-gray-800"
+              >0</span
+            >
+          </div>
+          <p class="text-gray-600 text-sm font-semibold">High Risk</p>
+        </div>
+      </div>
+
+      <!-- Actions Bar -->
+      <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-bold text-gray-800">
+            <i class="fas fa-users-cog mr-2 text-purple-600"></i>
+            Manage Athletes
+          </h2>
+          <button
+            onclick="openCreateAthleteModal()"
+            class="gradient-bg text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition shadow-lg"
+          >
+            <i class="fas fa-user-plus mr-2"></i>Create New Athlete
+          </button>
+        </div>
+      </div>
+
+      <!-- Athletes List -->
+      <div class="bg-white rounded-xl shadow-md overflow-hidden">
+        <div class="p-6 border-b">
+          <h3 class="text-lg font-bold text-gray-800">
+            <i class="fas fa-list mr-2 text-purple-600"></i>
+            Your Athletes
+          </h3>
+        </div>
+
+        <!-- Search & Filter -->
+        <div class="p-6 border-b bg-gray-50">
+          <div class="flex gap-4">
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Search by name, email, or UID..."
+              class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+            />
+            <select
+              id="filterRisk"
+              class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600"
+            >
+              <option value="">All Risk Levels</option>
+              <option value="Low Risk">Low Risk</option>
+              <option value="Medium Risk">Medium Risk</option>
+              <option value="High Risk">High Risk</option>
+              <option value="Critical Risk">Critical Risk</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Athletes Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-gray-50 border-b">
+              <tr>
+                <th
+                  class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase"
+                >
+                  Athlete
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase"
+                >
+                  UID
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase"
+                >
+                  Contact
+                </th>
+                <th
+                  class="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase"
+                >
+                  AISRI Score
+                </th>
+                <th
+                  class="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase"
+                >
+                  Risk
+                </th>
+                <th
+                  class="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase"
+                >
+                  Strava
+                </th>
+                <th
+                  class="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase"
+                >
+                  Last Login
+                </th>
+                <th
+                  class="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase"
+                >
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody id="athletesTableBody" class="divide-y divide-gray-200">
+              <tr>
+                <td colspan="8" class="px-6 py-12 text-center text-gray-500">
+                  <i class="fas fa-spinner fa-spin text-3xl mb-4"></i>
+                  <p>Loading athletes...</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create Athlete Modal -->
+    <div id="createAthleteModal" class="modal">
+      <div class="modal-content">
+        <div class="gradient-bg text-white p-6 rounded-t-xl">
+          <div class="flex items-center justify-between">
+            <h3 class="text-2xl font-bold">
+              <i class="fas fa-user-plus mr-2"></i>
+              Create New Athlete
+            </h3>
+            <button
+              onclick="closeCreateAthleteModal()"
+              class="text-white hover:text-gray-200"
+            >
+              <i class="fas fa-times text-2xl"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="p-6">
+          <form id="createAthleteForm">
+            <!-- Full Name -->
+            <div class="mb-4">
+              <label class="block text-gray-700 text-sm font-semibold mb-2">
+                <i class="fas fa-user mr-2 text-gray-500"></i>
+                Full Name *
+              </label>
+              <input
+                type="text"
+                id="athleteFullName"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600"
+                placeholder="e.g., John Doe"
+                required
+              />
+            </div>
+
+            <!-- Email -->
+            <div class="mb-4">
+              <label class="block text-gray-700 text-sm font-semibold mb-2">
+                <i class="fas fa-envelope mr-2 text-gray-500"></i>
+                Email Address *
+              </label>
+              <input
+                type="email"
+                id="athleteEmail"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600"
+                placeholder="athlete@example.com"
+                required
+              />
+            </div>
+
+            <!-- Phone -->
+            <div class="mb-4">
+              <label class="block text-gray-700 text-sm font-semibold mb-2">
+                <i class="fas fa-phone mr-2 text-gray-500"></i>
+                Phone Number
+              </label>
+              <input
+                type="tel"
+                id="athletePhone"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600"
+                placeholder="+91 9876543210"
+              />
+            </div>
+
+            <!-- Date of Birth -->
+            <div class="mb-4">
+              <label class="block text-gray-700 text-sm font-semibold mb-2">
+                <i class="fas fa-calendar mr-2 text-gray-500"></i>
+                Date of Birth
+              </label>
+              <input
+                type="date"
+                id="athleteDOB"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600"
+              />
+            </div>
+
+            <!-- Gender -->
+            <div class="mb-4">
+              <label class="block text-gray-700 text-sm font-semibold mb-2">
+                <i class="fas fa-venus-mars mr-2 text-gray-500"></i>
+                Gender
+              </label>
+              <select
+                id="athleteGender"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600"
+              >
+                <option value="">Select gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <!-- Temporary Password -->
+            <div class="mb-4">
+              <label class="block text-gray-700 text-sm font-semibold mb-2">
+                <i class="fas fa-key mr-2 text-gray-500"></i>
+                Temporary Password *
+              </label>
+              <div class="relative">
+                <input
+                  type="password"
+                  id="athletePassword"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 pr-24"
+                  placeholder="Min. 8 characters"
+                  required
+                  minlength="8"
+                />
+                <button
+                  type="button"
+                  onclick="generatePassword()"
+                  class="absolute right-2 top-1/2 transform -translate-y-1/2 text-purple-600 hover:text-purple-800 text-sm font-semibold"
+                >
+                  Generate
+                </button>
+              </div>
+              <p class="text-xs text-gray-500 mt-1">
+                <i class="fas fa-info-circle mr-1"></i>
+                Athlete will be required to change this on first login
+              </p>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="flex gap-3 mt-6">
+              <button
+                type="button"
+                onclick="closeCreateAthleteModal()"
+                class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-3 px-4 rounded-lg transition"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                id="createAthleteButton"
+                class="flex-1 gradient-bg text-white font-semibold py-3 px-4 rounded-lg hover:opacity-90 transition shadow-lg"
+              >
+                <i class="fas fa-user-plus mr-2"></i>
+                Create Athlete
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Supabase Configuration
+      const SUPABASE_URL = "https://bdisppaxbvygsspcuymb.supabase.co";
+      const SUPABASE_ANON_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkaXNwcGF4YnZ5Z3NzcGN1eW1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzcxMjcxMzEsImV4cCI6MjA1MjcwMzEzMX0.n9_qU_5X5VZnzMj5YLqn3Kz3v2g9Y3k8X1Y4_3_0_0";
+
+      const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      // Check authentication
+      let currentUser = null;
+      const userData =
+        localStorage.getItem("akura_user") ||
+        sessionStorage.getItem("akura_user");
+
+      if (!userData) {
+        window.location.href = "/login.html";
+      } else {
+        currentUser = JSON.parse(userData);
+        if (
+          currentUser.role_name !== "coach" &&
+          currentUser.role_name !== "admin"
+        ) {
+          window.location.href = "/athlete-dashboard.html";
+        }
+        document.getElementById("coachName").textContent =
+          currentUser.full_name;
+      }
+
+      // Global variables
+      let athletesList = [];
+
+      // Load athletes on page load
+      document.addEventListener("DOMContentLoaded", loadAthletes);
+
+      // Load athletes from database
+      async function loadAthletes() {
+        try {
+          const { data, error } = await supabase.rpc("get_coach_athletes", {
+            p_coach_id: currentUser.user_id,
+          });
+
+          if (error) throw error;
+
+          athletesList = data || [];
+          displayAthletes(athletesList);
+          updateStats(athletesList);
+        } catch (err) {
+          console.error("Error loading athletes:", err);
+          document.getElementById("athletesTableBody").innerHTML = `
+                    <tr>
+                        <td colspan="8" class="px-6 py-12 text-center text-red-600">
+                            <i class="fas fa-exclamation-triangle text-3xl mb-4"></i>
+                            <p>Error loading athletes: ${err.message}</p>
+                        </td>
+                    </tr>
+                `;
+        }
+      }
+
+      // Display athletes in table
+      function displayAthletes(athletes) {
+        const tbody = document.getElementById("athletesTableBody");
+
+        if (!athletes || athletes.length === 0) {
+          tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="px-6 py-12 text-center text-gray-500">
+                            <i class="fas fa-users text-4xl mb-4"></i>
+                            <p class="text-lg font-semibold">No athletes yet</p>
+                            <p class="text-sm">Click "Create New Athlete" to add your first athlete</p>
+                        </td>
+                    </tr>
+                `;
+          return;
+        }
+
+        tbody.innerHTML = athletes
+          .map(
+            (athlete) => `
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full gradient-bg flex items-center justify-center text-white font-bold mr-3">
+                                ${athlete.full_name.charAt(0)}
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-800">${athlete.full_name}</p>
+                                <p class="text-xs text-gray-500">${athlete.email}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="font-mono text-sm font-semibold text-purple-600">${athlete.athlete_uid || "N/A"}</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <p class="text-sm">${athlete.phone || "N/A"}</p>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <span class="text-2xl font-bold ${getScoreColor(athlete.aisri_score)}">
+                            ${athlete.aisri_score || "-"}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        ${getRiskBadge(athlete.risk_category)}
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        ${
+                          athlete.strava_connected
+                            ? '<i class="fas fa-check-circle text-green-600 text-xl"></i>'
+                            : '<i class="fas fa-times-circle text-gray-400 text-xl"></i>'
+                        }
+                    </td>
+                    <td class="px-6 py-4 text-center text-sm text-gray-600">
+                        ${athlete.last_login_at ? formatDate(athlete.last_login_at) : "Never"}
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <button 
+                            onclick="viewAthlete('${athlete.athlete_id}')"
+                            class="text-purple-600 hover:text-purple-800 mx-1"
+                            title="View Details"
+                        >
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </td>
+                </tr>
+            `,
+          )
+          .join("");
+      }
+
+      // Update statistics
+      function updateStats(athletes) {
+        document.getElementById("totalAthletes").textContent = athletes.length;
+
+        const activeCount = athletes.filter((a) => {
+          if (!a.last_login_at) return false;
+          const lastLogin = new Date(a.last_login_at);
+          const weekAgo = new Date();
+          weekAgo.setDate(weekAgo.getDate() - 7);
+          return lastLogin >= weekAgo;
+        }).length;
+        document.getElementById("activeAthletes").textContent = activeCount;
+
+        const connectedCount = athletes.filter(
+          (a) => a.strava_connected,
+        ).length;
+        document.getElementById("connectedDevices").textContent =
+          connectedCount;
+
+        const highRiskCount = athletes.filter(
+          (a) =>
+            a.risk_category === "High Risk" ||
+            a.risk_category === "Critical Risk",
+        ).length;
+        document.getElementById("highRiskCount").textContent = highRiskCount;
+      }
+
+      // Helper functions
+      function getScoreColor(score) {
+        if (!score) return "text-gray-400";
+        if (score >= 75) return "text-green-600";
+        if (score >= 55) return "text-yellow-600";
+        return "text-red-600";
+      }
+
+      function getRiskBadge(risk) {
+        if (!risk)
+          return '<span class="status-badge bg-gray-200 text-gray-600">No Data</span>';
+        const classMap = {
+          "Low Risk": "status-low",
+          "Medium Risk": "status-medium",
+          "High Risk": "status-high",
+          "Critical Risk": "status-high",
+        };
+        return `<span class="status-badge ${classMap[risk] || ""}">${risk}</span>`;
+      }
+
+      function formatDate(dateString) {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diff = now - date;
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+        if (days === 0) return "Today";
+        if (days === 1) return "Yesterday";
+        if (days < 7) return `${days} days ago`;
+        return date.toLocaleDateString();
+      }
+
+      // Modal functions
+      function openCreateAthleteModal() {
+        document.getElementById("createAthleteModal").style.display = "flex";
+      }
+
+      function closeCreateAthleteModal() {
+        document.getElementById("createAthleteModal").style.display = "none";
+        document.getElementById("createAthleteForm").reset();
+      }
+
+      // Generate random password
+      function generatePassword() {
+        const chars =
+          "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789@#$%";
+        let password = "";
+        for (let i = 0; i < 12; i++) {
+          password += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        document.getElementById("athletePassword").value = password;
+        document.getElementById("athletePassword").type = "text";
+      }
+
+      // Create athlete form submission
+      document
+        .getElementById("createAthleteForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const button = document.getElementById("createAthleteButton");
+          button.disabled = true;
+          button.innerHTML =
+            '<i class="fas fa-spinner fa-spin mr-2"></i>Creating...';
+
+          try {
+            const { data, error } = await supabase.rpc(
+              "create_athlete_account",
+              {
+                p_email: document.getElementById("athleteEmail").value.trim(),
+                p_full_name: document
+                  .getElementById("athleteFullName")
+                  .value.trim(),
+                p_temporary_password:
+                  document.getElementById("athletePassword").value,
+                p_coach_id: currentUser.user_id,
+                p_phone:
+                  document.getElementById("athletePhone").value.trim() || null,
+                p_date_of_birth:
+                  document.getElementById("athleteDOB").value || null,
+                p_gender:
+                  document.getElementById("athleteGender").value || null,
+              },
+            );
+
+            if (error) throw error;
+
+            alert("Athlete created successfully!");
+            closeCreateAthleteModal();
+            loadAthletes();
+          } catch (err) {
+            console.error("Error creating athlete:", err);
+            alert("Error creating athlete: " + err.message);
+          } finally {
+            button.disabled = false;
+            button.innerHTML =
+              '<i class="fas fa-user-plus mr-2"></i>Create Athlete';
+          }
+        });
+
+      // View athlete details
+      function viewAthlete(athleteId) {
+        window.location.href = `/training-plan-builder.html?athlete_id=${athleteId}`;
+      }
+
+      // Logout
+      function logout() {
+        localStorage.removeItem("akura_user");
+        sessionStorage.removeItem("akura_user");
+        window.location.href = "/login.html";
+      }
+
+      // Search and filter
+      document
+        .getElementById("searchInput")
+        .addEventListener("input", filterAthletes);
+      document
+        .getElementById("filterRisk")
+        .addEventListener("change", filterAthletes);
+
+      function filterAthletes() {
+        const searchTerm = document
+          .getElementById("searchInput")
+          .value.toLowerCase();
+        const riskFilter = document.getElementById("filterRisk").value;
+
+        const filtered = athletesList.filter((athlete) => {
+          const matchesSearch =
+            athlete.full_name.toLowerCase().includes(searchTerm) ||
+            athlete.email.toLowerCase().includes(searchTerm) ||
+            (athlete.athlete_uid &&
+              athlete.athlete_uid.toLowerCase().includes(searchTerm));
+
+          const matchesRisk =
+            !riskFilter || athlete.risk_category === riskFilter;
+
+          return matchesSearch && matchesRisk;
+        });
+
+        displayAthletes(filtered);
+      }
+    </script>
+  </body>
+</html>

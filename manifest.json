@@ -1,0 +1,53 @@
+{
+    "name": "SafeStride - Running Coach",
+    "short_name": "SafeStride",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#1a1a2e",
+    "theme_color": "#4CAF50",
+    "description": "Your personal running coach with Strava integration, workout builder, and advanced analytics",
+    "orientation": "portrait-primary",
+    "prefer_related_applications": false,
+    "categories": ["fitness", "health", "sports"],
+    "lang": "en",
+    "scope": ".",
+    "icons": [
+        {
+            "src": "icons/Icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-maskable-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/Icon-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ],
+    "screenshots": [],
+    "shortcuts": [
+        {
+            "name": "Calendar",
+            "short_name": "Calendar",
+            "description": "View your training calendar",
+            "url": "/#/calendar"
+        },
+        {
+            "name": "Create Workout",
+            "short_name": "Workout",
+            "description": "Build a new workout",
+            "url": "/#/workout-builder"
+        }
+    ]
+}
