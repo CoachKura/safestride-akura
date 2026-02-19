@@ -1,0 +1,97 @@
+/**
+ * SafeStride Strava Integration Configuration
+ * 
+ * This file contains all configuration needed for the Strava auto-fill system
+ * Update these values with your actual credentials
+ */
+
+const SAFESTRIDE_CONFIG = {
+    // Supabase Configuration
+    supabase: {
+        url: 'https://your-project.supabase.co',
+        anonKey: 'your-anon-key-here',
+        functionsUrl: 'https://your-project.supabase.co/functions/v1'
+    },
+    
+    // Strava OAuth Configuration
+    strava: {
+        clientId: 'your-strava-client-id',
+        clientSecret: 'your-strava-client-secret', // Only used in edge functions
+        redirectUri: window.location.origin + '/public/strava-callback.html',
+        authorizeUrl: 'https://www.strava.com/oauth/authorize',
+        tokenUrl: 'https://www.strava.com/oauth/token',
+        apiUrl: 'https://www.strava.com/api/v3',
+        scope: 'read,activity:read_all,profile:read_all'
+    },
+    
+    // Feature Flags
+    features: {
+        autoFillEnabled: true,
+        mlAnalysisEnabled: true,
+        realTimeSync: true,
+        activityImport: true,
+        personalBests: true
+    },
+    
+    // AISRI Configuration
+    aisri: {
+        // Pillar weights (must sum to 1.0)
+        weights: {
+            running: 0.40,
+            strength: 0.15,
+            rom: 0.12,
+            balance: 0.13,
+            alignment: 0.10,
+            mobility: 0.10
+        },
+        
+        // Risk thresholds
+        riskThresholds: {
+            low: 75,        // >= 75: Low risk
+            medium: 55,     // >= 55: Medium risk
+            high: 35,       // >= 35: High risk
+            critical: 0     // < 35: Critical risk
+        },
+        
+        // Training zone unlocks
+        zoneUnlocks: {
+            AR: 0,    // Active Recovery: Always available
+            F: 0,     // Foundation: Always available
+            EN: 40,   // Endurance: AISRI >= 40
+            TH: 55,   // Threshold: AISRI >= 55
+            P: 70,    // Power: AISRI >= 70
+            SP: 85    // Speed: AISRI >= 85
+        }
+    },
+    
+    // Session Configuration
+    session: {
+        tokenKey: 'safestride_session',
+        expiryHours: 24,
+        rememberMeDays: 30
+    },
+    
+    // API Configuration
+    api: {
+        timeout: 30000, // 30 seconds
+        retryAttempts: 3,
+        retryDelay: 1000 // 1 second
+    },
+    
+    // UI Configuration
+    ui: {
+        animationDuration: 300,
+        toastDuration: 3000,
+        pageLoadTimeout: 10000
+    }
+};
+
+// Export for use in other modules
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = SAFESTRIDE_CONFIG;
+}
+
+// Make available globally
+if (typeof window !== 'undefined') {
+    window.SAFESTRIDE_CONFIG = SAFESTRIDE_CONFIG;
+}

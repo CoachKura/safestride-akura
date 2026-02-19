@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strava OAuth Callback - SafeStride</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #fc4c02;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center">
+    <div class="max-w-md w-full px-4">
+        <!-- Loading State -->
+        <div id="loadingState" class="bg-white rounded-lg shadow-lg p-8 text-center fade-in">
+            <div class="spinner mb-6"></div>
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">Connecting to Strava</h2>
+            <p id="statusMessage" class="text-gray-600 mb-4">
+                Please wait while we connect your Strava account...
+            </p>
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 text-left">
+                <p class="text-sm text-blue-800">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    This process will:
+                </p>
+                <ul class="text-sm text-blue-800 ml-6 mt-2 space-y-1">
+                    <li>• Authenticate with Strava</li>
+                    <li>• Import your athlete profile</li>
+                    <li>• Sync your activities</li>
+                    <li>• Calculate AISRI scores</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Success State -->
+        <div id="successState" class="bg-white rounded-lg shadow-lg p-8 text-center fade-in" style="display: none;">
+            <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-check text-4xl text-green-600"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">Successfully Connected!</h2>
+            <p class="text-gray-600 mb-6">
+                Your Strava account has been connected to SafeStride.
+            </p>
+            <div class="bg-green-50 border-l-4 border-green-500 p-4 text-left mb-6">
+                <p class="text-sm text-green-800 font-semibold mb-2">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    Connection Details:
+                </p>
+                <ul class="text-sm text-green-800 space-y-1">
+                    <li>• Athlete ID: <span id="athleteId" class="font-mono"></span></li>
+                    <li>• Activities synced: <span id="activityCount">0</span></li>
+                    <li>• AISRI scores calculated: <span id="scoreCount">0</span></li>
+                </ul>
+            </div>
+            <button onclick="goToProfile()" class="w-full bg-orange-600 text-white py-3 px-6 rounded-lg hover:bg-orange-700 transition font-semibold">
+                <i class="fas fa-user-circle mr-2"></i>
+                Go to Profile
+            </button>
+        </div>
+
+        <!-- Error State -->
+        <div id="errorState" class="bg-white rounded-lg shadow-lg p-8 text-center fade-in" style="display: none;">
+            <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-exclamation-triangle text-4xl text-red-600"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">Connection Failed</h2>
+            <p id="errorMessage" class="text-gray-600 mb-6">
+                Unable to connect your Strava account. Please try again.
+            </p>
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 text-left mb-6">
+                <p class="text-sm text-red-800">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    <strong>Possible reasons:</strong>
+                </p>
+                <ul class="text-sm text-red-800 ml-6 mt-2 space-y-1">
+                    <li>• Authorization was denied</li>
+                    <li>• Invalid authorization code</li>
+                    <li>• Session expired</li>
+                    <li>• Network error</li>
+                </ul>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="retryConnection()" class="flex-1 bg-orange-600 text-white py-3 px-6 rounded-lg hover:bg-orange-700 transition font-semibold">
+                    <i class="fas fa-redo mr-2"></i>
+                    Try Again
+                </button>
+                <button onclick="goBack()" class="flex-1 bg-gray-200 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-300 transition font-semibold">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Go Back
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const SUPABASE_URL = 'https://your-project.supabase.co';
+        const SUPABASE_FUNCTIONS_URL = 'https://your-project.supabase.co/functions/v1';
+        
+        let currentSession = null;
+        let authCode = null;
+        let athleteState = null;
+
+        // Parse URL parameters
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                code: params.get('code'),
+                state: params.get('state'),
+                error: params.get('error'),
+                scope: params.get('scope')
+            };
+        }
+
+        // Update status message
+        function updateStatus(message) {
+            const statusEl = document.getElementById('statusMessage');
+            if (statusEl) {
+                statusEl.textContent = message;
+            }
+        }
+
+        // Show success state
+        function showSuccess(data) {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('errorState').style.display = 'none';
+            
+            const successEl = document.getElementById('successState');
+            successEl.style.display = 'block';
+            
+            if (data) {
+                if (data.athlete_id) {
+                    document.getElementById('athleteId').textContent = data.athlete_id;
+                }
+                if (data.activity_count !== undefined) {
+                    document.getElementById('activityCount').textContent = data.activity_count;
+                }
+                if (data.score_count !== undefined) {
+                    document.getElementById('scoreCount').textContent = data.score_count;
+                }
+            }
+        }
+
+        // Show error state
+        function showError(message) {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('successState').style.display = 'none';
+            
+            const errorEl = document.getElementById('errorState');
+            errorEl.style.display = 'block';
+            
+            document.getElementById('errorMessage').textContent = message;
+        }
+
+        // Handle OAuth callback
+        async function handleOAuthCallback() {
+            // Get URL parameters
+            const params = getUrlParams();
+            
+            console.log('OAuth callback params:', params);
+            
+            // Check for errors
+            if (params.error) {
+                showError(`Strava authorization ${params.error}. Please try again.`);
+                return;
+            }
+            
+            // Validate required parameters
+            if (!params.code || !params.state) {
+                showError('Invalid callback parameters. Missing authorization code or state.');
+                return;
+            }
+            
+            authCode = params.code;
+            athleteState = params.state;
+            
+            // Get session
+            currentSession = JSON.parse(sessionStorage.getItem('safestride_session') || '{}');
+            
+            // Validate session
+            if (!currentSession.uid || !currentSession.token) {
+                showError('Session expired. Please login again and reconnect Strava.');
+                setTimeout(() => {
+                    window.location.href = '/public/login.html';
+                }, 3000);
+                return;
+            }
+            
+            // Verify state matches current user
+            if (athleteState !== currentSession.uid) {
+                showError('State mismatch. The Strava authorization is for a different athlete.');
+                return;
+            }
+            
+            // Exchange code for tokens
+            await exchangeCodeForTokens();
+        }
+
+        // Exchange authorization code for access tokens
+        async function exchangeCodeForTokens() {
+            try {
+                updateStatus('Exchanging authorization code for access tokens...');
+                
+                const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/strava-oauth`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentSession.token}`
+                    },
+                    body: JSON.stringify({
+                        code: authCode,
+                        athlete_id: currentSession.uid
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Failed to exchange authorization code');
+                }
+
+                const data = await response.json();
+                console.log('OAuth exchange successful:', data);
+                
+                // Store connection info
+                const connectionData = {
+                    athlete_id: data.athlete_id,
+                    strava_athlete_id: data.strava_athlete_id,
+                    activity_count: 0,
+                    score_count: 0
+                };
+                
+                // Sync activities in background
+                syncActivitiesInBackground(connectionData);
+                
+            } catch (error) {
+                console.error('OAuth exchange error:', error);
+                showError(error.message || 'Failed to connect Strava account');
+            }
+        }
+
+        // Sync activities in background
+        async function syncActivitiesInBackground(connectionData) {
+            try {
+                updateStatus('Syncing your Strava activities...');
+                
+                const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/strava-sync-activities`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentSession.token}`
+                    },
+                    body: JSON.stringify({
+                        athlete_id: currentSession.uid,
+                        full_sync: true
+                    })
+                });
+
+                if (!response.ok) {
+                    console.error('Activity sync failed, but connection successful');
+                    showSuccess(connectionData);
+                    return;
+                }
+
+                const syncData = await response.json();
+                console.log('Activity sync successful:', syncData);
+                
+                connectionData.activity_count = syncData.activities_synced || 0;
+                connectionData.score_count = syncData.scores_calculated || 0;
+                
+                showSuccess(connectionData);
+                
+            } catch (error) {
+                console.error('Activity sync error:', error);
+                // Still show success since OAuth worked
+                showSuccess(connectionData);
+            }
+        }
+
+        // Navigation functions
+        function goToProfile() {
+            window.location.href = '/public/strava-profile.html';
+        }
+
+        function goBack() {
+            window.location.href = '/public/strava-profile.html';
+        }
+
+        function retryConnection() {
+            window.location.href = '/public/strava-profile.html';
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            handleOAuthCallback();
+        });
+    </script>
+</body>
+</html>
