@@ -394,10 +394,19 @@
         window.location.href = "/login.html";
       } else {
         currentUser = JSON.parse(userData);
-        if (
-          currentUser.role !== "coach" &&
-          currentUser.role !== "admin"
-        ) {
+
+        // AUTO-MIGRATE: Convert old format (role_name) to new format (role)
+        if (currentUser.role_name && !currentUser.role) {
+          currentUser.role = currentUser.role_name;
+          delete currentUser.role_name;
+          // Save updated session
+          const storage = localStorage.getItem("akura_user")
+            ? localStorage
+            : sessionStorage;
+          storage.setItem("akura_user", JSON.stringify(currentUser));
+        }
+
+        if (currentUser.role !== "coach" && currentUser.role !== "admin") {
           window.location.href = "/athlete-dashboard.html";
         }
         document.getElementById("coachName").textContent =

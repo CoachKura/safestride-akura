@@ -343,18 +343,32 @@
       );
 
       // Check authentication
-      const currentUser =
+      const currentUserStr =
         localStorage.getItem("akura_user") ||
         sessionStorage.getItem("akura_user");
-      if (!currentUser) {
+
+      if (!currentUserStr) {
         window.location.href = "/login.html";
+        throw new Error("No session"); // Stop execution
       }
 
-      const user = JSON.parse(currentUser);
+      let user = JSON.parse(currentUserStr);
+
+      // AUTO-MIGRATE: Convert old format (role_name) to new format (role)
+      if (user.role_name && !user.role) {
+        user.role = user.role_name;
+        delete user.role_name;
+        // Save updated session
+        const storage = localStorage.getItem("akura_user")
+          ? localStorage
+          : sessionStorage;
+        storage.setItem("akura_user", JSON.stringify(user));
+      }
 
       // Check if user is athlete
-      if (user.role !== "athlete") {
+      if (user.role && user.role !== "athlete") {
         window.location.href = `/${user.role}-dashboard.html`;
+        throw new Error("Wrong role"); // Stop execution
       }
 
       // Initialize dashboard
