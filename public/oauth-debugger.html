@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strava OAuth Debugger - SafeStride</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 min-h-screen p-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-lg shadow-lg p-8 mb-6">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                <i class="fas fa-bug text-red-600 mr-2"></i>
+                Strava OAuth Debugger
+            </h1>
+            <p class="text-gray-600">Test the OAuth flow and see detailed error messages</p>
+        </div>
+
+        <!-- Configuration Status -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">
+                <i class="fas fa-cog mr-2"></i>Configuration Status
+            </h2>
+            <div id="configStatus" class="space-y-2">
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded">
+                    <span class="font-semibold">Config Loaded:</span>
+                    <span id="configLoaded" class="text-gray-600">Checking...</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded">
+                    <span class="font-semibold">Supabase URL:</span>
+                    <span id="supabaseUrl" class="text-gray-600 font-mono text-sm">-</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded">
+                    <span class="font-semibold">Functions URL:</span>
+                    <span id="functionsUrl" class="text-gray-600 font-mono text-sm">-</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded">
+                    <span class="font-semibold">Strava Client ID:</span>
+                    <span id="stravaClientId" class="text-gray-600 font-mono text-sm">-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test OAuth Flow -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">
+                <i class="fas fa-flask mr-2"></i>Test OAuth Flow
+            </h2>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    Authorization Code (from URL):
+                </label>
+                <input type="text" id="authCode" 
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg font-mono text-sm"
+                    placeholder="e.g., 46b4f712ae...">
+                <p class="text-xs text-gray-500 mt-1">
+                    Get this from the URL after Strava redirects you (code=...)
+                </p>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    Athlete ID (optional):
+                </label>
+                <input type="text" id="athleteId" 
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg font-mono text-sm"
+                    placeholder="e.g., athlete_1771582352618">
+                <p class="text-xs text-gray-500 mt-1">
+                    Leave empty to auto-generate from Strava athlete ID
+                </p>
+            </div>
+
+            <button onclick="testOAuth()" id="testBtn"
+                class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition font-semibold">
+                <i class="fas fa-play mr-2"></i>Test OAuth Exchange
+            </button>
+        </div>
+
+        <!-- Results -->
+        <div id="resultsSection" class="bg-white rounded-lg shadow-lg p-6" style="display: none;">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">
+                <i class="fas fa-clipboard-list mr-2"></i>Test Results
+            </h2>
+            
+            <!-- Request Details -->
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Request Details</h3>
+                <div class="bg-gray-50 rounded-lg p-4 font-mono text-sm overflow-x-auto">
+                    <div class="mb-2"><strong>URL:</strong> <span id="requestUrl" class="text-blue-600"></span></div>
+                    <div class="mb-2"><strong>Method:</strong> POST</div>
+                    <div class="mb-2"><strong>Headers:</strong></div>
+                    <pre id="requestHeaders" class="ml-4 text-xs"></pre>
+                    <div class="mb-2"><strong>Body:</strong></div>
+                    <pre id="requestBody" class="ml-4 text-xs"></pre>
+                </div>
+            </div>
+
+            <!-- Response -->
+            <div id="responseSuccess" class="mb-6" style="display: none;">
+                <h3 class="text-lg font-semibold text-green-800 mb-2">
+                    <i class="fas fa-check-circle mr-2"></i>Success!
+                </h3>
+                <div class="bg-green-50 rounded-lg p-4 font-mono text-sm overflow-x-auto">
+                    <pre id="successResponse" class="text-xs"></pre>
+                </div>
+            </div>
+
+            <div id="responseError" class="mb-6" style="display: none;">
+                <h3 class="text-lg font-semibold text-red-800 mb-2">
+                    <i class="fas fa-exclamation-circle mr-2"></i>Error Response
+                </h3>
+                <div class="bg-red-50 rounded-lg p-4 font-mono text-sm overflow-x-auto">
+                    <div class="mb-2"><strong>Status:</strong> <span id="errorStatus" class="text-red-600"></span></div>
+                    <div class="mb-2"><strong>Error Message:</strong></div>
+                    <pre id="errorMessage" class="ml-4 text-xs text-red-700"></pre>
+                    <div class="mt-4 mb-2"><strong>Full Response:</strong></div>
+                    <pre id="errorResponse" class="ml-4 text-xs"></pre>
+                </div>
+            </div>
+
+            <!-- Network Error -->
+            <div id="networkError" class="mb-6" style="display: none;">
+                <h3 class="text-lg font-semibold text-orange-800 mb-2">
+                    <i class="fas fa-wifi mr-2"></i>Network Error
+                </h3>
+                <div class="bg-orange-50 rounded-lg p-4">
+                    <p class="text-orange-800" id="networkErrorMsg"></p>
+                </div>
+            </div>
+
+            <!-- Troubleshooting -->
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4">
+                <h4 class="font-semibold text-blue-900 mb-2">
+                    <i class="fas fa-lightbulb mr-2"></i>Troubleshooting Tips
+                </h4>
+                <ul class="text-sm text-blue-800 space-y-1 ml-4">
+                    <li>• Check Supabase Edge Function logs for detailed error</li>
+                    <li>• Verify authorization code is fresh (can only be used once)</li>
+                    <li>• Ensure strava_connections table exists in database</li>
+                    <li>• Check Edge Function has correct environment variables</li>
+                    <li>• Verify Strava client ID and secret are correct</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mt-6">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">
+                <i class="fas fa-external-link-alt mr-2"></i>Quick Links
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <a href="https://app.supabase.com/project/bdisppaxbvygsspcuymb/functions/strava-oauth/logs" 
+                   target="_blank"
+                   class="flex items-center justify-center px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                    <i class="fas fa-file-alt mr-2"></i>View Supabase Logs
+                </a>
+                <a href="https://www.strava.com/settings/api" 
+                   target="_blank"
+                   class="flex items-center justify-center px-4 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition">
+                    <i class="fab fa-strava mr-2"></i>Strava API Settings
+                </a>
+                <a href="/config.js" 
+                   target="_blank"
+                   class="flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                    <i class="fas fa-cog mr-2"></i>View Config.js
+                </a>
+                <button onclick="location.reload()"
+                   class="flex items-center justify-center px-4 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
+                    <i class="fas fa-redo mr-2"></i>Refresh Page
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/config.js"></script>
+    <script>
+        // Check configuration on load
+        document.addEventListener('DOMContentLoaded', () => {
+            checkConfig();
+            
+            // Auto-fill code from URL if present
+            const params = new URLSearchParams(window.location.search);
+            const code = params.get('code');
+            if (code) {
+                document.getElementById('authCode').value = code;
+            }
+        });
+
+        function checkConfig() {
+            if (typeof SAFESTRIDE_CONFIG !== 'undefined') {
+                document.getElementById('configLoaded').innerHTML = 
+                    '<span class="text-green-600"><i class="fas fa-check-circle mr-1"></i>Loaded</span>';
+                
+                document.getElementById('supabaseUrl').textContent = 
+                    SAFESTRIDE_CONFIG.supabase.url;
+                document.getElementById('functionsUrl').textContent = 
+                    SAFESTRIDE_CONFIG.supabase.functionsUrl;
+                document.getElementById('stravaClientId').textContent = 
+                    SAFESTRIDE_CONFIG.strava.clientId;
+            } else {
+                document.getElementById('configLoaded').innerHTML = 
+                    '<span class="text-red-600"><i class="fas fa-times-circle mr-1"></i>Failed</span>';
+            }
+        }
+
+        async function testOAuth() {
+            const btn = document.getElementById('testBtn');
+            const resultsSection = document.getElementById('resultsSection');
+            const authCode = document.getElementById('authCode').value.trim();
+            const athleteId = document.getElementById('athleteId').value.trim();
+
+            // Reset results
+            document.getElementById('responseSuccess').style.display = 'none';
+            document.getElementById('responseError').style.display = 'none';
+            document.getElementById('networkError').style.display = 'none';
+
+            if (!authCode) {
+                alert('Please enter an authorization code');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Testing...';
+            resultsSection.style.display = 'block';
+
+            try {
+                const url = `${SAFESTRIDE_CONFIG.supabase.functionsUrl}/strava-oauth`;
+                const headers = {
+                    'Content-Type': 'application/json',
+                };
+                const body = {
+                    code: authCode,
+                };
+                
+                if (athleteId) {
+                    body.athleteId = athleteId;
+                }
+
+                // Display request details
+                document.getElementById('requestUrl').textContent = url;
+                document.getElementById('requestHeaders').textContent = 
+                    JSON.stringify(headers, null, 2);
+                document.getElementById('requestBody').textContent = 
+                    JSON.stringify(body, null, 2);
+
+                console.log('🔵 Sending OAuth request:', { url, body });
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(body)
+                });
+
+                console.log('🔵 Response status:', response.status);
+                console.log('🔵 Response headers:', Object.fromEntries(response.headers.entries()));
+
+                const responseText = await response.text();
+                console.log('🔵 Response text:', responseText);
+
+                let responseData;
+                try {
+                    responseData = JSON.parse(responseText);
+                } catch (e) {
+                    responseData = { raw: responseText };
+                }
+
+                if (response.ok) {
+                    // Success
+                    document.getElementById('responseSuccess').style.display = 'block';
+                    document.getElementById('successResponse').textContent = 
+                        JSON.stringify(responseData, null, 2);
+                    
+                    console.log('✅ OAuth Success:', responseData);
+                } else {
+                    // Error response
+                    document.getElementById('responseError').style.display = 'block';
+                    document.getElementById('errorStatus').textContent = 
+                        `${response.status} ${response.statusText}`;
+                    document.getElementById('errorMessage').textContent = 
+                        responseData.error || responseData.message || 'Unknown error';
+                    document.getElementById('errorResponse').textContent = 
+                        JSON.stringify(responseData, null, 2);
+                    
+                    console.error('❌ OAuth Error:', responseData);
+                }
+
+            } catch (error) {
+                // Network error
+                document.getElementById('networkError').style.display = 'block';
+                document.getElementById('networkErrorMsg').textContent = error.message;
+                
+                console.error('❌ Network Error:', error);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-play mr-2"></i>Test OAuth Exchange';
+            }
+        }
+    </script>
+</body>
+</html>
