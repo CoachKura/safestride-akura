@@ -6,7 +6,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const STRAVA_CLIENT_ID = "162971"
-const STRAVA_CLIENT_SECRET = "6554eb9bb83f222a585e312c17420221313f85c1"
+const STRAVA_CLIENT_SECRET = "ca2a2ef68680c324e0ba4db3ed6e6006a9dc7626"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',

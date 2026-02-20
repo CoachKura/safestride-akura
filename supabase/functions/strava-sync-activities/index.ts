@@ -162,7 +162,7 @@ async function refreshStravaToken(refreshToken, supabase, athleteId) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       client_id: "162971",
-      client_secret: "6554eb9bb83f222a585e312c17420221313f85c1",
+      client_secret: "ca2a2ef68680c324e0ba4db3ed6e6006a9dc7626",
       grant_type: 'refresh_token',
       refresh_token: refreshToken,
     }),
