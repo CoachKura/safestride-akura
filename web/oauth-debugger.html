@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OAuth Debugger - SafeStride</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="safestride-config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  </head>
+  <body class="bg-gray-900 text-white min-h-screen p-8">
+    <div class="max-w-4xl mx-auto">
+      <h1 class="text-3xl font-bold mb-2">🔍 OAuth Debugger</h1>
+      <p class="text-gray-400 mb-8">Diagnose Strava OAuth issues</p>
+
+      <!-- Configuration Status -->
+      <div class="bg-gray-800 rounded-lg p-6 mb-6">
+        <h2 class="text-xl font-bold mb-4">📋 Configuration Status</h2>
+        <div id="configStatus" class="space-y-2 font-mono text-sm"></div>
+      </div>
+
+      <!-- OAuth Code Tester -->
+      <div class="bg-gray-800 rounded-lg p-6 mb-6">
+        <h2 class="text-xl font-bold mb-4">🧪 Test OAuth Code</h2>
+
+        <div class="mb-4">
+          <label class="block text-sm font-medium mb-2"
+            >Authorization Code:</label
+          >
+          <input
+            type="text"
+            id="authCode"
+            placeholder="Paste Strava authorization code here (e.g., 46b4f712ae...)"
+            class="w-full bg-gray-700 text-white px-4 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+          />
+          <p class="text-xs text-gray-400 mt-1">
+            Get this from the URL after authorizing on Strava: ?code=...
+          </p>
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-sm font-medium mb-2"
+            >Athlete ID (optional):</label
+          >
+          <input
+            type="text"
+            id="athleteId"
+            placeholder="athlete_1234567890 (auto-generated if empty)"
+            class="w-full bg-gray-700 text-white px-4 py-2 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+          />
+        </div>
+
+        <button
+          onclick="testOAuth()"
+          class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded font-medium w-full"
+        >
+          🚀 Test OAuth Exchange
+        </button>
+      </div>
+
+      <!-- Results -->
+      <div id="results" class="hidden">
+        <!-- Request Details -->
+        <div class="bg-gray-800 rounded-lg p-6 mb-6">
+          <h2 class="text-xl font-bold mb-4">📤 Request Sent</h2>
+          <pre
+            id="requestDetails"
+            class="bg-gray-900 p-4 rounded overflow-x-auto text-xs"
+          ></pre>
+        </div>
+
+        <!-- Response Details -->
+        <div class="bg-gray-800 rounded-lg p-6 mb-6">
+          <h2 class="text-xl font-bold mb-4">📥 Response Received</h2>
+          <div id="responseStatus" class="mb-3"></div>
+          <pre
+            id="responseDetails"
+            class="bg-gray-900 p-4 rounded overflow-x-auto text-xs"
+          ></pre>
+        </div>
+
+        <!-- Error Analysis -->
+        <div
+          id="errorAnalysis"
+          class="hidden bg-red-900/30 border border-red-500 rounded-lg p-6 mb-6"
+        >
+          <h2 class="text-xl font-bold mb-4">❌ Error Analysis</h2>
+          <div id="errorMessage" class="text-red-300 mb-4"></div>
+          <div id="errorSolution" class="text-gray-300"></div>
+        </div>
+
+        <!-- Success Message -->
+        <div
+          id="successMessage"
+          class="hidden bg-green-900/30 border border-green-500 rounded-lg p-6 mb-6"
+        >
+          <h2 class="text-xl font-bold mb-4">✅ Success!</h2>
+          <div class="text-green-300"></div>
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="bg-gray-800 rounded-lg p-6">
+        <h2 class="text-xl font-bold mb-4">🔗 Quick Links</h2>
+        <div class="space-y-2">
+          <a
+            href="https://app.supabase.com/project/bdisppaxbvygsspcuymb/functions/strava-oauth/logs"
+            target="_blank"
+            class="block text-blue-400 hover:text-blue-300"
+          >
+            📊 Supabase Edge Function Logs →
+          </a>
+          <a
+            href="https://www.strava.com/settings/api"
+            target="_blank"
+            class="block text-blue-400 hover:text-blue-300"
+          >
+            🔧 Strava API Settings →
+          </a>
+          <a
+            href="/training-plan-builder.html"
+            class="block text-blue-400 hover:text-blue-300"
+          >
+            🏃 Back to Training Plan Builder →
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Display configuration status
+      function displayConfigStatus() {
+        const status = document.getElementById("configStatus");
+        const config = SAFESTRIDE_CONFIG;
+
+        status.innerHTML = `
+                <div class="flex items-center gap-2">
+                    <span class="${config.supabase.url.includes("your-project") ? "text-red-500" : "text-green-500"}">
+                        ${config.supabase.url.includes("your-project") ? "❌" : "✅"}
+                    </span>
+                    <span>Supabase URL: <span class="text-blue-400">${config.supabase.url}</span></span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="${config.supabase.anonKey.length < 100 ? "text-red-500" : "text-green-500"}">
+                        ${config.supabase.anonKey.length < 100 ? "❌" : "✅"}
+                    </span>
+                    <span>Anon Key: <span class="text-blue-400">${config.supabase.anonKey.substring(0, 30)}...</span></span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="${config.strava.clientId === "YOUR_STRAVA_CLIENT_ID" ? "text-red-500" : "text-green-500"}">
+                        ${config.strava.clientId === "YOUR_STRAVA_CLIENT_ID" ? "❌" : "✅"}
+                    </span>
+                    <span>Strava Client ID: <span class="text-blue-400">${config.strava.clientId}</span></span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="${config.supabase.functionsUrl.includes("your-project") ? "text-red-500" : "text-green-500"}">
+                        ${config.supabase.functionsUrl.includes("your-project") ? "❌" : "✅"}
+                    </span>
+                    <span>Functions URL: <span class="text-blue-400">${config.supabase.functionsUrl}</span></span>
+                </div>
+            `;
+      }
+
+      // Test OAuth exchange
+      async function testOAuth() {
+        const authCode = document.getElementById("authCode").value.trim();
+        const athleteId =
+          document.getElementById("athleteId").value.trim() ||
+          `athlete_${Date.now()}`;
+
+        if (!authCode) {
+          alert("Please enter an authorization code");
+          return;
+        }
+
+        // Show results section
+        document.getElementById("results").classList.remove("hidden");
+        document.getElementById("errorAnalysis").classList.add("hidden");
+        document.getElementById("successMessage").classList.add("hidden");
+
+        // Prepare request
+        const requestUrl = `${SAFESTRIDE_CONFIG.supabase.functionsUrl}/strava-oauth`;
+        const requestBody = {
+          code: authCode,
+          athleteId: athleteId,
+        };
+
+        // Display request details
+        document.getElementById("requestDetails").textContent = JSON.stringify(
+          {
+            url: requestUrl,
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              apikey:
+                SAFESTRIDE_CONFIG.supabase.anonKey.substring(0, 20) + "...",
+            },
+            body: requestBody,
+          },
+          null,
+          2,
+        );
+
+        try {
+          // Initialize Supabase client
+          const supabase = window.supabase.createClient(
+            SAFESTRIDE_CONFIG.supabase.url,
+            SAFESTRIDE_CONFIG.supabase.anonKey,
+          );
+
+          console.log("🔵 Calling Edge Function...");
+
+          // Call Edge Function
+          const { data, error } = await supabase.functions.invoke(
+            "strava-oauth",
+            {
+              body: requestBody,
+            },
+          );
+
+          // Display response
+          document.getElementById("responseStatus").innerHTML = `
+                    <div class="inline-block px-3 py-1 rounded ${error ? "bg-red-600" : "bg-green-600"}">
+                        Status: ${error ? "ERROR" : "SUCCESS"}
+                    </div>
+                `;
+
+          document.getElementById("responseDetails").textContent =
+            JSON.stringify(error || data, null, 2);
+
+          if (error) {
+            // Show error analysis
+            showErrorAnalysis(error);
+          } else if (data && data.success) {
+            // Show success
+            document
+              .getElementById("successMessage")
+              .classList.remove("hidden");
+            document
+              .getElementById("successMessage")
+              .querySelector(".text-green-300").textContent =
+              `Strava connected successfully! Athlete ID: ${data.athlete?.id || "Unknown"}`;
+          } else if (data && !data.success) {
+            // Show error from response
+            showErrorAnalysis({ message: data.error || "Unknown error" });
+          }
+        } catch (err) {
+          console.error("❌ Error:", err);
+          document.getElementById("responseStatus").innerHTML = `
+                    <div class="inline-block px-3 py-1 rounded bg-red-600">
+                        Status: ERROR
+                    </div>
+                `;
+          document.getElementById("responseDetails").textContent =
+            JSON.stringify(
+              {
+                error: err.message,
+                stack: err.stack,
+              },
+              null,
+              2,
+            );
+          showErrorAnalysis(err);
+        }
+      }
+
+      // Analyze and display error
+      function showErrorAnalysis(error) {
+        const errorDiv = document.getElementById("errorAnalysis");
+        const errorMsg = document.getElementById("errorMessage");
+        const errorSol = document.getElementById("errorSolution");
+
+        errorDiv.classList.remove("hidden");
+
+        const errorText = error.message || JSON.stringify(error);
+        errorMsg.textContent = errorText;
+
+        // Provide solutions based on error
+        let solution = "";
+
+        if (errorText.includes("client_id") && errorText.includes("invalid")) {
+          solution = `
+                    <strong>Problem:</strong> Strava rejected the client ID as invalid.<br><br>
+                    <strong>Possible causes:</strong><br>
+                    1. Wrong Client ID in Supabase secrets<br>
+                    2. Strava API application deleted or suspended<br>
+                    3. Authorization callback domain mismatch<br><br>
+                    <strong>Fix:</strong><br>
+                    1. Check Strava API settings: <a href="https://www.strava.com/settings/api" class="text-blue-400 underline">Strava API</a><br>
+                    2. Verify Client ID is: 162971<br>
+                    3. Verify callback domain is: www.akura.in<br>
+                    4. Update Supabase secret if needed: <a href="https://app.supabase.com/project/bdisppaxbvygsspcuymb/settings/vault/secrets" class="text-blue-400 underline">Supabase Secrets</a>
+                `;
+        } else if (errorText.includes("already")) {
+          solution = `
+                    <strong>Problem:</strong> Authorization code already used.<br><br>
+                    <strong>Cause:</strong> Each OAuth code can only be used once.<br><br>
+                    <strong>Fix:</strong><br>
+                    1. Go back to Training Plan Builder<br>
+                    2. Disconnect and reconnect Strava<br>
+                    3. Get a fresh authorization code<br>
+                    4. Test again with the new code
+                `;
+        } else if (
+          errorText.includes("relation") ||
+          errorText.includes("table")
+        ) {
+          solution = `
+                    <strong>Problem:</strong> Database table doesn't exist.<br><br>
+                    <strong>Cause:</strong> Missing database migrations.<br><br>
+                    <strong>Fix:</strong><br>
+                    1. Run: <code class="bg-gray-800 px-2 py-1 rounded">supabase db push</code><br>
+                    2. Or manually create the strava_connections table in Supabase Dashboard
+                `;
+        } else if (errorText.includes("column")) {
+          solution = `
+                    <strong>Problem:</strong> Missing column in database table.<br><br>
+                    <strong>Cause:</strong> Table schema needs updating.<br><br>
+                    <strong>Fix:</strong><br>
+                    Run migrations to update table schema
+                `;
+        } else {
+          solution = `
+                    <strong>Unknown error.</strong><br><br>
+                    Check:<br>
+                    1. Supabase Edge Function logs: <a href="https://app.supabase.com/project/bdisppaxbvygsspcuymb/functions/strava-oauth/logs" class="text-blue-400 underline">View Logs</a><br>
+                    2. Browser console for more details<br>
+                    3. Ensure all secrets are set correctly
+                `;
+        }
+
+        errorSol.innerHTML = solution;
+      }
+
+      // Initialize on page load
+      displayConfigStatus();
+    </script>
+  </body>
+</html>
