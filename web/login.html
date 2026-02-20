@@ -298,7 +298,7 @@
             user_id: user.user_id,
             email: user.email,
             full_name: user.full_name,
-            role_name: user.role_name,
+            role: user.role, // Changed from role_name to role
             coach_id: user.coach_id,
             athlete_uid: user.athlete_uid,
             logged_in_at: new Date().toISOString(),
@@ -315,7 +315,7 @@
 
           // Redirect after 1 second
           setTimeout(() => {
-            redirectToDashboard(user.role_name);
+            redirectToDashboard(user.role); // Changed from user.role_name to user.role
           }, 1000);
         } catch (err) {
           console.error("Login error:", err);
