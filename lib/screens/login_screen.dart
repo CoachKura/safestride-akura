@@ -255,6 +255,7 @@ class _LoginScreenState extends State<LoginScreen>
                                     ),
                                   ),
                                   const SizedBox(height: 24),
+
                                   Wrap(
                                     alignment: WrapAlignment.center,
                                     children: [
