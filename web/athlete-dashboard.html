@@ -337,7 +337,10 @@
       const STRAVA_CLIENT_ID = "162971";
       const REDIRECT_URI = window.location.origin;
 
-      const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const supabaseClient = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY,
+      );
 
       // Check authentication
       const currentUser =
