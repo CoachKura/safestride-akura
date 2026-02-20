@@ -175,7 +175,10 @@
       const SUPABASE_ANON_KEY =
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkaXNwcGF4YnZ5Z3NzcGN1eW1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzcxMjcxMzEsImV4cCI6MjA1MjcwMzEzMX0.n9_qU_5X5VZnzMj5YLqn3Kz3v2g9Y3k8X1Y4_3_0_0";
 
-      const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const supabaseClient = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY,
+      );
 
       // DOM Elements
       const loginForm = document.getElementById("loginForm");
@@ -261,11 +264,14 @@
 
         try {
           // Call authentication function
-          const { data, error } = await supabase.rpc("authenticate_user", {
-            p_email: email,
-            p_password: password,
-            p_ip_address: await getClientIP(),
-          });
+          const { data, error } = await supabaseClient.rpc(
+            "authenticate_user",
+            {
+              p_email: email,
+              p_password: password,
+              p_ip_address: await getClientIP(),
+            },
+          );
 
           if (error) {
             throw error;
