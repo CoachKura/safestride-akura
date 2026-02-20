@@ -395,8 +395,8 @@
       } else {
         currentUser = JSON.parse(userData);
         if (
-          currentUser.role_name !== "coach" &&
-          currentUser.role_name !== "admin"
+          currentUser.role !== "coach" &&
+          currentUser.role !== "admin"
         ) {
           window.location.href = "/athlete-dashboard.html";
         }

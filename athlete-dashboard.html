@@ -353,8 +353,8 @@
       const user = JSON.parse(currentUser);
 
       // Check if user is athlete
-      if (user.role_name !== "athlete") {
-        window.location.href = `/${user.role_name}-dashboard.html`;
+      if (user.role !== "athlete") {
+        window.location.href = `/${user.role}-dashboard.html`;
       }
 
       // Initialize dashboard
