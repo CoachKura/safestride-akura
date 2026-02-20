@@ -115,10 +115,13 @@
         </div>
     </div>
 
+    <!-- Load config first -->
+    <script src="/config.js"></script>
+    
     <script>
-        // Configuration
-        const SUPABASE_URL = 'https://your-project.supabase.co';
-        const SUPABASE_FUNCTIONS_URL = 'https://your-project.supabase.co/functions/v1';
+        // Configuration from config.js
+        const SUPABASE_URL = SAFESTRIDE_CONFIG.supabase.url;
+        const SUPABASE_FUNCTIONS_URL = SAFESTRIDE_CONFIG.supabase.functionsUrl;
         
         let currentSession = null;
         let authCode = null;
@@ -232,22 +235,34 @@
                     },
                     body: JSON.stringify({
                         code: authCode,
-                        athlete_id: currentSession.uid
+                        athleteId: currentSession.uid  // Changed from athlete_id to match Edge Function
                     })
                 });
 
                 if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.message || 'Failed to exchange authorization code');
+                    const errorText = await response.text();
+                    let errorMsg = 'Failed to exchange authorization code';
+                    try {
+                        const error = JSON.parse(errorText);
+                        errorMsg = error.error || error.message || errorMsg;
+                    } catch (e) {
+                        errorMsg = errorText || errorMsg;
+                    }
+                    console.error('OAuth error details:', errorText);
+                    throw new Error(errorMsg);
                 }
 
                 const data = await response.json();
                 console.log('OAuth exchange successful:', data);
                 
+                if (!data.success) {
+                    throw new Error(data.error || 'OAuth exchange failed');
+                }
+                
                 // Store connection info
                 const connectionData = {
-                    athlete_id: data.athlete_id,
-                    strava_athlete_id: data.strava_athlete_id,
+                    athlete_id: currentSession.uid,
+                    strava_athlete_id: data.athlete?.id,
                     activity_count: 0,
                     score_count: 0
                 };
@@ -273,8 +288,8 @@
                         'Authorization': `Bearer ${currentSession.token}`
                     },
                     body: JSON.stringify({
-                        athlete_id: currentSession.uid,
-                        full_sync: true
+                        athleteId: currentSession.uid,  // Changed to match Edge Function
+                        daysBack: 90  // Sync last 90 days
                     })
                 });
 

@@ -20,7 +20,14 @@ serve(async (req) => {
   }
 
   try {
-    const { code, athleteId } = await req.json()
+    const body = await req.json()
+    const { code, athleteId } = body
+
+    console.log('📥 OAuth request received:', { 
+      hasCode: !!code, 
+      athleteId: athleteId || 'not provided',
+      bodyKeys: Object.keys(body)
+    })
 
     if (!code) {
       throw new Error('Authorization code is required')
@@ -44,11 +51,12 @@ serve(async (req) => {
 
     if (!tokenResponse.ok) {
       const error = await tokenResponse.text()
+      console.error('❌ Strava token exchange failed:', error)
       throw new Error(`Strava token exchange failed: ${error}`)
     }
 
     const tokenData = await tokenResponse.json()
-    console.log('✅ Strava tokens received')
+    console.log('✅ Strava tokens received for athlete:', tokenData.athlete?.id)
 
     // Step 2: Calculate expiration timestamp
     const expiresAt = new Date(tokenData.expires_at * 1000).toISOString()
@@ -59,23 +67,28 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
     )
 
+    const upsertData = {
+      athlete_id: athleteId || `strava_${tokenData.athlete.id}`,
+      strava_athlete_id: tokenData.athlete.id,
+      access_token: tokenData.access_token,
+      refresh_token: tokenData.refresh_token,
+      expires_at: expiresAt,
+      athlete_data: tokenData.athlete,
+      updated_at: new Date().toISOString(),
+    }
+
+    console.log('💾 Saving to database with athlete_id:', upsertData.athlete_id)
+
     const { data: connection, error: dbError } = await supabaseClient
       .from('strava_connections')
-      .upsert({
-        athlete_id: athleteId || `strava_${tokenData.athlete.id}`,
-        strava_athlete_id: tokenData.athlete.id,
-        access_token: tokenData.access_token,
-        refresh_token: tokenData.refresh_token,
-        expires_at: expiresAt,
-        athlete_data: tokenData.athlete,
-        updated_at: new Date().toISOString(),
-      }, {
+      .upsert(upsertData, {
         onConflict: 'athlete_id'
       })
       .select()
       .single()
 
     if (dbError) {
+      console.error('❌ Database error:', dbError)
       throw new Error(`Database error: ${dbError.message}`)
     }
 
@@ -99,6 +112,7 @@ serve(async (req) => {
       JSON.stringify({
         success: false,
         error: error.message,
+        details: error.toString()
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
