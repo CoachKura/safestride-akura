@@ -173,10 +173,10 @@ class MLInjuryPredictionService {
     final restDays = activityData?['rest_days_per_week'] ?? 2;
     if (restDays < 1) {
       riskScore += 25;
-      riskFactors.add('Insufficient rest (${restDays} days/week)');
+      riskFactors.add('Insufficient rest ($restDays days/week)');
     } else if (restDays < 2) {
       riskScore += 10;
-      riskFactors.add('Limited rest (${restDays} days/week)');
+      riskFactors.add('Limited rest ($restDays days/week)');
     }
 
     // AISRI hip weakness indicators

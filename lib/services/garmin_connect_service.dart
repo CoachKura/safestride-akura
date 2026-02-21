@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:async';
@@ -7,43 +8,46 @@ import 'dart:convert';
 /// Supports: Forerunner, Fenix, Vivoactive, Venu series
 class GarminConnectService {
   static const MethodChannel _channel = MethodChannel('com.safestride/garmin');
-  static const EventChannel _eventChannel = EventChannel('com.safestride/garmin_events');
-  
+  static const EventChannel _eventChannel =
+      EventChannel('com.safestride/garmin_events');
+
   // TEST_MODE: Set to true for testing without native implementation
   // Set to false to use actual Garmin device connection via native code
   static const bool TEST_MODE = false;
-  
+
   // Device connection state
   static bool _isConnected = false;
   static String? _connectedDeviceId;
   static String? _connectedDeviceName;
   static Map<String, dynamic>? _deviceInfo;
-  
+
   // Real-time workout data stream
   static StreamSubscription? _dataSubscription;
-  static final StreamController<Map<String, dynamic>> _workoutDataController = 
+  static final StreamController<Map<String, dynamic>> _workoutDataController =
       StreamController<Map<String, dynamic>>.broadcast();
-  
+
   // Getters
   static bool get isConnected => _isConnected;
   static String? get connectedDeviceId => _connectedDeviceId;
   static String? get connectedDeviceName => _connectedDeviceName;
   static Map<String, dynamic>? get deviceInfo => _deviceInfo;
-  static Stream<Map<String, dynamic>> get workoutDataStream => _workoutDataController.stream;
+  static Stream<Map<String, dynamic>> get workoutDataStream =>
+      _workoutDataController.stream;
 
   /// Initialize Garmin SDK
   static Future<bool> initialize() async {
     try {
       final result = await _channel.invokeMethod('initialize');
-      
+
       // Start listening to device events
-      _dataSubscription = _eventChannel.receiveBroadcastStream().listen((event) {
+      _dataSubscription =
+          _eventChannel.receiveBroadcastStream().listen((event) {
         _handleDeviceEvent(event);
       });
-      
+
       return result == true;
     } catch (e) {
-      print('Error initializing Garmin SDK: $e');
+      debugPrint('Error initializing Garmin SDK: $e');
       return false;
     }
   }
@@ -59,20 +63,22 @@ class GarminConnectService {
         'duration': durationSeconds,
         'connectionType': connectionType,
       });
-      
+
       if (result is List) {
-        return result.map((device) => Map<String, dynamic>.from(device)).toList();
+        return result
+            .map((device) => Map<String, dynamic>.from(device))
+            .toList();
       }
       return [];
     } catch (e) {
-      print('Error scanning for devices: $e');
-      
+      debugPrint('Error scanning for devices: $e');
+
       // TEST MODE: Return mock devices if native implementation not ready
       if (TEST_MODE) {
         await Future.delayed(Duration(seconds: 2)); // Simulate scanning
         return _getMockDevices(connectionType);
       }
-      
+
       return [];
     }
   }
@@ -80,7 +86,7 @@ class GarminConnectService {
   /// Mock devices for testing UI (remove once native implementation complete)
   static List<Map<String, dynamic>> _getMockDevices(String connectionType) {
     final mockDevices = <Map<String, dynamic>>[];
-    
+
     if (connectionType == 'bluetooth' || connectionType == 'both') {
       mockDevices.add({
         'id': 'mock-bt-001',
@@ -89,7 +95,7 @@ class GarminConnectService {
         'signal_strength': 85,
       });
     }
-    
+
     if (connectionType == 'wifi' || connectionType == 'both') {
       mockDevices.add({
         'id': 'mock-wifi-001',
@@ -99,54 +105,60 @@ class GarminConnectService {
         'signal_strength': 90,
       });
     }
-    
+
     return mockDevices;
   }
 
   /// Scan for Garmin devices on local WiFi network
-  static Future<List<Map<String, dynamic>>> scanWiFiDevices({int durationSeconds = 10}) async {
+  static Future<List<Map<String, dynamic>>> scanWiFiDevices(
+      {int durationSeconds = 10}) async {
     try {
       final result = await _channel.invokeMethod('scanWiFiDevices', {
         'duration': durationSeconds,
       });
-      
+
       if (result is List) {
-        return result.map((device) => Map<String, dynamic>.from(device)).toList();
+        return result
+            .map((device) => Map<String, dynamic>.from(device))
+            .toList();
       }
       return [];
     } catch (e) {
-      print('Error scanning WiFi devices: $e');
-      
+      debugPrint('Error scanning WiFi devices: $e');
+
       // TEST MODE: Return mock WiFi devices
       if (TEST_MODE) {
         await Future.delayed(Duration(seconds: 2));
         return _getMockDevices('wifi');
       }
-      
+
       return [];
     }
   }
 
   /// Scan for Garmin devices via Bluetooth
-  static Future<List<Map<String, dynamic>>> scanBluetoothDevices({int durationSeconds = 10}) async {
+  static Future<List<Map<String, dynamic>>> scanBluetoothDevices(
+      {int durationSeconds = 10}) async {
     try {
       final result = await _channel.invokeMethod('scanBluetoothDevices', {
         'duration': durationSeconds,
       });
-      
+
       if (result is List) {
-        return result.map((device) => Map<String, dynamic>.from(device)).toList();
+        return result
+            .map((device) => Map<String, dynamic>.from(device))
+            .toList();
       }
       return [];
     } catch (e) {
-      print('Error scanning Bluetooth devices: $e');
-      
+      debugPrint('Error scanning Bluetooth devices: $e');
+
       // TEST MODE: Return mock Bluetooth devices
       if (TEST_MODE) {
         await Future.delayed(Duration(seconds: 2));
         return _getMockDevices('bluetooth');
       }
-      
+
       return [];
     }
   }
@@ -164,32 +176,32 @@ class GarminConnectService {
         'deviceId': deviceId,
         'connectionType': connectionType,
       };
-      
+
       if (connectionType == 'wifi' && ipAddress != null) {
         params['ipAddress'] = ipAddress;
       }
-      
+
       final result = await _channel.invokeMethod('connectDevice', params);
-      
+
       if (result == true) {
         _isConnected = true;
         _connectedDeviceId = deviceId;
-        
+
         // Get device info
         _deviceInfo = await getDeviceInfo();
         _connectedDeviceName = _deviceInfo?['name'] ?? 'Garmin Device';
         _deviceInfo?['connectionType'] = connectionType;
         _deviceInfo?['ipAddress'] = ipAddress;
-        
+
         // Save connection to database
         await _saveDeviceConnection();
-        
+
         return true;
       }
       return false;
     } catch (e) {
-      print('Error connecting to device: $e');
-      
+      debugPrint('Error connecting to device: $e');
+
       // TEST MODE: Simulate successful connection
       if (TEST_MODE) {
         await Future.delayed(Duration(seconds: 1));
@@ -204,13 +216,13 @@ class GarminConnectService {
           'connectionType': connectionType,
           'ipAddress': ipAddress,
         };
-        
+
         // Save connection to database
         await _saveDeviceConnection();
-        
+
         return true;
       }
-      
+
       return false;
     }
   }
@@ -219,15 +231,15 @@ class GarminConnectService {
   static Future<bool> disconnect() async {
     try {
       final result = await _channel.invokeMethod('disconnect');
-      
+
       _isConnected = false;
       _connectedDeviceId = null;
       _connectedDeviceName = null;
       _deviceInfo = null;
-      
+
       return result == true;
     } catch (e) {
-      print('Error disconnecting: $e');
+      debugPrint('Error disconnecting: $e');
       if (TEST_MODE) {
         _isConnected = false;
         _connectedDeviceId = null;
@@ -245,7 +257,7 @@ class GarminConnectService {
       final result = await _channel.invokeMethod('getDeviceInfo');
       return result != null ? Map<String, dynamic>.from(result) : null;
     } catch (e) {
-      print('Error getting device info: $e');
+      debugPrint('Error getting device info: $e');
       if (TEST_MODE) {
         // Return mock device info
         return _deviceInfo;
@@ -268,10 +280,10 @@ class GarminConnectService {
         'targetPace': targetPace,
         'targetDistance': targetDistance,
       });
-      
+
       return result == true;
     } catch (e) {
-      print('Error starting workout: $e');
+      debugPrint('Error starting workout: $e');
       return false;
     }
   }
@@ -280,18 +292,18 @@ class GarminConnectService {
   static Future<Map<String, dynamic>?> stopWorkout() async {
     try {
       final result = await _channel.invokeMethod('stopWorkout');
-      
+
       if (result != null) {
         final workoutData = Map<String, dynamic>.from(result);
-        
+
         // Save to database
         await _saveWorkoutData(workoutData);
-        
+
         return workoutData;
       }
       return null;
     } catch (e) {
-      print('Error stopping workout: $e');
+      debugPrint('Error stopping workout: $e');
       return null;
     }
   }
@@ -302,7 +314,7 @@ class GarminConnectService {
       final result = await _channel.invokeMethod('pauseWorkout');
       return result == true;
     } catch (e) {
-      print('Error pausing workout: $e');
+      debugPrint('Error pausing workout: $e');
       return false;
     }
   }
@@ -313,7 +325,7 @@ class GarminConnectService {
       final result = await _channel.invokeMethod('resumeWorkout');
       return result == true;
     } catch (e) {
-      print('Error resuming workout: $e');
+      debugPrint('Error resuming workout: $e');
       return false;
     }
   }
@@ -324,45 +336,47 @@ class GarminConnectService {
       final result = await _channel.invokeMethod('getCurrentHeartRate');
       return result as int?;
     } catch (e) {
-      print('Error getting heart rate: $e');
+      debugPrint('Error getting heart rate: $e');
       return null;
     }
   }
 
   /// Sync historical data from device
-  static Future<List<Map<String, dynamic>>> syncHistoricalData({int days = 7}) async {
+  static Future<List<Map<String, dynamic>>> syncHistoricalData(
+      {int days = 7}) async {
     try {
       final result = await _channel.invokeMethod('syncHistoricalData', {
         'days': days,
       });
-      
+
       if (result is List) {
-        final workouts = result.map((w) => Map<String, dynamic>.from(w)).toList();
-        
+        final workouts =
+            result.map((w) => Map<String, dynamic>.from(w)).toList();
+
         // Save each workout to database
         for (var workout in workouts) {
           await _saveWorkoutData(workout);
         }
-        
+
         return workouts;
       }
       return [];
     } catch (e) {
-      print('Error syncing historical data: $e');
+      debugPrint('Error syncing historical data: $e');
       return [];
     }
   }
 
-  /// Send workout plan to Garmin device  
+  /// Send workout plan to Garmin device
   static Future<bool> sendWorkoutToDevice(Map<String, dynamic> workout) async {
     try {
       final result = await _channel.invokeMethod('sendWorkout', {
         'workout': jsonEncode(workout),
       });
-      
+
       return result == true;
     } catch (e) {
-      print('Error sending workout to device: $e');
+      debugPrint('Error sending workout to device: $e');
       return false;
     }
   }
@@ -373,7 +387,7 @@ class GarminConnectService {
       final result = await _channel.invokeMethod('getBatteryLevel');
       return result as int?;
     } catch (e) {
-      print('Error getting battery level: $e');
+      debugPrint('Error getting battery level: $e');
       if (TEST_MODE) {
         // Return 85% battery for test mode
         return 85;
@@ -388,10 +402,10 @@ class GarminConnectService {
       final result = await _channel.invokeMethod('setHeartRateZones', {
         'zones': zones,
       });
-      
+
       return result == true;
     } catch (e) {
-      print('Error setting HR zones: $e');
+      debugPrint('Error setting HR zones: $e');
       return false;
     }
   }
@@ -402,10 +416,10 @@ class GarminConnectService {
       final result = await _channel.invokeMethod('enableLiveTracking', {
         'enable': enable,
       });
-      
+
       return result == true;
     } catch (e) {
-      print('Error toggling live tracking: $e');
+      debugPrint('Error toggling live tracking: $e');
       return false;
     }
   }
@@ -415,7 +429,7 @@ class GarminConnectService {
     try {
       final data = Map<String, dynamic>.from(event);
       final eventType = data['type'] as String?;
-      
+
       switch (eventType) {
         case 'heart_rate':
           _workoutDataController.add({
@@ -424,7 +438,7 @@ class GarminConnectService {
             'timestamp': DateTime.now().toIso8601String(),
           });
           break;
-          
+
         case 'location':
           _workoutDataController.add({
             'type': 'location',
@@ -435,7 +449,7 @@ class GarminConnectService {
             'timestamp': DateTime.now().toIso8601String(),
           });
           break;
-          
+
         case 'workout_update':
           _workoutDataController.add({
             'type': 'workout_update',
@@ -446,7 +460,7 @@ class GarminConnectService {
             'timestamp': DateTime.now().toIso8601String(),
           });
           break;
-          
+
         case 'device_disconnected':
           _isConnected = false;
           _connectedDeviceId = null;
@@ -457,7 +471,7 @@ class GarminConnectService {
           break;
       }
     } catch (e) {
-      print('Error handling device event: $e');
+      debugPrint('Error handling device event: $e');
     }
   }
 
@@ -466,7 +480,7 @@ class GarminConnectService {
     try {
       final userId = Supabase.instance.client.auth.currentUser?.id;
       if (userId == null) return;
-      
+
       await Supabase.instance.client.from('garmin_devices').upsert({
         'user_id': userId,
         'device_id': _connectedDeviceId,
@@ -478,7 +492,7 @@ class GarminConnectService {
         'is_active': true,
       });
     } catch (e) {
-      print('Error saving device connection: $e');
+      debugPrint('Error saving device connection: $e');
     }
   }
 
@@ -487,13 +501,14 @@ class GarminConnectService {
     try {
       final userId = Supabase.instance.client.auth.currentUser?.id;
       if (userId == null) return;
-      
+
       await Supabase.instance.client.from('gps_activities').insert({
         'user_id': userId,
         'device_source': 'garmin',
         'device_id': _connectedDeviceId,
         'activity_type': workoutData['workout_type'] ?? 'running',
-        'start_time': workoutData['start_time'] ?? DateTime.now().toIso8601String(),
+        'start_time':
+            workoutData['start_time'] ?? DateTime.now().toIso8601String(),
         'duration_seconds': workoutData['duration_seconds'] ?? 0,
         'distance_meters': workoutData['distance_meters'] ?? 0,
         'avg_heart_rate': workoutData['avg_heart_rate'],
@@ -505,7 +520,7 @@ class GarminConnectService {
         'track_points': workoutData['track_points'] ?? [],
       });
     } catch (e) {
-      print('Error saving workout data: $e');
+      debugPrint('Error saving workout data: $e');
     }
   }
 
@@ -517,11 +532,11 @@ class GarminConnectService {
         'message': 'No device connected',
       };
     }
-    
+
     try {
       final battery = await getBatteryLevel();
       final info = await getDeviceInfo();
-      
+
       return {
         'connected': true,
         'device_id': _connectedDeviceId,

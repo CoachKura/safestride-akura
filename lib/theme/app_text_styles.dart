@@ -4,14 +4,11 @@ import 'package:google_fonts/google_fonts.dart';
 
 /// AKURA SafeStride Typography System
 /// Version 7.0 - Modern Dark Edition
-/// 
+///
 /// Complete text style definitions using Inter font family
 /// Follows Material Design 3 type scale with customizations
 class AppTextStyles {
   AppTextStyles._(); // Private constructor
-
-  /// Base font family - Inter (modern, readable, athletic)
-  static const String _primaryFont = 'Inter';
 
   // ============================================================================
   // DISPLAY STYLES - Hero sections, large headlines
@@ -226,7 +223,8 @@ class AppTextStyles {
   /// Apply opacity to any text style
   static TextStyle withOpacity(TextStyle style, double opacity) {
     return style.copyWith(
-      color: (style.color ?? const Color(0xFFFFFFFF)).withOpacity(opacity),
+      color:
+          (style.color ?? const Color(0xFFFFFFFF)).withValues(alpha: opacity),
     );
   }
 

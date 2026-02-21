@@ -10,7 +10,7 @@ import '../theme/theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class GarminConnectScreen extends StatefulWidget {
-  const GarminConnectScreen({Key? key}) : super(key: key);
+  const GarminConnectScreen({super.key});
 
   @override
   State<GarminConnectScreen> createState() => _GarminConnectScreenState();
@@ -18,7 +18,7 @@ class GarminConnectScreen extends StatefulWidget {
 
 class _GarminConnectScreenState extends State<GarminConnectScreen> {
   final GarminOAuthService _garminService = GarminOAuthService();
-  
+
   bool _isConnected = false;
   bool _isLoading = true;
   bool _isSyncing = false;
@@ -33,11 +33,11 @@ class _GarminConnectScreenState extends State<GarminConnectScreen> {
 
   Future<void> _checkConnection() async {
     setState(() => _isLoading = true);
-    
+
     try {
       final connected = await _garminService.isConnected();
       final status = await _garminService.getConnectionStatus();
-      
+
       setState(() {
         _isConnected = connected;
         _connectionStatus = status;
@@ -72,7 +72,7 @@ class _GarminConnectScreenState extends State<GarminConnectScreen> {
       final uri = Uri.parse(authUrl);
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
-        
+
         // Show instructions
         if (!mounted) return;
         _showInstructions();
@@ -86,13 +86,13 @@ class _GarminConnectScreenState extends State<GarminConnectScreen> {
 
   Future<void> _syncActivities() async {
     setState(() => _isSyncing = true);
-    
+
     try {
       final activities = await _garminService.syncActivities();
-      
+
       if (!mounted) return;
       setState(() => _isSyncing = false);
-      
+
       _showSuccess('Synced ${activities.length} activities from Garmin');
       await _checkConnection(); // Refresh status
     } catch (e) {
@@ -145,10 +145,11 @@ class _GarminConnectScreenState extends State<GarminConnectScreen> {
             Container(
               padding: const EdgeInsets.all(AppSpacing.sm),
               decoration: BoxDecoration(
-                color: AppColors.primaryBlue.withOpacity(0.1),
+                color: AppColors.primaryBlue.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.info_outline, color: AppColors.primaryBlue),
+              child:
+                  const Icon(Icons.info_outline, color: AppColors.primaryBlue),
             ),
             const SizedBox(width: AppSpacing.sm),
             const Text('Almost There!'),
@@ -166,18 +167,20 @@ class _GarminConnectScreenState extends State<GarminConnectScreen> {
             Container(
               padding: AppPadding.md,
               decoration: BoxDecoration(
-                color: AppColors.info.withOpacity(0.1),
+                color: AppColors.info.withValues(alpha: 0.1),
                 borderRadius: AppRadius.defaultRadius,
                 border: Border.all(color: AppColors.info),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.lightbulb_outline, color: AppColors.info, size: 20),
+                  const Icon(Icons.lightbulb_outline,
+                      color: AppColors.info, size: 20),
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(
                       'Tip: If the browser doesn\'t open, check your browser settings.',
-                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.info),
+                      style: AppTextStyles.bodySmall
+                          .copyWith(color: AppColors.info),
                     ),
                   ),
                 ],
@@ -243,7 +246,7 @@ class _GarminConnectScreenState extends State<GarminConnectScreen> {
                   children: [
                     // Garmin Branding
                     _buildHeader(),
-                    
+
                     const SizedBox(height: AppSpacing.lg),
 
                     // Connection Status Card
@@ -331,8 +334,8 @@ class _GarminConnectScreenState extends State<GarminConnectScreen> {
             padding: const EdgeInsets.all(AppSpacing.sm),
             decoration: BoxDecoration(
               color: isConnected
-                  ? AppColors.success.withOpacity(0.15)
-                  : AppColors.warning.withOpacity(0.15),
+                  ? AppColors.success.withValues(alpha: 0.15)
+                  : AppColors.warning.withValues(alpha: 0.15),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -396,9 +399,9 @@ class _GarminConnectScreenState extends State<GarminConnectScreen> {
         Container(
           padding: AppPadding.md,
           decoration: BoxDecoration(
-            color: AppColors.info.withOpacity(0.1),
+            color: AppColors.info.withValues(alpha: 0.1),
             borderRadius: AppRadius.defaultRadius,
-            border: Border.all(color: AppColors.info.withOpacity(0.3)),
+            border: Border.all(color: AppColors.info.withValues(alpha: 0.3)),
           ),
           child: Row(
             children: [
@@ -518,7 +521,7 @@ class _GarminConnectScreenState extends State<GarminConnectScreen> {
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.sm),
                     decoration: BoxDecoration(
-                      color: AppColors.primaryBlue.withOpacity(0.15),
+                      color: AppColors.primaryBlue.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(AppSpacing.sm),
                     ),
                     child: const Icon(
@@ -587,7 +590,8 @@ class _GarminConnectScreenState extends State<GarminConnectScreen> {
           _buildBenefitItem(
             icon: Icons.upload_rounded,
             title: 'Send Workouts to Watch',
-            description: 'Push structured workouts directly to your Garmin device',
+            description:
+                'Push structured workouts directly to your Garmin device',
           ),
           _buildBenefitItem(
             icon: Icons.sync_rounded,
@@ -624,7 +628,7 @@ class _GarminConnectScreenState extends State<GarminConnectScreen> {
           Container(
             padding: const EdgeInsets.all(AppSpacing.xs),
             decoration: BoxDecoration(
-              color: AppColors.primaryOrange.withOpacity(0.15),
+              color: AppColors.primaryOrange.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(AppSpacing.sm),
             ),
             child: Icon(icon, color: AppColors.primaryOrange, size: 20),
@@ -662,7 +666,8 @@ class _GarminConnectScreenState extends State<GarminConnectScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.help_outline, color: AppColors.textSecondary, size: 20),
+              const Icon(Icons.help_outline,
+                  color: AppColors.textSecondary, size: 20),
               const SizedBox(width: AppSpacing.sm),
               Text('Need Help?', style: AppTextStyles.titleSmall),
             ],
@@ -699,8 +704,8 @@ class _GarminConnectScreenState extends State<GarminConnectScreen> {
       if (difference.inHours < 1) return '${difference.inMinutes}m ago';
       if (difference.inDays < 1) return '${difference.inHours}h ago';
       if (difference.inDays < 7) return '${difference.inDays}d ago';
-      
-      return'${date.day}/${date.month}/${date.year}';
+
+      return '${date.day}/${date.month}/${date.year}';
     } catch (e) {
       return 'Unknown';
     }

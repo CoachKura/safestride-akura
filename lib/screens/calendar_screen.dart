@@ -6,7 +6,6 @@ import '../services/calendar_service.dart';
 import '../widgets/workout_card.dart';
 import '../widgets/gps_activity_tabs.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'garmin_workout_builder_screen.dart';
 import 'dart:developer' as developer;
 
 class CalendarScreen extends StatefulWidget {
@@ -119,6 +118,7 @@ class _CalendarScreenState extends State<CalendarScreen>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // Required by AutomaticKeepAliveClientMixin
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
@@ -128,12 +128,12 @@ class _CalendarScreenState extends State<CalendarScreen>
         elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.blue),
-            tooltip: 'Refresh Calendar',
-            onPressed: () async {
-              developer.log('🔄 Manual refresh triggered');
-              await _loadWorkouts();
-              if (mounted) {
+              icon: const Icon(Icons.refresh, color: Colors.blue),
+              tooltip: 'Refresh Calendar',
+              onPressed: () async {
+                developer.log('🔄 Manual refresh triggered');
+                await _loadWorkouts();
+                if (!context.mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('✅ Calendar refreshed!'),
@@ -141,9 +141,7 @@ class _CalendarScreenState extends State<CalendarScreen>
                     backgroundColor: Colors.green,
                   ),
                 );
-              }
-            },
-          ),
+              }),
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
             onPressed: () {

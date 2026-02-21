@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
@@ -14,7 +16,7 @@ class AthleteGoalsScreen extends StatefulWidget {
 class _AthleteGoalsScreenState extends State<AthleteGoalsScreen> {
   final _formKey = GlobalKey<FormState>();
   final _supabase = Supabase.instance.client;
-  
+
   bool _loading = false;
   bool _hasExistingGoals = false;
 
@@ -26,19 +28,19 @@ class _AthleteGoalsScreenState extends State<AthleteGoalsScreen> {
   int _daysPerWeek = 4;
   String _preferredTime = 'morning';
   int _maxSessionMinutes = 60; // Changed to int to fix slider issue
-  
+
   // Personal Records
   final _current5kController = TextEditingController();
   final _current10kController = TextEditingController();
   final _currentHalfController = TextEditingController();
   final _currentFullController = TextEditingController();
-  
+
   // Target Records
   final _target5kController = TextEditingController();
   final _target10kController = TextEditingController();
   final _targetHalfController = TextEditingController();
   final _targetFullController = TextEditingController();
-  
+
   // Additional info
   final _injuryHistoryController = TextEditingController();
   final _obstaclesController = TextEditingController();
@@ -69,7 +71,7 @@ class _AthleteGoalsScreenState extends State<AthleteGoalsScreen> {
 
   Future<void> _loadExistingGoals() async {
     setState(() => _loading = true);
-    
+
     try {
       final userId = _supabase.auth.currentUser?.id;
       if (userId == null) return;
@@ -86,24 +88,25 @@ class _AthleteGoalsScreenState extends State<AthleteGoalsScreen> {
           _hasExistingGoals = true;
           _primaryGoal = data['primary_goal'] ?? '10k';
           _targetEvent = data['target_event'];
-          _targetDate = data['target_date'] != null 
-              ? DateTime.parse(data['target_date']) 
+          _targetDate = data['target_date'] != null
+              ? DateTime.parse(data['target_date'])
               : null;
           _currentExperience = data['current_experience'] ?? 'intermediate';
           _daysPerWeek = data['days_per_week'] ?? 4;
           _preferredTime = data['preferred_time'] ?? 'morning';
           _maxSessionMinutes = data['max_session_minutes'] ?? 60;
-          
+
           _current5kController.text = data['current_5k_time'] ?? '';
           _current10kController.text = data['current_10k_time'] ?? '';
-          _currentHalfController.text = data['current_half_marathon_time'] ?? '';
+          _currentHalfController.text =
+              data['current_half_marathon_time'] ?? '';
           _currentFullController.text = data['current_marathon_time'] ?? '';
-          
+
           _target5kController.text = data['target_5k_time'] ?? '';
           _target10kController.text = data['target_10k_time'] ?? '';
           _targetHalfController.text = data['target_half_marathon_time'] ?? '';
           _targetFullController.text = data['target_marathon_time'] ?? '';
-          
+
           _injuryHistoryController.text = data['injury_history'] ?? '';
           _obstaclesController.text = data['training_obstacles'] ?? '';
           _notesController.text = data['notes'] ?? '';
@@ -139,16 +142,35 @@ class _AthleteGoalsScreenState extends State<AthleteGoalsScreen> {
         'days_per_week': _daysPerWeek,
         'preferred_time': _preferredTime,
         'max_session_minutes': _maxSessionMinutes,
-        'current_5k_time': _current5kController.text.isEmpty ? null : _current5kController.text,
-        'current_10k_time': _current10kController.text.isEmpty ? null : _current10kController.text,
-        'current_half_marathon_time': _currentHalfController.text.isEmpty ? null : _currentHalfController.text,
-        'current_marathon_time': _currentFullController.text.isEmpty ? null : _currentFullController.text,
-        'target_5k_time': _target5kController.text.isEmpty ? null : _target5kController.text,
-        'target_10k_time': _target10kController.text.isEmpty ? null : _target10kController.text,
-        'target_half_marathon_time': _targetHalfController.text.isEmpty ? null : _targetHalfController.text,
-        'target_marathon_time': _targetFullController.text.isEmpty ? null : _targetFullController.text,
-        'injury_history': _injuryHistoryController.text.isEmpty ? null : _injuryHistoryController.text,
-        'training_obstacles': _obstaclesController.text.isEmpty ? null : _obstaclesController.text,
+        'current_5k_time': _current5kController.text.isEmpty
+            ? null
+            : _current5kController.text,
+        'current_10k_time': _current10kController.text.isEmpty
+            ? null
+            : _current10kController.text,
+        'current_half_marathon_time': _currentHalfController.text.isEmpty
+            ? null
+            : _currentHalfController.text,
+        'current_marathon_time': _currentFullController.text.isEmpty
+            ? null
+            : _currentFullController.text,
+        'target_5k_time':
+            _target5kController.text.isEmpty ? null : _target5kController.text,
+        'target_10k_time': _target10kController.text.isEmpty
+            ? null
+            : _target10kController.text,
+        'target_half_marathon_time': _targetHalfController.text.isEmpty
+            ? null
+            : _targetHalfController.text,
+        'target_marathon_time': _targetFullController.text.isEmpty
+            ? null
+            : _targetFullController.text,
+        'injury_history': _injuryHistoryController.text.isEmpty
+            ? null
+            : _injuryHistoryController.text,
+        'training_obstacles': _obstaclesController.text.isEmpty
+            ? null
+            : _obstaclesController.text,
         'motivation_level': _motivationLevel,
         'notes': _notesController.text.isEmpty ? null : _notesController.text,
         'active': true,
@@ -216,7 +238,7 @@ class _AthleteGoalsScreenState extends State<AthleteGoalsScreen> {
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
+                          color: Colors.black.withValues(alpha: 0.1),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -225,7 +247,8 @@ class _AthleteGoalsScreenState extends State<AthleteGoalsScreen> {
                     child: Column(
                       children: [
                         // Icon and Title
-                        const Icon(Icons.auto_awesome, size: 48, color: Colors.white),
+                        const Icon(Icons.auto_awesome,
+                            size: 48, color: Colors.white),
                         const SizedBox(height: 12),
                         const Text(
                           'Kura Coach AI',
@@ -241,16 +264,16 @@ class _AthleteGoalsScreenState extends State<AthleteGoalsScreen> {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withValues(alpha: 0.9),
                           ),
                         ),
                         const SizedBox(height: 16),
-                        
+
                         // Features Box
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Column(
@@ -258,45 +281,53 @@ class _AthleteGoalsScreenState extends State<AthleteGoalsScreen> {
                             children: [
                               Row(
                                 children: [
-                                  Icon(Icons.calendar_month, color: Colors.white, size: 18),
+                                  Icon(Icons.calendar_month,
+                                      color: Colors.white, size: 18),
                                   SizedBox(width: 8),
                                   Text(
                                     '4-Week Training Plans',
-                                    style: TextStyle(color: Colors.white, fontSize: 14),
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 14),
                                   ),
                                 ],
                               ),
                               SizedBox(height: 6),
                               Row(
                                 children: [
-                                  Icon(Icons.track_changes, color: Colors.white, size: 18),
+                                  Icon(Icons.track_changes,
+                                      color: Colors.white, size: 18),
                                   SizedBox(width: 8),
                                   Text(
                                     'Personalized to Your Goals',
-                                    style: TextStyle(color: Colors.white, fontSize: 14),
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 14),
                                   ),
                                 ],
                               ),
                               SizedBox(height: 6),
                               Row(
                                 children: [
-                                  Icon(Icons.trending_up, color: Colors.white, size: 18),
+                                  Icon(Icons.trending_up,
+                                      color: Colors.white, size: 18),
                                   SizedBox(width: 8),
                                   Text(
                                     'Adapts Every 4 Weeks',
-                                    style: TextStyle(color: Colors.white, fontSize: 14),
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 14),
                                   ),
                                 ],
                               ),
                               SizedBox(height: 6),
                               Row(
                                 children: [
-                                  Icon(Icons.watch, color: Colors.white, size: 18),
+                                  Icon(Icons.watch,
+                                      color: Colors.white, size: 18),
                                   SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
                                       'Create Manually in Garmin Connect',
-                                      style: TextStyle(color: Colors.white, fontSize: 14),
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 14),
                                     ),
                                   ),
                                 ],
@@ -307,11 +338,12 @@ class _AthleteGoalsScreenState extends State<AthleteGoalsScreen> {
                       ],
                     ),
                   ),
-                  
+
                   // Section Header: Set Your Goals
                   Card(
                     elevation: 1,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Row(
@@ -319,10 +351,13 @@ class _AthleteGoalsScreenState extends State<AthleteGoalsScreen> {
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: Theme.of(context).primaryColor.withOpacity(0.1),
+                              color: Theme.of(context)
+                                  .primaryColor
+                                  .withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: Icon(Icons.flag, color: Theme.of(context).primaryColor),
+                            child: Icon(Icons.flag,
+                                color: Theme.of(context).primaryColor),
                           ),
                           const SizedBox(width: 12),
                           const Expanded(
@@ -331,12 +366,15 @@ class _AthleteGoalsScreenState extends State<AthleteGoalsScreen> {
                               children: [
                                 Text(
                                   'Set Your Goals',
-                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
                                 ),
                                 SizedBox(height: 2),
                                 Text(
                                   'Tell us what you want to achieve',
-                                  style: TextStyle(fontSize: 13, color: Colors.grey),
+                                  style: TextStyle(
+                                      fontSize: 13, color: Colors.grey),
                                 ),
                               ],
                             ),
@@ -345,15 +383,15 @@ class _AthleteGoalsScreenState extends State<AthleteGoalsScreen> {
                       ),
                     ),
                   ),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // Section 1: Primary Goal
                   _buildSectionTitle('Primary Goal'),
                   _buildPrimaryGoalSelector(),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Target Event
                   TextFormField(
                     initialValue: _targetEvent,
@@ -363,11 +401,12 @@ class _AthleteGoalsScreenState extends State<AthleteGoalsScreen> {
                       prefixIcon: Icon(Icons.event),
                       border: OutlineInputBorder(),
                     ),
-                    onChanged: (value) => _targetEvent = value.isEmpty ? null : value,
+                    onChanged: (value) =>
+                        _targetEvent = value.isEmpty ? null : value,
                   ),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Target Date
                   InkWell(
                     onTap: _selectTargetDate,
@@ -382,33 +421,37 @@ class _AthleteGoalsScreenState extends State<AthleteGoalsScreen> {
                             ? DateFormat('MMM dd, yyyy').format(_targetDate!)
                             : 'Select date',
                         style: TextStyle(
-                          color: _targetDate != null ? Colors.black87 : Colors.grey,
+                          color: _targetDate != null
+                              ? Colors.black87
+                              : Colors.grey,
                         ),
                       ),
                     ),
                   ),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // Section 2: Experience Level
                   _buildSectionTitle('Experience Level'),
                   _buildExperienceSelector(),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // Section 3: Training Schedule
                   _buildSectionTitle('Training Schedule'),
                   const SizedBox(height: 8),
-                  const Text('Days per week:', style: TextStyle(fontWeight: FontWeight.w500)),
+                  const Text('Days per week:',
+                      style: TextStyle(fontWeight: FontWeight.w500)),
                   _buildDaysPerWeekChips(),
-                  
+
                   const SizedBox(height: 16),
-                  
-                  const Text('Preferred training time:', style: TextStyle(fontWeight: FontWeight.w500)),
+
+                  const Text('Preferred training time:',
+                      style: TextStyle(fontWeight: FontWeight.w500)),
                   _buildPreferredTimeSelector(),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   Text(
                     'Max workout duration: $_maxSessionMinutes minutes',
                     style: const TextStyle(fontWeight: FontWeight.w500),
@@ -419,11 +462,12 @@ class _AthleteGoalsScreenState extends State<AthleteGoalsScreen> {
                     max: 120,
                     divisions: 20,
                     label: '$_maxSessionMinutes min',
-                    onChanged: (value) => setState(() => _maxSessionMinutes = value.toInt()),
+                    onChanged: (value) =>
+                        setState(() => _maxSessionMinutes = value.toInt()),
                   ),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // Section 4: Personal Records
                   _buildSectionTitle('Personal Records (Optional)'),
                   const Text(
@@ -434,11 +478,13 @@ class _AthleteGoalsScreenState extends State<AthleteGoalsScreen> {
                   Row(
                     children: [
                       Expanded(
-                        child: _buildTimeField('Current 5K', _current5kController),
+                        child:
+                            _buildTimeField('Current 5K', _current5kController),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
-                        child: _buildTimeField('Target 5K', _target5kController),
+                        child:
+                            _buildTimeField('Target 5K', _target5kController),
                       ),
                     ],
                   ),
@@ -446,11 +492,13 @@ class _AthleteGoalsScreenState extends State<AthleteGoalsScreen> {
                   Row(
                     children: [
                       Expanded(
-                        child: _buildTimeField('Current 10K', _current10kController),
+                        child: _buildTimeField(
+                            'Current 10K', _current10kController),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
-                        child: _buildTimeField('Target 10K', _target10kController),
+                        child:
+                            _buildTimeField('Target 10K', _target10kController),
                       ),
                     ],
                   ),
@@ -458,11 +506,13 @@ class _AthleteGoalsScreenState extends State<AthleteGoalsScreen> {
                   Row(
                     children: [
                       Expanded(
-                        child: _buildTimeField('Current Half', _currentHalfController),
+                        child: _buildTimeField(
+                            'Current Half', _currentHalfController),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
-                        child: _buildTimeField('Target Half', _targetHalfController),
+                        child: _buildTimeField(
+                            'Target Half', _targetHalfController),
                       ),
                     ],
                   ),
@@ -470,17 +520,19 @@ class _AthleteGoalsScreenState extends State<AthleteGoalsScreen> {
                   Row(
                     children: [
                       Expanded(
-                        child: _buildTimeField('Current Full', _currentFullController),
+                        child: _buildTimeField(
+                            'Current Full', _currentFullController),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
-                        child: _buildTimeField('Target Full', _targetFullController),
+                        child: _buildTimeField(
+                            'Target Full', _targetFullController),
                       ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // Section 5: Additional Information
                   _buildSectionTitle('Additional Information'),
                   TextFormField(
@@ -513,7 +565,8 @@ class _AthleteGoalsScreenState extends State<AthleteGoalsScreen> {
                     max: 10,
                     divisions: 9,
                     label: _motivationLevel.toString(),
-                    onChanged: (value) => setState(() => _motivationLevel = value.toInt()),
+                    onChanged: (value) =>
+                        setState(() => _motivationLevel = value.toInt()),
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
@@ -525,9 +578,9 @@ class _AthleteGoalsScreenState extends State<AthleteGoalsScreen> {
                     ),
                     maxLines: 3,
                   ),
-                  
+
                   const SizedBox(height: 32),
-                  
+
                   // Save Button
                   ElevatedButton(
                     onPressed: _loading ? null : _saveGoals,
@@ -539,14 +592,16 @@ class _AthleteGoalsScreenState extends State<AthleteGoalsScreen> {
                         ? const SizedBox(
                             width: 20,
                             height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: Colors.white),
                           )
                         : Text(
                             _hasExistingGoals ? 'Update Goals' : 'Save Goals',
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                   ),
-                  
+
                   const SizedBox(height: 16),
                 ],
               ),
@@ -570,11 +625,23 @@ class _AthleteGoalsScreenState extends State<AthleteGoalsScreen> {
 
   Widget _buildPrimaryGoalSelector() {
     final goals = [
-      {'value': 'fitness', 'label': '🏃 General Fitness', 'icon': Icons.fitness_center},
-      {'value': 'weight_loss', 'label': '⚖️ Weight Loss', 'icon': Icons.trending_down},
+      {
+        'value': 'fitness',
+        'label': '🏃 General Fitness',
+        'icon': Icons.fitness_center
+      },
+      {
+        'value': 'weight_loss',
+        'label': '⚖️ Weight Loss',
+        'icon': Icons.trending_down
+      },
       {'value': '5k', 'label': '🏅 5K Race', 'icon': Icons.emoji_events},
       {'value': '10k', 'label': '🏅 10K Race', 'icon': Icons.emoji_events},
-      {'value': 'half_marathon', 'label': '🏅 Half Marathon', 'icon': Icons.emoji_events},
+      {
+        'value': 'half_marathon',
+        'label': '🏅 Half Marathon',
+        'icon': Icons.emoji_events
+      },
       {'value': 'marathon', 'label': '🏆 Marathon', 'icon': Icons.emoji_events},
       {'value': 'speed', 'label': '⚡ Speed Improvement', 'icon': Icons.speed},
     ];
@@ -590,7 +657,7 @@ class _AthleteGoalsScreenState extends State<AthleteGoalsScreen> {
           onSelected: (selected) {
             setState(() => _primaryGoal = goal['value'] as String);
           },
-          selectedColor: Theme.of(context).primaryColor.withOpacity(0.3),
+          selectedColor: Theme.of(context).primaryColor.withValues(alpha: 0.3),
         );
       }).toList(),
     );
@@ -599,9 +666,18 @@ class _AthleteGoalsScreenState extends State<AthleteGoalsScreen> {
   Widget _buildExperienceSelector() {
     return SegmentedButton<String>(
       segments: const [
-        ButtonSegment(value: 'beginner', label: Text('Beginner'), icon: Icon(Icons.looks_one)),
-        ButtonSegment(value: 'intermediate', label: Text('Intermediate'), icon: Icon(Icons.looks_two)),
-        ButtonSegment(value: 'advanced', label: Text('Advanced'), icon: Icon(Icons.looks_3)),
+        ButtonSegment(
+            value: 'beginner',
+            label: Text('Beginner'),
+            icon: Icon(Icons.looks_one)),
+        ButtonSegment(
+            value: 'intermediate',
+            label: Text('Intermediate'),
+            icon: Icon(Icons.looks_two)),
+        ButtonSegment(
+            value: 'advanced',
+            label: Text('Advanced'),
+            icon: Icon(Icons.looks_3)),
       ],
       selected: {_currentExperience},
       onSelectionChanged: (Set<String> newSelection) {
@@ -620,7 +696,7 @@ class _AthleteGoalsScreenState extends State<AthleteGoalsScreen> {
           onSelected: (selected) {
             setState(() => _daysPerWeek = days);
           },
-          selectedColor: Theme.of(context).primaryColor.withOpacity(0.3),
+          selectedColor: Theme.of(context).primaryColor.withValues(alpha: 0.3),
         );
       }).toList(),
     );

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 /// AKURA SafeStride Spacing & Layout System
 /// Version 7.0 - Modern Dark Edition
-/// 
+///
 /// Spacing scale, border radius, elevations, and shadows
 class AppSpacing {
   AppSpacing._(); // Private constructor
@@ -127,7 +127,8 @@ class AppRadius {
   static const BorderRadius smallRadius = BorderRadius.all(Radius.circular(8));
 
   /// Default border radius
-  static const BorderRadius defaultRadius = BorderRadius.all(Radius.circular(12));
+  static const BorderRadius defaultRadius =
+      BorderRadius.all(Radius.circular(12));
 
   /// Large border radius
   static const BorderRadius largeRadius = BorderRadius.all(Radius.circular(16));
@@ -198,7 +199,7 @@ class AppShadows {
   /// Glow effect for active states
   /// Usage: Active buttons, focused fields
   static BoxShadow glowShadow(Color color) => BoxShadow(
-        color: color.withOpacity(0.4),
+        color: color.withValues(alpha: 0.4),
         offset: const Offset(0, 0),
         blurRadius: 16,
         spreadRadius: 0,

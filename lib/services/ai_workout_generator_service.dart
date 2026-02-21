@@ -1,10 +1,12 @@
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AIWorkoutGeneratorService {
   /// Generate a personalized training plan based on athlete's goal
   static Future<Map<String, dynamic>> generateWorkoutPlan({
-    required String goalType, // 'marathon', '10k', '5k', 'fitness', 'weight_loss'
+    required String
+        goalType, // 'marathon', '10k', '5k', 'fitness', 'weight_loss'
     required int weeksToGoal,
     required int currentWeeklyKm,
     required int trainingDaysPerWeek,
@@ -52,7 +54,7 @@ class AIWorkoutGeneratorService {
         startDate: startDate.add(Duration(days: week * 7)),
         AISRIScore: AISRIScore,
       );
-      
+
       workouts.addAll(weeklyWorkouts);
     }
 
@@ -81,7 +83,7 @@ class AIWorkoutGeneratorService {
         .maybeSingle();
 
     if (profileResponse == null) {
-      print('No athlete profile found for user');
+      debugPrint('No athlete profile found for user');
       return;
     }
 
@@ -94,13 +96,17 @@ class AIWorkoutGeneratorService {
         final workoutTemplate = await Supabase.instance.client
             .from('workouts')
             .insert({
-          'workout_name': workout['type'],
-          'workout_type': 'cardio',
-          'exercises': [],
-          'estimated_duration_minutes': workout['duration_minutes'],
-          'difficulty': workout['intensity'] == 'high' ? 'hard' : workout['intensity'] == 'low' ? 'easy' : 'moderate',
-          'description': workout['description'],
-        })
+              'workout_name': workout['type'],
+              'workout_type': 'cardio',
+              'exercises': [],
+              'estimated_duration_minutes': workout['duration_minutes'],
+              'difficulty': workout['intensity'] == 'high'
+                  ? 'hard'
+                  : workout['intensity'] == 'low'
+                      ? 'easy'
+                      : 'moderate',
+              'description': workout['description'],
+            })
             .select('id')
             .single();
 
@@ -122,7 +128,7 @@ class AIWorkoutGeneratorService {
           'description': workout['description'],
         });
       } catch (e) {
-        print('Error saving workout: $e');
+        debugPrint('Error saving workout: $e');
       }
     }
   }
@@ -205,7 +211,6 @@ class AIWorkoutGeneratorService {
     required double AISRIScore,
   }) {
     final workouts = <Map<String, dynamic>>[];
-    final random = Random(week); // Consistent random for same week
 
     // Determine workout types distribution
     final workoutTypes = _getWorkoutDistribution(
@@ -215,18 +220,24 @@ class AIWorkoutGeneratorService {
       totalWeeks: totalWeeks,
     );
 
-    // Distribute weekly distance across workouts
-    var remainingKm = weeklyKm;
-    final workoutDays = [1, 3, 5, 0, 2, 4, 6]; // Mon, Wed, Fri, Sun, Tue, Thu, Sat priority
+    final workoutDays = [
+      1,
+      3,
+      5,
+      0,
+      2,
+      4,
+      6
+    ]; // Mon, Wed, Fri, Sun, Tue, Thu, Sat priority
 
     for (int i = 0; i < trainingDaysPerWeek && i < workoutTypes.length; i++) {
       final workoutType = workoutTypes[i];
       final dayOffset = workoutDays[i];
-      
+
       // Calculate distance for this workout
-      final distancePercent = _getDistancePercent(workoutType, i, trainingDaysPerWeek);
+      final distancePercent =
+          _getDistancePercent(workoutType, i, trainingDaysPerWeek);
       final distance = (weeklyKm * distancePercent).clamp(3.0, 25.0);
-      remainingKm -= distance;
 
       // Calculate duration based on pace
       final pace = _calculatePace(fitnessLevel, workoutType);
@@ -236,7 +247,8 @@ class AIWorkoutGeneratorService {
       final hrZones = _getHRZones(workoutType, maxHR);
 
       final workout = {
-        'scheduled_date': startDate.add(Duration(days: dayOffset)).toIso8601String(),
+        'scheduled_date':
+            startDate.add(Duration(days: dayOffset)).toIso8601String(),
         'type': _getWorkoutTypeName(workoutType),
         'workout_category': workoutType,
         'duration_minutes': duration,
@@ -245,7 +257,8 @@ class AIWorkoutGeneratorService {
         'hr_zone_min': hrZones['min'],
         'hr_zone_max': hrZones['max'],
         'pace_target': pace,
-        'description': _generateDescription(workoutType, distance, week, totalWeeks),
+        'description':
+            _generateDescription(workoutType, distance, week, totalWeeks),
         'notes': _generateNotes(workoutType, AISRIScore, fitnessLevel),
         'week_number': week + 1,
       };
@@ -274,8 +287,8 @@ class AIWorkoutGeneratorService {
 
     // Adjust for taper phase (last 2 weeks)
     if (week >= totalWeeks - 2) {
-      return List.generate(
-          trainingDaysPerWeek, (i) => i == trainingDaysPerWeek - 1 ? 'easy' : 'recovery');
+      return List.generate(trainingDaysPerWeek,
+          (i) => i == trainingDaysPerWeek - 1 ? 'easy' : 'recovery');
     }
 
     return distributions[trainingDaysPerWeek] ??
@@ -324,14 +337,21 @@ class AIWorkoutGeneratorService {
   /// Get HR zones for workout type
   static Map<String, int> _getHRZones(String workoutType, int maxHR) {
     final zones = {
-      'recovery': {'min': (maxHR * 0.50).round(), 'max': (maxHR * 0.60).round()},
+      'recovery': {
+        'min': (maxHR * 0.50).round(),
+        'max': (maxHR * 0.60).round()
+      },
       'easy': {'min': (maxHR * 0.60).round(), 'max': (maxHR * 0.70).round()},
       'tempo': {'min': (maxHR * 0.80).round(), 'max': (maxHR * 0.87).round()},
-      'intervals': {'min': (maxHR * 0.87).round(), 'max': (maxHR * 0.95).round()},
+      'intervals': {
+        'min': (maxHR * 0.87).round(),
+        'max': (maxHR * 0.95).round()
+      },
       'long': {'min': (maxHR * 0.65).round(), 'max': (maxHR * 0.75).round()},
     };
 
-    return zones[workoutType] ?? {'min': (maxHR * 0.60).round(), 'max': (maxHR * 0.70).round()};
+    return zones[workoutType] ??
+        {'min': (maxHR * 0.60).round(), 'max': (maxHR * 0.70).round()};
   }
 
   /// Get intensity level
@@ -365,7 +385,8 @@ class AIWorkoutGeneratorService {
   }
 
   /// Generate workout description
-  static String _generateDescription(String type, double distance, int week, int totalWeeks) {
+  static String _generateDescription(
+      String type, double distance, int week, int totalWeeks) {
     final weekPhase = week < totalWeeks * 0.7
         ? 'Base Building'
         : week < totalWeeks * 0.9
@@ -389,7 +410,8 @@ class AIWorkoutGeneratorService {
   }
 
   /// Generate workout notes
-  static String _generateNotes(String type, double AISRIScore, String fitnessLevel) {
+  static String _generateNotes(
+      String type, double AISRIScore, String fitnessLevel) {
     final notes = <String>[];
 
     // AISRI-based recommendations
@@ -408,7 +430,8 @@ class AIWorkoutGeneratorService {
         notes.add('🎯 Should feel easy throughout. Build aerobic base.');
         break;
       case 'tempo':
-        notes.add('🎯 Comfortably hard pace. Should be able to say short phrases.');
+        notes.add(
+            '🎯 Comfortably hard pace. Should be able to say short phrases.');
         notes.add('⏱️ Warm up 10-15min, tempo effort middle, cool down 10min.');
         break;
       case 'intervals':

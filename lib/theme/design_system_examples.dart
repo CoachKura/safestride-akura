@@ -1,7 +1,7 @@
 // lib/theme/design_system_examples.dart
 //
 // AKURA SafeStride Design System - Usage Examples
-// 
+//
 // This file contains example widgets demonstrating how to use
 // the design system components. Use as reference when building screens.
 
@@ -43,15 +43,16 @@ class ExamplePrimaryCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(AppSpacing.sm),
                 decoration: BoxDecoration(
-                  color: iconColor.withOpacity(0.1),
+                  color: iconColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.sm),
                 ),
                 child: Icon(icon, color: iconColor, size: AppSpacing.iconSize),
               ),
               const SizedBox(width: AppSpacing.sm),
-              Text(title, style: AppTextStyles.labelMedium.copyWith(
-                color: AppColors.textSecondary,
-              )),
+              Text(title,
+                  style: AppTextStyles.labelMedium.copyWith(
+                    color: AppColors.textSecondary,
+                  )),
             ],
           ),
           const SizedBox(height: AppSpacing.sm),
@@ -134,14 +135,16 @@ class ExampleZoneBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = AppColors.getZoneColor(zone);
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.sm,
         vertical: AppSpacing.xs,
       ),
       decoration: BoxDecoration(
-        color: isActive ? color.withOpacity(0.2) : color.withOpacity(0.1),
+        color: isActive
+            ? color.withValues(alpha: 0.2)
+            : color.withValues(alpha: 0.1),
         borderRadius: AppRadius.pillRadius,
         border: Border.all(
           color: color,
@@ -337,9 +340,9 @@ class ExampleWorkoutListItem extends StatelessWidget {
           width: 48,
           height: 48,
           decoration: BoxDecoration(
-            color: isCompleted 
-                ? AppColors.success.withOpacity(0.15) 
-                : AppColors.primaryOrange.withOpacity(0.15),
+            color: isCompleted
+                ? AppColors.success.withValues(alpha: 0.15)
+                : AppColors.primaryOrange.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(AppSpacing.sm),
           ),
           child: Icon(

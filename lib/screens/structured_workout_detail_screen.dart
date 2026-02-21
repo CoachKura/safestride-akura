@@ -68,7 +68,8 @@ class _StructuredWorkoutDetailScreenState
       double? estimatedDistance = 0;
 
       for (var step in _steps) {
-        if (step.durationType == DurationType.time && step.durationValue != null) {
+        if (step.durationType == DurationType.time &&
+            step.durationValue != null) {
           estimatedDuration = estimatedDuration! + step.durationValue!;
         } else if (step.durationType == DurationType.distance &&
             step.durationValue != null) {
@@ -83,8 +84,10 @@ class _StructuredWorkoutDetailScreenState
         description: _descriptionController.text.trim(),
         activityType: _activityType,
         steps: _steps,
-        estimatedDuration: (estimatedDuration ?? 0) > 0 ? estimatedDuration : null,
-        estimatedDistance: (estimatedDistance ?? 0) > 0 ? estimatedDistance : null,
+        estimatedDuration:
+            (estimatedDuration ?? 0) > 0 ? estimatedDuration : null,
+        estimatedDistance:
+            (estimatedDistance ?? 0) > 0 ? estimatedDistance : null,
         createdAt: widget.workout?.createdAt ?? DateTime.now(),
         updatedAt: DateTime.now(),
       );
@@ -333,7 +336,7 @@ class _StructuredWorkoutDetailScreenState
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 4,
                     offset: const Offset(0, -2),
                   ),

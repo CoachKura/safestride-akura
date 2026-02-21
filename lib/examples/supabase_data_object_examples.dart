@@ -40,12 +40,12 @@ Future<void> example1BasicUsage() async {
 
   // Listen for data changes
   athleteProfiles.onDataChanged((data) {
-    print('Athlete profiles updated: ${data.length} records');
+    debugPrint('Athlete profiles updated: ${data.length} records');
   });
 
   // Get current data
   final profiles = athleteProfiles.getData();
-  print('Current profiles: ${profiles.length}');
+  debugPrint('Current profiles: ${profiles.length}');
 
   // Update a profile
   await athleteProfiles.update(
@@ -90,7 +90,7 @@ Future<void> example2AssessmentsRealtime() async {
   assessments.onDataChanged((data) {
     if (data.isNotEmpty) {
       final latest = data.first;
-      print('Latest assessment score: ${latest['overall_score']}');
+      debugPrint('Latest assessment score: ${latest['overall_score']}');
     }
   });
 
@@ -149,7 +149,7 @@ Future<void> example3WorkoutCalendar() async {
 
   // Get upcoming workouts
   final upcomingWorkouts = calendar.getData();
-  print('Upcoming workouts: ${upcomingWorkouts.length}');
+  debugPrint('Upcoming workouts: ${upcomingWorkouts.length}');
 
   // Complete a workout
   if (upcomingWorkouts.isNotEmpty) {
@@ -160,7 +160,8 @@ Future<void> example3WorkoutCalendar() async {
   // Add new workout
   await calendar.insert({
     'user_id': userId,
-    'workout_date': today.add(Duration(days: 3)).toIso8601String().split('T')[0],
+    'workout_date':
+        today.add(Duration(days: 3)).toIso8601String().split('T')[0],
     'workout_name': 'Easy Run',
     'workout_type': 'easy_run',
     'target_distance': 5.0,
@@ -199,8 +200,8 @@ Future<void> example4ReadOnlyReporting() async {
 
   final data = summary.getData();
   if (data.isNotEmpty) {
-    print('Total distance this month: ${data.first['total_distance']} km');
-    print('Total workouts: ${data.first['workout_count']}');
+    debugPrint('Total distance this month: ${data.first['total_distance']} km');
+    debugPrint('Total workouts: ${data.first['workout_count']}');
   }
 }
 
@@ -216,7 +217,7 @@ Future<void> example5DataObjectStore() async {
   // Access from anywhere in the app
   final profiles = DataObjectStore.getDataObjectById('athlete_profiles');
   if (profiles != null) {
-    print('Profiles data: ${profiles.getData().length} records');
+    debugPrint('Profiles data: ${profiles.getData().length} records');
   }
 
   final assessments = DataObjectStore.getDataObjectById('user_assessments');
@@ -226,7 +227,7 @@ Future<void> example5DataObjectStore() async {
 
   // List all registered data objects
   final allIds = DataObjectStore.getAllIds();
-  print('Registered data objects: $allIds');
+  debugPrint('Registered data objects: $allIds');
 
   // Clean up specific data object
   DataObjectStore.unregister('monthly_summary');
@@ -239,7 +240,7 @@ Future<void> example5DataObjectStore() async {
 // Example 6: Integration with StatefulWidget
 // ====================
 class WorkoutListScreen extends StatefulWidget {
-  const WorkoutListScreen({Key? key}) : super(key: key);
+  const WorkoutListScreen({super.key});
 
   @override
   State<WorkoutListScreen> createState() => _WorkoutListScreenState();
@@ -351,7 +352,8 @@ Future<SupabaseDataObject> createAthleteGoalsDataObject(String userId) async {
 // ====================
 // Example 8: Strava Activities
 // ====================
-Future<SupabaseDataObject> createStravaActivitiesDataObject(String userId) async {
+Future<SupabaseDataObject> createStravaActivitiesDataObject(
+    String userId) async {
   final options = DataObjectOptions(
     tableName: 'strava_activities',
     fields: [

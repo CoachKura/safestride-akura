@@ -1,4 +1,4 @@
-import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'kura_coach_service.dart';
 
@@ -11,7 +11,7 @@ class KuraCoachAdaptiveService {
   /// PHASE 1: Analyze Athlete's Current State
   /// Inputs: Evaluation form + Goals + Strava history
   static Future<Map<String, dynamic>> analyzeAthleteState(String userId) async {
-    print('📊 Analyzing athlete state for user: $userId');
+    debugPrint('📊 Analyzing athlete state for user: $userId');
 
     // 1. Get athlete profile and latest AISRI assessment
     final profileData = await _supabase
@@ -72,7 +72,7 @@ class KuraCoachAdaptiveService {
     required String userId,
     required Map<String, dynamic> athleteState,
   }) async {
-    print('🎯 Generating 4-week plan for ${athleteState['athlete_name']}');
+    debugPrint('🎯 Generating 4-week plan for ${athleteState['athlete_name']}');
 
     final trainingPhase = athleteState['training_phase'];
     final aisriScore = athleteState['aisri_score'];
@@ -100,20 +100,17 @@ class KuraCoachAdaptiveService {
     );
 
     // Add plan metadata
-    await _supabase
-        .from('ai_workout_plans')
-        .update({
-          'aisri_score_at_creation': aisriScore,
-          'metadata': {
-            'weekly_schedule': weeklySchedule,
-            'athlete_state': athleteState,
-            'adaptation_enabled': true,
-            'adaptation_after_week': 4,
-          },
-        })
-        .eq('id', planId);
+    await _supabase.from('ai_workout_plans').update({
+      'aisri_score_at_creation': aisriScore,
+      'metadata': {
+        'weekly_schedule': weeklySchedule,
+        'athlete_state': athleteState,
+        'adaptation_enabled': true,
+        'adaptation_after_week': 4,
+      },
+    }).eq('id', planId);
 
-    print('✅ Plan created: $planId');
+    debugPrint('✅ Plan created: $planId');
     return planId;
   }
 
@@ -123,9 +120,10 @@ class KuraCoachAdaptiveService {
     required String planId,
     required int weekNumber,
   }) async {
-    print('📈 Tracking week $weekNumber performance');
+    debugPrint('📈 Tracking week $weekNumber performance');
 
-    final weekStart = DateTime.now().subtract(Duration(days: DateTime.now().weekday - 1));
+    final weekStart =
+        DateTime.now().subtract(Duration(days: DateTime.now().weekday - 1));
     final weekEnd = weekStart.add(Duration(days: 6));
 
     // Get completed workouts this week
@@ -137,7 +135,8 @@ class KuraCoachAdaptiveService {
         .gte('workout_date', weekStart.toIso8601String())
         .lte('workout_date', weekEnd.toIso8601String());
 
-    final completedWorkouts = workouts.where((w) => w['status'] == 'completed').toList();
+    final completedWorkouts =
+        workouts.where((w) => w['status'] == 'completed').toList();
     final scheduledCount = workouts.length;
     final completedCount = completedWorkouts.length;
 
@@ -149,14 +148,15 @@ class KuraCoachAdaptiveService {
     for (var workout in completedWorkouts) {
       totalTimeMinutes += (workout['actual_duration_minutes'] ?? 0) as int;
       totalDistance += ((workout['actual_distance'] ?? 0) as num).toDouble();
-      
+
       final zone = workout['zone'];
-      zonesTime[zone] = (zonesTime[zone] ?? 0) + (workout['actual_duration_minutes'] ?? 0) as int;
+      zonesTime[zone] = (zonesTime[zone] ?? 0) +
+          (workout['actual_duration_minutes'] ?? 0) as int;
     }
 
     // Get AISRI scores
     final currentAisri = await KuraCoachService.calculateAISRIScore(userId);
-    
+
     // Save to training history
     await _supabase.from('aisri_training_history').insert({
       'user_id': userId,
@@ -168,10 +168,12 @@ class KuraCoachAdaptiveService {
       'total_time_minutes': totalTimeMinutes,
       'total_distance': totalDistance,
       'zones_trained': zonesTime,
-      'progression_notes': 'Week $weekNumber: $completedCount/$scheduledCount workouts completed',
+      'progression_notes':
+          'Week $weekNumber: $completedCount/$scheduledCount workouts completed',
     });
 
-    print('✅ Week $weekNumber tracked: $completedCount/$scheduledCount workouts');
+    debugPrint(
+        '✅ Week $weekNumber tracked: $completedCount/$scheduledCount workouts');
   }
 
   /// PHASE 4: After Week 4 - Decide Next Training Plan
@@ -179,10 +181,11 @@ class KuraCoachAdaptiveService {
     required String userId,
     required String previousPlanId,
   }) async {
-    print('🔄 Adapting training plan after 4 weeks');
+    debugPrint('🔄 Adapting training plan after 4 weeks');
 
     // 1. Analyze performance from past 4 weeks
-    final performanceAnalysis = await _analyzePerformanceTrend(userId, previousPlanId);
+    final performanceAnalysis =
+        await _analyzePerformanceTrend(userId, previousPlanId);
 
     // 2. Calculate current AISRI and compare to baseline
     final currentAisri = await KuraCoachService.calculateAISRIScore(userId);
@@ -191,7 +194,7 @@ class KuraCoachAdaptiveService {
         .select()
         .eq('id', previousPlanId)
         .single();
-    
+
     final baselineAisri = previousPlan['aisri_score_at_creation'];
     final aisriChange = currentAisri - baselineAisri;
 
@@ -222,16 +225,15 @@ class KuraCoachAdaptiveService {
     // 6. Mark previous plan as completed
     await _supabase
         .from('ai_workout_plans')
-        .update({'status': 'completed'})
-        .eq('id', previousPlanId);
+        .update({'status': 'completed'}).eq('id', previousPlanId);
 
-    print('✅ New plan generated: $newPlanId with phase: $nextPhase');
+    debugPrint('✅ New plan generated: $newPlanId with phase: $nextPhase');
     return newPlanId;
   }
 
   /// EXECUTION: Generate Plans for 10 Athletes
   static Future<List<Map<String, dynamic>>> generatePlansFor10Athletes() async {
-    print('🚀 Starting plan generation for 10 athletes');
+    debugPrint('🚀 Starting plan generation for 10 athletes');
 
     // Get 10 athletes with recent evaluations
     final athletes = await _supabase
@@ -245,11 +247,11 @@ class KuraCoachAdaptiveService {
     for (var athlete in athletes) {
       try {
         final userId = athlete['user_id'];
-        print('\n👤 Processing: ${athlete['full_name']}');
+        debugPrint('\n👤 Processing: ${athlete['full_name']}');
 
         // Phase 1: Analyze
         final athleteState = await analyzeAthleteState(userId);
-        
+
         // Phase 2: Generate Plan
         final planId = await generateInitial4WeekPlan(
           userId: userId,
@@ -265,9 +267,9 @@ class KuraCoachAdaptiveService {
           'status': 'success',
         });
 
-        print('✅ Plan created for ${athlete['full_name']}: $planId');
+        debugPrint('✅ Plan created for ${athlete['full_name']}: $planId');
       } catch (e) {
-        print('❌ Error for ${athlete['full_name']}: $e');
+        debugPrint('❌ Error for ${athlete['full_name']}: $e');
         results.add({
           'user_id': athlete['user_id'],
           'name': athlete['full_name'],
@@ -277,7 +279,8 @@ class KuraCoachAdaptiveService {
       }
     }
 
-    print('\n🎉 Batch generation complete: ${results.length} athletes processed');
+    debugPrint(
+        '\n🎉 Batch generation complete: ${results.length} athletes processed');
     return results;
   }
 
@@ -300,13 +303,16 @@ class KuraCoachAdaptiveService {
 
     for (var activity in activities) {
       final duration = activity['moving_time'] ?? 0;
-      final distance = ((activity['distance'] ?? 0) / 1000).toDouble(); // Convert to km
-      
+      final distance =
+          ((activity['distance'] ?? 0) / 1000).toDouble(); // Convert to km
+
       totalTime += duration as int;
       totalDistance += distance;
 
       final date = DateTime.parse(activity['activity_date']);
-      final weekNum = date.difference(DateTime.now().subtract(Duration(days: 21))).inDays ~/ 7;
+      final weekNum =
+          date.difference(DateTime.now().subtract(Duration(days: 21))).inDays ~/
+              7;
       weeklyCount[weekNum] = (weeklyCount[weekNum] ?? 0) + 1;
     }
 
@@ -315,9 +321,11 @@ class KuraCoachAdaptiveService {
     final consistencyScore = (weeklyCount.length / 3 * 100).round();
 
     String trainingLevel;
-    if (avgWeeklyTime < 60 * 60) { // Less than 1 hour/week
+    if (avgWeeklyTime < 60 * 60) {
+      // Less than 1 hour/week
       trainingLevel = 'beginner';
-    } else if (avgWeeklyTime < 180 * 60) { // Less than 3 hours/week
+    } else if (avgWeeklyTime < 180 * 60) {
+      // Less than 3 hours/week
       trainingLevel = 'intermediate';
     } else {
       trainingLevel = 'advanced';
@@ -342,19 +350,22 @@ class KuraCoachAdaptiveService {
     final consistencyScore = trainingLoad['consistency_score'];
 
     // Beginners or low AISRI → Foundation
-    if (aisriScore < 55 || trainingLevel == 'beginner' || consistencyScore < 50) {
+    if (aisriScore < 55 ||
+        trainingLevel == 'beginner' ||
+        consistencyScore < 50) {
       return 'Foundation';
     }
 
     // Check if preparing for an event
     if (goals != null && goals['target_event'] != null) {
-      final targetDate = goals['target_date'] != null 
+      final targetDate = goals['target_date'] != null
           ? DateTime.parse(goals['target_date'])
           : null;
-      
+
       if (targetDate != null) {
-        final weeksUntilEvent = targetDate.difference(DateTime.now()).inDays ~/ 7;
-        
+        final weeksUntilEvent =
+            targetDate.difference(DateTime.now()).inDays ~/ 7;
+
         if (weeksUntilEvent <= 4) {
           return 'Peak';
         } else if (weeksUntilEvent <= 8) {
@@ -392,7 +403,8 @@ class KuraCoachAdaptiveService {
         .gte('workout_date', fourWeeksAgo.toIso8601String())
         .order('workout_date', ascending: true);
 
-    final completed = workouts.where((w) => w['status'] == 'completed').toList();
+    final completed =
+        workouts.where((w) => w['status'] == 'completed').toList();
     final completionRate = completed.length / workouts.length;
 
     // Calculate weekly progression
@@ -400,7 +412,7 @@ class KuraCoachAdaptiveService {
     for (var workout in completed) {
       final date = DateTime.parse(workout['workout_date']);
       final weekNum = date.difference(fourWeeksAgo).inDays ~/ 7 + 1;
-      
+
       if (!weeklyMetrics.containsKey(weekNum)) {
         weeklyMetrics[weekNum] = {
           'count': 0,
@@ -413,9 +425,11 @@ class KuraCoachAdaptiveService {
 
       final week = weeklyMetrics[weekNum]!;
       week['count'] = week['count'] + 1;
-      week['total_time'] = week['total_time'] + (workout['actual_duration_minutes'] ?? 0);
-      week['total_distance'] = week['total_distance'] + ((workout['actual_distance'] ?? 0) as num).toDouble();
-      
+      week['total_time'] =
+          week['total_time'] + (workout['actual_duration_minutes'] ?? 0);
+      week['total_distance'] = week['total_distance'] +
+          ((workout['actual_distance'] ?? 0) as num).toDouble();
+
       final performance = workout['workout_performance'];
       if (performance != null && performance.isNotEmpty) {
         final perception = performance[0]['perception_rating'];
@@ -429,7 +443,8 @@ class KuraCoachAdaptiveService {
     // Calculate averages
     for (var week in weeklyMetrics.values) {
       if (week['perception_count'] > 0) {
-        week['avg_perception'] = week['avg_perception'] / week['perception_count'];
+        week['avg_perception'] =
+            week['avg_perception'] / week['perception_count'];
       }
     }
 
@@ -473,7 +488,8 @@ class KuraCoachAdaptiveService {
       'intensity': intensity,
       'aisri_change': aisriChange,
       'completion_rate': completionRate,
-      'reasoning': '$trend performance with ${(completionRate * 100).round()}% completion',
+      'reasoning':
+          '$trend performance with ${(completionRate * 100).round()}% completion',
     };
   }
 
@@ -487,7 +503,8 @@ class KuraCoachAdaptiveService {
     final phaseProgression = ['Foundation', 'Endurance', 'Threshold', 'Peak'];
     final currentIndex = phaseProgression.indexOf(currentPhase);
 
-    if (recommendation == 'progress' && currentIndex < phaseProgression.length - 1) {
+    if (recommendation == 'progress' &&
+        currentIndex < phaseProgression.length - 1) {
       return phaseProgression[currentIndex + 1];
     } else if (recommendation == 'reduce' && currentIndex > 0) {
       return phaseProgression[currentIndex - 1];

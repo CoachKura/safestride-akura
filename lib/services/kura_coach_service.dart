@@ -1,4 +1,5 @@
 import 'dart:developer' as developer;
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Kura Coach AI Workout Generator
@@ -56,7 +57,7 @@ class KuraCoachService {
   };
 
   /// Calculate AISRI Score (0-100)
-  /// Formula: (Weighted HRV * 0.3) + (Recovery Status * 0.3) + 
+  /// Formula: (Weighted HRV * 0.3) + (Recovery Status * 0.3) +
   ///          (Load History * 0.2) + (Sleep Quality * 0.1) + (Subjective Feel * 0.1)
   static Future<double> calculateAISRIScore(String userId) async {
     try {
@@ -67,7 +68,6 @@ class KuraCoachService {
           .eq('user_id', userId)
           .single();
 
-      final profile = response;
       final assessments = response['aisri_assessments'] as List?;
 
       if (assessments == null || assessments.isEmpty) {
@@ -77,7 +77,8 @@ class KuraCoachService {
       final latest = assessments.first;
 
       // Component scores (0-100 each)
-      double runningPerformance = (latest['running_performance'] ?? 75).toDouble();
+      double runningPerformance =
+          (latest['running_performance'] ?? 75).toDouble();
       double strength = (latest['strength_score'] ?? 75).toDouble();
       double rom = (latest['rom_score'] ?? 75).toDouble();
       double balance = (latest['balance_score'] ?? 75).toDouble();
@@ -85,8 +86,7 @@ class KuraCoachService {
       double alignment = (latest['alignment_score'] ?? 75).toDouble();
 
       // AISRI weighted formula
-      double aisriScore = 
-          (runningPerformance * 0.40) +
+      double aisriScore = (runningPerformance * 0.40) +
           (strength * 0.15) +
           (rom * 0.12) +
           (balance * 0.13) +
@@ -95,7 +95,7 @@ class KuraCoachService {
 
       return aisriScore.clamp(0.0, 100.0);
     } catch (e) {
-      print('Error calculating AISRI score: $e');
+      debugPrint('Error calculating AISRI score: $e');
       return 50.0;
     }
   }
@@ -130,10 +130,11 @@ class KuraCoachService {
 
       // Check for recent injuries (past 4 weeks)
       final recentInjuries = injuries?.where((injury) {
-        final injuryDate = DateTime.parse(injury['injury_date']);
-        final weeksDiff = DateTime.now().difference(injuryDate).inDays / 7;
-        return weeksDiff <= 4 && injury['status'] != 'recovered';
-      }).toList() ?? [];
+            final injuryDate = DateTime.parse(injury['injury_date']);
+            final weeksDiff = DateTime.now().difference(injuryDate).inDays / 7;
+            return weeksDiff <= 4 && injury['status'] != 'recovered';
+          }).toList() ??
+          [];
 
       // Zone P (Power) Requirements
       bool zonePAllowed = aisriScore >= 70 &&
@@ -154,7 +155,7 @@ class KuraCoachService {
         'SP': zoneSPAllowed,
       };
     } catch (e) {
-      print('Error checking safety gates: $e');
+      debugPrint('Error checking safety gates: $e');
       return {'P': false, 'SP': false};
     }
   }
@@ -175,13 +176,25 @@ class KuraCoachService {
         {'day': 'Monday', 'zone': 'F', 'duration': 45, 'type': 'steady'},
         {'day': 'Tuesday', 'zone': 'EN', 'duration': 30, 'type': 'steady'},
         {'day': 'Wednesday', 'zone': 'AR', 'duration': 20, 'type': 'recovery'},
-        {'day': 'Thursday', 'zone': 'TH', 'duration': 25, 'type': 'intervals', 'intervals': [
-          {'work': 5, 'rest': 2, 'repeats': 4}
-        ]},
+        {
+          'day': 'Thursday',
+          'zone': 'TH',
+          'duration': 25,
+          'type': 'intervals',
+          'intervals': [
+            {'work': 5, 'rest': 2, 'repeats': 4}
+          ]
+        },
         {'day': 'Friday', 'zone': 'F', 'duration': 45, 'type': 'steady'},
-        {'day': 'Saturday', 'zone': 'P', 'duration': 20, 'type': 'intervals', 'intervals': [
-          {'work': 3, 'rest': 3, 'repeats': 5}
-        ]},
+        {
+          'day': 'Saturday',
+          'zone': 'P',
+          'duration': 20,
+          'type': 'intervals',
+          'intervals': [
+            {'work': 3, 'rest': 3, 'repeats': 5}
+          ]
+        },
         {'day': 'Sunday', 'zone': 'AR', 'duration': 30, 'type': 'recovery'},
       ],
       'Endurance': [
@@ -195,38 +208,63 @@ class KuraCoachService {
       ],
       'Threshold': [
         {'day': 'Monday', 'zone': 'F', 'duration': 40, 'type': 'steady'},
-        {'day': 'Tuesday', 'zone': 'TH', 'duration': 30, 'type': 'intervals', 'intervals': [
-          {'work': 8, 'rest': 3, 'repeats': 3}
-        ]},
+        {
+          'day': 'Tuesday',
+          'zone': 'TH',
+          'duration': 30,
+          'type': 'intervals',
+          'intervals': [
+            {'work': 8, 'rest': 3, 'repeats': 3}
+          ]
+        },
         {'day': 'Wednesday', 'zone': 'AR', 'duration': 25, 'type': 'recovery'},
         {'day': 'Thursday', 'zone': 'EN', 'duration': 45, 'type': 'steady'},
         {'day': 'Friday', 'zone': 'TH', 'duration': 25, 'type': 'tempo'},
-        {'day': 'Saturday', 'zone': 'P', 'duration': 30, 'type': 'intervals', 'intervals': [
-          {'work': 4, 'rest': 3, 'repeats': 6}
-        ]},
+        {
+          'day': 'Saturday',
+          'zone': 'P',
+          'duration': 30,
+          'type': 'intervals',
+          'intervals': [
+            {'work': 4, 'rest': 3, 'repeats': 6}
+          ]
+        },
         {'day': 'Sunday', 'zone': 'AR', 'duration': 35, 'type': 'recovery'},
       ],
       'Peak': [
         {'day': 'Monday', 'zone': 'F', 'duration': 35, 'type': 'steady'},
-        {'day': 'Tuesday', 'zone': 'P', 'duration': 25, 'type': 'intervals', 'intervals': [
-          {'work': 3, 'rest': 4, 'repeats': 6}
-        ]},
+        {
+          'day': 'Tuesday',
+          'zone': 'P',
+          'duration': 25,
+          'type': 'intervals',
+          'intervals': [
+            {'work': 3, 'rest': 4, 'repeats': 6}
+          ]
+        },
         {'day': 'Wednesday', 'zone': 'AR', 'duration': 20, 'type': 'recovery'},
         {'day': 'Thursday', 'zone': 'TH', 'duration': 30, 'type': 'tempo'},
         {'day': 'Friday', 'zone': 'AR', 'duration': 20, 'type': 'recovery'},
-        {'day': 'Saturday', 'zone': 'SP', 'duration': 20, 'type': 'intervals', 'intervals': [
-          {'work': 1, 'rest': 5, 'repeats': 8}
-        ]},
+        {
+          'day': 'Saturday',
+          'zone': 'SP',
+          'duration': 20,
+          'type': 'intervals',
+          'intervals': [
+            {'work': 1, 'rest': 5, 'repeats': 8}
+          ]
+        },
         {'day': 'Sunday', 'zone': 'EN', 'duration': 50, 'type': 'long_run'},
       ],
     };
 
-    List<Map<String, dynamic>> schedule = scheduleTemplates[trainingPhase] ?? scheduleTemplates['Foundation']!;
+    List<Map<String, dynamic>> schedule =
+        scheduleTemplates[trainingPhase] ?? scheduleTemplates['Foundation']!;
 
     // Filter workouts based on allowed zones and safety gates
     List<Map<String, dynamic>> filteredSchedule = schedule.map((workout) {
       String zone = workout['zone'];
-      
+
       // Check if zone is allowed
       if (!allowedZones.contains(zone)) {
         // Downgrade to highest allowed zone
@@ -357,7 +395,8 @@ class KuraCoachService {
       'hr_max': hrMax,
       'pace_min': paceMin,
       'pace_max': paceMax,
-      'estimated_distance': _estimateDistance(durationMinutes, paceMin, paceMax),
+      'estimated_distance':
+          _estimateDistance(durationMinutes, paceMin, paceMax),
       'workout_steps': workoutSteps,
       'intervals': intervals,
       'garmin_compatible': true,
@@ -382,7 +421,9 @@ class KuraCoachService {
             'plan_name': planName,
             'training_phase': trainingPhase,
             'start_date': startDate.toIso8601String(),
-            'end_date': startDate.add(Duration(days: durationWeeks * 7)).toIso8601String(),
+            'end_date': startDate
+                .add(Duration(days: durationWeeks * 7))
+                .toIso8601String(),
             'duration_weeks': durationWeeks,
             'status': 'active',
             'metadata': {
@@ -399,7 +440,8 @@ class KuraCoachService {
       // Generate and insert individual workouts
       for (int week = 0; week < durationWeeks; week++) {
         for (var dayWorkout in weeklySchedule) {
-          final workoutDate = startDate.add(Duration(days: week * 7 + _getDayOffset(dayWorkout['day'])));
+          final workoutDate = startDate
+              .add(Duration(days: week * 7 + _getDayOffset(dayWorkout['day'])));
 
           final structuredWorkout = await generateStructuredWorkout(
             userId: userId,
@@ -432,7 +474,7 @@ class KuraCoachService {
 
       return planId;
     } catch (e) {
-      print('Error saving workout plan: $e');
+      debugPrint('Error saving workout plan: $e');
       throw Exception('Failed to save workout plan: $e');
     }
   }
@@ -443,7 +485,8 @@ class KuraCoachService {
     final dob = DateTime.parse(dateOfBirth);
     final today = DateTime.now();
     int age = today.year - dob.year;
-    if (today.month < dob.month || (today.month == dob.month && today.day < dob.day)) {
+    if (today.month < dob.month ||
+        (today.month == dob.month && today.day < dob.day)) {
       age--;
     }
     return age;
@@ -454,7 +497,7 @@ class KuraCoachService {
     // Lower HR = slower pace, higher HR = faster pace
     final maxHR = 208 - (0.7 * age);
     final hrPercent = hr / maxHR;
-    
+
     double paceMinPerKm;
     if (hrPercent < 0.6) {
       paceMinPerKm = 7.0; // Easy pace
@@ -475,13 +518,14 @@ class KuraCoachService {
     return '$minutes:${seconds.toString().padLeft(2, '0')}';
   }
 
-  static double _estimateDistance(int durationMinutes, String paceMin, String paceMax) {
+  static double _estimateDistance(
+      int durationMinutes, String paceMin, String paceMax) {
     // Parse pace strings (format: "5:30")
     final minParts = paceMin.split(':');
     final maxParts = paceMax.split(':');
-    final avgPaceMinutes = 
+    final avgPaceMinutes =
         (int.parse(minParts[0]) + int.parse(maxParts[0])) / 2 +
-        (int.parse(minParts[1]) + int.parse(maxParts[1])) / 120;
+            (int.parse(minParts[1]) + int.parse(maxParts[1])) / 120;
 
     return durationMinutes / avgPaceMinutes;
   }
@@ -509,20 +553,23 @@ class KuraCoachService {
       final aisriScore = evaluationData['aisri_score'] as double;
       final fitnessLevel = evaluationData['fitness_level'] as String;
       final injuryRisk = evaluationData['injury_risk'] as String;
-      final pillarScores = evaluationData['pillar_scores'] as Map<String, dynamic>;
+      final pillarScores =
+          evaluationData['pillar_scores'] as Map<String, dynamic>;
 
       // Determine protocol duration (8-16 weeks based on fitness level)
-      final protocolWeeks = _calculateProtocolDuration(fitnessLevel, injuryRisk);
-      
+      final protocolWeeks =
+          _calculateProtocolDuration(fitnessLevel, injuryRisk);
+
       // Determine training frequency (3-6 days per week)
-      final weeklyFrequency = _calculateWeeklyFrequency(fitnessLevel, aisriScore);
-      
+      final weeklyFrequency =
+          _calculateWeeklyFrequency(fitnessLevel, aisriScore);
+
       // Calculate target volume
       final weeklyVolume = _calculateWeeklyVolume(fitnessLevel, aisriScore);
-      
+
       // Identify weak areas from pillar scores
       final weakAreas = _identifyWeakAreas(pillarScores);
-      
+
       // Create initial athlete goals entry
       await _supabase.from('athlete_goals').insert({
         'user_id': athleteId,
@@ -548,7 +595,6 @@ class KuraCoachService {
       );
 
       developer.log('Protocol generated successfully for athlete: $athleteId');
-      
     } catch (e, stackTrace) {
       developer.log(
         'Error generating protocol from evaluation',
@@ -559,10 +605,11 @@ class KuraCoachService {
     }
   }
 
-  static int _calculateProtocolDuration(String fitnessLevel, String injuryRisk) {
+  static int _calculateProtocolDuration(
+      String fitnessLevel, String injuryRisk) {
     // Base duration
     int weeks = 12;
-    
+
     // Adjust for fitness level
     switch (fitnessLevel) {
       case 'beginner':
@@ -575,12 +622,12 @@ class KuraCoachService {
         weeks = 10; // More efficient progression
         break;
     }
-    
+
     // Adjust for injury risk
     if (injuryRisk == 'high' || injuryRisk == 'High') {
       weeks += 2; // Extra time for careful progression
     }
-    
+
     return weeks;
   }
 
@@ -615,18 +662,18 @@ class KuraCoachService {
   static List<String> _identifyWeakAreas(Map<String, dynamic> pillarScores) {
     final weakAreas = <String>[];
     final threshold = 65.0; // Scores below this are considered weak
-    
+
     pillarScores.forEach((pillar, score) {
       if (score < threshold) {
         weakAreas.add(pillar);
       }
     });
-    
+
     // If no weak areas, focus on balanced development
     if (weakAreas.isEmpty) {
       weakAreas.add('balanced_development');
     }
-    
+
     return weakAreas;
   }
 
@@ -639,12 +686,12 @@ class KuraCoachService {
   }) async {
     // Generate 4 weeks of workouts
     final startDate = DateTime.now();
-    
+
     for (int week = 1; week <= 4; week++) {
       // Calculate weekly progression (start at 80%, build to 100%)
       final weekMultiplier = 0.8 + (week * 0.05);
       final weekVolume = weeklyVolume * weekMultiplier;
-      
+
       // Generate workouts for this week
       final workouts = _generateWeekWorkouts(
         weekNumber: week,
@@ -653,11 +700,11 @@ class KuraCoachService {
         fitnessLevel: fitnessLevel,
         focusAreas: focusAreas,
       );
-      
+
       // Insert workouts into calendar
       for (int day = 0; day < workouts.length; day++) {
         final workoutDate = startDate.add(Duration(days: (week - 1) * 7 + day));
-        
+
         await _supabase.from('athlete_calendar').insert({
           'user_id': athleteId,
           'workout_date': workoutDate.toIso8601String().split('T')[0],
@@ -684,10 +731,10 @@ class KuraCoachService {
     required List<String> focusAreas,
   }) {
     final workouts = <Map<String, dynamic>>[];
-    
+
     // Distribute volume across workouts
     final avgWorkoutDistance = weeklyVolume / frequency;
-    
+
     // Week structure based on frequency
     if (frequency <= 3) {
       // 3 days: Easy, Tempo, Long
@@ -724,11 +771,12 @@ class KuraCoachService {
         _createWorkout('long_run', avgWorkoutDistance * 2.4, 'Zone EN'),
       ]);
     }
-    
+
     return workouts;
   }
 
-  static Map<String, dynamic> _createWorkout(String type, double distance, String zone) {
+  static Map<String, dynamic> _createWorkout(
+      String type, double distance, String zone) {
     final workoutDetails = {
       'easy_run': {
         'name': 'Easy Run',
@@ -751,9 +799,9 @@ class KuraCoachService {
         'intensity': 0.70,
       },
     };
-    
+
     final details = workoutDetails[type]!;
-    
+
     return {
       'type': type,
       'name': details['name'],

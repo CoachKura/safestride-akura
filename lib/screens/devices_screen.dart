@@ -5,7 +5,6 @@
 import 'package:flutter/material.dart';
 import '../services/device_integration_service.dart';
 import '../services/strava_service.dart';
-import '../theme/app_theme.dart';
 import 'dart:developer' as developer;
 
 class DevicesScreen extends StatefulWidget {
@@ -282,7 +281,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
                     children: [
                       // Header Card
                       Card(
-                        color: const Color(0xFF00D9FF).withOpacity(0.1),
+                        color: const Color(0xFF00D9FF).withValues(alpha: 0.1),
                         child: Padding(
                           padding: const EdgeInsets.all(16),
                           child: Column(
@@ -290,7 +289,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
                               const Icon(
                                 Icons.sync,
                                 size: 48,
-                                color: const Color(0xFF00D9FF),
+                                color: Color(0xFF00D9FF),
                               ),
                               const SizedBox(height: 12),
                               const Text(
@@ -405,7 +404,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
                     height: 48,
                     decoration: BoxDecoration(
                       color: connected
-                          ? const Color(0xFF00D9FF).withOpacity(0.1)
+                          ? const Color(0xFF00D9FF).withValues(alpha: 0.1)
                           : Colors.grey[200],
                       borderRadius: BorderRadius.circular(12),
                     ),

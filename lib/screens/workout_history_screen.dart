@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
@@ -13,7 +15,8 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
   List<Map<String, dynamic>> _workouts = [];
   bool _isLoading = true;
   String _filterType = 'all'; // all, running, strength, other
-  String _sortBy = 'date_desc'; // date_desc, date_asc, distance_desc, duration_desc
+  String _sortBy =
+      'date_desc'; // date_desc, date_asc, distance_desc, duration_desc
 
   @override
   void initState() {
@@ -31,7 +34,8 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
       // Fetch GPS activities (runs)
       final gpsQuery = Supabase.instance.client
           .from('gps_activities')
-          .select('id, start_time, duration_seconds, distance_meters, activity_type, avg_heart_rate, max_heart_rate, calories_burned')
+          .select(
+              'id, start_time, duration_seconds, distance_meters, activity_type, avg_heart_rate, max_heart_rate, calories_burned')
           .eq('user_id', userId)
           .order('start_time', ascending: false);
 
@@ -40,7 +44,8 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
       // Fetch manual workouts
       final workoutsQuery = Supabase.instance.client
           .from('workouts')
-          .select('id, created_at, duration_minutes, distance, distance_km, workout_type, notes')
+          .select(
+              'id, created_at, duration_minutes, distance, distance_km, workout_type, notes')
           .or('user_id.eq.$userId,athlete_id.eq.$userId')
           .order('created_at', ascending: false);
 
@@ -57,7 +62,8 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
           'date': DateTime.parse(activity['start_time']),
           'type': activity['activity_type'] ?? 'running',
           'duration': activity['duration_seconds'] / 60.0, // Convert to minutes
-          'distance': (activity['distance_meters'] ?? 0) / 1000.0, // Convert to km
+          'distance':
+              (activity['distance_meters'] ?? 0) / 1000.0, // Convert to km
           'avgHr': activity['avg_heart_rate'],
           'maxHr': activity['max_heart_rate'],
           'calories': activity['calories_burned'],
@@ -85,7 +91,7 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
 
       _applySortAndFilter();
     } catch (e) {
-      print('Error loading workouts: $e');
+      debugPrint('Error loading workouts: $e');
       setState(() => _isLoading = false);
     }
   }
@@ -467,15 +473,15 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
               ),
               const SizedBox(height: 20),
               _buildDetailRow('Type', workout['type']),
-              _buildDetailRow('Date',
-                  DateFormat('MMMM dd, yyyy').format(workout['date'])),
-              _buildDetailRow('Time',
-                  DateFormat('HH:mm:ss').format(workout['date'])),
+              _buildDetailRow(
+                  'Date', DateFormat('MMMM dd, yyyy').format(workout['date'])),
+              _buildDetailRow(
+                  'Time', DateFormat('HH:mm:ss').format(workout['date'])),
               _buildDetailRow('Duration',
                   '${workout['duration'].toStringAsFixed(0)} minutes'),
               if (workout['distance'] != null && workout['distance'] > 0)
-                _buildDetailRow('Distance',
-                    '${workout['distance'].toStringAsFixed(2)} km'),
+                _buildDetailRow(
+                    'Distance', '${workout['distance'].toStringAsFixed(2)} km'),
               if (workout['avgHr'] != null)
                 _buildDetailRow('Avg Heart Rate', '${workout['avgHr']} bpm'),
               if (workout['maxHr'] != null)

@@ -214,8 +214,10 @@ class _GPSTrackerScreenState extends State<GPSTrackerScreen> {
       final userId = Supabase.instance.client.auth.currentUser?.id;
       if (userId == null) {
         developer.log('❌ SAVE FAILED: User not logged in');
-        developer.log('❌ Current user: ${Supabase.instance.client.auth.currentUser}');
-        developer.log('❌ Session: ${Supabase.instance.client.auth.currentSession}');
+        developer.log(
+            '❌ Current user: ${Supabase.instance.client.auth.currentUser}');
+        developer
+            .log('❌ Session: ${Supabase.instance.client.auth.currentSession}');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -228,9 +230,11 @@ class _GPSTrackerScreenState extends State<GPSTrackerScreen> {
         return false;
       }
 
-      developer.log('💾 Saving activity: ${_distance.toStringAsFixed(2)} km, $_duration seconds');
+      developer.log(
+          '💾 Saving activity: ${_distance.toStringAsFixed(2)} km, $_duration seconds');
       developer.log('👤 User ID: $userId');
-      developer.log('📦 Insert data: platform=manual, distance=${(_distance * 1000).toInt()}m, duration=$_duration sec');
+      developer.log(
+          '📦 Insert data: platform=manual, distance=${(_distance * 1000).toInt()}m, duration=$_duration sec');
 
       // Save activity and get the ID
       final activityResponse = await Supabase.instance.client
@@ -282,7 +286,8 @@ class _GPSTrackerScreenState extends State<GPSTrackerScreen> {
       }
 
       // Show success snackbar immediately
-      developer.log('✅✅✅ SUCCESS! Activity saved to database with ID: $activityId');
+      developer
+          .log('✅✅✅ SUCCESS! Activity saved to database with ID: $activityId');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -303,7 +308,8 @@ class _GPSTrackerScreenState extends State<GPSTrackerScreen> {
       developer.log('❌❌❌ SAVE FAILED!');
       developer.log('❌ Error: $e');
       developer.log('❌ Stack trace: $stackTrace');
-      developer.log('❌ User ID at error: ${Supabase.instance.client.auth.currentUser?.id}');
+      developer.log(
+          '❌ User ID at error: ${Supabase.instance.client.auth.currentUser?.id}');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -381,7 +387,7 @@ class _GPSTrackerScreenState extends State<GPSTrackerScreen> {
             onPressed: () async {
               // Show loading
               Navigator.pop(context); // Close dialog first
-              
+
               // Show saving indicator
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -392,7 +398,8 @@ class _GPSTrackerScreenState extends State<GPSTrackerScreen> {
                         height: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
                         ),
                       ),
                       SizedBox(width: 12),
@@ -406,91 +413,92 @@ class _GPSTrackerScreenState extends State<GPSTrackerScreen> {
 
               // Attempt to save
               final saveSuccess = await _saveActivity();
+              if (!context.mounted) return;
 
-              if (mounted) {
-                if (saveSuccess) {
-                  // Show success message
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Row(
-                        children: [
-                          Icon(Icons.check_circle, color: Colors.white, size: 24),
-                          SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              '✅ Workout saved! Tap "Calendar" tab to view.',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
+              if (saveSuccess) {
+                // Show success message
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Row(
+                      children: [
+                        Icon(Icons.check_circle, color: Colors.white, size: 24),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            '✅ Workout saved! Tap "Calendar" tab to view.',
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                        ],
-                      ),
-                      duration: Duration(seconds: 5),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-                  
-                  // Clear data
-                  setState(() {
-                    _trackPoints.clear();
-                    _distance = 0;
-                    _duration = 0;
-                    _calories = 0;
-                  });
-                } else {
-                  // Show error and allow retry
-                  final retry = await showDialog<bool>(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: const Row(
-                        children: [
-                          Icon(Icons.error, color: Colors.red, size: 32),
-                          SizedBox(width: 12),
-                          Text('Save Failed'),
-                        ],
-                      ),
-                      content: const Text(
-                        'Could not save workout to database. Check console logs for details.\n\nWould you like to try again?',
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context, false),
-                          child: const Text('Cancel'),
-                        ),
-                        ElevatedButton(
-                          onPressed: () => Navigator.pop(context, true),
-                          style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
-                          child: const Text('Retry'),
                         ),
                       ],
                     ),
-                  );
-                  
-                  if (retry == true && mounted) {
-                    // Retry save
-                    final retrySuccess = await _saveActivity();
-                    if (mounted) {
-                      if (retrySuccess) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('✅ Workout saved successfully!'),
-                            backgroundColor: Colors.green,
-                          ),
-                        );
-                        setState(() {
-                          _trackPoints.clear();
-                          _distance = 0;
-                          _duration = 0;
-                          _calories = 0;
-                        });
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('❌ Save failed again. Check logs.'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      }
-                    }
+                    duration: Duration(seconds: 5),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+
+                // Clear data
+                setState(() {
+                  _trackPoints.clear();
+                  _distance = 0;
+                  _duration = 0;
+                  _calories = 0;
+                });
+              } else {
+                // Show error and allow retry
+                final retry = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Row(
+                      children: [
+                        Icon(Icons.error, color: Colors.red, size: 32),
+                        SizedBox(width: 12),
+                        Text('Save Failed'),
+                      ],
+                    ),
+                    content: const Text(
+                      'Could not save workout to database. Check console logs for details.\n\nWould you like to try again?',
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: const Text('Cancel'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue),
+                        child: const Text('Retry'),
+                      ),
+                    ],
+                  ),
+                );
+
+                if (!context.mounted) return;
+                if (retry == true) {
+                  // Retry save
+                  final retrySuccess = await _saveActivity();
+                  if (!context.mounted) return;
+
+                  if (retrySuccess) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('✅ Workout saved successfully!'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                    setState(() {
+                      _trackPoints.clear();
+                      _distance = 0;
+                      _duration = 0;
+                      _calories = 0;
+                    });
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('❌ Save failed again. Check logs.'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
                   }
                 }
               }

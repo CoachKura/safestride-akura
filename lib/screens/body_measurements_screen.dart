@@ -83,7 +83,8 @@ class _BodyMeasurementsScreenState extends State<BodyMeasurementsScreen> {
               ),
               const SizedBox(height: 16),
               ListTile(
-                title: Text('Date: ${DateFormat('MMM dd, yyyy').format(selectedDate)}'),
+                title: Text(
+                    'Date: ${DateFormat('MMM dd, yyyy').format(selectedDate)}'),
                 trailing: const Icon(Icons.calendar_today),
                 onTap: () async {
                   final date = await showDatePicker(
@@ -118,7 +119,8 @@ class _BodyMeasurementsScreenState extends State<BodyMeasurementsScreen> {
               }
 
               await _addMeasurement(weight, height, selectedDate);
-              if (mounted) Navigator.pop(context);
+              if (!context.mounted) return;
+              Navigator.pop(context);
             },
             child: const Text('Add'),
           ),
@@ -216,13 +218,16 @@ class _BodyMeasurementsScreenState extends State<BodyMeasurementsScreen> {
     final start = measurements.last;
     final weightChange = current.weightKg - start.weightKg;
 
-
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(int.parse(current.bmiCategoryColor.replaceFirst('#', '0xFF'))), Colors.black87],
+          colors: [
+            Color(
+                int.parse(current.bmiCategoryColor.replaceFirst('#', '0xFF'))),
+            Colors.black87
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -298,7 +303,8 @@ class _BodyMeasurementsScreenState extends State<BodyMeasurementsScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  DateFormat('MMM dd, yyyy').format(measurement.measurementDate),
+                  DateFormat('MMM dd, yyyy')
+                      .format(measurement.measurementDate),
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -308,14 +314,16 @@ class _BodyMeasurementsScreenState extends State<BodyMeasurementsScreen> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Color(int.parse(measurement.bmiCategoryColor.replaceFirst('#', '0xFF')))
+                    color: Color(int.parse(measurement.bmiCategoryColor
+                            .replaceFirst('#', '0xFF')))
                         .withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     measurement.bmiCategoryDisplay,
                     style: TextStyle(
-                      color: Color(int.parse(measurement.bmiCategoryColor.replaceFirst('#', '0xFF'))),
+                      color: Color(int.parse(measurement.bmiCategoryColor
+                          .replaceFirst('#', '0xFF'))),
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
                     ),

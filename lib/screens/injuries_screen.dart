@@ -36,9 +36,8 @@ class _InjuriesScreenState extends State<InjuriesScreen> {
           .eq('user_id', userId)
           .order('injury_date', ascending: false);
 
-      final allInjuries = (response as List)
-          .map((json) => Injury.fromJson(json))
-          .toList();
+      final allInjuries =
+          (response as List).map((json) => Injury.fromJson(json)).toList();
 
       setState(() {
         activeInjuries = allInjuries.where((i) => i.isActive).toList();
@@ -96,7 +95,9 @@ class _InjuriesScreenState extends State<InjuriesScreen> {
   }
 
   Widget _buildContent() {
-    final injuries = showActiveOnly ? activeInjuries : [...activeInjuries, ...healedInjuries];
+    final injuries = showActiveOnly
+        ? activeInjuries
+        : [...activeInjuries, ...healedInjuries];
 
     if (injuries.isEmpty) {
       return Center(
@@ -172,7 +173,10 @@ class _InjuriesScreenState extends State<InjuriesScreen> {
               ),
               _buildSummaryItem(
                 'Recovering',
-                activeInjuries.where((i) => i.status == 'recovering').length.toString(),
+                activeInjuries
+                    .where((i) => i.status == 'recovering')
+                    .length
+                    .toString(),
                 Icons.trending_up,
               ),
               _buildSummaryItem(
@@ -234,7 +238,8 @@ class _InjuriesScreenState extends State<InjuriesScreen> {
                     width: 8,
                     height: 8,
                     decoration: BoxDecoration(
-                      color: Color(int.parse(injury.statusColor.replaceFirst('#', '0xFF'))),
+                      color: Color(int.parse(
+                          injury.statusColor.replaceFirst('#', '0xFF'))),
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -249,16 +254,19 @@ class _InjuriesScreenState extends State<InjuriesScreen> {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Color(int.parse(injury.severityColor.replaceFirst('#', '0xFF')))
-                          .withOpacity(0.2),
+                      color: Color(int.parse(
+                              injury.severityColor.replaceFirst('#', '0xFF')))
+                          .withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       injury.severityLabel,
                       style: TextStyle(
-                        color: Color(int.parse(injury.severityColor.replaceFirst('#', '0xFF'))),
+                        color: Color(int.parse(
+                            injury.severityColor.replaceFirst('#', '0xFF'))),
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
                       ),
@@ -306,7 +314,8 @@ class _InjuriesScreenState extends State<InjuriesScreen> {
                     minHeight: 6,
                     backgroundColor: Colors.grey[200],
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      Color(int.parse(injury.statusColor.replaceFirst('#', '0xFF'))),
+                      Color(int.parse(
+                          injury.statusColor.replaceFirst('#', '0xFF'))),
                     ),
                   ),
                 ),

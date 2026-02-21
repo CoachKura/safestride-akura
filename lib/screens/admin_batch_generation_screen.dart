@@ -7,12 +7,14 @@ class AdminBatchGenerationScreen extends StatefulWidget {
   const AdminBatchGenerationScreen({super.key});
 
   @override
-  State<AdminBatchGenerationScreen> createState() => _AdminBatchGenerationScreenState();
+  State<AdminBatchGenerationScreen> createState() =>
+      _AdminBatchGenerationScreenState();
 }
 
-class _AdminBatchGenerationScreenState extends State<AdminBatchGenerationScreen> {
+class _AdminBatchGenerationScreenState
+    extends State<AdminBatchGenerationScreen> {
   final _supabase = Supabase.instance.client;
-  
+
   bool _loading = false;
   bool _analyzing = false;
   List<Map<String, dynamic>> _athletes = [];
@@ -35,9 +37,7 @@ class _AdminBatchGenerationScreenState extends State<AdminBatchGenerationScreen>
 
     try {
       // Get athletes with recent AISRI assessments
-      final data = await _supabase
-          .from('athlete_profiles')
-          .select('''
+      final data = await _supabase.from('athlete_profiles').select('''
             user_id,
             full_name,
             date_of_birth,
@@ -51,8 +51,7 @@ class _AdminBatchGenerationScreenState extends State<AdminBatchGenerationScreen>
               mobility,
               alignment
             )
-          ''')
-          .limit(10);
+          ''').limit(10);
 
       // Check for goals
       for (var athlete in data) {
@@ -61,7 +60,7 @@ class _AdminBatchGenerationScreenState extends State<AdminBatchGenerationScreen>
             .select()
             .eq('user_id', athlete['user_id'])
             .maybeSingle();
-        
+
         athlete['has_goals'] = goals != null;
         athlete['goals_data'] = goals;
       }
@@ -95,9 +94,10 @@ class _AdminBatchGenerationScreenState extends State<AdminBatchGenerationScreen>
 
     try {
       List<Map<String, dynamic>> results = [];
-      
+
       for (var userId in _selectedAthletes) {
-        final state = await KuraCoachAdaptiveService.analyzeAthleteState(userId);
+        final state =
+            await KuraCoachAdaptiveService.analyzeAthleteState(userId);
         results.add(state);
       }
 
@@ -125,15 +125,17 @@ class _AdminBatchGenerationScreenState extends State<AdminBatchGenerationScreen>
     setState(() {
       _loading = true;
       _generationResults = [];
-      _statusMessage = 'Generating plans for ${_analysisResults.length} athletes...';
+      _statusMessage =
+          'Generating plans for ${_analysisResults.length} athletes...';
     });
 
     try {
       List<Map<String, dynamic>> results = [];
-      
+
       for (var athleteState in _analysisResults) {
         try {
-          final planId = await KuraCoachAdaptiveService.generateInitial4WeekPlan(
+          final planId =
+              await KuraCoachAdaptiveService.generateInitial4WeekPlan(
             userId: athleteState['user_id'],
             athleteState: athleteState,
           );
@@ -159,7 +161,8 @@ class _AdminBatchGenerationScreenState extends State<AdminBatchGenerationScreen>
       setState(() {
         _generationResults = results;
         _loading = false;
-        _statusMessage = 'Plans generated: ${results.where((r) => r['status'] == 'success').length}/${results.length} successful';
+        _statusMessage =
+            'Plans generated: ${results.where((r) => r['status'] == 'success').length}/${results.length} successful';
       });
 
       // Show success dialog
@@ -186,7 +189,8 @@ class _AdminBatchGenerationScreenState extends State<AdminBatchGenerationScreen>
             children: [
               Text(
                 'Successfully generated ${_generationResults.where((r) => r['status'] == 'success').length} training plans',
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
               ..._generationResults.map((result) {
@@ -207,17 +211,20 @@ class _AdminBatchGenerationScreenState extends State<AdminBatchGenerationScreen>
                           children: [
                             Text(
                               result['name'],
-                              style: const TextStyle(fontWeight: FontWeight.w600),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.w600),
                             ),
                             if (isSuccess)
                               Text(
                                 '${result['training_phase']} • AISRI: ${result['aisri_score'].toStringAsFixed(1)}',
-                                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                                style: TextStyle(
+                                    fontSize: 12, color: Colors.grey[600]),
                               )
                             else
                               Text(
                                 'Error: ${result['error']}',
-                                style: const TextStyle(fontSize: 12, color: Colors.red),
+                                style: const TextStyle(
+                                    fontSize: 12, color: Colors.red),
                               ),
                           ],
                         ),
@@ -259,13 +266,16 @@ class _AdminBatchGenerationScreenState extends State<AdminBatchGenerationScreen>
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
-            color: Theme.of(context).primaryColor.withOpacity(0.1),
+            color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _statusMessage.isEmpty ? 'Ready to generate plans' : _statusMessage,
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  _statusMessage.isEmpty
+                      ? 'Ready to generate plans'
+                      : _statusMessage,
+                  style: const TextStyle(
+                      fontSize: 14, fontWeight: FontWeight.w500),
                 ),
                 if (_selectedAthletes.isNotEmpty)
                   Padding(
@@ -286,9 +296,10 @@ class _AdminBatchGenerationScreenState extends State<AdminBatchGenerationScreen>
               children: [
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: _selectedAthletes.isEmpty || _analyzing || _loading
-                        ? null
-                        : _analyzeAthletes,
+                    onPressed:
+                        _selectedAthletes.isEmpty || _analyzing || _loading
+                            ? null
+                            : _analyzeAthletes,
                     icon: _analyzing
                         ? const SizedBox(
                             width: 16,
@@ -296,7 +307,8 @@ class _AdminBatchGenerationScreenState extends State<AdminBatchGenerationScreen>
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Icon(Icons.analytics),
-                    label: Text(_analyzing ? 'Analyzing...' : 'Analyze Athletes'),
+                    label:
+                        Text(_analyzing ? 'Analyzing...' : 'Analyze Athletes'),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
@@ -335,16 +347,19 @@ class _AdminBatchGenerationScreenState extends State<AdminBatchGenerationScreen>
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.people_outline, size: 64, color: Colors.grey[400]),
+                            Icon(Icons.people_outline,
+                                size: 64, color: Colors.grey[400]),
                             const SizedBox(height: 16),
                             Text(
                               'No athletes found',
-                              style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                              style: TextStyle(
+                                  fontSize: 18, color: Colors.grey[600]),
                             ),
                             const SizedBox(height: 8),
                             Text(
                               'Make sure athletes have completed AISRI evaluations',
-                              style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+                              style: TextStyle(
+                                  fontSize: 14, color: Colors.grey[500]),
                             ),
                           ],
                         ),
@@ -356,13 +371,15 @@ class _AdminBatchGenerationScreenState extends State<AdminBatchGenerationScreen>
                           final userId = athlete['user_id'];
                           final isSelected = _selectedAthletes.contains(userId);
                           final hasGoals = athlete['has_goals'] ?? false;
-                          
-                          final assessment = athlete['aisri_assessments'] is List
-                              ? athlete['aisri_assessments'][0]
-                              : athlete['aisri_assessments'];
+
+                          final assessment =
+                              athlete['aisri_assessments'] is List
+                                  ? athlete['aisri_assessments'][0]
+                                  : athlete['aisri_assessments'];
 
                           return Card(
-                            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            margin: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
                             child: CheckboxListTile(
                               value: isSelected,
                               onChanged: hasGoals
@@ -378,7 +395,8 @@ class _AdminBatchGenerationScreenState extends State<AdminBatchGenerationScreen>
                                   : null,
                               title: Text(
                                 athlete['full_name'] ?? 'Unknown',
-                                style: const TextStyle(fontWeight: FontWeight.w600),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w600),
                               ),
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -387,16 +405,24 @@ class _AdminBatchGenerationScreenState extends State<AdminBatchGenerationScreen>
                                   Row(
                                     children: [
                                       Icon(
-                                        hasGoals ? Icons.check_circle : Icons.warning,
+                                        hasGoals
+                                            ? Icons.check_circle
+                                            : Icons.warning,
                                         size: 16,
-                                        color: hasGoals ? Colors.green : Colors.orange,
+                                        color: hasGoals
+                                            ? Colors.green
+                                            : Colors.orange,
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
-                                        hasGoals ? 'Goals set' : 'Goals missing',
+                                        hasGoals
+                                            ? 'Goals set'
+                                            : 'Goals missing',
                                         style: TextStyle(
                                           fontSize: 12,
-                                          color: hasGoals ? Colors.green : Colors.orange,
+                                          color: hasGoals
+                                              ? Colors.green
+                                              : Colors.orange,
                                         ),
                                       ),
                                     ],
@@ -405,14 +431,17 @@ class _AdminBatchGenerationScreenState extends State<AdminBatchGenerationScreen>
                                     const SizedBox(height: 4),
                                     Text(
                                       'AISRI components: R:${assessment['running_performance']} S:${assessment['strength']} ROM:${assessment['rom']} B:${assessment['balance']} M:${assessment['mobility']} A:${assessment['alignment']}',
-                                      style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                                      style: TextStyle(
+                                          fontSize: 11,
+                                          color: Colors.grey[600]),
                                     ),
                                   ],
                                 ],
                               ),
                               secondary: hasGoals
                                   ? const Icon(Icons.person, color: Colors.blue)
-                                  : Icon(Icons.person_outline, color: Colors.grey[400]),
+                                  : Icon(Icons.person_outline,
+                                      color: Colors.grey[400]),
                             ),
                           );
                         },
@@ -454,14 +483,16 @@ class _AdminBatchGenerationScreenState extends State<AdminBatchGenerationScreen>
                           ),
                           Expanded(
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
                                 color: _getPhaseColor(result['training_phase']),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
                                 result['training_phase'],
-                                style: const TextStyle(fontSize: 10, color: Colors.white),
+                                style: const TextStyle(
+                                    fontSize: 10, color: Colors.white),
                                 textAlign: TextAlign.center,
                               ),
                             ),

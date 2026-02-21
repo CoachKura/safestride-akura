@@ -1,8 +1,9 @@
+// ignore_for_file: deprecated_member_use
+
 // Step Editor Screen - Edit individual workout steps with Garmin-style features
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:uuid/uuid.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/structured_workout.dart';
 
 class StepEditorScreen extends StatefulWidget {
@@ -28,12 +29,10 @@ class _StepEditorScreenState extends State<StepEditorScreen> {
   DurationType _durationType = DurationType.distance;
   IntensityType _intensityType = IntensityType.noTarget;
   int? _heartRateZone;
-  int? _userAge;
 
   @override
   void initState() {
     super.initState();
-    _loadUserAge();
     if (widget.step != null) {
       final step = widget.step!;
       _stepType = step.stepType;
@@ -53,27 +52,6 @@ class _StepEditorScreenState extends State<StepEditorScreen> {
       if (step.notes != null) {
         _notesController.text = step.notes!;
       }
-    }
-  }
-
-  Future<void> _loadUserAge() async {
-    try {
-      final userId = Supabase.instance.client.auth.currentUser?.id;
-      if (userId == null) return;
-
-      final response = await Supabase.instance.client
-          .from('athlete_profile')
-          .select('date_of_birth')
-          .eq('user_id', userId)
-          .maybeSingle();
-
-      if (response != null && response['date_of_birth'] != null) {
-        final dob = DateTime.parse(response['date_of_birth']);
-        final age = DateTime.now().year - dob.year;
-        setState(() => _userAge = age);
-      }
-    } catch (e) {
-      // If error, _userAge remains null and we'll use default
     }
   }
 
@@ -122,7 +100,8 @@ class _StepEditorScreenState extends State<StepEditorScreen> {
 
     double? targetMin;
     double? targetMax;
-    if (_intensityType == IntensityType.heartRateZone && _heartRateZone != null) {
+    if (_intensityType == IntensityType.heartRateZone &&
+        _heartRateZone != null) {
       final zones = _getHRZoneRange(_heartRateZone!);
       targetMin = zones[0];
       targetMax = zones[1];
@@ -178,7 +157,9 @@ class _StepEditorScreenState extends State<StepEditorScreen> {
       case DurationType.calories:
         return value != null ? '${value.toStringAsFixed(0)} kcal' : '0 kcal';
       case DurationType.heartRate:
-        return value != null ? 'Until ${value.toStringAsFixed(0)} bpm' : 'Until target HR';
+        return value != null
+            ? 'Until ${value.toStringAsFixed(0)} bpm'
+            : 'Until target HR';
       case DurationType.open:
         return 'Open (No Limit)';
     }
@@ -272,7 +253,7 @@ class _StepEditorScreenState extends State<StepEditorScreen> {
     // 6 AISRI Training Zones based on Max HR percentage
     // Max HR = 208 - (0.7 × Age)
     final maxHR = _getMaxHR().toDouble();
-    
+
     switch (zone) {
       case 1: // Zone AR: 50-60% Max HR
         return [(maxHR * 0.50), (maxHR * 0.60)];
@@ -376,9 +357,11 @@ class _StepEditorScreenState extends State<StepEditorScreen> {
                           hintText: '1.00',
                           suffixText: 'km',
                         ),
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
                         inputFormatters: [
-                          FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                          FilteringTextInputFormatter.allow(
+                              RegExp(r'^\d+\.?\d{0,2}')),
                         ],
                       )
                     else if (_durationType == DurationType.time)
@@ -390,16 +373,20 @@ class _StepEditorScreenState extends State<StepEditorScreen> {
                           suffixText: 'min',
                           helperText: 'Will be converted to hh:mm:ss format',
                         ),
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
                         inputFormatters: [
-                          FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                          FilteringTextInputFormatter.allow(
+                              RegExp(r'^\d+\.?\d{0,2}')),
                         ],
                         onChanged: (value) {
                           // Convert minutes to seconds
                           final minutes = double.tryParse(value);
                           if (minutes != null) {
-                            _durationValueController.text = (minutes * 60).toString();
-                            _durationValueController.selection = TextSelection.fromPosition(
+                            _durationValueController.text =
+                                (minutes * 60).toString();
+                            _durationValueController.selection =
+                                TextSelection.fromPosition(
                               TextPosition(offset: value.length),
                             );
                           }
@@ -539,7 +526,7 @@ class _StepEditorScreenState extends State<StepEditorScreen> {
                             final range = _getHRZoneRange(zone);
                             final zoneName = _getZoneName(zone);
                             final purpose = _getZonePurpose(zone);
-                            
+
                             Color zoneColor;
                             switch (zone) {
                               case 1:
@@ -563,11 +550,11 @@ class _StepEditorScreenState extends State<StepEditorScreen> {
                               default:
                                 zoneColor = Colors.grey;
                             }
-                            
+
                             return Card(
                               margin: const EdgeInsets.only(bottom: 8),
                               color: _heartRateZone == zone
-                                  ? zoneColor.withOpacity(0.1)
+                                  ? zoneColor.withValues(alpha: 0.1)
                                   : null,
                               child: RadioListTile<int>(
                                 title: Row(
@@ -665,9 +652,12 @@ class _StepEditorScreenState extends State<StepEditorScreen> {
                                 labelText: 'Min Pace',
                                 suffixText: 'min/km',
                               ),
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                      decimal: true),
                               inputFormatters: [
-                                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                                FilteringTextInputFormatter.allow(
+                                    RegExp(r'^\d+\.?\d{0,2}')),
                               ],
                             ),
                           ),
@@ -679,9 +669,12 @@ class _StepEditorScreenState extends State<StepEditorScreen> {
                                 labelText: 'Max Pace',
                                 suffixText: 'min/km',
                               ),
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                      decimal: true),
                               inputFormatters: [
-                                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                                FilteringTextInputFormatter.allow(
+                                    RegExp(r'^\d+\.?\d{0,2}')),
                               ],
                             ),
                           ),
@@ -763,7 +756,8 @@ class _StepEditorScreenState extends State<StepEditorScreen> {
                         ),
                         child: const Row(
                           children: [
-                            Icon(Icons.remove_circle_outline, color: Colors.grey),
+                            Icon(Icons.remove_circle_outline,
+                                color: Colors.grey),
                             SizedBox(width: 12),
                             Expanded(
                               child: Text(

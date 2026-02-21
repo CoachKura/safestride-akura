@@ -57,11 +57,13 @@ class _GoalBasedWorkoutCreatorScreenState
       });
 
       setState(() {
-        _aisriScore = ((aisriData?['total_score'] ?? aisriData?['aisri_score']) ?? 70.0).toDouble();
+        _aisriScore =
+            ((aisriData?['total_score'] ?? aisriData?['aisri_score']) ?? 70.0)
+                .toDouble();
         _currentWeeklyKm = weeklyKm.round().clamp(5, 100);
       });
     } catch (e) {
-      print('Error loading user data: $e');
+      debugPrint('Error loading user data: $e');
     }
   }
 
@@ -112,9 +114,9 @@ class _GoalBasedWorkoutCreatorScreenState
     setState(() => _isGenerating = true);
 
     try {
-      final workouts = (_generatedPlan!['workouts'] as List)
-          .cast<Map<String, dynamic>>();
-      
+      final workouts =
+          (_generatedPlan!['workouts'] as List).cast<Map<String, dynamic>>();
+
       await AIWorkoutGeneratorService.saveWorkoutsToCalendar(workouts);
 
       if (mounted) {
@@ -124,7 +126,7 @@ class _GoalBasedWorkoutCreatorScreenState
             backgroundColor: Colors.green,
           ),
         );
-        
+
         // Navigate back
         Navigator.pop(context, true);
       }
@@ -295,12 +297,24 @@ class _GoalBasedWorkoutCreatorScreenState
 
   Widget _buildGoalSelector() {
     final goals = [
-      {'id': 'fitness', 'name': 'General Fitness', 'icon': Icons.fitness_center},
+      {
+        'id': 'fitness',
+        'name': 'General Fitness',
+        'icon': Icons.fitness_center
+      },
       {'id': '5k', 'name': '5K Race', 'icon': Icons.directions_run},
       {'id': '10k', 'name': '10K Race', 'icon': Icons.directions_run},
-      {'id': 'half_marathon', 'name': 'Half Marathon', 'icon': Icons.emoji_events},
+      {
+        'id': 'half_marathon',
+        'name': 'Half Marathon',
+        'icon': Icons.emoji_events
+      },
       {'id': 'marathon', 'name': 'Marathon', 'icon': Icons.emoji_events},
-      {'id': 'weight_loss', 'name': 'Weight Loss', 'icon': Icons.monitor_weight},
+      {
+        'id': 'weight_loss',
+        'name': 'Weight Loss',
+        'icon': Icons.monitor_weight
+      },
     ];
 
     return Wrap(
@@ -348,7 +362,8 @@ class _GoalBasedWorkoutCreatorScreenState
       onTap: () async {
         final date = await showDatePicker(
           context: context,
-          initialDate: _targetRaceDate ?? DateTime.now().add(const Duration(days: 90)),
+          initialDate:
+              _targetRaceDate ?? DateTime.now().add(const Duration(days: 90)),
           firstDate: DateTime.now(),
           lastDate: DateTime.now().add(const Duration(days: 365)),
         );
@@ -408,7 +423,8 @@ class _GoalBasedWorkoutCreatorScreenState
               max: 24,
               divisions: 20,
               activeColor: Colors.deepPurple,
-              onChanged: (value) => setState(() => _weeksToGoal = value.round()),
+              onChanged: (value) =>
+                  setState(() => _weeksToGoal = value.round()),
             ),
           ],
         ),
@@ -501,13 +517,12 @@ class _GoalBasedWorkoutCreatorScreenState
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: InkWell(
-              onTap: () => setState(() => _fitnessLevel = level['id'] as String),
+              onTap: () =>
+                  setState(() => _fitnessLevel = level['id'] as String),
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 decoration: BoxDecoration(
-                  color: isSelected
-                      ? (level['color'] as Color)
-                      : Colors.white,
+                  color: isSelected ? (level['color'] as Color) : Colors.white,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: isSelected
@@ -586,8 +601,10 @@ class _GoalBasedWorkoutCreatorScreenState
   }
 
   Widget _buildPlanPreview() {
-    final workouts = (_generatedPlan!['workouts'] as List).cast<Map<String, dynamic>>();
-    final weeklyProgression = (_generatedPlan!['weekly_progression'] as List).cast<double>();
+    final workouts =
+        (_generatedPlan!['workouts'] as List).cast<Map<String, dynamic>>();
+    final weeklyProgression =
+        (_generatedPlan!['weekly_progression'] as List).cast<double>();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
@@ -691,7 +708,9 @@ class _GoalBasedWorkoutCreatorScreenState
             ],
           ),
           const SizedBox(height: 12),
-          ...workouts.take(5).map((workout) => _buildWorkoutPreviewCard(workout)),
+          ...workouts
+              .take(5)
+              .map((workout) => _buildWorkoutPreviewCard(workout)),
           const SizedBox(height: 24),
 
           // Save Button
@@ -738,13 +757,14 @@ class _GoalBasedWorkoutCreatorScreenState
 
   Widget _buildWorkoutPreviewCard(Map<String, dynamic> workout) {
     final date = DateTime.parse(workout['scheduled_date']);
-    
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: _getIntensityColor(workout['intensity']),
-          child: const Icon(Icons.directions_run, color: Colors.white, size: 20),
+          child:
+              const Icon(Icons.directions_run, color: Colors.white, size: 20),
         ),
         title: Text(
           workout['type'],
@@ -788,8 +808,9 @@ class _GoalBasedWorkoutCreatorScreenState
   }
 
   void _showAllWorkouts() {
-    final workouts = (_generatedPlan!['workouts'] as List).cast<Map<String, dynamic>>();
-    
+    final workouts =
+        (_generatedPlan!['workouts'] as List).cast<Map<String, dynamic>>();
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -821,7 +842,8 @@ class _GoalBasedWorkoutCreatorScreenState
                 child: ListView.builder(
                   controller: scrollController,
                   itemCount: workouts.length,
-                  itemBuilder: (context, index) => _buildWorkoutPreviewCard(workouts[index]),
+                  itemBuilder: (context, index) =>
+                      _buildWorkoutPreviewCard(workouts[index]),
                 ),
               ),
             ],

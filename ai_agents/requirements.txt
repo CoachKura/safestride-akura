@@ -1,0 +1,9 @@
+﻿langgraph==1.0.5
+openai==1.83.0
+supabase==2.28.0
+fastapi==0.121.1
+uvicorn==0.38.0
+crewai==1.9.3
+python-dotenv==1.0.0
+pydantic==2.10.6
+httpx==0.29.3

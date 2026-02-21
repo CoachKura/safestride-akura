@@ -322,11 +322,11 @@ class TrainingLoadService {
       final totalDistance = activitiesList.fold<double>(
           0, (sum, act) => sum + (act['distance_km'] ?? 0));
 
-      final totalTime = activitiesList.fold<int>(
-          0, (sum, act) => sum + (act['duration_minutes'] ?? 0).toInt());
+      final totalTime = activitiesList.fold<int>(0,
+          (sum, act) => sum + ((act['duration_minutes'] as num?) ?? 0).toInt());
 
-      final elevationGain = activitiesList.fold<int>(
-          0, (sum, act) => sum + (act['elevation_gain'] ?? 0).toInt());
+      final elevationGain = activitiesList.fold<int>(0,
+          (sum, act) => sum + ((act['elevation_gain'] as num?) ?? 0).toInt());
 
       // Calculate average pace
       final avgPace =

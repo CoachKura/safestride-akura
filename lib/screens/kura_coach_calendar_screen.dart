@@ -9,7 +9,8 @@ class KuraCoachCalendarScreen extends StatefulWidget {
   const KuraCoachCalendarScreen({super.key});
 
   @override
-  State<KuraCoachCalendarScreen> createState() => _KuraCoachCalendarScreenState();
+  State<KuraCoachCalendarScreen> createState() =>
+      _KuraCoachCalendarScreenState();
 }
 
 class _KuraCoachCalendarScreenState extends State<KuraCoachCalendarScreen> {
@@ -22,12 +23,12 @@ class _KuraCoachCalendarScreenState extends State<KuraCoachCalendarScreen> {
 
   // Zone colors matching AISRI methodology
   static const Map<String, Color> _zoneColors = {
-    'AR': Color(0xFF2196F3),  // Blue - Active Recovery
-    'F': Color(0xFF00BCD4),   // Cyan - Foundation
-    'EN': Color(0xFF009688),  // Teal - Endurance
-    'TH': Color(0xFFFF9800),  // Orange - Threshold
-    'P': Color(0xFFF44336),   // Red - Performance
-    'SP': Color(0xFF9C27B0),  // Purple - Speed
+    'AR': Color(0xFF2196F3), // Blue - Active Recovery
+    'F': Color(0xFF00BCD4), // Cyan - Foundation
+    'EN': Color(0xFF009688), // Teal - Endurance
+    'TH': Color(0xFFFF9800), // Orange - Threshold
+    'P': Color(0xFFF44336), // Red - Performance
+    'SP': Color(0xFF9C27B0), // Purple - Speed
   };
 
   @override
@@ -55,14 +56,16 @@ class _KuraCoachCalendarScreenState extends State<KuraCoachCalendarScreen> {
           .from('ai_workouts')
           .select('*, ai_workout_plans!inner(user_id)')
           .eq('ai_workout_plans.user_id', userId)
-          .gte('workout_date', _selectedWeekStart.toIso8601String().split('T')[0])
+          .gte('workout_date',
+              _selectedWeekStart.toIso8601String().split('T')[0])
           .lt('workout_date', weekEnd.toIso8601String().split('T')[0])
           .order('workout_date');
 
       // Calculate which week we're viewing (1-4)
       final now = DateTime.now();
       final firstWorkoutDate = _selectedWeekStart;
-      _currentWeek = ((now.difference(firstWorkoutDate).inDays / 7).floor() % 4) + 1;
+      _currentWeek =
+          ((now.difference(firstWorkoutDate).inDays / 7).floor() % 4) + 1;
 
       setState(() {
         _weekWorkouts = (response as List).cast<Map<String, dynamic>>();
@@ -153,7 +156,8 @@ class _KuraCoachCalendarScreenState extends State<KuraCoachCalendarScreen> {
                   children: [
                     IconButton(
                       onPressed: _previousWeek,
-                      icon: const Icon(Icons.chevron_left, color: Colors.white, size: 32),
+                      icon: const Icon(Icons.chevron_left,
+                          color: Colors.white, size: 32),
                     ),
                     Column(
                       children: [
@@ -169,7 +173,7 @@ class _KuraCoachCalendarScreenState extends State<KuraCoachCalendarScreen> {
                         Text(
                           '${DateFormat('MMM d').format(_selectedWeekStart)} - ${DateFormat('MMM d, yyyy').format(_selectedWeekStart.add(const Duration(days: 6)))}',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withValues(alpha: 0.9),
                             fontSize: 14,
                           ),
                         ),
@@ -177,7 +181,8 @@ class _KuraCoachCalendarScreenState extends State<KuraCoachCalendarScreen> {
                     ),
                     IconButton(
                       onPressed: _nextWeek,
-                      icon: const Icon(Icons.chevron_right, color: Colors.white, size: 32),
+                      icon: const Icon(Icons.chevron_right,
+                          color: Colors.white, size: 32),
                     ),
                   ],
                 ),
@@ -190,7 +195,8 @@ class _KuraCoachCalendarScreenState extends State<KuraCoachCalendarScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: const Color(0xFF0099CC),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 10),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -246,7 +252,8 @@ class _KuraCoachCalendarScreenState extends State<KuraCoachCalendarScreen> {
               label: const Text('Set Goals'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF00D9FF),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -315,7 +322,8 @@ class _KuraCoachCalendarScreenState extends State<KuraCoachCalendarScreen> {
                   color: isToday
                       ? const Color(0xFF00D9FF)
                       : workout != null
-                          ? _getZoneColor(workout['zone']).withOpacity(0.1)
+                          ? _getZoneColor(workout['zone'])
+                              .withValues(alpha: 0.1)
                           : Colors.grey[200],
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -390,7 +398,8 @@ class _KuraCoachCalendarScreenState extends State<KuraCoachCalendarScreen> {
                           const SizedBox(height: 4),
                           Row(
                             children: [
-                              Icon(Icons.timer, size: 14, color: Colors.grey[600]),
+                              Icon(Icons.timer,
+                                  size: 14, color: Colors.grey[600]),
                               const SizedBox(width: 4),
                               Text(
                                 '${workout['duration_minutes']} min',
@@ -400,7 +409,8 @@ class _KuraCoachCalendarScreenState extends State<KuraCoachCalendarScreen> {
                                 ),
                               ),
                               const SizedBox(width: 12),
-                              Icon(Icons.straighten, size: 14, color: Colors.grey[600]),
+                              Icon(Icons.straighten,
+                                  size: 14, color: Colors.grey[600]),
                               const SizedBox(width: 4),
                               Text(
                                 '${workout['estimated_distance']?.toStringAsFixed(1) ?? '0.0'} km',

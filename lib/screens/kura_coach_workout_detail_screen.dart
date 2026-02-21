@@ -189,7 +189,7 @@ class _KuraCoachWorkoutDetailScreenState
               'Repeat: ${intervals.length} times\n\n${intervals.map((interval) {
                 final work = interval['work'] as Map<String, dynamic>? ?? {};
                 final rest = interval['rest'] as Map<String, dynamic>? ?? {};
-                return '→ Work: ${work['duration_minutes']} min (HR ${work['hr_range']})\n' +
+                return '→ Work: ${work['duration_minutes']} min (HR ${work['hr_range']})\n'
                     '→ Rest: ${rest['duration_minutes']} min (HR ${rest['hr_range']})';
               }).join('\n\n')}',
               Icons.repeat,
@@ -217,7 +217,7 @@ class _KuraCoachWorkoutDetailScreenState
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: _getZoneColor().withOpacity(0.1),
+              color: _getZoneColor().withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: _getZoneColor(), width: 2),
             ),
@@ -382,7 +382,10 @@ class _KuraCoachWorkoutDetailScreenState
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [_getZoneColor(), _getZoneColor().withOpacity(0.7)],
+                  colors: [
+                    _getZoneColor(),
+                    _getZoneColor().withValues(alpha: 0.7)
+                  ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -395,7 +398,7 @@ class _KuraCoachWorkoutDetailScreenState
                     padding:
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.3),
+                      color: Colors.white.withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -422,7 +425,7 @@ class _KuraCoachWorkoutDetailScreenState
                   Text(
                     DateFormat('EEEE, MMMM d, yyyy').format(scheduledDate),
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                       fontSize: 16,
                     ),
                   ),
@@ -683,7 +686,7 @@ class _KuraCoachWorkoutDetailScreenState
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: color, width: 2),
               ),
