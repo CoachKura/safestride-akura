@@ -1,0 +1,29 @@
+# Ignore Flutter web build
+
+web/
+build/
+
+# Ignore Flutter mobile builds
+
+android/
+ios/
+linux/
+macos/
+windows/
+
+# Ignore Flutter config
+
+.flutter-plugins
+.flutter-plugins-dependencies
+.dart_tool/
+.packages
+pubspec.lock
+
+# Ignore other non-Python files
+
+\*.md
+docs/
+test/
+.vscode/
+.idea/
+.git/
