@@ -49,16 +49,18 @@ def get_athlete_id(telegram_user_id: int) -> Optional[str]:
         return str(telegram_user_id)
     
     try:
+        # Try to find athlete by telegram_id (if column exists)
         response = supabase_client.table("profiles").select("id").eq("telegram_id", telegram_user_id).execute()
         if response.data and len(response.data) > 0:
             athlete_id = response.data[0]["id"]
             logger.info(f"✅ Found athlete_id: {athlete_id} for telegram_id: {telegram_user_id}")
             return athlete_id
         else:
-            logger.warning(f"No athlete found for telegram_id: {telegram_user_id}")
+            logger.warning(f"No athlete found for telegram_id: {telegram_user_id}, using telegram_id as fallback")
             return str(telegram_user_id)
     except Exception as e:
-        logger.error(f"❌ Error fetching athlete_id: {e}")
+        # Graceful fallback if column doesn't exist or other error
+        logger.warning(f"⚠️ Supabase lookup failed (using telegram_id as fallback): {e}")
         return str(telegram_user_id)
 
 
