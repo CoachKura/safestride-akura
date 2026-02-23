@@ -82,6 +82,17 @@ def root():
     }
 
 
+@app.get("/env-check")`ndef env_check():`n    import os`n    return {`n        "SUPABASE_URL": bool(os.getenv("SUPABASE_URL")),`n        "SUPABASE_SERVICE_KEY": bool(os.getenv("SUPABASE_SERVICE_KEY")),`n        "SUPABASE_ANON_KEY": bool(os.getenv("SUPABASE_ANON_KEY")),`n        "OPENAI_API_KEY": bool(os.getenv("OPENAI_API_KEY"))`n    }`n`n
+@app.get("/env-check")
+def env_check():
+    import os
+    return {
+        "SUPABASE_URL_set": bool(os.getenv("SUPABASE_URL")),
+        "SUPABASE_SERVICE_KEY_set": bool(os.getenv("SUPABASE_SERVICE_KEY")),
+        "SUPABASE_ANON_KEY_set": bool(os.getenv("SUPABASE_ANON_KEY")),
+        "OPENAI_API_KEY_set": bool(os.getenv("OPENAI_API_KEY")),
+        "supabase_client_initialized": supabase is not None
+    }
 @app.get("/test-supabase")
 def test_supabase() -> dict[str, Any]:
     if supabase is None:
@@ -283,4 +294,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
 
