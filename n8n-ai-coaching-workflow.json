@@ -1,0 +1,174 @@
+{
+  "name": "AI Coaching - Daily Autonomous Decisions",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 4 * * *"
+            }
+          ]
+        }
+      },
+      "name": "Daily 4:00 AM Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://127.0.0.1:8001/agent/commander",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "goal",
+              "value": "list_athletes"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "List All Athletes",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [470, 300]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "result",
+        "options": {}
+      },
+      "name": "Split Athletes",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [690, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://127.0.0.1:8001/agent/autonomous-decision",
+        "method": "POST",
+        "sendBody": true,
+        "contentType": "application/json",
+        "body": "={\n  \"athlete_id\": \"{{$json[\"id\"]}}\"\n}",
+        "options": {}
+      },
+      "name": "Get Decision",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [910, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"decision\"][\"decision\"]}}",
+              "value2": "REST"
+            }
+          ]
+        }
+      },
+      "name": "Check if REST needed",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1130, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"injury_risk\"][\"risk_level\"]}}",
+              "value2": "HIGH"
+            }
+          ]
+        }
+      },
+      "name": "Check if HIGH risk",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1130, 500]
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "table": "ai_decisions",
+        "columns": "athlete_id,decision,reason",
+        "values": "={{$json[\"athlete_id\"]}},={{$json[\"decision\"][\"decision\"]}},={{$json[\"decision\"][\"reason\"]}}"
+      },
+      "name": "Save to Database",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [1350, 300],
+      "credentials": {
+        "postgres": {
+          "id": "1",
+          "name": "Supabase"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Daily 4:00 AM Trigger": {
+      "main": [
+        [
+          {
+            "node": "List All Athletes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List All Athletes": {
+      "main": [
+        [
+          {
+            "node": "Split Athletes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Athletes": {
+      "main": [
+        [
+          {
+            "node": "Get Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Decision": {
+      "main": [
+        [
+          {
+            "node": "Check if REST needed",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Check if HIGH risk",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Save to Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

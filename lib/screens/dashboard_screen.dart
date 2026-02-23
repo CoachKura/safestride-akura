@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../services/workout_ai_service.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -17,6 +18,7 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   String _userName = '';
   bool _isLoading = true;
+  bool _isGeneratingWorkout = false;
 
   @override
   void initState() {
@@ -64,9 +66,73 @@ class _DashboardScreenState extends State<DashboardScreen>
     }
   }
 
+  Future<void> _generateAIWorkout() async {
+    setState(() {
+      _isGeneratingWorkout = true;
+    });
+
+    try {
+      final userId = _supabase.auth.currentUser?.id;
+      if (userId == null) {
+        throw Exception('User not logged in');
+      }
+
+      final result = await WorkoutAIService.generateWorkout(userId);
+
+      if (!mounted) return;
+
+      if (result['status'] == 'success') {
+        setState(() {
+          _isGeneratingWorkout = false;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content:
+                Text('✅ AI Workout Generated: ${result['workout']['name']}'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        throw Exception(result['message'] ?? 'Failed to generate workout');
+      }
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        _isGeneratingWorkout = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('❌ Error: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _isGeneratingWorkout ? null : _generateAIWorkout,
+        backgroundColor: const Color(0xFF00D9A3),
+        icon: _isGeneratingWorkout
+            ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2,
+                ),
+              )
+            : const Icon(Icons.auto_awesome),
+        label: Text(
+          _isGeneratingWorkout ? 'Generating...' : 'AI Workout',
+          style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+        ),
+      ),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -482,6 +548,18 @@ class _DashboardScreenState extends State<DashboardScreen>
               ),
             ),
           ],
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          width: double.infinity,
+          child: _buildActionButton(
+            _isGeneratingWorkout
+                ? 'Generating AI Workout...'
+                : 'Generate AI Workout',
+            _isGeneratingWorkout ? Icons.hourglass_empty : Icons.psychology,
+            const Color(0xFF9C27B0),
+            _isGeneratingWorkout ? () {} : _generateAIWorkout,
+          ),
         ),
       ],
     );

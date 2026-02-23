@@ -1,0 +1,688 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SafeStride Athlete Signup</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+      .gradient-bg {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50">
+    <div class="min-h-screen gradient-bg py-12 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-3xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+          <h1 class="text-4xl font-bold text-white mb-2">
+            🏃 SafeStride Athlete Signup
+          </h1>
+          <p class="text-purple-100">
+            Join our AI-powered injury prevention platform
+          </p>
+        </div>
+
+        <!-- Signup Form Card -->
+        <div class="bg-white rounded-lg shadow-xl p-8">
+          <!-- Progress Indicator -->
+          <div class="flex items-center justify-between mb-8">
+            <div class="flex items-center">
+              <div
+                id="step1-indicator"
+                class="w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold"
+              >
+                1
+              </div>
+              <div class="w-24 h-1 bg-purple-600"></div>
+            </div>
+            <div class="flex items-center">
+              <div
+                id="step2-indicator"
+                class="w-8 h-8 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center font-bold"
+              >
+                2
+              </div>
+              <div class="w-24 h-1 bg-gray-300"></div>
+            </div>
+            <div class="flex items-center">
+              <div
+                id="step3-indicator"
+                class="w-8 h-8 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center font-bold"
+              >
+                3
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 1: Basic Info -->
+          <div id="step1" class="space-y-6">
+            <h2 class="text-2xl font-bold text-gray-800">
+              Step 1: Basic Information
+            </h2>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Full Name *</label
+              >
+              <input
+                type="text"
+                id="athlete-name"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+                placeholder="John Doe"
+                required
+              />
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2"
+                  >Age *</label
+                >
+                <input
+                  type="number"
+                  id="athlete-age"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+                  placeholder="30"
+                  min="15"
+                  max="100"
+                  required
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2"
+                  >Email *</label
+                >
+                <input
+                  type="email"
+                  id="athlete-email"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+                  placeholder="john@example.com"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2"
+                  >Resting Heart Rate (bpm)</label
+                >
+                <input
+                  type="number"
+                  id="resting-hr"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+                  placeholder="55"
+                  min="30"
+                  max="120"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2"
+                  >Weekly Running Distance (km)</label
+                >
+                <input
+                  type="number"
+                  id="weekly-distance"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+                  placeholder="50"
+                  min="0"
+                  max="300"
+                />
+              </div>
+            </div>
+
+            <button
+              onclick="goToStep2()"
+              class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors"
+            >
+              Next: AISRI Evaluation →
+            </button>
+          </div>
+
+          <!-- Step 2: AISRI Evaluation Form -->
+          <div id="step2" class="space-y-6 hidden">
+            <h2 class="text-2xl font-bold text-gray-800">
+              Step 2: AISRI Evaluation
+            </h2>
+            <p class="text-gray-600">Rate yourself on each pillar (0-100)</p>
+
+            <!-- Evaluation Questions -->
+            <div class="space-y-4">
+              <!-- Running/Endurance -->
+              <div class="bg-purple-50 p-4 rounded-lg">
+                <label class="block text-sm font-bold text-purple-900 mb-2">
+                  🏃 Running/Endurance (0-100) *
+                </label>
+                <p class="text-xs text-gray-600 mb-3">
+                  Rate your current running fitness and endurance level
+                </p>
+                <input
+                  type="range"
+                  id="running-score"
+                  min="0"
+                  max="100"
+                  value="50"
+                  class="w-full"
+                  oninput="updateRangeValue('running')"
+                />
+                <div class="flex justify-between items-center mt-2">
+                  <span class="text-xs text-gray-500">Beginner</span>
+                  <span
+                    id="running-value"
+                    class="text-2xl font-bold text-purple-600"
+                    >50</span
+                  >
+                  <span class="text-xs text-gray-500">Elite</span>
+                </div>
+              </div>
+
+              <!-- Strength -->
+              <div class="bg-blue-50 p-4 rounded-lg">
+                <label class="block text-sm font-bold text-blue-900 mb-2">
+                  💪 Strength (0-100) *
+                </label>
+                <p class="text-xs text-gray-600 mb-3">
+                  Rate your lower body and core strength
+                </p>
+                <input
+                  type="range"
+                  id="strength-score"
+                  min="0"
+                  max="100"
+                  value="50"
+                  class="w-full"
+                  oninput="updateRangeValue('strength')"
+                />
+                <div class="flex justify-between items-center mt-2">
+                  <span class="text-xs text-gray-500">Weak</span>
+                  <span
+                    id="strength-value"
+                    class="text-2xl font-bold text-blue-600"
+                    >50</span
+                  >
+                  <span class="text-xs text-gray-500">Strong</span>
+                </div>
+              </div>
+
+              <!-- Range of Motion -->
+              <div class="bg-green-50 p-4 rounded-lg">
+                <label class="block text-sm font-bold text-green-900 mb-2">
+                  🤸 Range of Motion (0-100) *
+                </label>
+                <p class="text-xs text-gray-600 mb-3">
+                  Rate your flexibility and joint mobility
+                </p>
+                <input
+                  type="range"
+                  id="rom-score"
+                  min="0"
+                  max="100"
+                  value="50"
+                  class="w-full"
+                  oninput="updateRangeValue('rom')"
+                />
+                <div class="flex justify-between items-center mt-2">
+                  <span class="text-xs text-gray-500">Stiff</span>
+                  <span id="rom-value" class="text-2xl font-bold text-green-600"
+                    >50</span
+                  >
+                  <span class="text-xs text-gray-500">Flexible</span>
+                </div>
+              </div>
+
+              <!-- Balance -->
+              <div class="bg-yellow-50 p-4 rounded-lg">
+                <label class="block text-sm font-bold text-yellow-900 mb-2">
+                  ⚖️ Balance (0-100) *
+                </label>
+                <p class="text-xs text-gray-600 mb-3">
+                  Rate your balance and stability
+                </p>
+                <input
+                  type="range"
+                  id="balance-score"
+                  min="0"
+                  max="100"
+                  value="50"
+                  class="w-full"
+                  oninput="updateRangeValue('balance')"
+                />
+                <div class="flex justify-between items-center mt-2">
+                  <span class="text-xs text-gray-500">Unstable</span>
+                  <span
+                    id="balance-value"
+                    class="text-2xl font-bold text-yellow-600"
+                    >50</span
+                  >
+                  <span class="text-xs text-gray-500">Stable</span>
+                </div>
+              </div>
+
+              <!-- Alignment -->
+              <div class="bg-orange-50 p-4 rounded-lg">
+                <label class="block text-sm font-bold text-orange-900 mb-2">
+                  📐 Alignment (0-100) *
+                </label>
+                <p class="text-xs text-gray-600 mb-3">
+                  Rate your postural alignment and biomechanics
+                </p>
+                <input
+                  type="range"
+                  id="alignment-score"
+                  min="0"
+                  max="100"
+                  value="50"
+                  class="w-full"
+                  oninput="updateRangeValue('alignment')"
+                />
+                <div class="flex justify-between items-center mt-2">
+                  <span class="text-xs text-gray-500">Poor</span>
+                  <span
+                    id="alignment-value"
+                    class="text-2xl font-bold text-orange-600"
+                    >50</span
+                  >
+                  <span class="text-xs text-gray-500">Perfect</span>
+                </div>
+              </div>
+
+              <!-- Mobility -->
+              <div class="bg-pink-50 p-4 rounded-lg">
+                <label class="block text-sm font-bold text-pink-900 mb-2">
+                  🦵 Mobility (0-100) *
+                </label>
+                <p class="text-xs text-gray-600 mb-3">
+                  Rate your joint mobility and movement quality
+                </p>
+                <input
+                  type="range"
+                  id="mobility-score"
+                  min="0"
+                  max="100"
+                  value="50"
+                  class="w-full"
+                  oninput="updateRangeValue('mobility')"
+                />
+                <div class="flex justify-between items-center mt-2">
+                  <span class="text-xs text-gray-500">Restricted</span>
+                  <span
+                    id="mobility-value"
+                    class="text-2xl font-bold text-pink-600"
+                    >50</span
+                  >
+                  <span class="text-xs text-gray-500">Mobile</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex gap-4">
+              <button
+                onclick="goToStep1()"
+                class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+              >
+                ← Back
+              </button>
+              <button
+                onclick="goToStep3()"
+                class="flex-1 bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors"
+              >
+                Next: Connect Strava →
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 3: Strava Connection -->
+          <div id="step3" class="space-y-6 hidden">
+            <h2 class="text-2xl font-bold text-gray-800">
+              Step 3: Connect Your Strava
+            </h2>
+            <p class="text-gray-600">
+              Connect your Strava account to sync your running activities and
+              calculate your Running pillar score automatically.
+            </p>
+
+            <div class="bg-orange-50 border-l-4 border-orange-500 p-4 rounded">
+              <div class="flex items-start">
+                <div class="flex-shrink-0">
+                  <svg
+                    class="h-5 w-5 text-orange-500"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                      clip-rule="evenodd"
+                    ></path>
+                  </svg>
+                </div>
+                <div class="ml-3">
+                  <h3 class="text-sm font-medium text-orange-800">
+                    Why Connect Strava?
+                  </h3>
+                  <div class="mt-2 text-sm text-orange-700">
+                    <ul class="list-disc pl-5 space-y-1">
+                      <li>
+                        Automatically calculate your Running pillar score from
+                        activity history
+                      </li>
+                      <li>Track training load and prevent overtraining</li>
+                      <li>Generate personalized AI training plans</li>
+                      <li>Monitor injury risk in real-time</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="strava-status" class="text-center py-8">
+              <button
+                onclick="connectStrava()"
+                class="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-lg font-bold text-lg inline-flex items-center gap-2 transition-colors"
+              >
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path
+                    d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"
+                  />
+                </svg>
+                Connect with Strava
+              </button>
+              <p class="mt-4 text-sm text-gray-500">
+                You can skip this and connect later from your dashboard
+              </p>
+            </div>
+
+            <div class="flex gap-4 mt-8">
+              <button
+                onclick="goToStep2()"
+                class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+              >
+                ← Back
+              </button>
+              <button
+                onclick="skipStravaAndComplete()"
+                class="flex-1 bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors"
+              >
+                Skip & Complete Signup
+              </button>
+            </div>
+          </div>
+
+          <!-- Success Message -->
+          <div id="success-message" class="hidden text-center py-8">
+            <div class="text-6xl mb-4">🎉</div>
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">
+              Welcome to SafeStride!
+            </h2>
+            <p class="text-gray-600 mb-6">
+              Your account has been created successfully.
+            </p>
+            <button
+              onclick="goToDashboard()"
+              class="bg-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors"
+            >
+              Go to Training Plan Builder →
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Supabase Configuration
+      const SUPABASE_URL = "https://bdisppaxbvygsspcuymb.supabase.co";
+      const SUPABASE_ANON_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkaXNwcGF4YnZ5Z3NzcGN1eW1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyNDY4NDQsImV4cCI6MjA4NjgyMjg0NH0.bjgoVhVboDQTmIPe_A5_4yiWvTBvckVtw88lQ7GWFrc";
+      const STRAVA_CLIENT_ID = "162971";
+
+      const supabaseClient = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY,
+      );
+      let athleteData = {};
+
+      // Range slider updates
+      function updateRangeValue(pillar) {
+        const value = document.getElementById(`${pillar}-score`).value;
+        document.getElementById(`${pillar}-value`).textContent = value;
+      }
+
+      // Navigation functions
+      function goToStep1() {
+        document.getElementById("step1").classList.remove("hidden");
+        document.getElementById("step2").classList.add("hidden");
+        document.getElementById("step3").classList.add("hidden");
+        updateProgressIndicator(1);
+      }
+
+      function goToStep2() {
+        // Validate Step 1
+        const name = document.getElementById("athlete-name").value;
+        const age = document.getElementById("athlete-age").value;
+        const email = document.getElementById("athlete-email").value;
+
+        if (!name || !age || !email) {
+          alert("Please fill in all required fields (Name, Age, Email)");
+          return;
+        }
+
+        // Save Step 1 data
+        athleteData.name = name;
+        athleteData.age = parseInt(age);
+        athleteData.email = email;
+        athleteData.restingHR =
+          parseInt(document.getElementById("resting-hr").value) || 60;
+        athleteData.weeklyDistance =
+          parseInt(document.getElementById("weekly-distance").value) || 0;
+
+        document.getElementById("step1").classList.add("hidden");
+        document.getElementById("step2").classList.remove("hidden");
+        document.getElementById("step3").classList.add("hidden");
+        updateProgressIndicator(2);
+      }
+
+      function goToStep3() {
+        // Save Step 2 data (AISRI scores)
+        athleteData.pillars = {
+          running: parseInt(document.getElementById("running-score").value),
+          strength: parseInt(document.getElementById("strength-score").value),
+          rom: parseInt(document.getElementById("rom-score").value),
+          balance: parseInt(document.getElementById("balance-score").value),
+          alignment: parseInt(document.getElementById("alignment-score").value),
+          mobility: parseInt(document.getElementById("mobility-score").value),
+        };
+
+        document.getElementById("step1").classList.add("hidden");
+        document.getElementById("step2").classList.add("hidden");
+        document.getElementById("step3").classList.remove("hidden");
+        updateProgressIndicator(3);
+      }
+
+      function updateProgressIndicator(step) {
+        for (let i = 1; i <= 3; i++) {
+          const indicator = document.getElementById(`step${i}-indicator`);
+          if (i <= step) {
+            indicator.classList.remove("bg-gray-300", "text-gray-600");
+            indicator.classList.add("bg-purple-600", "text-white");
+          } else {
+            indicator.classList.remove("bg-purple-600", "text-white");
+            indicator.classList.add("bg-gray-300", "text-gray-600");
+          }
+        }
+      }
+
+      // Strava Connection
+      function connectStrava() {
+        // Generate athlete ID
+        athleteData.id = `athlete_${Date.now()}`;
+
+        // Save to localStorage before redirect
+        localStorage.setItem(
+          "pending_athlete_signup",
+          JSON.stringify(athleteData),
+        );
+
+        // Redirect to Strava OAuth
+        const redirectUri = encodeURIComponent(
+          window.location.href.split("?")[0],
+        );
+        const authUrl = `https://www.strava.com/oauth/authorize?client_id=${STRAVA_CLIENT_ID}&response_type=code&redirect_uri=${redirectUri}&scope=activity:read_all&state=signup`;
+        window.location.href = authUrl;
+      }
+
+      // Check for Strava callback
+      window.addEventListener("DOMContentLoaded", async () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get("code");
+        const state = urlParams.get("state");
+
+        if (code && state === "signup") {
+          // Hide the form steps and show processing message
+          document.getElementById("step1").classList.add("hidden");
+          document.getElementById("step2").classList.add("hidden");
+          document.getElementById("step3").classList.add("hidden");
+
+          // Show loading state
+          const loadingDiv = document.createElement("div");
+          loadingDiv.className = "text-center py-12";
+          loadingDiv.innerHTML = `
+            <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-600 mx-auto mb-4"></div>
+            <p class="text-xl font-semibold text-gray-700">🔗 Connecting your Strava account...</p>
+            <p class="text-gray-500 mt-2">Please wait while we sync your data</p>
+          `;
+          document
+            .querySelector(".bg-white.rounded-lg")
+            .insertBefore(
+              loadingDiv,
+              document.getElementById("success-message"),
+            );
+
+          // Retrieve pending signup data
+          const pendingData = localStorage.getItem("pending_athlete_signup");
+          if (pendingData) {
+            athleteData = JSON.parse(pendingData);
+
+            // Exchange code for tokens via edge function
+            const { data: oauthData, error: oauthError } =
+              await supabaseClient.functions.invoke("strava-oauth", {
+                body: { code, athleteId: athleteData.id },
+              });
+
+            if (oauthError) {
+              console.error("Strava OAuth error:", oauthError);
+              loadingDiv.remove();
+              alert("Failed to connect Strava. Please try again.");
+              document.getElementById("step3").classList.remove("hidden");
+              return;
+            }
+
+            // Save athlete profile to database
+            try {
+              await saveAthleteProfile(true);
+
+              localStorage.removeItem("pending_athlete_signup");
+              loadingDiv.remove();
+
+              // Clear URL parameters to prevent re-processing on refresh
+              window.history.replaceState(
+                {},
+                document.title,
+                window.location.pathname,
+              );
+
+              showSuccess();
+            } catch (error) {
+              loadingDiv.remove();
+
+              // Handle duplicate email error
+              if (error.code === "23505" && error.message.includes("email")) {
+                alert(
+                  "⚠️ This email is already registered!\n\nPlease use a different email address.",
+                );
+                localStorage.removeItem("pending_athlete_signup");
+                window.location.href = window.location.pathname; // Restart signup
+              } else {
+                alert(
+                  "❌ Error saving profile: " +
+                    error.message +
+                    "\n\nPlease try again.",
+                );
+                document.getElementById("step3").classList.remove("hidden");
+              }
+            }
+          }
+        }
+      });
+
+      // Save athlete profile to database
+      async function saveAthleteProfile(hasStrava = false) {
+        try {
+          const { data, error } = await supabaseClient
+            .from("athlete_profiles")
+            .insert({
+              athlete_id: athleteData.id,
+              name: athleteData.name,
+              email: athleteData.email,
+              age: athleteData.age,
+              resting_hr: athleteData.restingHR,
+              weekly_distance: athleteData.weeklyDistance,
+              pillars: athleteData.pillars,
+              has_strava: hasStrava,
+              created_at: new Date().toISOString(),
+            })
+            .select()
+            .single();
+
+          if (error) throw error;
+
+          console.log("✅ Athlete profile saved:", data);
+          return data;
+        } catch (error) {
+          console.error("❌ Error saving profile:", error);
+          throw error;
+        }
+      }
+
+      // Skip Strava and complete signup
+      async function skipStravaAndComplete() {
+        athleteData.id = `athlete_${Date.now()}`;
+        try {
+          await saveAthleteProfile(false);
+          showSuccess();
+        } catch (error) {
+          // Handle duplicate email error
+          if (error.code === "23505" && error.message.includes("email")) {
+            alert(
+              "⚠️ This email is already registered!\n\nPlease go back and use a different email address.",
+            );
+            // Go back to step 1 to change email
+            goToStep1();
+          } else {
+            alert(
+              "❌ Error saving profile: " +
+                error.message +
+                "\n\nPlease try again.",
+            );
+          }
+        }
+      }
+
+      // Show success message
+      function showSuccess() {
+        document.getElementById("step3").classList.add("hidden");
+        document.getElementById("success-message").classList.remove("hidden");
+
+        // Save athlete ID to session
+        sessionStorage.setItem("current_athlete_id", athleteData.id);
+      }
+
+      // Go to dashboard
+      function goToDashboard() {
+        window.location.href = "/training-plan-builder.html";
+      }
+    </script>
+  </body>
+</html>

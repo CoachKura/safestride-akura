@@ -848,7 +848,15 @@
 
           if (oauthError) {
             console.error("❌ OAuth error details:", oauthError);
-            const errorMsg = oauthError.message || JSON.stringify(oauthError);
+            // Try to extract detailed error message from response data
+            let errorMsg = oauthError.message || JSON.stringify(oauthError);
+
+            // If edge function returned error details in data, use that
+            if (oauthData && oauthData.error) {
+              errorMsg = oauthData.error;
+              console.error("❌ Edge Function error:", errorMsg);
+            }
+
             throw new Error(errorMsg);
           }
 
@@ -1111,7 +1119,7 @@
       // STEP 1 → STEP 2 TRANSITION
       // ============================================================================
 
-      function proceedToAnalysis() {
+      async function proceedToAnalysis() {
         // Gather all input data
         athleteData.name =
           document.getElementById("athlete-name").value || "Athlete";
@@ -1146,10 +1154,17 @@
         }
 
         // Run ML analysis
-        if (athleteData.activities) {
-          const mlResults = mlAnalyzer.analyzeAthlete(athleteData.activities);
-          athleteData.mlInsights = mlResults.insights;
-          athleteData.patterns = mlResults.patterns;
+        if (athleteData.activities && athleteData.activities.length > 0) {
+          const mlResults = await mlAnalyzer.analyzeAthleteData({
+            trainingLoad: {
+              ratio: athleteData.trainingLoadRatio || 1.0,
+              weeklyDistance: athleteData.totalDistance || 0
+            },
+            hrv: athleteData.hrv || null,
+            sleep: athleteData.averageSleep || null,
+            recentActivities: athleteData.activities.slice(0, 30)
+          });
+          athleteData.mlInsights = mlResults;
         }
 
         // Calculate AISRI

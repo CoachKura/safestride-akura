@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AISRI Assessment - Detailed ROM Protocol</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .test-card {
+        border-left: 4px solid;
+      }
+      .test-card.rom {
+        border-color: #10b981;
+      }
+      .test-card.mobility {
+        border-color: #3b82f6;
+      }
+      .test-card.balance {
+        border-color: #f59e0b;
+      }
+      .test-card.strength {
+        border-color: #ef4444;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 p-6">
+    <div class="max-w-6xl mx-auto">
+      <!-- Header -->
+      <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">
+          🏃 AISRI Assessment Protocol
+        </h1>
+        <p class="text-gray-600 mt-2">
+          Complete Range of Motion & Biomechanical Testing Guide
+        </p>
+        <div class="mt-4 bg-blue-50 border-l-4 border-blue-500 p-4">
+          <p class="text-sm text-blue-800">
+            <strong>📋 Instructions:</strong> Perform each test carefully. Score
+            yourself 0-100 based on the measurements provided. These scores
+            directly affect your stride length, cadence, and injury risk
+            prediction.
+          </p>
+        </div>
+      </div>
+
+      <!-- ROM PILLAR -->
+      <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <h2 class="text-2xl font-bold text-green-600 mb-4">
+          🤸 Range of Motion (ROM) Pillar
+        </h2>
+        <p class="text-gray-700 mb-6">
+          <strong>What ROM Affects:</strong> Stride length (most important!),
+          vertical oscillation, ground contact time
+        </p>
+
+        <!-- Hip Flexion -->
+        <div class="test-card rom bg-gray-50 p-6 rounded-lg mb-4">
+          <div class="grid md:grid-cols-2 gap-6">
+            <div>
+              <h3 class="text-lg font-bold text-gray-800 mb-3">
+                1. Hip Flexion Test
+              </h3>
+              <div class="space-y-2 text-sm">
+                <p>
+                  <strong>🎯 Target Impact:</strong> Stride length (critical!)
+                </p>
+                <p><strong>📏 How to Test:</strong></p>
+                <ol class="list-decimal ml-5 space-y-1">
+                  <li>Lie on your back on a flat surface</li>
+                  <li>Keep one leg straight on the ground</li>
+                  <li>Bring the other knee toward your chest</li>
+                  <li>Measure the angle between your thigh and torso</li>
+                </ol>
+                <div class="mt-4 bg-white p-3 rounded border">
+                  <p class="font-semibold text-green-700">Scoring:</p>
+                  <ul class="mt-2 space-y-1 text-xs">
+                    <li>
+                      • 120°+ = <strong>100 points</strong> (Excellent) → Full
+                      2.0m stride
+                    </li>
+                    <li>
+                      • 100-119° = <strong>80 points</strong> (Good) → 1.8m
+                      stride
+                    </li>
+                    <li>
+                      • 80-99° = <strong>60 points</strong> (Fair) → 1.6m stride
+                    </li>
+                    <li>
+                      • 60-79° = <strong>40 points</strong> (Limited) → 1.4m
+                      stride
+                    </li>
+                    <li>
+                      • <60° = <strong>20 points</strong> (Poor) → 1.2m stride
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center justify-center">
+              <div class="text-center">
+                <div class="text-6xl mb-2">🦵</div>
+                <p class="text-xs text-gray-500">
+                  Bring knee to chest<br />while keeping back flat
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hip Extension -->
+        <div class="test-card rom bg-gray-50 p-6 rounded-lg mb-4">
+          <div class="grid md:grid-coins-2 gap-6">
+            <div>
+              <h3 class="text-lg font-bold text-gray-800 mb-3">
+                2. Hip Extension Test
+              </h3>
+              <div class="space-y-2 text-sm">
+                <p>
+                  <strong>🎯 Target Impact:</strong> Push-off power, stride
+                  length
+                </p>
+                <p><strong>📏 How to Test:</strong></p>
+                <ol class="list-decimal ml-5 space-y-1">
+                  <li>Lie face down on a bench/table</li>
+                  <li>Keep hips on the edge, legs hanging</li>
+                  <li>Lift one leg backward as high as possible</li>
+                  <li>Keep knee straight, measure angle behind body</li>
+                </ol>
+                <div class="mt-4 bg-white p-3 rounded border">
+                  <p class="font-semibold text-green-700">Scoring:</p>
+                  <ul class="mt-2 space-y-1 text-xs">
+                    <li>
+                      • 30°+ = <strong>100 points</strong> (Excellent push-off)
+                    </li>
+                    <li>• 20-29° = <strong>75 points</strong> (Good)</li>
+                    <li>• 10-19° = <strong>50 points</strong> (Limited)</li>
+                    <li>
+                      • <10° = <strong>25 points</strong> (Poor - weak glutes)
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center justify-center">
+              <div class="text-center">
+                <div class="text-6xl mb-2">🏋️</div>
+                <p class="text-xs text-gray-500">
+                  Lift leg backward<br />without arching back
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ankle Dorsiflexion -->
+        <div class="test-card rom bg-gray-50 p-6 rounded-lg mb-4">
+          <div class="grid md:grid-cols-2 gap-6">
+            <div>
+              <h3 class="text-lg font-bold text-gray-800 mb-3">
+                3. Ankle Dorsiflexion Test
+              </h3>
+              <div class="space-y-2 text-sm">
+                <p>
+                  <strong>🎯 Target Impact:</strong> Vertical oscillation
+                  (bouncing)
+                </p>
+                <p><strong>📏 How to Test:</strong></p>
+                <ol class="list-decimal ml-5 space-y-1">
+                  <li>Stand facing a wall, 10cm away</li>
+                  <li>Keep heel on ground</li>
+                  <li>Lean forward until knee touches wall</li>
+                  <li>Measure shin angle from vertical</li>
+                </ol>
+                <div class="mt-4 bg-white p-3 rounded border">
+                  <p class="font-semibold text-green-700">Scoring:</p>
+                  <ul class="mt-2 space-y-1 text-xs">
+                    <li>
+                      • 20°+ = <strong>100 points</strong> → 6cm vertical
+                      oscillation
+                    </li>
+                    <li>
+                      • 15-19° = <strong>75 points</strong> → 7-8cm oscillation
+                    </li>
+                    <li>
+                      • 10-14° = <strong>50 points</strong> → 9-10cm oscillation
+                    </li>
+                    <li>
+                      • <10° = <strong>25 points</strong> → 12cm+ bounce (poor)
+                    </li>
+                  </ul>
+                  <p class="mt-2 text-xs text-red-600">
+                    <strong>⚠️ Impact:</strong> Poor ankle ROM = Bouncing gait =
+                    Wasted energy going UP!
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center justify-center">
+              <div class="text-center">
+                <div class="text-6xl mb-2">👟</div>
+                <p class="text-xs text-gray-500">
+                  Knee touches wall<br />while heel stays down
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Knee Flexion -->
+        <div class="test-card rom bg-gray-50 p-6 rounded-lg">
+          <div class="grid md:grid-cols-2 gap-6">
+            <div>
+              <h3 class="text-lg font-bold text-gray-800 mb-3">
+                4. Knee Flexion Test
+              </h3>
+              <div class="space-y-2 text-sm">
+                <p>
+                  <strong>🎯 Target Impact:</strong> Leg recovery phase, cadence
+                </p>
+                <p><strong>📏 How to Test:</strong></p>
+                <ol class="list-decimal ml-5 space-y-1">
+                  <li>Lie face down</li>
+                  <li>Bend knee, bring heel toward buttock</li>
+                  <li>Measure angle (heel to buttock distance)</li>
+                </ol>
+                <div class="mt-4 bg-white p-3 rounded border">
+                  <p class="font-semibold text-green-700">Scoring:</p>
+                  <ul class="mt-2 space-y-1 text-xs">
+                    <li>
+                      • 135°+ = <strong>100 points</strong> (Heel touches
+                      buttock)
+                    </li>
+                    <li>• 120-134° = <strong>80 points</strong></li>
+                    <li>• 100-119° = <strong>60 points</strong></li>
+                    <li>
+                      • <100° = <strong>40 points</strong> (Tight quadriceps)
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center justify-center">
+              <div class="text-center">
+                <div class="text-6xl mb-2">🦿</div>
+                <p class="text-xs text-gray-500">Bend knee fully</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MOBILITY PILLAR -->
+      <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <h2 class="text-2xl font-bold text-blue-600 mb-4">
+          🔄 Mobility Pillar
+        </h2>
+        <p class="text-gray-700 mb-6">
+          <strong>What Mobility Affects:</strong> Energy transfer efficiency,
+          cadence, coordination
+        </p>
+
+        <!-- Hip Internal/External Rotation -->
+        <div class="test-card mobility bg-gray-50 p-6 rounded-lg mb-4">
+          <div class="grid md:grid-cols-2 gap-6">
+            <div>
+              <h3 class="text-lg font-bold text-gray-800 mb-3">
+                5. Hip Rotation Test
+              </h3>
+              <div class="space-y-2 text-sm">
+                <p><strong>🎯 Target Impact:</strong> Hip turnover, cadence</p>
+                <p><strong>📏 How to Test:</strong></p>
+                <ol class="list-decimal ml-5 space-y-1">
+                  <li>Sit on chair with knee bent 90°</li>
+                  <li>Internal rotation: Move foot outward</li>
+                  <li>External rotation: Move foot inward</li>
+                  <li>Measure rotation angle</li>
+                </ol>
+                <div class="mt-4 bg-white p-3 rounded border">
+                  <p class="font-semibold text-blue-700">Scoring:</p>
+                  <ul class="mt-2 space-y-1 text-xs">
+                    <li>
+                      • 45°+ each direction = <strong>100 points</strong> → 180
+                      spm cadence
+                    </li>
+                    <li>• 30-44° = <strong>75 points</strong> → 170 spm</li>
+                    <li>• 20-29° = <strong>50 points</strong> → 160 spm</li>
+                    <li>
+                      • <20° = <strong>25 points</strong> → 150 spm
+                      (inefficient)
+                    </li>
+                  </ul>
+                  <p class="mt-2 text-xs text-red-600">
+                    <strong>⚠️ Impact:</strong> Limited hip rotation = Slower
+                    cadence = Higher impact forces!
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center justify-center">
+              <div class="text-center">
+                <div class="text-6xl mb-2">↩️</div>
+                <p class="text-xs text-gray-500">
+                  Rotate leg inward<br />and outward
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Thoracic Rotation -->
+        <div class="test-card mobility bg-gray-50 p-6 rounded-lg">
+          <div class="grid md:grid-cols-2 gap-6">
+            <div>
+              <h3 class="text-lg font-bold text-gray-800 mb-3">
+                6. Thoracic Spine Rotation
+              </h3>
+              <div class="space-y-2 text-sm">
+                <p>
+                  <strong>🎯 Target Impact:</strong> Arm swing, breathing
+                  efficiency
+                </p>
+                <p><strong>📏 How to Test:</strong></p>
+                <ol class="list-decimal ml-5 space-y-1">
+                  <li>Sit with hips stable</li>
+                  <li>Arms crossed on chest</li>
+                  <li>Rotate torso left and right</li>
+                  <li>Measure rotation angle</li>
+                </ol>
+                <div class="mt-4 bg-white p-3 rounded border">
+                  <p class="font-semibold text-blue-700">Scoring:</p>
+                  <ul class="mt-2 space-y-1 text-xs">
+                    <li>
+                      • 45°+ = <strong>100 points</strong> (Optimal arm swing)
+                    </li>
+                    <li>• 35-44° = <strong>75 points</strong></li>
+                    <li>• 25-34° = <strong>50 points</strong> (Restricted)</li>
+                    <li>• <25° = <strong>25 points</strong> (Very stiff)</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center justify-center">
+              <div class="text-center">
+                <div class="text-6xl mb-2">🌀</div>
+                <p class="text-xs text-gray-500">
+                  Rotate trunk<br />while hips stay still
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BALANCE PILLAR -->
+      <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <h2 class="text-2xl font-bold text-yellow-600 mb-4">
+          ⚖️ Balance Pillar
+        </h2>
+        <p class="text-gray-700 mb-6">
+          <strong>What Balance Affects:</strong> Propulsion efficiency, energy
+          waste from corrections
+        </p>
+
+        <!-- Single Leg Stand -->
+        <div class="test-card balance bg-gray-50 p-6 rounded-lg">
+          <div class="grid md:grid-cols-2 gap-6">
+            <div>
+              <h3 class="text-lg font-bold text-gray-800 mb-3">
+                7. Single-Leg Balance Test
+              </h3>
+              <div class="space-y-2 text-sm">
+                <p>
+                  <strong>🎯 Target Impact:</strong> Landing stability, energy
+                  efficiency
+                </p>
+                <p><strong>📏 How to Test:</strong></p>
+                <ol class="list-decimal ml-5 space-y-1">
+                  <li>Stand on one leg, arms crossed</li>
+                  <li>Eyes closed (optional: harder)</li>
+                  <li>Time how long you can maintain balance</li>
+                  <li>Test both legs</li>
+                </ol>
+                <div class="mt-4 bg-white p-3 rounded border">
+                  <p class="font-semibold text-yellow-700">Scoring:</p>
+                  <ul class="mt-2 space-y-1 text-xs">
+                    <li>
+                      • 60s+ = <strong>100 points</strong> → 2% energy loss from
+                      micro-corrections
+                    </li>
+                    <li>
+                      • 30-59s = <strong>75 points</strong> → 5% energy loss
+                    </li>
+                    <li>
+                      • 15-29s = <strong>50 points</strong> → 8% energy loss
+                    </li>
+                    <li>
+                      • <15s = <strong>25 points</strong> → 12% energy loss
+                      (very unstable)
+                    </li>
+                  </ul>
+                  <p class="mt-2 text-xs text-red-600">
+                    <strong>⚠️ Impact:</strong> Poor balance = Constant
+                    micro-corrections = Wasted energy!
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center justify-center">
+              <div class="text-center">
+                <div class="text-6xl mb-2">🧘</div>
+                <p class="text-xs text-gray-500">
+                  Stand on one leg<br />eyes closed
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STRENGTH PILLAR -->
+      <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <h2 class="text-2xl font-bold text-red-600 mb-4">💪 Strength Pillar</h2>
+        <p class="text-gray-700 mb-6">
+          <strong>What Strength Affects:</strong> Stride power, hill running,
+          fatigue resistance
+        </p>
+
+        <!-- Single Leg Squat -->
+        <div class="test-card strength bg-gray-50 p-6 rounded-lg">
+          <div class="grid md:grid-cols-2 gap-6">
+            <div>
+              <h3 class="text-lg font-bold text-gray-800 mb-3">
+                8. Single-Leg Squat Test
+              </h3>
+              <div class="space-y-2 text-sm">
+                <p>
+                  <strong>🎯 Target Impact:</strong> Stride power, glute
+                  strength
+                </p>
+                <p><strong>📏 How to Test:</strong></p>
+                <ol class="list-decimal ml-5 space-y-1">
+                  <li>Stand on one leg</li>
+                  <li>Squat down as low as possible</li>
+                  <li>Keep knee aligned over toes (no valgus)</li>
+                  <li>Count quality reps (16 reps target)</li>
+                </ol>
+                <div class="mt-4 bg-white p-3 rounded border">
+                  <p class="font-semibold text-red-700">Scoring:</p>
+                  <ul class="mt-2 space-y-1 text-xs">
+                    <li>
+                      • 16+ reps = <strong>100 points</strong> → 2.2m stride
+                      length
+                    </li>
+                    <li>
+                      • 12-15 reps = <strong>75 points</strong> → 1.9m stride
+                    </li>
+                    <li>
+                      • 8-11 reps = <strong>50 points</strong> → 1.6m stride
+                    </li>
+                    <li>
+                      • <8 reps = <strong>25 points</strong> → 1.4m stride (weak
+                      glutes)
+                    </li>
+                  </ul>
+                  <p class="mt-2 text-xs text-red-600">
+                    <strong>⚠️ Impact:</strong> Weak glutes = 36% shorter stride
+                    = Much slower pace!
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center justify-center">
+              <div class="text-center">
+                <div class="text-6xl mb-2">🏋️‍♀️</div>
+                <p class="text-xs text-gray-500">
+                  Single-leg squat<br />knee stays aligned
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary -->
+      <div class="bg-purple-900 text-white rounded-lg shadow-lg p-6">
+        <h2 class="text-2xl font-bold mb-4">
+          📊 How Scores Translate to Running Performance
+        </h2>
+        <div class="grid md:grid-cols-2 gap-6 text-sm">
+          <div>
+            <h3 class="font-bold mb-2">Excellent (80-100):</h3>
+            <ul class="space-y-1 ml-4">
+              <li>• Stride length: 2.0m+</li>
+              <li>• Cadence: 180 spm</li>
+              <li>• Vertical oscillation: 6-7cm</li>
+              <li>• Running economy: Optimal</li>
+              <li>• Injury risk: Very Low</li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="font-bold mb-2">Poor (0-40):</h3>
+            <ul class="space-y-1 ml-4">
+              <li>• Stride length: 1.2-1.4m (-30-40%)</li>
+              <li>• Cadence: 150-160 spm</li>
+              <li>• Vertical oscillation: 10-12cm (+70%)</li>
+              <li>• Running economy: 20-30% worse</li>
+              <li>• Injury risk: High-Critical</li>
+            </ul>
+          </div>
+        </div>
+        <div class="mt-6 bg-purple-800 p-4 rounded">
+          <p class="text-sm">
+            <strong>🤖 AI Analysis:</strong> These test results feed into the AI
+            algorithm to calculate your AISRI score (0-1000), predict injury
+            risk, determine safe training zones, and generate a personalized
+            training plan that addresses your specific weaknesses.
+          </p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
