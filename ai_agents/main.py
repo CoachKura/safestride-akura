@@ -262,20 +262,16 @@ def main() -> None:
     Railway uses PORT environment variable.
     For production, always bind to 0.0.0.0 to accept external connections.
     """
-    # Use 0.0.0.0 to accept connections from anywhere (required for Railway)
+    # ✅ Uses 0.0.0.0
     host = os.getenv("API_HOST") or "0.0.0.0"
     
-    # Railway provides PORT variable, fallback to 8000 for local dev
+    # ✅ Uses PORT environment variable
     port = int(os.getenv("PORT") or os.getenv("API_PORT") or "8000")
     
-    # Disable reload in production (when PORT is set by Railway)
-    reload = (os.getenv("API_RELOAD") or "false").lower() in {"1", "true", "yes"}
-    if os.getenv("PORT"):  # Railway sets PORT, so we're in production
+    # ✅ Production detection
+    if os.getenv("PORT"):
         reload = False
 
-    import uvicorn
-
-    print(f"🚀 Starting AISRi AI Engine on {host}:{port}")
     uvicorn.run("main:app", host=host, port=port, reload=reload)
 
 

@@ -6,4 +6,5 @@ uvicorn==0.38.0
 crewai==1.9.3
 python-dotenv==1.0.0
 pydantic==2.10.6
-httpx==0.29.3
+httpx==0.28.1
+requests==2.31.0
