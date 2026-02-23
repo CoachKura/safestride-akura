@@ -3,6 +3,7 @@ from typing import Any
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 # Load environment variables (prefer ai_agents/.env, then fall back to workspace root .env)
@@ -35,10 +36,39 @@ else:
 
 app = FastAPI(title="AISRi AI Engine", version="1.0")
 
+# Add CORS middleware to allow Flutter app access
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins (restrict in production if needed)
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # Allow all headers
+)
+
 
 class CommanderRequest(BaseModel):
     goal: str = Field(..., min_length=1)
     athlete_id: str | None = None
+
+
+class WorkoutRequest(BaseModel):
+    athlete_id: str
+
+
+class InjuryPredictionRequest(BaseModel):
+    athlete_id: str
+
+
+class TrainingPlanRequest(BaseModel):
+    athlete_id: str
+
+
+class PerformancePredictionRequest(BaseModel):
+    athlete_id: str
+
+
+class AutonomousDecisionRequest(BaseModel):
+    athlete_id: str
 
 
 @app.get("/")
@@ -65,12 +95,12 @@ def get_aisri_score(athlete_id: str) -> dict[str, Any]:
         raise HTTPException(status_code=500, detail=f"Supabase not configured: {_SUPABASE_INIT_ERROR}")
 
     try:
-        # In this repo's canonical schema, AISRI_assessments uses `profile_id`.
+        # In this repo's canonical schema, AISRI_assessments uses `athlete_id`.
         response = (
             supabase.table('AISRI_assessments')
             .select("*")
-            .eq("profile_id", athlete_id)
-            .order("assessment_date", desc=True)
+            .eq("athlete_id", athlete_id)
+            .order("created_at", desc=True)
             .limit(1)
             .execute()
         )
@@ -145,13 +175,107 @@ def latest_aisri(profile_id: str) -> dict[str, Any]:
         raise HTTPException(status_code=502, detail=str(exc))
 
 
+@app.post("/agent/generate-workout")
+def generate_workout(request: WorkoutRequest):
+    from ai_engine_agent.workout_generator_agent import AISRiWorkoutGeneratorAgent
+
+    agent = AISRiWorkoutGeneratorAgent()
+
+    result = agent.generate_workout(request.athlete_id)
+
+    return result
+
+
+@app.post("/agent/predict-injury-risk")
+def predict_injury(request: InjuryPredictionRequest):
+    from ai_engine_agent.injury_prediction_agent import AISRiInjuryPredictionAgent
+
+    agent = AISRiInjuryPredictionAgent()
+
+    result = agent.predict_injury_risk(request.athlete_id)
+
+    return result
+
+
+@app.post("/agent/generate-training-plan")
+def generate_training_plan(request: TrainingPlanRequest):
+    """
+    Generate adaptive 7-day training plan based on:
+    - Latest AISRI score
+    - Current injury risk level
+    - Athlete's readiness
+    
+    Returns: Weekly plan with zones (AR, F, EN, TH, P, REST)
+    """
+    from ai_engine_agent.adaptive_training_plan_agent import AISRiAdaptiveTrainingPlanAgent
+
+    agent = AISRiAdaptiveTrainingPlanAgent()
+
+    result = agent.generate_plan(request.athlete_id)
+
+    return result
+
+
+@app.post("/agent/predict-performance")
+def predict_performance(request: PerformancePredictionRequest):
+    """
+    Predict comprehensive performance metrics:
+    - VO2max estimate
+    - Race time predictions (5K, 10K, Half, Marathon)
+    - Running biomechanics (stride, cadence, vertical oscillation)
+    - Performance score (0-100)
+    
+    Based on AISRI scores, ROM tests, and training history.
+    """
+    from ai_engine_agent.performance_prediction_agent import AISRiPerformancePredictionAgent
+
+    agent = AISRiPerformancePredictionAgent()
+
+    result = agent.predict_performance(request.athlete_id)
+
+    return result
+
+
+@app.post("/agent/autonomous-decision")
+def autonomous_decision(request: AutonomousDecisionRequest):
+    """
+    Make autonomous training decisions based on:
+    - Current AISRI score
+    - Injury risk level
+    - Recent training load (last 7 days)
+    
+    Returns: Decision (REST, RECOVERY, INTENSIFY, TRAIN, LIGHT_TRAIN) with reason
+    """
+    from ai_engine_agent.autonomous_decision_agent import AISRiAutonomousDecisionAgent
+
+    agent = AISRiAutonomousDecisionAgent()
+
+    result = agent.run_decision_cycle(request.athlete_id)
+
+    return result
+
+
 def main() -> None:
-    host = os.getenv("API_HOST") or "127.0.0.1"
-    port = int(os.getenv("API_PORT") or "8000")
+    """
+    Start the FastAPI server.
+    
+    Railway uses PORT environment variable.
+    For production, always bind to 0.0.0.0 to accept external connections.
+    """
+    # Use 0.0.0.0 to accept connections from anywhere (required for Railway)
+    host = os.getenv("API_HOST") or "0.0.0.0"
+    
+    # Railway provides PORT variable, fallback to 8000 for local dev
+    port = int(os.getenv("PORT") or os.getenv("API_PORT") or "8000")
+    
+    # Disable reload in production (when PORT is set by Railway)
     reload = (os.getenv("API_RELOAD") or "false").lower() in {"1", "true", "yes"}
+    if os.getenv("PORT"):  # Railway sets PORT, so we're in production
+        reload = False
 
     import uvicorn
 
+    print(f"🚀 Starting AISRi AI Engine on {host}:{port}")
     uvicorn.run("main:app", host=host, port=port, reload=reload)
 
 
