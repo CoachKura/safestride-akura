@@ -1,7 +1,10 @@
 [build]
 builder = "nixpacks"
 
+[build.nixpacksPlan]
+providers = ["python"]
+
 [deploy]
-startCommand = "cd ai_agents && pip install -r requirements.txt && uvicorn main:app --host 0.0.0.0 --port $PORT"
+startCommand = "if [ -f 'main.py' ]; then pip install -r requirements.txt && uvicorn main:app --host 0.0.0.0 --port $PORT; else cd ai_agents && pip install -r requirements.txt && uvicorn main:app --host 0.0.0.0 --port $PORT; fi"
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 10
