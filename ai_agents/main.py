@@ -72,8 +72,14 @@ class AutonomousDecisionRequest(BaseModel):
 
 
 @app.get("/")
-def root() -> dict[str, str]:
-    return {"status": "AISRi AI Engine Running"}
+def root():
+    return {
+        "status": "AISRi AI Engine Running",
+        "service": "AISRi AI Engine",
+        "version": "1.0",
+        "api": "https://api.akura.in",
+        "docs": "https://api.akura.in/docs"
+    }
 
 
 @app.get("/test-supabase")
@@ -277,3 +283,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
