@@ -29,7 +29,7 @@ from telegram_handler_v2 import TelegramHandler
 app = FastAPI(
     title="AISRi Communication Agent V2",
     description="Production-grade AI coaching communication infrastructure",
-    version="2.0.0"
+    version="2.0.1"
 )
 
 scheduler = AsyncIOScheduler()
