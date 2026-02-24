@@ -124,11 +124,9 @@ async def telegram_webhook(request: Request):
         route = classify_message(message["text"])
         logger.info(f"Athlete {athlete['id']} → Route: {route}")
 
-        # Prepare payload with conversation context
+        # Prepare payload (AI Engine expects only athlete_id as string)
         payload = {
-            "athlete_id": athlete["id"],
-            "query": message["text"],
-            "context": SupabaseHandler.get_last_messages(athlete["id"])
+            "athlete_id": str(athlete["id"])
         }
 
         # Route to appropriate endpoint
