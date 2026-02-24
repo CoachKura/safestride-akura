@@ -10,7 +10,7 @@ python-dotenv>=1.0.0
 python-telegram-bot>=20.7
 
 # Supabase - Use compatible version
-supabase-py==0.7.4
+supabase>=2.0.0
 
 # Scheduler
 APScheduler>=3.10.4
