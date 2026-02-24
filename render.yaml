@@ -1,9 +1,50 @@
 services:
+  # AISRi AI Engine - Main AI/ML backend service
   - type: web
     name: aisri-ai-engine
     runtime: python
+    region: oregon
+    plan: starter
+    branch: main
+    rootDir: ai_agents
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /
+    autoDeploy: true
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+
+  # AISRi Communication V2 - Telegram bot and communication layer
+  - type: web
+    name: aisri-communication-v2
+    runtime: python
+    region: oregon
+    plan: starter
+    branch: main
+    rootDir: ai_agents
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn communication_agent_v2:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: AISRI_API_BASE
+        value: https://api.akura.in
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
