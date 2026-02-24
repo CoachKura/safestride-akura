@@ -6,10 +6,16 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-# Load environment variables (prefer ai_agents/.env, then fall back to workspace root .env)
+# Load environment variables only if .env files exist (for local development)
+# On production (Render), environment variables are injected directly
 _HERE = os.path.dirname(os.path.abspath(__file__))
-load_dotenv(dotenv_path=os.path.join(_HERE, ".env"), override=False)
-load_dotenv(dotenv_path=os.path.join(_HERE, "..", ".env"), override=False)
+_LOCAL_ENV = os.path.join(_HERE, ".env")
+_ROOT_ENV = os.path.join(_HERE, "..", ".env")
+
+if os.path.exists(_LOCAL_ENV):
+    load_dotenv(dotenv_path=_LOCAL_ENV, override=False)
+if os.path.exists(_ROOT_ENV):
+    load_dotenv(dotenv_path=_ROOT_ENV, override=False)
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 
