@@ -249,3 +249,16 @@ async def shutdown_event():
     """Cleanup on shutdown"""
     scheduler.shutdown()
     logger.info("👋 AISRi Communication Agent V2 stopped")
+
+# ===============================
+# PRODUCTION DIRECT RUN
+# ===============================
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(
+        "communication_agent_v2:app",
+        host="0.0.0.0",
+        port=int(os.getenv("PORT", 10000)),
+        reload=False
+    )
