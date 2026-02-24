@@ -1,0 +1,20 @@
+﻿# AISRi Communication Agent - Simplified Dependencies
+# Python 3.11+ required
+
+# Core Framework
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+python-dotenv>=1.0.0
+
+# Telegram Bot
+python-telegram-bot>=20.7
+
+# Supabase - Use compatible version
+supabase-py==0.7.4
+
+# Scheduler
+APScheduler>=3.10.4
+
+# Utilities
+pydantic>=2.6.0
+python-multipart>=0.0.6
