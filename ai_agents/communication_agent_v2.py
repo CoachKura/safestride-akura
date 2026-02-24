@@ -34,14 +34,19 @@ app = FastAPI(
 
 scheduler = AsyncIOScheduler()
 
-# Configure logging
+# Configure logging (production-safe)
+handlers = [logging.StreamHandler()]
+log_dir = "logs"
+if os.path.exists(log_dir) or os.makedirs(log_dir, exist_ok=True) is None:
+    try:
+        handlers.append(logging.FileHandler(f"{log_dir}/aisri_communication.log"))
+    except:
+        pass  # Fall back to console-only logging in production
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[
-        logging.FileHandler("logs/aisri_communication.log"),
-        logging.StreamHandler()
-    ]
+    handlers=handlers
 )
 logger = logging.getLogger("AISRi.CommunicationAgent")
 
