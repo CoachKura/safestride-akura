@@ -281,21 +281,87 @@ class AISRIEngine {
   determineTrainingPhase(totalDistance, aisriScore) {
     // Beginners or low AISRI → Foundation
     if (aisriScore < 550 || totalDistance < 20) {
-      return 'Foundation';
+      return "Foundation";
     }
 
     // Intermediate → Endurance
     if (aisriScore >= 550 && aisriScore < 700) {
-      return 'Endurance';
+      return "Endurance";
     }
 
     // Advanced → Threshold
     if (aisriScore >= 700 && aisriScore < 850) {
-      return 'Threshold';
+      return "Threshold";
     }
 
     // Elite → Peak (if safety gates pass)
-    return 'Peak';
+    return "Peak";
+  }
+
+  /**
+   * Check Power Zone (P) Safety Gate
+   * @param {Object} params - Safety gate parameters
+   * @param {number} params.aisriScore - Current AISRI score (0-1000)
+   * @param {number} params.romScore - Range of Motion pillar score (0-100)
+   * @param {number} params.injuryFreeWeeks - Weeks since last injury
+   * @param {number} params.foundationWeeks - Weeks of foundation training
+   * @returns {boolean} True if power zone is unlocked
+   */
+  checkPowerZoneSafetyGate(params) {
+    const {
+      aisriScore,
+      romScore,
+      injuryFreeWeeks = 0,
+      foundationWeeks = 0,
+    } = params;
+
+    // Power Zone Requirements:
+    // - AISRI >= 700 (70%)
+    // - ROM >= 75
+    // - At least 6 weeks injury-free
+    // - At least 8 weeks of foundation training
+    const aisriMet = aisriScore >= 700;
+    const romMet = romScore >= 75;
+    const injuryFreeMet = injuryFreeWeeks >= 6;
+    const foundationMet = foundationWeeks >= 8;
+
+    return aisriMet && romMet && injuryFreeMet && foundationMet;
+  }
+
+  /**
+   * Check Speed Zone (SP) Safety Gate
+   * @param {Object} params - Safety gate parameters
+   * @param {number} params.aisriScore - Current AISRI score (0-1000)
+   * @param {number} params.runningScore - Running pillar score (0-100)
+   * @param {number} params.strengthScore - Strength pillar score (0-100)
+   * @param {number} params.romScore - Range of Motion pillar score (0-100)
+   * @param {number} params.balanceScore - Balance pillar score (0-100)
+   * @param {number} params.powerTrainingWeeks - Weeks of power zone training
+   * @returns {boolean} True if speed zone is unlocked
+   */
+  checkSpeedZoneSafetyGate(params) {
+    const {
+      aisriScore,
+      runningScore,
+      strengthScore,
+      romScore,
+      balanceScore,
+      powerTrainingWeeks = 0,
+    } = params;
+
+    // Speed Zone Requirements:
+    // - AISRI >= 750 (75%)
+    // - All pillars >= 75
+    // - At least 12 weeks of power training
+    const aisriMet = aisriScore >= 750;
+    const allPillarsMet =
+      runningScore >= 75 &&
+      strengthScore >= 75 &&
+      romScore >= 75 &&
+      balanceScore >= 75;
+    const powerTrainingMet = powerTrainingWeeks >= 12;
+
+    return aisriMet && allPillarsMet && powerTrainingMet;
   }
 }
 
