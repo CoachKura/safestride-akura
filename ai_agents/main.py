@@ -279,6 +279,89 @@ def autonomous_decision(request: AutonomousDecisionRequest):
     return result
 
 
+# ===============================
+# SELF-LEARNING & ATHLETE JOURNEY ENDPOINTS
+# ===============================
+
+class DataSyncRequest(BaseModel):
+    athlete_id: str
+    sync_source: str = Field(..., description="strava, garmin, or manual")
+    sync_data: dict = Field(default={}, description="Optional sync metadata")
+
+
+class AthleteJourneyRequest(BaseModel):
+    athlete_id: str
+
+
+@app.post("/sync/data")
+def trigger_data_sync(request: DataSyncRequest):
+    """
+    Triggered when athlete syncs data from Strava/Garmin or logs workout manually
+    Automatically analyzes athlete journey and updates ML models
+    
+    Process:
+    1. Detect sync source (Strava, Garmin, Manual)
+    2. Trigger self-learning analysis
+    3. Generate personalized insights
+    4. Update athlete's learned profile
+    
+    Returns: Journey analysis and insights
+    """
+    from ai_engine_agent.self_learning_integration import AthleteDataSyncHandler
+    
+    if request.sync_source.lower() == "strava":
+        result = AthleteDataSyncHandler.on_strava_sync(request.athlete_id, request.sync_data)
+    elif request.sync_source.lower() == "garmin":
+        result = AthleteDataSyncHandler.on_garmin_sync(request.athlete_id, request.sync_data)
+    elif request.sync_source.lower() == "manual":
+        result = AthleteDataSyncHandler.on_manual_workout_log(request.athlete_id, request.sync_data)
+    else:
+        raise HTTPException(status_code=400, detail="Invalid sync_source. Must be 'strava', 'garmin', or 'manual'")
+    
+    return result
+
+
+@app.post("/athlete/journey-analysis")
+def get_athlete_journey(request: AthleteJourneyRequest):
+    """
+    Get comprehensive athlete journey analysis
+    Shows progression from start to current state
+    
+    Returns:
+    - Starting metrics vs current metrics
+    - Improvement percentages
+    - Training patterns
+    - Milestones achieved
+    - AI-generated insights
+    """
+    from ai_engine_agent.self_learning_engine import AthleteJourneyAnalyzer
+    
+    analysis = AthleteJourneyAnalyzer.analyze_athlete_journey(request.athlete_id)
+    
+    return analysis
+
+
+@app.post("/system/daily-learning")
+def trigger_daily_learning():
+    """
+    Manually trigger daily ML learning cycle
+    (Normally runs automatically at 2 AM via scheduler)
+    
+    Process:
+    1. Collect all athlete data
+    2. Train/update ML models
+    3. Identify knowledge gaps
+    4. Generate system improvements
+    
+    Returns: Learning cycle results
+    """
+    from ai_engine_agent.self_learning_engine import SelfLearningEngine
+    
+    result = SelfLearningEngine.daily_learning_cycle()
+    
+    return result
+
+
 def main() -> None:
     """
     Start the FastAPI server.

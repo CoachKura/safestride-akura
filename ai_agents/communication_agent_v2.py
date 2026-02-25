@@ -22,6 +22,7 @@ from aisri_api_handler_v2 import AISRiAPI
 from supabase_handler_v2 import SupabaseHandler
 from telegram_handler_v2 import TelegramHandler
 from ai_engine_agent.technical_knowledge_base import TechnicalKnowledge
+from ai_engine_agent.self_learning_integration import IntelligentResponseGenerator
 
 # ===============================
 # APP INITIALIZATION
@@ -301,25 +302,13 @@ async def telegram_webhook(request: Request):
 
         # Extract and format response based on route type
         elif route == "performance":
-            # Format performance prediction response
+            # Format performance prediction response with ML-powered personalization
             if ai_response.get("status") == "success":
-                predictions = ai_response.get("predictions", {})
-                vo2max = ai_response.get("vo2max", "N/A")
-                aisri_score = ai_response.get("aisri_score", "N/A")
-                
-                response_text = f"""📈 *Performance Predictions*
-
-*Current Fitness:*
-• VO2max: {vo2max}
-• AISRi Score: {aisri_score}
-
-*Race Time Predictions:*
-🏃 5K: {predictions.get('5K', 'N/A')}
-🏃 10K: {predictions.get('10K', 'N/A')}
-🏃 Half Marathon: {predictions.get('Half Marathon', 'N/A')}
-🏃 Marathon: {predictions.get('Marathon', 'N/A')}
-
-Keep training to improve these times! 🎯"""
+                # Use intelligent response generator to enhance with learned insights
+                response_text = IntelligentResponseGenerator.enhance_performance_response(
+                    athlete["id"], 
+                    ai_response
+                )
             else:
                 # Coach-like response for missing data
                 error_msg = ai_response.get("message", "")
@@ -362,10 +351,13 @@ Try connecting your Strava or Garmin account, or ask me "how do I get started?" 
 Listen to your body and train smart! 🩺"""
 
         elif route == "training":
-            # Format training plan response
+            # Format training plan response with ML-powered personalization
             if ai_response.get("status") == "success":
-                response_text = ai_response.get("plan") or ai_response.get("response") or \
-                       "Your training plan is ready! Check your schedule."
+                # Enhance training plan with athlete's journey context
+                response_text = IntelligentResponseGenerator.enhance_training_plan_response(
+                    athlete["id"],
+                    ai_response
+                )
             else:
                 # Coach-like response for missing AISRi score
                 error_msg = ai_response.get("message", "")
@@ -500,9 +492,19 @@ async def daily_recovery_check():
     # - Check athlete recovery scores
     # - Send alerts for overtraining
 
+
+def daily_ml_learning_cycle():
+    """Daily ML self-learning cycle - runs at 2 AM"""
+    from ai_engine_agent.self_learning_integration import DailyLearningScheduler
+    logger.info("[ML-LEARNING] Starting daily self-learning cycle")
+    result = DailyLearningScheduler.schedule_daily_learning()
+    logger.info(f"[ML-LEARNING] Cycle complete: {result.get('status')}")
+
+
 # Schedule jobs
 scheduler.add_job(daily_workout_automation, "cron", hour=6, minute=0)
 scheduler.add_job(daily_recovery_check, "cron", hour=20, minute=0)
+scheduler.add_job(daily_ml_learning_cycle, "cron", hour=2, minute=0)  # 2 AM daily ML learning
 
 # ===============================
 # STARTUP / SHUTDOWN
