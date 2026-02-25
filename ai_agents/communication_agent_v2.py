@@ -21,6 +21,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from aisri_api_handler_v2 import AISRiAPI
 from supabase_handler_v2 import SupabaseHandler
 from telegram_handler_v2 import TelegramHandler
+from ai_engine_agent.technical_knowledge_base import TechnicalKnowledge
 
 # ===============================
 # APP INITIALIZATION
@@ -62,9 +63,20 @@ def classify_message(text: str):
         text: User message text
         
     Returns:
-        str: Endpoint type (faq/injury/performance/training/autonomous)
+        str: Endpoint type (technical/faq/injury/performance/training/autonomous)
     """
     text = text.lower()
+
+    # Technical/Scientific questions - ML-powered knowledge base
+    # Check for running science, biomechanics, training methodology questions
+    if any(k in text for k in ["cadence", "spm", "interval", "recovery", "oscillation", 
+                                 "vertical", "contact time", "stride", "biomechanics",
+                                 "how do you measure", "why", "explain", "measuring",
+                                 "heart rate zone", "hr zone", "threshold"]):
+        # Additional context checks for technical questions
+        if any(k in text for k in ["measure", "calculate", "analyze", "why", "how do", 
+                                     "what is the", "explain", "during", "average"]):
+            return "technical"
 
     # FAQ/General questions - handle these with custom responses
     if any(k in text for k in ["what is aisri", "aisri mean", "abbreviation", "acronym", "stand for", 
@@ -182,6 +194,33 @@ I'm your AISRi running coach, and I'm here to help you train smarter and run saf
 
 What would you like to know? 😊"""
 
+
+def handle_technical_question(text: str, athlete_data: dict = None):
+    """
+    Handle technical/scientific questions using ML-powered knowledge base
+    Provides context-aware, detailed explanations with examples
+    
+    Args:
+        text: User's technical question
+        athlete_data: Optional athlete context for personalized responses
+        
+    Returns:
+        str: Formatted technical response with scientific explanation
+    """
+    # Classify the specific type of technical question
+    question_type = TechnicalKnowledge.classify_technical_question(text)
+    
+    # Prepare context if available
+    context = {
+        "athlete_data": athlete_data,
+        "question_text": text
+    } if athlete_data else None
+    
+    # Get the appropriate technical response
+    response = TechnicalKnowledge.get_response(question_type, context)
+    
+    return response
+
 # ===============================
 # TELEGRAM WEBHOOK
 # ===============================
@@ -225,10 +264,16 @@ async def telegram_webhook(request: Request):
         route = classify_message(message["text"])
         logger.info(f"Athlete {athlete['id']} → Route: {route}")
 
-        # Handle FAQ questions directly without API call
+        # Handle FAQ and Technical questions directly without API call
         if route == "faq":
             response_text = handle_faq(message["text"])
             ai_response = {}  # Empty response since we're not calling API
+        
+        elif route == "technical":
+            # ML-powered technical knowledge base
+            response_text = handle_technical_question(message["text"], athlete)
+            ai_response = {}  # Empty response since we're not calling API
+            logger.info(f"Technical question answered for athlete {athlete['id']}")
 
         else:
             # Prepare payload (AI Engine expects only athlete_id as string)
@@ -246,9 +291,9 @@ async def telegram_webhook(request: Request):
             else:
                 ai_response = await AISRiAPI.autonomous(payload)
 
-        # Check for API errors first (skip for FAQ since we handled it already)
-        if route == "faq":
-            # response_text already set by handle_faq()
+        # Check for API errors first (skip for FAQ/Technical since we handled them already)
+        if route in ["faq", "technical"]:
+            # response_text already set by handler functions
             pass
         elif "error" in ai_response:
             response_text = "⚠️ AISRi engine is temporarily unavailable. Please try again in a moment."
