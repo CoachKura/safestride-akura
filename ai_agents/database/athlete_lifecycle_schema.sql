@@ -16,7 +16,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE IF NOT EXISTS athlete_detailed_profile (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  athlete_id UUID REFERENCES athlete_profiles(athlete_id) UNIQUE NOT NULL,
+  athlete_id TEXT REFERENCES athlete_profiles(athlete_id) UNIQUE NOT NULL,
   
   -- Signup Information (BEFORE state)
   signup_date TIMESTAMP DEFAULT NOW(),
@@ -104,7 +104,7 @@ CREATE INDEX idx_athlete_detailed_profile_active ON athlete_detailed_profile(is_
 
 CREATE TABLE IF NOT EXISTS baseline_assessment_plan (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  athlete_id UUID REFERENCES athlete_profiles(athlete_id) NOT NULL,
+  athlete_id TEXT REFERENCES athlete_profiles(athlete_id) NOT NULL,
   
   -- 14-Day Plan Structure
   day_number INTEGER NOT NULL CHECK (day_number BETWEEN 1 AND 14),
@@ -175,7 +175,7 @@ CREATE INDEX idx_baseline_plan_type ON baseline_assessment_plan(workout_type);
 
 CREATE TABLE IF NOT EXISTS daily_performance_tracking (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  athlete_id UUID REFERENCES athlete_profiles(athlete_id) NOT NULL,
+  athlete_id TEXT REFERENCES athlete_profiles(athlete_id) NOT NULL,
   workout_date DATE NOT NULL,
   
   -- Workout Assignment
@@ -290,7 +290,7 @@ CREATE INDEX idx_performance_date_athlete ON daily_performance_tracking(workout_
 
 CREATE TABLE IF NOT EXISTS adaptive_workout_generation (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  athlete_id UUID REFERENCES athlete_profiles(athlete_id) NOT NULL,
+  athlete_id TEXT REFERENCES athlete_profiles(athlete_id) NOT NULL,
   
   -- Workout Schedule
   scheduled_date DATE NOT NULL,
@@ -398,7 +398,7 @@ CREATE INDEX idx_adaptive_workout_type ON adaptive_workout_generation(workout_ty
 
 CREATE TABLE IF NOT EXISTS athlete_ability_progression (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  athlete_id UUID REFERENCES athlete_profiles(athlete_id) NOT NULL,
+  athlete_id TEXT REFERENCES athlete_profiles(athlete_id) NOT NULL,
   assessment_date DATE NOT NULL DEFAULT CURRENT_DATE,
   
   -- ========== ABILITY METRICS (Daily Deduction) ==========
@@ -535,7 +535,7 @@ CREATE TABLE IF NOT EXISTS existing_athlete_import (
   processing_notes TEXT,
   
   -- Linked Athlete
-  created_athlete_id UUID REFERENCES athlete_profiles(athlete_id),
+  created_athlete_id TEXT REFERENCES athlete_profiles(athlete_id),
   athlete_created_at TIMESTAMP,
   
   -- Onboarding Progress
