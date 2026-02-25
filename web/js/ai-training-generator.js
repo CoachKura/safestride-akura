@@ -463,7 +463,7 @@ class AITrainingProgramGenerator {
         ? "Recovery & Consolidation"
         : this._getWeekTheme(weekNumber, trainingPhase),
       totalDistance: Math.round(weeklyDistance * 10) / 10,
-      workouts: [],
+      days: [],
     };
 
     // Generate 7 days
@@ -475,7 +475,7 @@ class AITrainingProgramGenerator {
         weeklyDistance,
         aisriScore,
       });
-      week.workouts.push(workout);
+      week.days.push(workout);
     }
 
     return week;
@@ -497,8 +497,13 @@ class AITrainingProgramGenerator {
    * @private
    */
   _generateDayWorkout(day, weekNumber, params) {
-    const { isRecoveryWeek, allowedZones, hrZones, weeklyDistance, aisriScore } =
-      params;
+    const {
+      isRecoveryWeek,
+      allowedZones,
+      hrZones,
+      weeklyDistance,
+      aisriScore,
+    } = params;
 
     const dayNames = [
       "Monday",
@@ -519,9 +524,9 @@ class AITrainingProgramGenerator {
         name: "Rest Day",
         description: "Complete rest or light stretching/yoga",
         distance: 0,
-        duration: 0,
+        duration: "0 min",
         zone: "AR",
-        hrRange: "N/A",
+        hrZone: "N/A",
       };
     }
 
@@ -533,9 +538,9 @@ class AITrainingProgramGenerator {
         name: "Rest Day",
         description: "Recovery week - prioritize rest",
         distance: 0,
-        duration: 0,
+        duration: "0 min",
         zone: "AR",
-        hrRange: "N/A",
+        hrZone: "N/A",
       };
     }
 
@@ -555,15 +560,25 @@ class AITrainingProgramGenerator {
    * @private
    */
   _createWorkout(day, weekNumber, params) {
-    const { dayName, allowedZones, hrZones, weeklyDistance, isRecoveryWeek, aisriScore } =
-      params;
+    const {
+      dayName,
+      allowedZones,
+      hrZones,
+      weeklyDistance,
+      isRecoveryWeek,
+      aisriScore,
+    } = params;
 
     // Determine workout type based on day
     let workoutType;
-    if (day === 1) workoutType = "easy"; // Monday: Easy
-    else if (day === 3) workoutType = "tempo"; // Wednesday: Quality
-    else if (day === 5) workoutType = "intervals"; // Friday: Intervals
-    else if (day === 6) workoutType = "long"; // Saturday: Long run
+    if (day === 1)
+      workoutType = "easy"; // Monday: Easy
+    else if (day === 3)
+      workoutType = "tempo"; // Wednesday: Quality
+    else if (day === 5)
+      workoutType = "intervals"; // Friday: Intervals
+    else if (day === 6)
+      workoutType = "long"; // Saturday: Long run
     else workoutType = "easy"; // Default
 
     // If recovery week, make everything easy
@@ -585,14 +600,20 @@ class AITrainingProgramGenerator {
    * @private
    */
   _getWorkoutDetails(type, params) {
-    const { dayName, allowedZones, hrZones, weeklyDistance, aisriScore, weekNumber } =
-      params;
+    const {
+      dayName,
+      allowedZones,
+      hrZones,
+      weeklyDistance,
+      aisriScore,
+      weekNumber,
+    } = params;
 
     // Base distances
     const easyDistance = weeklyDistance * 0.15;
     const tempoDistance = weeklyDistance * 0.12;
-    const intervalDistance = weeklyDistance * 0.10;
-    const longDistance = weeklyDistance * 0.30;
+    const intervalDistance = weeklyDistance * 0.1;
+    const longDistance = weeklyDistance * 0.3;
 
     switch (type) {
       case "easy":
@@ -603,9 +624,9 @@ class AITrainingProgramGenerator {
           description:
             "Comfortable, conversational pace. Focus on building aerobic base.",
           distance: Math.round(easyDistance * 10) / 10,
-          duration: Math.round((easyDistance / 0.15) * 60), // ~9 min/km
+          duration: Math.round((easyDistance / 0.15) * 60) + " min", // ~9 min/km
           zone: "F",
-          hrRange: this._getHRRange(hrZones, "F"),
+          hrZone: this._getHRRange(hrZones, "F"),
         };
 
       case "tempo":
@@ -620,9 +641,9 @@ class AITrainingProgramGenerator {
             ? "Comfortably hard pace (10K race effort). Build lactate threshold."
             : "Steady, sustained effort. Working towards threshold pace.",
           distance: Math.round(tempoDistance * 10) / 10,
-          duration: Math.round((tempoDistance / 0.18) * 60), // ~5:30 min/km
+          duration: Math.round((tempoDistance / 0.18) * 60) + " min", // ~5:30 min/km
           zone: canDoTempo ? "TH" : "EN",
-          hrRange: this._getHRRange(hrZones, canDoTempo ? "TH" : "EN"),
+          hrZone: this._getHRRange(hrZones, canDoTempo ? "TH" : "EN"),
         };
 
       case "intervals":
@@ -637,9 +658,9 @@ class AITrainingProgramGenerator {
             ? "High-intensity intervals: 6x800m @ 5K pace (3min recovery)"
             : "Variable pace run with tempo surges (not full intensity)",
           distance: Math.round(intervalDistance * 10) / 10,
-          duration: Math.round((intervalDistance / 0.16) * 60), // ~6 min/km avg
+          duration: Math.round((intervalDistance / 0.16) * 60) + " min", // ~6 min/km avg
           zone: canDoIntervals ? "P" : "EN",
-          hrRange: this._getHRRange(hrZones, canDoIntervals ? "P" : "EN"),
+          hrZone: this._getHRRange(hrZones, canDoIntervals ? "P" : "EN"),
         };
 
       case "long":
@@ -650,9 +671,9 @@ class AITrainingProgramGenerator {
           description:
             "Extended run at easy pace. Build endurance and mental toughness.",
           distance: Math.round(longDistance * 10) / 10,
-          duration: Math.round((longDistance / 0.14) * 60), // ~8:30 min/km
+          duration: Math.round((longDistance / 0.14) * 60) + " min", // ~8:30 min/km
           zone: "EN",
-          hrRange: this._getHRRange(hrZones, "EN"),
+          hrZone: this._getHRRange(hrZones, "EN"),
         };
 
       default:
@@ -662,9 +683,9 @@ class AITrainingProgramGenerator {
           name: "Easy Run",
           description: "Comfortable recovery pace",
           distance: Math.round(easyDistance * 10) / 10,
-          duration: Math.round((easyDistance / 0.15) * 60),
+          duration: Math.round((easyDistance / 0.15) * 60) + " min",
           zone: "F",
-          hrRange: this._getHRRange(hrZones, "F"),
+          hrZone: this._getHRRange(hrZones, "F"),
         };
     }
   }
