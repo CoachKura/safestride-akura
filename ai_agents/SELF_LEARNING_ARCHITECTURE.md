@@ -1,6 +1,7 @@
 # 🧠 Self-Learning ML Engine - Complete Architecture
 
 ## Overview
+
 AISRi now has **unlimited self-development capability** - an ML-powered engine that continuously learns, evolves, and improves from athlete data and online sources.
 
 ---
@@ -8,6 +9,7 @@ AISRi now has **unlimited self-development capability** - an ML-powered engine t
 ## 🎯 Core Capabilities
 
 ### 1. **Automatic Athlete Journey Analysis**
+
 When athlete signs up and syncs data → System analyzes their entire running journey:
 
 ```json
@@ -19,12 +21,12 @@ When athlete signs up and syncs data → System analyzes their entire running jo
   "total_workouts": 45,
   "progression": {
     "starting_metrics": {
-      "average_pace": 360,  // 6:00/km
+      "average_pace": 360, // 6:00/km
       "average_cadence": 165,
       "avg_distance_per_run": 5.2
     },
     "current_metrics": {
-      "average_pace": 330,  // 5:30/km - 8.3% improvement!
+      "average_pace": 330, // 5:30/km - 8.3% improvement!
       "average_cadence": 178,
       "avg_distance_per_run": 7.8
     },
@@ -40,9 +42,9 @@ When athlete signs up and syncs data → System analyzes their entire running jo
     "avg_days_between_runs": 1.2
   },
   "milestones": [
-    {"type": "distance", "name": "First 5K"},
-    {"type": "distance", "name": "First 10K"},
-    {"type": "consistency", "name": "50 Workouts Completed"}
+    { "type": "distance", "name": "First 5K" },
+    { "type": "distance", "name": "First 10K" },
+    { "type": "consistency", "name": "50 Workouts Completed" }
   ],
   "insights": [
     {
@@ -62,15 +64,18 @@ When athlete signs up and syncs data → System analyzes their entire running jo
 ```
 
 ### 2. **ML Model Training**
+
 System trains/updates ML models daily from ALL athlete data:
 
 #### **Performance Prediction Model**
+
 - Learns patterns: avg_pace, cadence, distance, workout_frequency
 - Predicts improvement rates
 - Identifies high-performers and their training patterns
 - Updates model version daily
 
 #### **Injury Risk Model**
+
 - Learns patterns associated with injury risk:
   - Sudden volume increases (>30% week-over-week)
   - Insufficient recovery (no rest days)
@@ -80,7 +85,9 @@ System trains/updates ML models daily from ALL athlete data:
 - Provides early warning signals
 
 ### 3. **Knowledge Base Updates**
+
 System continuously learns from online sources:
+
 - Latest running science research (PubMed)
 - Professional coaches' insights
 - Sports science journals
@@ -88,7 +95,9 @@ System continuously learns from online sources:
 - Training methodology updates
 
 ### 4. **Self-Development**
+
 Meta-agent that improves the system itself:
+
 - Analyzes conversation quality
 - Identifies knowledge gaps
 - Proposes system improvements
@@ -178,6 +187,7 @@ Meta-agent that improves the system itself:
 ### **1. Data Sync Triggers**
 
 **Strava Sync:**
+
 ```python
 POST /sync/data
 {
@@ -188,6 +198,7 @@ POST /sync/data
 ```
 
 **Garmin Sync:**
+
 ```python
 POST /sync/data
 {
@@ -198,6 +209,7 @@ POST /sync/data
 ```
 
 **Manual Workout:**
+
 ```python
 POST /sync/data
 {
@@ -250,6 +262,7 @@ Response:
 **User:** "What pace for my 10K race?"
 
 **Bot:**
+
 ```
 📈 Performance Predictions
 
@@ -271,6 +284,7 @@ Keep training to improve these times! 🎯
 **User:** "What pace for my 10K race?"
 
 **Bot:**
+
 ```
 📈 Your Personalized Performance Analysis
 
@@ -351,6 +365,7 @@ CREATE TABLE system_improvement_proposals (
 ## 🔧 Implementation Files
 
 ### **Core Engine**
+
 - `ai_engine_agent/self_learning_engine.py` (550+ lines)
   - AthleteJourneyAnalyzer
   - MLModelTrainer
@@ -359,18 +374,21 @@ CREATE TABLE system_improvement_proposals (
   - SelfLearningEngine
 
 ### **Integration Layer**
+
 - `ai_engine_agent/self_learning_integration.py` (350+ lines)
   - AthleteDataSyncHandler
   - IntelligentResponseGenerator
   - DailyLearningScheduler
 
 ### **API Endpoints**
+
 - `main.py` - Added endpoints:
   - `/sync/data` - Data sync trigger
   - `/athlete/journey-analysis` - Get journey insights
   - `/system/daily-learning` - Manual learning trigger
 
 ### **Bot Integration**
+
 - `communication_agent_v2.py` - Enhanced:
   - Uses IntelligentResponseGenerator for personalized responses
   - Scheduled daily ML learning at 2 AM
@@ -424,7 +442,7 @@ POST /system/daily-learning
 1. Collects data from 1,000+ athletes
 2. Trains performance model: 15% accuracy improvement
 3. Updates injury model: Better risk prediction
-4. Identifies gap: "Nutrition guidance missing" 
+4. Identifies gap: "Nutrition guidance missing"
 5. Proposes: "Add nutrition module - HIGH priority"
 
 # Result:
@@ -436,18 +454,21 @@ System gets smarter every single day!
 ## 🚀 Future Enhancements
 
 ### **Phase 2: Advanced ML**
+
 - Deep learning models for biomechanics
 - Computer vision for running form analysis
 - Predictive analytics for race performance
 - Personalized training plan generation
 
 ### **Phase 3: Knowledge Expansion**
+
 - Nutrition science integration
 - Recovery protocols
 - Mental training techniques
 - Race strategy optimization
 
 ### **Phase 4: Continuous Evolution**
+
 - Reinforcement learning from athlete feedback
 - A/B testing for response optimization
 - Multi-modal learning (text, video, sensor data)
@@ -457,32 +478,38 @@ System gets smarter every single day!
 
 ## 📈 Success Metrics
 
-| Metric | Target | Current |
-|--------|---------|---------|
-| Journey Analysis Coverage | 100% of athletes | 0% → 100% ✅ |
-| Response Personalization | 80%+ responses | Basic → Personalized ✅ |
-| ML Model Accuracy | 85%+ | Baseline → Improving 📈 |
-| Knowledge Base Growth | +10% weekly | Static → Growing 📈 |
-| System Self-Improvements | 5+ per month | 0 → TBD 🔄 |
+| Metric                    | Target           | Current                 |
+| ------------------------- | ---------------- | ----------------------- |
+| Journey Analysis Coverage | 100% of athletes | 0% → 100% ✅            |
+| Response Personalization  | 80%+ responses   | Basic → Personalized ✅ |
+| ML Model Accuracy         | 85%+             | Baseline → Improving 📈 |
+| Knowledge Base Growth     | +10% weekly      | Static → Growing 📈     |
+| System Self-Improvements  | 5+ per month     | 0 → TBD 🔄              |
 
 ---
 
 ## 🎓 Key Innovations
 
 ### **1. Zero Manual Intervention**
+
 System learns automatically from every athlete interaction - no human updates needed!
 
 ### **2. Context-Aware Intelligence**
+
 Bot understands athlete's journey and provides personalized guidance.
 
 ### **3. Continuous Evolution**
+
 Daily learning cycles ensure system improves every single day.
 
 ### **4. Meta-Learning**
+
 System analyzes its own performance and proposes improvements.
 
 ### **5. Multi-Source Learning**
+
 Learns from:
+
 - Athlete workout data
 - Training patterns
 - Online research
@@ -498,7 +525,7 @@ Learns from:
 ✅ **Bot Integration:** Enhanced communication_agent_v2.py  
 ✅ **Scheduler:** Daily learning at 2 AM  
 ⏳ **Database Schema:** Needs migration  
-⏳ **Production Testing:** Pending  
+⏳ **Production Testing:** Pending
 
 ---
 
