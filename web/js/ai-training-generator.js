@@ -381,7 +381,321 @@ class AITrainingGenerator {
   }
 }
 
+/**
+ * AI Training Program Generator v2.0
+ * Advanced training plan generator with AISRI integration
+ */
+class AITrainingProgramGenerator {
+  constructor(aisriEngine) {
+    this.aisriEngine = aisriEngine;
+    console.log("✅ AITrainingProgramGenerator initialized (v2.0)");
+  }
+
+  /**
+   * Generate a comprehensive 12-week training program
+   * @param {Object} params - Athlete parameters
+   * @returns {Object} Complete training program
+   */
+  generateProgram(params) {
+    const {
+      name = "Athlete",
+      age = 30,
+      restingHR = 60,
+      aisriScore = 700,
+      pillars = {},
+      allowedZones = [],
+      hrZones = [],
+      totalDistance = 30,
+      trainingPhase = "Foundation",
+    } = params;
+
+    console.log("🏃 Generating training program for:", name);
+    console.log("   AISRI Score:", aisriScore);
+    console.log("   Training Phase:", trainingPhase);
+    console.log("   Allowed Zones:", allowedZones);
+
+    const program = {
+      athleteName: name,
+      programName: `${name}'s 12-Week Training Program`,
+      aisriScore,
+      trainingPhase,
+      allowedZones,
+      hrZones,
+      totalWeeks: 12,
+      weeks: [],
+    };
+
+    // Generate 12 weeks
+    for (let week = 1; week <= 12; week++) {
+      const weekPlan = this._generateWeek(week, {
+        aisriScore,
+        allowedZones,
+        hrZones,
+        totalDistance,
+        trainingPhase,
+        pillars,
+      });
+      program.weeks.push(weekPlan);
+    }
+
+    return program;
+  }
+
+  /**
+   * Generate a single week of training
+   * @private
+   */
+  _generateWeek(weekNumber, params) {
+    const { aisriScore, allowedZones, hrZones, totalDistance, trainingPhase } =
+      params;
+    const isRecoveryWeek = weekNumber % 4 === 0;
+
+    // Calculate weekly distance (progressive overload)
+    const baseDistance = totalDistance;
+    const progressFactor = 1 + weekNumber * 0.03; // 3% per week
+    const weeklyDistance = isRecoveryWeek
+      ? baseDistance * 0.7
+      : baseDistance * progressFactor;
+
+    const week = {
+      weekNumber,
+      theme: isRecoveryWeek
+        ? "Recovery & Consolidation"
+        : this._getWeekTheme(weekNumber, trainingPhase),
+      totalDistance: Math.round(weeklyDistance * 10) / 10,
+      workouts: [],
+    };
+
+    // Generate 7 days
+    for (let day = 1; day <= 7; day++) {
+      const workout = this._generateDayWorkout(day, weekNumber, {
+        isRecoveryWeek,
+        allowedZones,
+        hrZones,
+        weeklyDistance,
+        aisriScore,
+      });
+      week.workouts.push(workout);
+    }
+
+    return week;
+  }
+
+  /**
+   * Get week theme based on progression
+   * @private
+   */
+  _getWeekTheme(weekNumber, trainingPhase) {
+    if (weekNumber <= 3) return "Foundation Building";
+    if (weekNumber <= 6) return "Base Endurance";
+    if (weekNumber <= 9) return "Progressive Intensity";
+    return "Peak Training";
+  }
+
+  /**
+   * Generate a single day workout
+   * @private
+   */
+  _generateDayWorkout(day, weekNumber, params) {
+    const { isRecoveryWeek, allowedZones, hrZones, weeklyDistance, aisriScore } =
+      params;
+
+    const dayNames = [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday",
+    ];
+    const dayName = dayNames[day - 1];
+
+    // Rest days: Tuesday, Thursday, Sunday
+    if ([2, 4, 7].includes(day) && !isRecoveryWeek) {
+      return {
+        day: dayName,
+        type: "rest",
+        name: "Rest Day",
+        description: "Complete rest or light stretching/yoga",
+        distance: 0,
+        duration: 0,
+        zone: "AR",
+        hrRange: "N/A",
+      };
+    }
+
+    // Recovery week: more rest days
+    if (isRecoveryWeek && [2, 3, 4, 6, 7].includes(day)) {
+      return {
+        day: dayName,
+        type: "rest",
+        name: "Rest Day",
+        description: "Recovery week - prioritize rest",
+        distance: 0,
+        duration: 0,
+        zone: "AR",
+        hrRange: "N/A",
+      };
+    }
+
+    // Determine workout type based on day and allowed zones
+    return this._createWorkout(day, weekNumber, {
+      dayName,
+      allowedZones,
+      hrZones,
+      weeklyDistance,
+      isRecoveryWeek,
+      aisriScore,
+    });
+  }
+
+  /**
+   * Create a specific workout
+   * @private
+   */
+  _createWorkout(day, weekNumber, params) {
+    const { dayName, allowedZones, hrZones, weeklyDistance, isRecoveryWeek, aisriScore } =
+      params;
+
+    // Determine workout type based on day
+    let workoutType;
+    if (day === 1) workoutType = "easy"; // Monday: Easy
+    else if (day === 3) workoutType = "tempo"; // Wednesday: Quality
+    else if (day === 5) workoutType = "intervals"; // Friday: Intervals
+    else if (day === 6) workoutType = "long"; // Saturday: Long run
+    else workoutType = "easy"; // Default
+
+    // If recovery week, make everything easy
+    if (isRecoveryWeek) workoutType = "easy";
+
+    // Get workout details based on type
+    return this._getWorkoutDetails(workoutType, {
+      dayName,
+      allowedZones,
+      hrZones,
+      weeklyDistance,
+      aisriScore,
+      weekNumber,
+    });
+  }
+
+  /**
+   * Get workout details based on type
+   * @private
+   */
+  _getWorkoutDetails(type, params) {
+    const { dayName, allowedZones, hrZones, weeklyDistance, aisriScore, weekNumber } =
+      params;
+
+    // Base distances
+    const easyDistance = weeklyDistance * 0.15;
+    const tempoDistance = weeklyDistance * 0.12;
+    const intervalDistance = weeklyDistance * 0.10;
+    const longDistance = weeklyDistance * 0.30;
+
+    switch (type) {
+      case "easy":
+        return {
+          day: dayName,
+          type: "easy",
+          name: "Easy Run",
+          description:
+            "Comfortable, conversational pace. Focus on building aerobic base.",
+          distance: Math.round(easyDistance * 10) / 10,
+          duration: Math.round((easyDistance / 0.15) * 60), // ~9 min/km
+          zone: "F",
+          hrRange: this._getHRRange(hrZones, "F"),
+        };
+
+      case "tempo":
+        // Check if threshold zones are unlocked
+        const canDoTempo =
+          allowedZones.includes("TH") || allowedZones.includes("T");
+        return {
+          day: dayName,
+          type: "tempo",
+          name: canDoTempo ? "Tempo Run" : "Steady Pace Run",
+          description: canDoTempo
+            ? "Comfortably hard pace (10K race effort). Build lactate threshold."
+            : "Steady, sustained effort. Working towards threshold pace.",
+          distance: Math.round(tempoDistance * 10) / 10,
+          duration: Math.round((tempoDistance / 0.18) * 60), // ~5:30 min/km
+          zone: canDoTempo ? "TH" : "EN",
+          hrRange: this._getHRRange(hrZones, canDoTempo ? "TH" : "EN"),
+        };
+
+      case "intervals":
+        // Check if power/speed zones are unlocked
+        const canDoIntervals =
+          allowedZones.includes("P") || allowedZones.includes("SP");
+        return {
+          day: dayName,
+          type: "intervals",
+          name: canDoIntervals ? "Interval Training" : "Fartlek Run",
+          description: canDoIntervals
+            ? "High-intensity intervals: 6x800m @ 5K pace (3min recovery)"
+            : "Variable pace run with tempo surges (not full intensity)",
+          distance: Math.round(intervalDistance * 10) / 10,
+          duration: Math.round((intervalDistance / 0.16) * 60), // ~6 min/km avg
+          zone: canDoIntervals ? "P" : "EN",
+          hrRange: this._getHRRange(hrZones, canDoIntervals ? "P" : "EN"),
+        };
+
+      case "long":
+        return {
+          day: dayName,
+          type: "long",
+          name: "Long Run",
+          description:
+            "Extended run at easy pace. Build endurance and mental toughness.",
+          distance: Math.round(longDistance * 10) / 10,
+          duration: Math.round((longDistance / 0.14) * 60), // ~8:30 min/km
+          zone: "EN",
+          hrRange: this._getHRRange(hrZones, "EN"),
+        };
+
+      default:
+        return {
+          day: dayName,
+          type: "easy",
+          name: "Easy Run",
+          description: "Comfortable recovery pace",
+          distance: Math.round(easyDistance * 10) / 10,
+          duration: Math.round((easyDistance / 0.15) * 60),
+          zone: "F",
+          hrRange: this._getHRRange(hrZones, "F"),
+        };
+    }
+  }
+
+  /**
+   * Get HR range for a specific zone
+   * @private
+   */
+  _getHRRange(hrZones, zoneCode) {
+    if (!hrZones || hrZones.length === 0) return "N/A";
+
+    // Map zone codes to HR zone indices
+    const zoneMap = {
+      AR: 0, // Active Recovery
+      F: 1, // Foundation
+      EN: 2, // Endurance
+      TH: 3, // Threshold
+      T: 3, // Threshold (alias)
+      P: 4, // Power
+      SP: 4, // Speed (use Power zone)
+    };
+
+    const zoneIndex = zoneMap[zoneCode] || 1;
+    const zone = hrZones[zoneIndex];
+
+    if (!zone) return "N/A";
+    return `${zone.min}-${zone.max} bpm`;
+  }
+}
+
 // Export for use in other modules
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = AITrainingGenerator;
+  module.exports = { AITrainingGenerator, AITrainingProgramGenerator };
 }
