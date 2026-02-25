@@ -62,9 +62,15 @@ def classify_message(text: str):
         text: User message text
         
     Returns:
-        str: Endpoint type (injury/performance/training/autonomous)
+        str: Endpoint type (faq/injury/performance/training/autonomous)
     """
     text = text.lower()
+
+    # FAQ/General questions - handle these with custom responses
+    if any(k in text for k in ["what is aisri", "aisri mean", "abbreviation", "acronym", "stand for", 
+                                 "what does aisri", "explain aisri", "tell me about", "help", 
+                                "how do i", "getting started", "get started"]):
+        return "faq"
 
     # Injury/pain keywords
     if any(k in text for k in ["pain", "sore", "injury", "hurt", "ache", "strain"]):
@@ -80,6 +86,101 @@ def classify_message(text: str):
 
     # Default to autonomous
     return "autonomous"
+
+
+def handle_faq(text: str):
+    """
+    Handle frequently asked questions with coach-like responses
+    
+    Args:
+        text: User message text
+        
+    Returns:
+        str: Formatted response with helpful information
+    """
+    text = text.lower()
+
+    # AISRI explanation
+    if any(k in text for k in ["what is aisri", "aisri mean", "abbreviation", "acronym", "stand for", "what does aisri", "explain aisri"]):
+        return """🤖 *Welcome to AISRi!*
+
+*AISRi* stands for *Artificial Intelligence System for Running Intelligence* - your personal AI running coach!
+
+*What I do:*
+📊 Analyze your running biomechanics
+🏃 Predict race times and performance
+🩺 Monitor injury risk
+📅 Create personalized training plans
+💬 Provide daily coaching guidance
+
+Think of me as your 24/7 running coach who uses AI to understand your body, track your progress, and help you achieve your goals safely!
+
+*Ready to get started?* Try asking:
+• "What pace for my 10K race?"
+• "Am I at risk for injury?"
+• "Create me a training plan"
+• "Should I train today?"
+
+Let's crush those running goals together! 💪🏃‍♂️"""
+
+    # Getting started / help
+    elif any(k in text for k in ["help", "getting started", "get started", "how do i"]):
+        return """👋 *Let's Get You Started!*
+
+Here's your quick start guide:
+
+*1️⃣ Connect Your Data:*
+• Link Strava or Garmin account
+• Sync your running watch
+• Or manually log workouts
+
+*2️⃣ Complete AISRi Assessment (~5 min):*
+• Measure your flexibility & ROM
+• Assess current fitness level
+• Identify injury risk factors
+
+*3️⃣ Start Training:*
+• Get race predictions
+• Receive personalized training plans
+• Track injury risk daily
+• Get coaching advice anytime
+
+*What I Can Help With:*
+🏃 Race time predictions
+📅 Training plans
+🩺 Injury risk monitoring
+💬 Daily coaching questions
+📊 Performance analysis
+
+*Try asking me:*
+• "What is my 10K pace?"
+• "Create a training plan for me"
+• "Should I run today?"
+• "Am I at risk for injury?"
+
+Ready to start? Just ask me anything! 🎯"""
+
+    # Default general response for other questions
+    else:
+        return """👋 *Hey there!*
+
+I'm your AISRi running coach, and I'm here to help you train smarter and run safer!
+
+*I can help you with:*
+🏃 Race predictions & pace guidance
+📅 Personalized training plans
+🩺 Injury risk assessment
+💬 Daily training decisions
+📊 Performance analysis
+
+*Popular questions:*
+• "What pace for my 10K race?"
+• "Create me a training plan"
+• "Should I train today?"
+• "Am I at risk for injury?"
+• "What is AISRi?" (learn more about me!)
+
+What would you like to know? 😊"""
 
 # ===============================
 # TELEGRAM WEBHOOK
@@ -124,23 +225,32 @@ async def telegram_webhook(request: Request):
         route = classify_message(message["text"])
         logger.info(f"Athlete {athlete['id']} → Route: {route}")
 
-        # Prepare payload (AI Engine expects only athlete_id as string)
-        payload = {
-            "athlete_id": str(athlete["id"])
-        }
+        # Handle FAQ questions directly without API call
+        if route == "faq":
+            response_text = handle_faq(message["text"])
+            ai_response = {}  # Empty response since we're not calling API
 
-        # Route to appropriate endpoint
-        if route == "injury":
-            ai_response = await AISRiAPI.injury(payload)
-        elif route == "performance":
-            ai_response = await AISRiAPI.performance(payload)
-        elif route == "training":
-            ai_response = await AISRiAPI.training(payload)
         else:
-            ai_response = await AISRiAPI.autonomous(payload)
+            # Prepare payload (AI Engine expects only athlete_id as string)
+            payload = {
+                "athlete_id": str(athlete["id"])
+            }
 
-        # Check for API errors first
-        if "error" in ai_response:
+            # Route to appropriate endpoint
+            if route == "injury":
+                ai_response = await AISRiAPI.injury(payload)
+            elif route == "performance":
+                ai_response = await AISRiAPI.performance(payload)
+            elif route == "training":
+                ai_response = await AISRiAPI.training(payload)
+            else:
+                ai_response = await AISRiAPI.autonomous(payload)
+
+        # Check for API errors first (skip for FAQ since we handled it already)
+        if route == "faq":
+            # response_text already set by handle_faq()
+            pass
+        elif "error" in ai_response:
             response_text = "⚠️ AISRi engine is temporarily unavailable. Please try again in a moment."
             logger.error(f"API error for athlete {athlete['id']}: {ai_response['error']}")
 
@@ -166,7 +276,29 @@ async def telegram_webhook(request: Request):
 
 Keep training to improve these times! 🎯"""
             else:
-                response_text = ai_response.get("message", "Unable to predict performance. Please ensure you have recent workout data.")
+                # Coach-like response for missing data
+                error_msg = ai_response.get("message", "")
+                if "workout" in error_msg.lower() or "pace" in error_msg.lower():
+                    response_text = """🏃‍♂️ *Hey there!*
+
+I don't see any workout data yet. To give you accurate race predictions, I need to see some of your runs first!
+
+*Here's how to get started:*
+📱 Connect your Strava or Garmin account
+⌚ Sync your running watch
+📝 Or manually log a workout
+
+Once you have at least a few runs recorded, I'll be able to predict your race times accurately!
+
+Need help connecting your devices? Just ask! 💪"""
+                else:
+                    response_text = f"""⚠️ *Hmm, something's not quite right*
+
+I'm having trouble analyzing your performance right now. This usually means:
+• You might not have enough workout data yet
+• Your account might need to be set up
+
+Try connecting your Strava or Garmin account, or ask me "how do I get started?" for help!"""
 
         elif route == "injury":
             # Format injury risk response
@@ -186,8 +318,37 @@ Listen to your body and train smart! 🩺"""
 
         elif route == "training":
             # Format training plan response
-            response_text = ai_response.get("plan") or ai_response.get("response") or \
-                   "Unable to generate training plan. Please try again."
+            if ai_response.get("status") == "success":
+                response_text = ai_response.get("plan") or ai_response.get("response") or \
+                       "Your training plan is ready! Check your schedule."
+            else:
+                # Coach-like response for missing AISRi score
+                error_msg = ai_response.get("message", "")
+                if "aisri" in error_msg.lower() or "score" in error_msg.lower():
+                    response_text = """💪 *Let's Build Your Training Plan!*
+
+To create a personalized training plan, I first need to assess your current fitness and injury risk. 
+
+*Quick Start:*
+1️⃣ Complete your AISRi assessment (takes ~5 minutes)
+2️⃣ Log a few workouts so I can understand your baseline
+3️⃣ Then I'll create a custom plan just for you!
+
+Want me to guide you through the assessment? Just say "start assessment" or ask me any questions about getting started!
+
+Remember: Good training starts with good data! 📊"""
+                else:
+                    response_text = """🏃‍♂️ *Training Plan Builder*
+
+I'd love to help you create a training plan! To build something perfect for you, I need:
+
+✅ Your current fitness level (from workouts or assessment)
+✅ Any injury concerns or limitations
+✅ Your training goals
+
+Have you completed your AISRi assessment yet? That's the best way to get started!
+
+Type "help" if you need guidance on getting set up! 🎯"""
 
         else:  # autonomous
             # Format autonomous decision response
