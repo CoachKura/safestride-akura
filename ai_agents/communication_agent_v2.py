@@ -71,7 +71,7 @@ def classify_message(text: str):
         return "injury"
 
     # Performance/race keywords
-    if any(k in text for k in ["race", "pace", "performance", "pr", "personal best", "time"]):
+    if any(k in text for k in ["race", "pace", "performance", "pr", "personal best", "time", "predict", "10k", "5k", "marathon", "half marathon"]):
         return "performance"
 
     # Training plan keywords
@@ -139,15 +139,78 @@ async def telegram_webhook(request: Request):
         else:
             ai_response = await AISRiAPI.autonomous(payload)
 
-        # Extract response text
-        response_text = ai_response.get("recommendation") or \
-                       ai_response.get("response") or \
-                       ai_response.get("plan") or \
-                       "⚠️ Error processing your request. Please try again."
-
+        # Check for API errors first
         if "error" in ai_response:
             response_text = "⚠️ AISRi engine is temporarily unavailable. Please try again in a moment."
             logger.error(f"API error for athlete {athlete['id']}: {ai_response['error']}")
+
+        # Extract and format response based on route type
+        elif route == "performance":
+            # Format performance prediction response
+            if ai_response.get("status") == "success":
+                predictions = ai_response.get("predictions", {})
+                vo2max = ai_response.get("vo2max", "N/A")
+                aisri_score = ai_response.get("aisri_score", "N/A")
+                
+                response_text = f"""📈 *Performance Predictions*
+
+*Current Fitness:*
+• VO2max: {vo2max}
+• AISRi Score: {aisri_score}
+
+*Race Time Predictions:*
+🏃 5K: {predictions.get('5K', 'N/A')}
+🏃 10K: {predictions.get('10K', 'N/A')}
+🏃 Half Marathon: {predictions.get('Half Marathon', 'N/A')}
+🏃 Marathon: {predictions.get('Marathon', 'N/A')}
+
+Keep training to improve these times! 🎯"""
+            else:
+                response_text = ai_response.get("message", "Unable to predict performance. Please ensure you have recent workout data.")
+
+        elif route == "injury":
+            # Format injury risk response
+            risk_level = ai_response.get("risk_level", "UNKNOWN")
+            risk_score = ai_response.get("risk_score", 0)
+            recommendation = ai_response.get("recommendation", "Continue training carefully")
+            
+            response_text = f"""🏥 *Injury Risk Analysis*
+
+*Risk Level:* {risk_level}
+*Risk Score:* {risk_score}/100
+
+*Recommendation:*
+{recommendation}
+
+Listen to your body and train smart! 🩺"""
+
+        elif route == "training":
+            # Format training plan response
+            response_text = ai_response.get("plan") or ai_response.get("response") or \
+                   "Unable to generate training plan. Please try again."
+
+        else:  # autonomous
+            # Format autonomous decision response
+            decision_data = ai_response.get("decision", {})
+            decision = decision_data.get("decision", "TRAIN")
+            reason = decision_data.get("reason", "Training analysis completed")
+            recommendation = decision_data.get("recommendation", "Follow your training plan")
+            aisri_score = ai_response.get("aisri_score", "N/A")
+            injury_risk = ai_response.get("injury_risk", "UNKNOWN")
+            
+            response_text = f"""🤖 *AISRi Coach*
+
+*Status:* {decision}
+*AISRi Score:* {aisri_score}
+*Injury Risk:* {injury_risk}
+
+*Reason:*
+{reason}
+
+*Recommendation:*
+{recommendation}
+
+Train smart, stay healthy! 🏃‍♂️"""
 
         # Save conversation for memory
         SupabaseHandler.save_conversation(
@@ -243,15 +306,15 @@ scheduler.add_job(daily_recovery_check, "cron", hour=20, minute=0)
 async def startup_event():
     """Initialize services on startup"""
     scheduler.start()
-    logger.info("🚀 AISRi Communication Agent V2 started")
-    logger.info("✅ APScheduler initialized")
-    logger.info("✅ Telegram webhook ready at /telegram/webhook")
+    logger.info("[STARTUP] AISRi Communication Agent V2 started")
+    logger.info("[STARTUP] APScheduler initialized")
+    logger.info("[STARTUP] Telegram webhook ready at /telegram/webhook")
 
 @app.on_event("shutdown")
 async def shutdown_event():
     """Cleanup on shutdown"""
     scheduler.shutdown()
-    logger.info("👋 AISRi Communication Agent V2 stopped")
+    logger.info("[SHUTDOWN] AISRi Communication Agent V2 stopped")
 
 # ===============================
 # PRODUCTION DIRECT RUN

@@ -1,6 +1,7 @@
 import os
 from typing import Any
 
+import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -291,7 +292,11 @@ def main() -> None:
     # ✅ Uses PORT environment variable
     port = int(os.getenv("PORT") or os.getenv("API_PORT") or "8000")
     
-    # ✅ Production detection
+    # ✅ Reload mode - False by default to prevent crashes
+    reload_env = os.getenv("API_RELOAD", "false").lower()
+    reload = reload_env in ["true", "1", "yes"]
+    
+    # ✅ Production detection - disable reload in production
     if os.getenv("PORT"):
         reload = False
 
