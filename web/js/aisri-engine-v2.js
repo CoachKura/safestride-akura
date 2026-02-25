@@ -271,6 +271,32 @@ class AISRIEngine {
       factors,
     };
   }
+
+  /**
+   * Determine training phase based on AISRI score and training volume
+   * @param {number} totalDistance - Weekly training distance in km
+   * @param {number} aisriScore - Current AISRI score (0-1000)
+   * @returns {string} Training phase: 'Foundation', 'Endurance', 'Threshold', or 'Peak'
+   */
+  determineTrainingPhase(totalDistance, aisriScore) {
+    // Beginners or low AISRI → Foundation
+    if (aisriScore < 550 || totalDistance < 20) {
+      return 'Foundation';
+    }
+
+    // Intermediate → Endurance
+    if (aisriScore >= 550 && aisriScore < 700) {
+      return 'Endurance';
+    }
+
+    // Advanced → Threshold
+    if (aisriScore >= 700 && aisriScore < 850) {
+      return 'Threshold';
+    }
+
+    // Elite → Peak (if safety gates pass)
+    return 'Peak';
+  }
 }
 
 // Export for use in other modules
