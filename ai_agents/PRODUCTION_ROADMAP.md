@@ -1349,13 +1349,16 @@ Why? Weak glutes + tight hip flexors = MUST build foundation first
 **Sample Week (Week 1 - FOUNDATION PHASE):**
 
 ```
-🏃‍♂️💪 MONDAY: Easy Run + STRENGTH (Primary Focus)
-Morning:
-• Easy Run: 6 km @ 6:30-6:45/km
-• HR: 80% (152 bpm)
-• Focus: Relaxed, conversational pace
+💪 MONDAY: Rest or Easy Run + STRENGTH (Primary Focus)
+Option A (Rest Day Focus):
+• Morning: Complete rest or light mobility (15 min)
+• Afternoon/Evening: STRENGTH SESSION (60 min) - **CRITICAL**
 
-Afternoon/Evening: STRENGTH SESSION (60 min) - **CRITICAL**
+Option B (Easy Run + Strength):
+• Morning: Easy Run 5-6 km @ 6:30-6:45/km, HR 80%
+• Afternoon/Evening: STRENGTH SESSION (60 min)
+
+STRENGTH SESSION (60 min):
 • Glute Activation:
   - Clamshells: 3×20 each side
   - Glute bridges: 3×15
@@ -1372,9 +1375,24 @@ Afternoon/Evening: STRENGTH SESSION (60 min) - **CRITICAL**
   - Lateral band walks: 3×15 each direction
   - Single-leg RDL: 3×10 each
 
-🧘 TUESDAY: MOBILITY DAY + Easy Run
-Morning: MOBILITY WORK (30 min) - **NON-NEGOTIABLE**
-• Hip Flexor Stretch: 3×90 sec each side (FOCUS!)
+🏃‍♂️ TUESDAY: Interval Run + Easy Run
+Morning: INTERVAL RUN
+• Warmup: 2 km easy
+• Intervals: 6 × (400m @ 5:30/km, 200m jog recovery)
+• Cooldown: 1 km easy
+• Total: 6-7 km
+• Focus: Speed development, neuromuscular adaptation
+
+Evening: Easy Recovery Run
+• Distance: 4-5 km @ 6:45/km
+• HR: 75-80%
+• Focus: Active recovery, flush legs
+
+Daily Mobility: 15-20 min (hip flexors, ankles)
+
+🧘💪 WEDNESDAY: MOBILITY + CORE + Easy Run
+Morning: DEEP MOBILITY WORK (30-40 min) - **NON-NEGOTIABLE**
+• Hip Flexor Stretch: 3×90 sec each side (CRITICAL!)
 • Pigeon Pose: 3×90 sec each side
 • Ankle Dorsiflexion Mobilization: 3×20 reps
 • Cat-Cow: 3×15 reps
@@ -1382,43 +1400,42 @@ Morning: MOBILITY WORK (30 min) - **NON-NEGOTIABLE**
 • World's Greatest Stretch: 3×5 each side
 • Foam Rolling: Quads, IT band, calves (10 min)
 
-Evening:
-• Easy Run: 5 km @ 6:45/km
-• HR: 75-80%
-• Focus: Feel the improved ROM from morning work
-
-🏃‍♂️ WEDNESDAY: Tempo Run + CORE
-Morning/Afternoon:
-• Warmup: 2 km easy + dynamic stretches
-• Tempo: 4 km @ 6:00/km (controlled effort)
-• Cooldown: 1 km easy
-• Total: 7 km
-• HR: 85% (162 bpm)
-• Focus: Steady rhythm, good posture
-
-Evening: CORE CIRCUIT (25 min)
+Midday: CORE CIRCUIT (25-30 min)
 • Bird dogs: 3×12 each side
 • Pallof press: 3×15 each side
 • Side plank with leg raise: 3×10 each
 • Bicycle crunches: 3×20
 • Copenhagen plank: 3×20sec each side
+• Dead bugs: 3×12 each side
 
-⚖️ THURSDAY: BALANCE DAY + Recovery Run
-Morning: BALANCE & PROPRIOCEPTION (25 min)
-• Single-leg stance (eyes open): 3×45 sec each
-• Single-leg stance (eyes closed): 3×30 sec each
-• Single-leg balance on foam pad: 3×30 sec
-• Bosu ball balance: 3×30 sec each leg
-• Y-balance reach: 3×5 each direction, each leg
-• Single-leg hop and stick: 3×8 each
+Evening: Easy Run
+• Distance: 5-6 km @ 6:45/km
+• HR: 75-80%
+• Focus: Feel the improved ROM from mobility work
 
-Afternoon:
-• Easy Run: 5 km @ 6:45/km
-• Focus: Feel ground contact, balance
+🏃‍♂️ THURSDAY: Tempo Run or Threshold Run + Recovery Run
+Morning: TEMPO/THRESHOLD RUN
+Option A - Tempo Run:
+• Warmup: 2 km easy + dynamic stretches
+• Tempo: 4-5 km @ 6:00/km (controlled effort)
+• Cooldown: 1 km easy
+• Total: 7-8 km
+• HR: 85% (162 bpm)
 
-Evening: Full-Body Foam Rolling (15 min)
+Option B - Threshold Run (TR):
+• Warmup: 2 km easy
+• Threshold: 3 × (1.5 km @ 5:50/km, 90 sec rest)
+• Cooldown: 1 km easy
+• Total: 8 km
 
-💪 FRIDAY: STRENGTH DAY #2
+Evening: Recovery Run
+• Distance: 4 km @ 6:45-7:00/km
+• HR: 75%
+• Focus: Easy recovery, maintain aerobic base
+
+Daily Mobility: 15-20 min (focus on balance work)
+
+💪 FRIDAY: STRENGTH SESSION #2
 Full STRENGTH SESSION (60 min):
 • Warm-up: 10 min mobility flow
 • Squats (goblet or barbell): 3×12
@@ -1430,100 +1447,154 @@ Full STRENGTH SESSION (60 min):
   - Plank variations
   - Anti-rotation exercises
   - Hip flexor strengthening
+• Cool-down: 10 min stretching
 
-Evening: Mobility Work (20 min)
+Evening: Mobility Work (20-30 min)
 • Focus on hip flexors, ankles, hamstrings
+• Foam rolling full body
 
-🏃‍♂️ SATURDAY: LONG RUN + Mental Training
-Morning:
-• Long Run: 14 km @ 6:30/km
+🏃‍♂️💪 SATURDAY: STRENGTH SESSION or Long Run + Mental Training
+Option A (Alternating Weeks - STRENGTH WEEK):
+Morning: STRENGTH SESSION #3 (60 min)
+• Full-body strength with focus on power
+• Plyometrics: Box jumps, bounds, hops
+• Heavy compound lifts
+• Core stability work
+
+Afternoon: MOBILITY SESSION (45 min)
+• Deep stretching
+• Yoga flow
+• Recovery focus
+
+Evening: MENTAL TRAINING (15-20 min)
+• Visualization: Goal pace running
+• Race scenario rehearsal
+
+Option B (Alternating Weeks - LONG RUN WEEK):
+Morning: LONG RUN
+• Distance: 14-16 km @ 6:30/km
 • HR: 80% (152 bpm)
-• PRACTICE: Every 3 km, check pace (pacing discipline training)
+• PRACTICE: Every 3 km check pace (pacing discipline)
 • PRACTICE: Fuel at km 7 and 11
 • FOCUS: Posture, breathing, even effort
 
-Post-Run:
-• 15 min: MENTAL TRAINING
-  - Visualization: See yourself running strong at goal pace
-  - Positive self-talk practice
-  - Race scenario mental rehearsal
+Post-Run: MOBILITY SESSION (45 min)
+• Full-body stretching
+• Hip flexors: 3×90 sec each
+• Hamstrings, calves, ankles
+• Yoga flow or deep stretching
 
-Afternoon: Mobility & Recovery (20 min)
+Evening: MENTAL TRAINING (15-20 min)
+• Visualization: See yourself running strong at goal pace
+• Positive self-talk practice
+• Race scenario mental rehearsal
 
-🧘 SUNDAY: ACTIVE RECOVERY + Mental Work
-Morning: FULL MOBILITY SESSION (45 min)
-• Yoga flow or dedicated stretching
-• Focus areas:
-  - Hip flexors (3×90 sec each)
-  - Hamstrings (3×60 sec each)
-  - Calves/ankles (3×60 sec each)
-  - Thoracic spine rotation
-  - Full-body flow
+🏃‍♂️ SUNDAY: Long Run
+Morning: LONG RUN (Primary Long Run)
+• Distance: 16-18 km @ 6:30/km
+• HR: 80% (152 bpm)
+• Focus: Aerobic endurance, even pacing
+• Practice: Nutrition strategy, hydration
+• Mental: Pacing discipline check every 3 km
 
-Afternoon: MENTAL TRAINING (20 min)
+Afternoon: Recovery Routine
+• Light mobility work (20 min)
+• Foam rolling (15 min)
+• Stretching (15 min)
+• Ice bath or contrast therapy (optional)
+
+Evening: MENTAL WORK (15-20 min)
 • Guided visualization: Perfect race execution
 • Breathing exercises: Box breathing (5 min)
-• Pacing strategy review
-• Positive affirmations
-
-Evening: Light walk (20-30 min), foam rolling
+• Review week's progress
+• Prepare mentally for next week
 
 ═══════════════════════════════════════
 WEEKLY TOTALS (HOLISTIC):
 ═══════════════════════════════════════
-🏃 Running: 37 km (5 sessions)
-💪 Strength: 2 full sessions (120 min)
-🧘 Mobility/ROM: DAILY (30-45 min/day = 210-315 min total)
-⚖️ Balance: 1 dedicated session + integrated work
+🏃 Running: MIN 37 km (7-8 sessions mixing quality & recovery)
+💪 Strength: 3 sessions (180 min total) - 2 mandatory + 1 optional
+🧘 Mobility/ROM: DAILY (210-315 min/week = 30-45 min/day)
+⚖️ Balance: Weekly focus (integrated into mobility & strength)
 🧠 Mental Training: 35-40 min/week
 💤 Required Sleep: 7.5-8 hrs/night
 💧 Hydration: 2.5-3L water/day
 
 ⚠️ CRITICAL NOTES:
-• Mobility is DAILY - this fixes hip flexor & ankle limitations
-• Strength 2x/week minimum - builds glutes/core over 12 weeks
-• Balance work prevents injury + improves running economy
-• Mental training = pacing discipline (stops early fast starts)
-• Week 1 volume is CONSERVATIVE - foundation comes first!
+• Running: Mix of quality (intervals, tempo) + easy runs for recovery
+• Strength: 3x/week builds glutes/core faster (12-16 weeks to meaningful gains)
+• Mobility: DAILY non-negotiable - fixes hip flexor & ankle limitations
+• Saturday flexibility: Alternate strength week vs long run week based on goals
+• Balance work: Integrated into mobility sessions and strength warm-ups
+• Mental training: Daily visualization + weekly deep practice
+• Week 1 volume: CONSERVATIVE - foundation comes first, speed comes later!
 ```
 
 **Why This Week Structure?**
 
 ```
-🎯 RUNNING (37 km):
-- Easy pace builds aerobic engine safely
-- One tempo = lactate threshold work
-- Long run = endurance
-- Total volume: Conservative for foundation phase
+🎯 RUNNING (MIN 37 km - Quality + Volume Balance):
+- Easy runs: Build aerobic engine safely (conversational pace)
+- Intervals (Tuesday): Speed/neuromuscular development
+- Tempo/Threshold (Thursday): Lactate threshold work
+- Long runs (Saturday + Sunday): Endurance foundation
+- Recovery runs: Active recovery between quality sessions
+- Total volume: Mix of quality work + easy volume
 
-💪 STRENGTH (Critical!):
-- Monday: Heavy glute/core focus
-- Friday: Full-body power
-- Why 2x/week? Takes 12-16 weeks to build meaningful strength
-- Can't skip this - weak glutes = injury + inefficiency
+💪 STRENGTH (3x/week = Faster Gains!):
+- Monday: Primary glute/core/hip stability focus (60 min)
+- Friday: Full-body power and strength (60 min)
+- Saturday: Optional 3rd session (alternating weeks) OR long run
+- Why 3x/week? Accelerates strength building:
+  * 2x/week: 12-16 weeks to build meaningful strength
+  * 3x/week: 10-14 weeks to build meaningful strength
+  * Faster glute/core development = earlier speed work
+- Can't skip this - weak glutes = injury + inefficient running
 
 🧘 MOBILITY (DAILY - 30-45 min):
-- Hip flexors: EVERY DAY (they're very tight!)
-- Ankles: Fix 30° → 40°+ dorsiflexion
+- Hip flexors: EVERY DAY (fix tightness → longer stride)
+- Ankles: Daily dorsiflexion work (30° → 40°+)
 - After 8-12 weeks: Stride length increases = faster pace
-- This is NOT optional - it's as important as running!
+- Integrated into rest days and post-workout
+- Wednesday: Deep dedicated session (30-40 min)
+- This is NOT optional - as important as running!
 
 ⚖️ BALANCE:
-- Thursday dedicated session
-- Fixes stability issues
-- Reduces injury risk
-- Integrated into strength work
+- Integrated into strength warm-ups
+- Thursday focus on recovery + balance
+- Fixes stability issues → injury prevention
+- Improves running economy
+- Single-leg work in strength sessions
 
-🧠 MENTAL:
-- Visualization (race-day mental rehearsal)
-- Pacing practice during long run
+🧠 MENTAL (35-40 min/week):
+- Visualization: Daily quick sessions + weekly deep practice
+- Pacing practice: During long runs (check every 3 km)
+- Race scenario rehearsal: Saturday/Sunday
 - Fixes "starting too fast" problem
-- 8-12 weeks to build discipline
+- Builds confidence over 8-12 weeks
 
-🔄 ADAPTATION:
-If strength/mobility lagging → Stay in Foundation Phase longer
-If progressing fast → Can advance to Phase 2 after 10 weeks
-Timeline is INDIVIDUALIZED based on ALL factors
+🔄 WEEKLY STRUCTURE FLEXIBILITY:
+- Saturday alternates: STRENGTH week vs LONG RUN week
+  * Week 1, 3, 5...: Strength session + mobility
+  * Week 2, 4, 6...: Long run + mobility
+- This balances strength building with endurance development
+- Allows 3 strength sessions when needed most (foundation phase)
+- Drops to 2 strength sessions on long run weeks
+
+📊 PROGRESSION BUILT IN:
+- Intervals get faster as fitness improves
+- Tempo pace progresses toward goal pace
+- Long runs increase distance + add goal pace segments
+- Strength: Progressive overload (+5% weight/reps every 2-3 weeks)
+- Mobility: Maintain daily discipline = ROM gains compound
+- Mental: Visualization effectiveness improves with practice
+
+⚠️ ADAPTATION BASED ON PROGRESS:
+- If strength/mobility lagging → More focus on Wednesday + Saturday strength
+- If running fitness lagging → More easy volume, less intensity
+- If balance issues → Dedicated Thursday balance sessions
+- If mental barriers → More visualization work
+- Timeline is INDIVIDUALIZED based on ALL factors
 ```
 
 **Progressive Plan (MULTIFACTORIAL PROGRESSION):**
@@ -1534,11 +1605,11 @@ PHASE 1: FOUNDATION (Weeks 1-12) - BUILD THE BASE
 ═══════════════════════════════════════════════════════
 
 Weeks 1-4: ESTABLISH ROUTINE
-🏃 Running: 30-35 km/week, all easy (6:30-6:45/km), 80% HR
-💪 Strength: 2-3x/week, focus on glute activation
+🏃 Running: 30-35 km/week, mix of easy + intervals + tempo (6:30-6:45/km easy), 80% HR
+💪 Strength: 3x/week, focus on glute activation, core, hip stability
 🧘 Mobility: DAILY 30 min (hip flexors, ankles PRIORITY)
-⚖️ Balance: Build from 15 sec → 30 sec eyes closed
-🧠 Mental: Begin visualization practice
+⚖️ Balance: Build from 15 sec → 30 sec eyes closed (integrated into strength)
+🧠 Mental: Begin visualization practice (5-10 min daily)
 📊 Metrics:
   - Plank: 45 sec → 60 sec
   - Single-leg squat: 5 reps → 8 reps
@@ -1546,11 +1617,11 @@ Weeks 1-4: ESTABLISH ROUTINE
   - Ankle ROM: 30° → 32-33°
 
 Weeks 5-8: STRENGTHEN THE FOUNDATION
-🏃 Running: 35-40 km/week, add weekly tempo (6:00/km)
-💪 Strength: 2x/week, progressive overload (+5% weight/reps)
+🏃 Running: 35-40 km/week, add weekly tempo (6:00/km) + intervals
+💪 Strength: 3x/week, progressive overload (+5% weight/reps)
 🧘 Mobility: DAILY 30-40 min (seeing improvements!)
 ⚖️ Balance: 30 sec → 45 sec eyes closed
-🧠 Mental: Pacing practice in long runs
+🧠 Mental: Pacing practice in long runs (check every 3 km)
 📊 Metrics:
   - Plank: 60 sec → 75 sec
   - Single-leg squat: 8 reps → 12 reps (getting stronger!)
@@ -1560,7 +1631,7 @@ Weeks 5-8: STRENGTHEN THE FOUNDATION
 
 Weeks 9-12: FOUNDATION SOLIDIFIES
 🏃 Running: 40-45 km/week, tempo pace improving (5:55/km)
-💪 Strength: 2x/week, glutes/core significantly stronger
+💪 Strength: 2-3x/week (can reduce to 2x as foundation solidifies), glutes/core significantly stronger
 🧘 Mobility: DAILY 30 min (maintain gains)
 ⚖️ Balance: 45 sec+ eyes closed, asymmetry improving
 🧠 Mental: Pacing discipline developing
