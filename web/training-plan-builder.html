@@ -1756,30 +1756,85 @@
       }
 
       // ============================================================================
-      // SAVE TO DATABASE
+      // SAVE TO DATABASE OR LOCAL STORAGE
       // ============================================================================
 
       async function savePlanToDatabase() {
         try {
-          const { data, error } = await supabaseClient
-            .from("training_plans")
-            .insert([
-              {
-                athlete_name: athleteData.name,
-                aisri_score: analysisResults.score,
-                risk_category: analysisResults.category,
-                pillar_scores: athleteData.pillars,
-                training_plan: trainingPlan,
-                created_at: new Date().toISOString(),
-              },
-            ]);
+          // Prepare plan data
+          const planData = {
+            athlete_id: athleteData.athleteId || `athlete_${Date.now()}`,
+            athlete_name: athleteData.name,
+            aisri_score: analysisResults.score,
+            risk_category: analysisResults.category,
+            training_phase: analysisResults.trainingPhase,
+            allowed_zones: analysisResults.allowedZones,
+            pillar_scores: athleteData.pillars,
+            training_plan: trainingPlan,
+            created_at: new Date().toISOString(),
+          };
 
-          if (error) throw error;
+          // Try saving to Supabase first
+          try {
+            const { data, error } = await supabaseClient
+              .from("training_plans")
+              .insert([planData]);
 
-          alert("Training plan saved successfully!");
+            if (error) {
+              // If table doesn't exist, fall back to localStorage
+              if (error.code === "PGRST205") {
+                console.warn(
+                  "⚠️ training_plans table not found, saving to localStorage",
+                );
+                savePlanLocally(planData);
+              } else {
+                throw error;
+              }
+            } else {
+              alert(
+                "✅ Training plan saved to database successfully!\n\nYou can access it anytime from your dashboard.",
+              );
+            }
+          } catch (dbError) {
+            console.error(
+              "Database save failed, using localStorage:",
+              dbError,
+            );
+            savePlanLocally(planData);
+          }
         } catch (error) {
           console.error("Error saving plan:", error);
-          alert("Failed to save plan. Please try again.");
+          alert(
+            "Failed to save plan. Plan has been saved locally in your browser.",
+          );
+        }
+      }
+
+      function savePlanLocally(planData) {
+        try {
+          // Get existing plans from localStorage
+          const existingPlans =
+            JSON.parse(localStorage.getItem("safestride_training_plans")) || [];
+
+          // Add new plan
+          existingPlans.push(planData);
+
+          // Save back to localStorage
+          localStorage.setItem(
+            "safestride_training_plans",
+            JSON.stringify(existingPlans),
+          );
+
+          alert(
+            "✅ Training plan saved locally!\n\n" +
+              "Note: This plan is stored in your browser. To save to the database:\n" +
+              "1. Open: https://supabase.com/dashboard/project/bdisppaxbvygsspcuymb/editor\n" +
+              "2. Run the SQL from: supabase/migrations/20260225_training_plans_table.sql\n\n" +
+              `📊 You have ${existingPlans.length} plan(s) saved locally.`,
+          );
+        } catch (error) {
+          console.error("localStorage save failed:", error);
+          alert("Failed to save plan. Please try downloading as PDF instead.");
         }
       }
 
