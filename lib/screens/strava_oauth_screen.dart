@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'strava_stats_screen.dart';
+import '../services/strava_session_service.dart';
 
 /// Result returned by [StravaOAuthScreen] on successful auth.
 class StravaAuthResult {
@@ -112,6 +113,8 @@ class _StravaOAuthScreenState extends State<StravaOAuthScreen> {
           athlete: data['athlete'] as Map<String, dynamic>,
           isNewUser: isNew,
         );
+        // Persist session for auto-login on next app start
+        await StravaSessionService.save(result);
         if (mounted) {
           // Navigate to stats screen — it will pop with the result when done
           final confirmed = await Navigator.push<StravaAuthResult>(

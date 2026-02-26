@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:app_links/app_links.dart';
 import 'services/auth_service.dart';
 import 'services/strava_service.dart';
+import 'services/strava_session_service.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/dashboard_screen.dart';
@@ -17,6 +18,7 @@ import 'screens/history_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/devices_screen.dart';
 import 'screens/strava_oauth_screen.dart';
+import 'screens/strava_home_dashboard.dart';
 import 'theme/app_theme.dart';
 import 'dart:developer' as developer;
 
@@ -28,7 +30,7 @@ void main() async {
 
   // 🌐 PRODUCTION SUPABASE
   final supabaseUrl =
-      dotenv.env['SUPABASE_URL'] ?? 'https://xzxnnswggwqtctcgpocr.supabase.co';
+      dotenv.env['SUPABASE_URL'] ?? 'https://bdisppaxbvygsspcuymb.supabase.co';
   final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'] ??
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6d25tc3dnZ3dxdGN0Y2dwb2NyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzc0NjczNDIsImV4cCI6MjA1MzA0MzM0Mn0.ztLLjbvhMDmFz-qPq2TLRCPflb2HM1QT0eC5IVHQ0Ss';
   await Supabase.initialize(
@@ -156,9 +158,20 @@ class _MyAppState extends State<MyApp> {
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.dark,
 
-      // Start at login for production flow
-      initialRoute: '/login',
+      // Start at splash — auto-detects Strava session or falls through to login
+      initialRoute: '/',
+      onGenerateRoute: (settings) {
+        switch (settings.name) {
+          case '/strava-home':
+            final session = settings.arguments as StravaAuthResult?;
+            return MaterialPageRoute(
+                builder: (_) => StravaHomeDashboard(session: session));
+          default:
+            return null;
+        }
+      },
       routes: {
+        '/': (context) => const _StravaAutoLoginSplash(),
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
         '/dashboard': (context) => const DashboardScreen(),
@@ -237,5 +250,53 @@ class _AuthCheckScreenState extends State<AuthCheckScreen> {
     } else {
       return const EvaluationFormScreen();
     }
+  }
+}
+
+/// Splash screen that checks for a saved Strava session on app start.
+/// Routes to /strava-home if session found, otherwise /login.
+class _StravaAutoLoginSplash extends StatefulWidget {
+  const _StravaAutoLoginSplash();
+
+  @override
+  State<_StravaAutoLoginSplash> createState() => _StravaAutoLoginSplashState();
+}
+
+class _StravaAutoLoginSplashState extends State<_StravaAutoLoginSplash> {
+  @override
+  void initState() {
+    super.initState();
+    _check();
+  }
+
+  Future<void> _check() async {
+    final hasSession = await StravaSessionService.hasSession();
+    if (!mounted) return;
+    if (hasSession) {
+      Navigator.pushReplacementNamed(context, '/strava-home');
+    } else {
+      Navigator.pushReplacementNamed(context, '/login');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      backgroundColor: Color(0xFF1A1A2E),
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircleAvatar(
+              radius: 40,
+              backgroundColor: Color(0xFFFC4C02),
+              child: Icon(Icons.directions_run, color: Colors.white, size: 40),
+            ),
+            SizedBox(height: 20),
+            CircularProgressIndicator(color: Color(0xFFFC4C02)),
+          ],
+        ),
+      ),
+    );
   }
 }

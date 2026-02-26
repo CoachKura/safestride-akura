@@ -3,6 +3,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'strava_oauth_screen.dart';
+import '../services/strava_session_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -86,6 +88,17 @@ class _LoginScreenState extends State<LoginScreen>
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
+  }
+
+  Future<void> _connectStrava() async {
+    final result = await Navigator.push<StravaAuthResult>(
+      context,
+      MaterialPageRoute(builder: (_) => const StravaOAuthScreen()),
+    );
+    if (result != null && mounted) {
+      await StravaSessionService.save(result);
+      Navigator.pushReplacementNamed(context, '/strava-home', arguments: result);
+    }
   }
 
   @override
@@ -286,8 +299,52 @@ class _LoginScreenState extends State<LoginScreen>
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ],                    const SizedBox(height: 24),
+
+                    // ── Strava connect ─────────────────────────────────────
+                    Container(
+                      constraints: const BoxConstraints(maxWidth: 400),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              const Expanded(child: Divider(color: Colors.white24)),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 12),
+                                child: Text('or',
+                                    style: GoogleFonts.inter(
+                                        color: Colors.white38, fontSize: 13)),
+                              ),
+                              const Expanded(child: Divider(color: Colors.white24)),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 56,
+                            child: ElevatedButton.icon(
+                              onPressed: _connectStrava,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFFFC4C02),
+                                foregroundColor: Colors.white,
+                                elevation: 8,
+                                shadowColor:
+                                    const Color(0xFFFC4C02).withValues(alpha: 0.4),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16)),
+                              ),
+                              icon: const Icon(Icons.directions_run, size: 22),
+                              label: Text(
+                                'Continue with Strava',
+                                style: GoogleFonts.inter(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),                  ),
                 ),
               ),
             ),
