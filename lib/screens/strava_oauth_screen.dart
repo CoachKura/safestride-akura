@@ -3,17 +3,24 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'strava_stats_screen.dart';
 
 /// Result returned by [StravaOAuthScreen] on successful auth.
 class StravaAuthResult {
   final String userId;
+  final String stravaAthleteId;
   final String accessToken;
+  final String refreshToken;
   final Map<String, dynamic> athlete;
+  final bool isNewUser;
 
   const StravaAuthResult({
     required this.userId,
+    required this.stravaAthleteId,
     required this.accessToken,
+    required this.refreshToken,
     required this.athlete,
+    this.isNewUser = true,
   });
 }
 
@@ -28,11 +35,11 @@ class _StravaOAuthScreenState extends State<StravaOAuthScreen> {
   late final WebViewController _controller;
   bool _loading = false;
   String _loadingMessage = 'Connecting to Strava…';
+  String _subMessage = '';
 
   // Production API — override via SAFESTRIDE_STRAVA_API_URL in .env
   static String get _apiUrl =>
-      dotenv.env['SAFESTRIDE_STRAVA_API_URL'] ??
-      'https://safestride-oauth.onrender.com';
+      dotenv.env['SAFESTRIDE_STRAVA_API_URL'] ?? 'https://api.akura.in';
 
   // Strava app has `www.akura.in` registered as callback domain
   static const String _redirectUri = 'https://www.akura.in/strava-callback';
@@ -79,6 +86,7 @@ class _StravaOAuthScreenState extends State<StravaOAuthScreen> {
     setState(() {
       _loading = true;
       _loadingMessage = 'Signing you in…';
+      _subMessage = 'Fetching your Strava profile';
     });
     try {
       final resp = await http.post(
@@ -89,12 +97,34 @@ class _StravaOAuthScreenState extends State<StravaOAuthScreen> {
 
       if (resp.statusCode == 200) {
         final data = jsonDecode(resp.body) as Map<String, dynamic>;
+        final isNew = data['is_new_user'] as bool? ?? true;
+        if (mounted)
+          setState(() {
+            _loadingMessage =
+                isNew ? 'Welcome to SafeStride!' : 'Welcome back!';
+            _subMessage = 'Loading your running stats…';
+          });
         final result = StravaAuthResult(
           userId: data['user_id'] as String,
+          stravaAthleteId: data['strava_athlete_id'] as String,
           accessToken: data['access_token'] as String,
+          refreshToken: data['refresh_token'] as String? ?? '',
           athlete: data['athlete'] as Map<String, dynamic>,
+          isNewUser: isNew,
         );
-        if (mounted) Navigator.pop(context, result);
+        if (mounted) {
+          // Navigate to stats screen — it will pop with the result when done
+          final confirmed = await Navigator.push<StravaAuthResult>(
+            context,
+            MaterialPageRoute(
+              builder: (_) => StravaStatsScreen(
+                result: result,
+                apiUrl: _apiUrl,
+              ),
+            ),
+          );
+          if (mounted) Navigator.pop(context, confirmed);
+        }
       } else {
         final detail = (jsonDecode(resp.body) as Map?)?['detail'] ?? resp.body;
         if (mounted) {
@@ -134,8 +164,19 @@ class _StravaOAuthScreenState extends State<StravaOAuthScreen> {
                     const SizedBox(height: 16),
                     Text(
                       _loadingMessage,
-                      style: const TextStyle(color: Colors.white, fontSize: 16),
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
                     ),
+                    if (_subMessage.isNotEmpty) ...[
+                      const SizedBox(height: 6),
+                      Text(
+                        _subMessage,
+                        style: const TextStyle(
+                            color: Colors.white70, fontSize: 13),
+                      ),
+                    ],
                   ],
                 ),
               ),

@@ -65,9 +65,12 @@ class SyncActivitiesRequest(BaseModel):
 
 class StravaSignupResponse(BaseModel):
     user_id: str
+    strava_athlete_id: str
     access_token: str
+    refresh_token: str
     athlete: dict
     message: str
+    is_new_user: bool = True
     activities_synced: Optional[int] = None
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
@@ -257,6 +260,14 @@ async def strava_signup(request: StravaSignupRequest, background_tasks: Backgrou
             athlete_id          = strava_athlete.get('id')
             placeholder_email   = f"strava_{athlete_id}@strava.safestride.app"
 
+            # ── Step 1b: Check if athlete already exists (returning user) ──
+            existing_resp = await client.get(
+                f'{SUPABASE_URL}/rest/v1/profiles',
+                headers=_supabase_headers(),
+                params={'strava_athlete_id': f'eq.{athlete_id}', 'select': 'id'}
+            )
+            is_new_user = not (existing_resp.status_code == 200 and existing_resp.json())
+
             # ── Step 2: Upsert profile ──────────────────────────────────────
             profile_data = {
                 'email':                    placeholder_email,
@@ -296,11 +307,19 @@ async def strava_signup(request: StravaSignupRequest, background_tasks: Backgrou
                 sync_activities_background, str(athlete_id), strava_access_token
             )
 
+            msg = (
+                "Welcome to SafeStride! Profile created and Strava connected. Syncing activities…"
+                if is_new_user else
+                "Welcome back! Tokens refreshed and activities re-syncing…"
+            )
             return StravaSignupResponse(
                 user_id=str(user_id),
+                strava_athlete_id=str(athlete_id),
                 access_token=strava_access_token,
+                refresh_token=token_data.get('refresh_token', ''),
                 athlete=strava_athlete,
-                message="Sign up successful! Profile created and Strava connected. Activities syncing in background.",
+                message=msg,
+                is_new_user=is_new_user,
             )
 
     except HTTPException:
