@@ -16,9 +16,9 @@ class StravaService {
   // Redirect URIs with environment and platform-aware defaults
   // Prefer explicit env vars; fall back to Supabase auth callback to match Strava config
   static final String _redirectWeb = dotenv.env['STRAVA_REDIRECT_URI_WEB'] ??
-      'https://xzxnnswggwqtctcgpocr.supabase.co/auth/v1/callback';
+      'https://bdisppaxbvygsspcuymb.supabase.co/auth/v1/callback';
   static final String _redirectApp = dotenv.env['STRAVA_REDIRECT_URI_APP'] ??
-      'https://xzxnnswggwqtctcgpocr.supabase.co/auth/v1/callback';
+      'https://bdisppaxbvygsspcuymb.supabase.co/auth/v1/callback';
   static final String redirectUri = (() {
     final explicit = dotenv.env['STRAVA_REDIRECT_URI'];
     if (explicit != null && explicit.isNotEmpty) return explicit;
