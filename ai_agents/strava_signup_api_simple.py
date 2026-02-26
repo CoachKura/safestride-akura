@@ -14,7 +14,7 @@ except ImportError:
     import legacy_cgi as cgi
     sys.modules['cgi'] = cgi
 
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi import FastAPI, HTTPException, BackgroundTasks, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
@@ -30,6 +30,9 @@ load_dotenv()
 
 app = FastAPI(title="SafeStride Strava API")
 
+# Router for including in other FastAPI apps (e.g. main.py / api.akura.in)
+strava_router = APIRouter()
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -42,7 +45,11 @@ app.add_middleware(
 STRAVA_CLIENT_ID     = os.getenv('STRAVA_CLIENT_ID', '162971')
 STRAVA_CLIENT_SECRET = os.getenv('STRAVA_CLIENT_SECRET', '')
 SUPABASE_URL         = os.getenv('SUPABASE_URL', '')
-SUPABASE_SERVICE_KEY = os.getenv('SUPABASE_SERVICE_ROLE_KEY', '')
+SUPABASE_SERVICE_KEY = (
+    os.getenv('SUPABASE_SERVICE_ROLE_KEY')
+    or os.getenv('SUPABASE_SERVICE_KEY')
+    or ''
+)
 PORT                 = int(os.getenv('PORT', '8002'))  # Render sets PORT automatically
 
 STRAVA_TOKEN_URL      = 'https://www.strava.com/oauth/token'
@@ -225,6 +232,7 @@ def root():
 def health():
     return {"status": "healthy", "timestamp": str(datetime.utcnow())}
 
+@strava_router.post("/api/strava-signup", response_model=StravaSignupResponse)
 @app.post("/api/strava-signup", response_model=StravaSignupResponse)
 async def strava_signup(request: StravaSignupRequest, background_tasks: BackgroundTasks):
     """Exchange Strava auth code, upsert profile, then sync activities in background."""
@@ -303,6 +311,7 @@ async def strava_signup(request: StravaSignupRequest, background_tasks: Backgrou
         raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
 
 
+@strava_router.post("/api/strava-sync-activities")
 @app.post("/api/strava-sync-activities")
 async def manual_sync(request: SyncActivitiesRequest):
     """Manually trigger a full activity sync for an athlete."""
@@ -313,6 +322,7 @@ async def manual_sync(request: SyncActivitiesRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@strava_router.get("/api/athlete-stats/{strava_athlete_id}")
 @app.get("/api/athlete-stats/{strava_athlete_id}")
 async def athlete_stats(strava_athlete_id: str):
     """Return profile stats and PBs for display after sync."""

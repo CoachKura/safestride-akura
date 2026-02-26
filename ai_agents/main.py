@@ -7,6 +7,14 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
+# Strava OAuth signup & activity sync routes
+try:
+    from strava_signup_api_simple import strava_router
+    _STRAVA_ROUTER_OK = True
+except Exception as _e:
+    strava_router = None
+    _STRAVA_ROUTER_OK = False
+
 # Load environment variables only if .env files exist (for local development)
 # On production (Render), environment variables are injected directly
 _HERE = os.path.dirname(os.path.abspath(__file__))
@@ -51,6 +59,10 @@ app.add_middleware(
     allow_methods=["*"],  # Allow all HTTP methods
     allow_headers=["*"],  # Allow all headers
 )
+
+# Mount Strava OAuth & activity sync routes onto this app
+if strava_router:
+    app.include_router(strava_router)
 
 
 class CommanderRequest(BaseModel):

@@ -63,29 +63,8 @@ services:
       - key: API_PORT
         value: 8001
   
-  # SafeStride OAuth - Strava authorization flow + activity sync
-  - type: web
-    name: safestride-oauth
-    runtime: python
-    region: oregon
-    plan: starter
-    branch: main
-    rootDir: ai_agents
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn strava_signup_api_simple:app --host 0.0.0.0 --port $PORT
-    healthCheckPath: /health
-    autoDeploy: true
-    envVars:
-      - key: PYTHONUNBUFFERED
-        value: 1
-      - key: SUPABASE_URL
-        sync: false
-      - key: SUPABASE_SERVICE_ROLE_KEY
-        sync: false
-      - key: STRAVA_CLIENT_ID
-        sync: false
-      - key: STRAVA_CLIENT_SECRET
-        sync: false
+  # SafeStride OAuth routes now served by aisri-ai-engine (api.akura.in)
+  # safestride-oauth service removed - no longer needed
 
   # ===================================================================
   # AISRi Services (Existing)
@@ -113,6 +92,12 @@ services:
       - key: SUPABASE_ANON_KEY
         sync: false
       - key: OPENAI_API_KEY
+        sync: false
+      - key: STRAVA_CLIENT_ID
+        sync: false
+      - key: STRAVA_CLIENT_SECRET
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
         sync: false
 
   # AISRi Communication V2 - Telegram bot and communication layer
