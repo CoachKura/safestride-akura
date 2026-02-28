@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../screens/strava_oauth_screen.dart';
 import '../screens/strava_training_plan_screen.dart';
 import '../services/strava_session_service.dart';
@@ -46,18 +47,22 @@ class _StravaHomeDashboardState extends State<StravaHomeDashboard> {
         _session = saved;
         _loadStats();
       } else {
-        // No session — send to login
-        if (mounted) Navigator.pushReplacementNamed(context, '/login');
+        // No Strava session - show connect prompt (don't redirect to login anymore)
+        setState(() => _loading = false);
       }
     }
   }
 
   Future<void> _loadStats({bool silent = false}) async {
+    if (_session == null) {
+      setState(() => _loading = false);
+      return;
+    }
     if (!silent) setState(() => _loading = true);
     try {
       final resp = await http.get(
         Uri.parse(
-            '$_apiUrl/api/athlete-stats/${widget.session.stravaAthleteId}'),
+            '$_apiUrl/api/athlete-stats/${_session?.stravaAthleteId ?? ""}'),
       );
       if (resp.statusCode == 200 && mounted) {
         setState(() => _stats = jsonDecode(resp.body) as Map<String, dynamic>);
@@ -94,7 +99,7 @@ class _StravaHomeDashboardState extends State<StravaHomeDashboard> {
       builder: (_) => AlertDialog(
         backgroundColor: _card,
         title: const Text('Sign Out', style: TextStyle(color: Colors.white)),
-        content: const Text('Disconnect Strava and return to login?',
+        content: const Text('Sign out and return to login?',
             style: TextStyle(color: Colors.white70)),
         actions: [
           TextButton(
@@ -111,6 +116,7 @@ class _StravaHomeDashboardState extends State<StravaHomeDashboard> {
     );
     if (confirm == true) {
       await StravaSessionService.clear();
+      await Supabase.instance.client.auth.signOut();
       if (mounted) Navigator.pushReplacementNamed(context, '/login');
     }
   }
@@ -216,6 +222,92 @@ class _StravaHomeDashboardState extends State<StravaHomeDashboard> {
 
   @override
   Widget build(BuildContext context) {
+    // If loading, show loading indicator
+    if (_loading) {
+      return const Scaffold(
+        backgroundColor: _dark,
+        body: Center(
+          child: CircularProgressIndicator(color: _orange),
+        ),
+      );
+    }
+
+    // If no Strava session, show connect prompt
+    if (_session == null) {
+      return Scaffold(
+        backgroundColor: _dark,
+        appBar: AppBar(
+          backgroundColor: _orange,
+          title: const Text('SafeStride Dashboard'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.logout, color: Colors.white),
+              tooltip: 'Sign Out',
+              onPressed: _signOut,
+            ),
+          ],
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(32.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.directions_run, size: 80, color: _orange),
+                const SizedBox(height: 24),
+                const Text(
+                  'Connect with Strava',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Link your Strava account to access training analytics, AISRI assessment, and personalized coaching.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white70, fontSize: 14),
+                ),
+                const SizedBox(height: 32),
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    final result = await Navigator.push<StravaAuthResult>(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const StravaOAuthScreen()),
+                    );
+                    if (result != null && mounted) {
+                      await StravaSessionService.save(result);
+                      setState(() {
+                        _session = result;
+                        _loading = true;
+                      });
+                      _loadStats();
+                    }
+                  },
+                  icon: const Icon(Icons.link),
+                  label: const Text('Connect Strava'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _orange,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 16,
+                    ),
+                    textStyle: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     final athlete = _session?.athlete ?? {};
     final name = [athlete['firstname'], athlete['lastname']]
         .where((e) => e != null && (e as String).isNotEmpty)
@@ -361,32 +453,22 @@ class _StravaHomeDashboardState extends State<StravaHomeDashboard> {
                           crossAxisSpacing: 8,
                           children: [
                             _quickAction(
-                                'Start\nRun', Icons.play_circle_filled, _accent,
-                                () {
-                              Navigator.pushNamed(context, '/start_run');
-                            }),
-                            _quickAction(
                                 'Training\nPlan', Icons.calendar_today, _orange,
                                 () {
-                              if (_stats != null) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => StravaTrainingPlanScreen(
-                                      stats: _stats!,
-                                    ),
-                                  ),
-                                );
-                              }
+                              Navigator.pushNamed(context, '/calendar');
                             }),
                             _quickAction(
                                 'History', Icons.bar_chart, Colors.purpleAccent,
                                 () {
-                              Navigator.pushNamed(context, '/history');
+                              Navigator.pushNamed(context, '/run-history');
                             }),
                             _quickAction('Profile', Icons.person_outline,
                                 Colors.blueAccent, () {
                               Navigator.pushNamed(context, '/profile');
+                            }),
+                            _quickAction('Analytics', Icons.analytics_outlined,
+                                Colors.teal, () {
+                              Navigator.pushNamed(context, '/analytics');
                             }),
                           ],
                         ),
@@ -491,13 +573,13 @@ class _StravaHomeDashboardState extends State<StravaHomeDashboard> {
 
                         const SizedBox(height: 32),
 
-                        // ── Full dashboard link ───────────────────────────
+                        // ── Analytics link ───────────────────────────
                         OutlinedButton.icon(
                           onPressed: () =>
-                              Navigator.pushNamed(context, '/dashboard'),
+                              Navigator.pushNamed(context, '/analytics'),
                           icon: const Icon(Icons.analytics_outlined,
                               color: _accent),
-                          label: const Text('Open AI Coach Dashboard',
+                          label: const Text('View Analytics Dashboard',
                               style: TextStyle(color: _accent)),
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(color: _accent),

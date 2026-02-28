@@ -25,9 +25,9 @@ concurrency:
 
 # Environment variables
 env:
-  PYTHON_VERSION: '3.13'
-  FLUTTER_VERSION: '3.16.0'
-  JAVA_VERSION: '17'
+  PYTHON_VERSION: "3.13"
+  FLUTTER_VERSION: "3.16.0"
+  JAVA_VERSION: "17"
 
 jobs:
   # ===================================================================
@@ -36,24 +36,24 @@ jobs:
   test-backend:
     name: Test Python Backend
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Set up Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-          cache: 'pip'
-      
+          cache: "pip"
+
       - name: Install dependencies
         working-directory: ./ai_agents
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest pytest-cov pytest-asyncio
-      
+
       - name: Run unit tests
         working-directory: ./ai_agents
         env:
@@ -61,7 +61,7 @@ jobs:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
         run: |
           pytest test_database_integration.py -v --cov --cov-report=xml
-      
+
       - name: Run integration tests
         working-directory: ./ai_agents
         env:
@@ -69,26 +69,26 @@ jobs:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
         run: |
           python integration_test.py
-      
+
       - name: Upload coverage reports
         uses: codecov/codecov-action@v3
         with:
           files: ./ai_agents/coverage.xml
           flags: backend
-  
+
   # ===================================================================
   # Job 2: Deploy to Render (Backend)
   # ===================================================================
   deploy-backend:
     name: Deploy Backend to Render
     runs-on: ubuntu-latest
-    needs: test-backend  # Only deploy if tests pass
-    if: github.ref == 'refs/heads/main'  # Only on main branch
-    
+    needs: test-backend # Only deploy if tests pass
+    if: github.ref == 'refs/heads/main' # Only on main branch
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Deploy to Render
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
@@ -99,24 +99,24 @@ jobs:
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer $RENDER_API_KEY" \
             -d '{"clearCache": false}'
-          
+
           curl -X POST "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID_WEBHOOKS }}/deploys" \
             -H "Accept: application/json" \
             -H "Authorization: Bearer $RENDER_API_KEY"
-          
+
           curl -X POST "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID_OAUTH }}/deploys" \
             -H "Accept: application/json" \
             -H "Authorization: Bearer $RENDER_API_KEY"
-      
+
       - name: Wait for deployment
-        run: sleep 60  # Wait for services to start
-      
+        run: sleep 60 # Wait for services to start
+
       - name: Verify API health
         run: |
           curl -f https://safestride-api.onrender.com/health || exit 1
           curl -f https://safestride-webhooks.onrender.com/health || exit 1
           curl -f https://safestride-oauth.onrender.com/health || exit 1
-      
+
       - name: Notify deployment success
         if: success()
         run: |
@@ -124,45 +124,45 @@ jobs:
           echo "API: https://safestride-api.onrender.com"
           echo "Webhooks: https://safestride-webhooks.onrender.com"
           echo "OAuth: https://safestride-oauth.onrender.com"
-  
+
   # ===================================================================
   # Job 3: Build Flutter App (Android)
   # ===================================================================
   build-android:
     name: Build Android App
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Set up Java ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
+          distribution: "zulu"
           java-version: ${{ env.JAVA_VERSION }}
-      
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: 'stable'
+          channel: "stable"
           cache: true
-      
+
       - name: Install dependencies
         run: |
           flutter pub get
           flutter doctor -v
-      
+
       - name: Run Flutter tests
         run: flutter test
-      
+
       - name: Decode keystore
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: |
           echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/app/keystore.jks
-      
+
       - name: Create key.properties
         env:
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -175,53 +175,53 @@ jobs:
           keyAlias=$KEY_ALIAS
           storeFile=keystore.jks
           EOF
-      
+
       - name: Build App Bundle
         run: flutter build appbundle --release
-      
+
       - name: Upload AAB artifact
         uses: actions/upload-artifact@v4
         with:
           name: android-release-bundle
           path: build/app/outputs/bundle/release/app-release.aab
           retention-days: 30
-      
+
       - name: Build APKs (split by ABI)
         run: flutter build apk --release --split-per-abi
-      
+
       - name: Upload APK artifacts
         uses: actions/upload-artifact@v4
         with:
           name: android-release-apks
           path: build/app/outputs/flutter-apk/*.apk
           retention-days: 30
-  
+
   # ===================================================================
   # Job 4: Build Flutter App (iOS)
   # ===================================================================
   build-ios:
     name: Build iOS App
     runs-on: macos-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: 'stable'
+          channel: "stable"
           cache: true
-      
+
       - name: Install dependencies
         run: |
           flutter pub get
           cd ios && pod install --repo-update
-      
+
       - name: Run Flutter tests
         run: flutter test
-      
+
       - name: Import certificates
         env:
           IOS_CERTIFICATE_BASE64: ${{ secrets.IOS_CERTIFICATE_BASE64 }}
@@ -232,20 +232,20 @@ jobs:
           security default-keychain -s build.keychain
           security unlock-keychain -p "" build.keychain
           security set-keychain-settings -t 3600 -l build.keychain
-          
+
           # Import certificate
           echo "$IOS_CERTIFICATE_BASE64" | base64 --decode > certificate.p12
           security import certificate.p12 -k build.keychain -P "$IOS_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
-          
+
           # Import provisioning profile
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           echo "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
-      
+
       - name: Build iOS app
         run: |
           flutter build ios --release --no-codesign
-      
+
       - name: Build IPA (with signing)
         run: |
           cd ios
@@ -255,19 +255,19 @@ jobs:
             -configuration Release \
             -archivePath $PWD/build/Runner.xcarchive \
             clean archive
-          
+
           xcodebuild -exportArchive \
             -archivePath $PWD/build/Runner.xcarchive \
             -exportOptionsPlist ExportOptions.plist \
             -exportPath $PWD/build/Runner.ipa
-      
+
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
         with:
           name: ios-release-ipa
           path: ios/build/Runner.ipa/*.ipa
           retention-days: 30
-  
+
   # ===================================================================
   # Job 5: Deploy to App Stores (Manual Trigger)
   # ===================================================================
@@ -276,28 +276,28 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build-android, build-ios]
     if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
-    
+
     steps:
       - name: Download Android AAB
         uses: actions/download-artifact@v4
         with:
           name: android-release-bundle
-      
+
       - name: Deploy to Google Play Console
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}
           packageName: com.safestride.app
           releaseFiles: app-release.aab
-          track: internal  # Options: internal, alpha, beta, production
+          track: internal # Options: internal, alpha, beta, production
           status: completed
           whatsNewDirectory: fastlane/metadata/android/en-US/changelogs
-      
+
       - name: Download iOS IPA
         uses: actions/download-artifact@v4
         with:
           name: ios-release-ipa
-      
+
       - name: Deploy to TestFlight
         env:
           APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
@@ -305,13 +305,13 @@ jobs:
           APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
         run: |
           echo "$APPLE_API_KEY_BASE64" | base64 --decode > AuthKey.p8
-          
+
           xcrun altool --upload-app \
             --type ios \
             --file *.ipa \
             --apiKey $APPLE_API_KEY_ID \
             --apiIssuer $APPLE_API_ISSUER_ID
-  
+
   # ===================================================================
   # Job 6: Smoke Tests (Post-Deployment)
   # ===================================================================
@@ -320,33 +320,33 @@ jobs:
     runs-on: ubuntu-latest
     needs: deploy-backend
     if: github.ref == 'refs/heads/main'
-    
+
     steps:
       - name: Test Main API
         run: |
           # Health check
           curl -f https://safestride-api.onrender.com/health
-          
+
           # Test signup endpoint
           response=$(curl -s -X POST https://safestride-api.onrender.com/athletes/signup \
             -H "Content-Type: application/json" \
             -d '{"name":"Test User","age":30,"gender":"M","weight_kg":70,"height_cm":175,"email":"test@example.com"}')
-          
+
           echo "Signup response: $response"
-          
+
           # Verify response contains athlete_id
           echo "$response" | grep -q "athlete_id" || exit 1
-      
+
       - name: Test Strava OAuth
         run: |
           # Test OAuth initiate
           response=$(curl -s "https://safestride-oauth.onrender.com/strava/connect?athlete_id=test-123")
-          
+
           echo "OAuth response: $response"
-          
+
           # Verify response contains authorize_url
           echo "$response" | grep -q "authorize_url" || exit 1
-      
+
       - name: Notify success
         if: success()
         run: |

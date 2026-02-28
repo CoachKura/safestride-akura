@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Adaptive Timeline Calculator - SafeStride</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  </head>
+  <body class="bg-gray-900 text-white">
+    <div class="container mx-auto px-4 py-8">
+      <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+          <h1 class="text-4xl font-bold mb-4">
+            🎯 Adaptive Timeline Calculator Test
+          </h1>
+          <p class="text-gray-400">
+            Test how the calculator generates personalized timelines to 3:30/km
+          </p>
+        </div>
+
+        <!-- Test Scenarios -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <!-- Beginner -->
+          <div
+            class="bg-blue-900 bg-opacity-50 border border-blue-700 rounded-lg p-6 flex flex-col"
+          >
+            <h3 class="text-2xl font-bold mb-4 text-blue-400">🐣 Beginner</h3>
+            <div class="space-y-2 text-sm mb-4 flex-grow">
+              <p>
+                <span class="text-gray-400">Current Pace:</span>
+                <span class="font-bold">11:00/km</span>
+              </p>
+              <p>
+                <span class="text-gray-400">Weekly Mileage:</span>
+                <span class="font-bold">10 km</span>
+              </p>
+              <p>
+                <span class="text-gray-400">AISRI Score:</span>
+                <span class="font-bold">42</span>
+              </p>
+            </div>
+            <button
+              onclick="testBeginner()"
+              class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-auto"
+            >
+              Calculate Timeline
+            </button>
+            <div
+              id="beginner-result"
+              class="mt-4 text-center text-lg font-bold text-blue-400 min-h-[60px]"
+            ></div>
+          </div>
+
+          <!-- Intermediate -->
+          <div
+            class="bg-green-900 bg-opacity-50 border border-green-700 rounded-lg p-6 flex flex-col"
+          >
+            <h3 class="text-2xl font-bold mb-4 text-green-400">
+              🏃 Intermediate
+            </h3>
+            <div class="space-y-2 text-sm mb-4 flex-grow">
+              <p>
+                <span class="text-gray-400">Current Pace:</span>
+                <span class="font-bold">6:00/km</span>
+              </p>
+              <p>
+                <span class="text-gray-400">Weekly Mileage:</span>
+                <span class="font-bold">35 km</span>
+              </p>
+              <p>
+                <span class="text-gray-400">AISRI Score:</span>
+                <span class="font-bold">58</span>
+              </p>
+            </div>
+            <button
+              onclick="testIntermediate()"
+              class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-auto"
+            >
+              Calculate Timeline
+            </button>
+            <div
+              id="intermediate-result"
+              class="mt-4 text-center text-lg font-bold text-green-400 min-h-[60px]"
+            ></div>
+          </div>
+
+          <!-- Advanced -->
+          <div
+            class="bg-purple-900 bg-opacity-50 border border-purple-700 rounded-lg p-6 flex flex-col"
+          >
+            <h3 class="text-2xl font-bold mb-4 text-purple-400">⚡ Advanced</h3>
+            <div class="space-y-2 text-sm mb-4 flex-grow">
+              <p>
+                <span class="text-gray-400">Current Pace:</span>
+                <span class="font-bold">4:30/km</span>
+              </p>
+              <p>
+                <span class="text-gray-400">Weekly Mileage:</span>
+                <span class="font-bold">65 km</span>
+              </p>
+              <p>
+                <span class="text-gray-400">AISRI Score:</span>
+                <span class="font-bold">78</span>
+              </p>
+            </div>
+            <button
+              onclick="testAdvanced()"
+              class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded mt-auto"
+            >
+              Calculate Timeline
+            </button>
+            <div
+              id="advanced-result"
+              class="mt-4 text-center text-lg font-bold text-purple-400 min-h-[60px]"
+            ></div>
+          </div>
+        </div>
+
+        <!-- Custom Test -->
+        <div class="bg-gray-800 rounded-lg p-6 mb-8">
+          <h3 class="text-2xl font-bold mb-4 text-amber-400">🔧 Custom Test</h3>
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+            <div>
+              <label class="block text-sm text-gray-400 mb-2"
+                >Current Pace (min/km)</label
+              >
+              <input
+                type="number"
+                id="customPace"
+                value="7.5"
+                step="0.5"
+                min="3.5"
+                max="15"
+                class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white"
+              />
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2"
+                >Weekly Mileage (km)</label
+              >
+              <input
+                type="number"
+                id="customMileage"
+                value="25"
+                step="5"
+                min="0"
+                max="150"
+                class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white"
+              />
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2"
+                >AISRI Score</label
+              >
+              <input
+                type="number"
+                id="customAISRI"
+                value="50"
+                step="1"
+                min="0"
+                max="100"
+                class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white"
+              />
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-2"
+                >Experience Level</label
+              >
+              <select
+                id="customExperience"
+                class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white"
+              >
+                <option value="beginner">Beginner</option>
+                <option value="intermediate" selected>Intermediate</option>
+                <option value="advanced">Advanced</option>
+                <option value="elite">Elite</option>
+              </select>
+            </div>
+          </div>
+          <button
+            onclick="testCustom()"
+            class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-4 rounded"
+          >
+            Calculate Custom Timeline
+          </button>
+          <div
+            id="custom-result"
+            class="mt-4 text-center text-lg font-bold text-amber-400"
+          ></div>
+        </div>
+
+        <!-- Results Display -->
+        <div id="detailed-results" class="bg-gray-800 rounded-lg p-6 hidden">
+          <h3 class="text-2xl font-bold mb-4">📊 Detailed Results</h3>
+          <div id="results-content"></div>
+        </div>
+
+        <!-- Documentation Link -->
+        <div class="text-center mt-8">
+          <a
+            href="http://localhost:3001"
+            class="text-blue-400 hover:text-blue-300 underline"
+          >
+            ← Back to SafeStride App
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Calculator Logic (JavaScript version for web testing)
+      const GOAL_PACE = 3.5; // 3:30/km
+      const GOAL_AISRI = 75;
+
+      function getWeeklyPaceImprovement(aisriScore) {
+        if (aisriScore >= 75) return 0.15;
+        if (aisriScore >= 60) return 0.1;
+        if (aisriScore >= 45) return 0.07;
+        return 0.05;
+      }
+
+      function getGoalMileage(experienceLevel) {
+        const mileageMap = {
+          beginner: 40,
+          intermediate: 60,
+          advanced: 80,
+          elite: 100,
+        };
+        return mileageMap[experienceLevel] || 60;
+      }
+
+      function calculateMileageWeeks(current, goal) {
+        if (current >= goal) return 0;
+        let weeks = 0;
+        let mileage = current;
+        while (mileage < goal && weeks < 52) {
+          mileage *= 1.1; // 10% increase
+          weeks++;
+        }
+        return weeks;
+      }
+
+      function calculateTimeline(
+        currentPace,
+        currentMileage,
+        aisriScore,
+        experienceLevel,
+      ) {
+        // 1. Calculate pace improvement weeks
+        const paceImprovement = currentPace - GOAL_PACE;
+        const weeklyImprovement = getWeeklyPaceImprovement(aisriScore);
+        const paceWeeks = Math.ceil(paceImprovement / weeklyImprovement);
+
+        // 2. Calculate AISRI improvement weeks
+        const aisriWeeks =
+          aisriScore < GOAL_AISRI
+            ? Math.ceil((GOAL_AISRI - aisriScore) / 2)
+            : 0;
+
+        // 3. Calculate mileage build weeks
+        const goalMileage = getGoalMileage(experienceLevel);
+        const mileageWeeks = calculateMileageWeeks(currentMileage, goalMileage);
+
+        // 4. Total weeks = max of all constraints
+        const totalWeeks = Math.max(paceWeeks, aisriWeeks, mileageWeeks);
+        const months = Math.ceil(totalWeeks / 4.33);
+
+        return {
+          totalWeeks,
+          months,
+          paceWeeks,
+          aisriWeeks,
+          mileageWeeks,
+          startPace: currentPace,
+          goalPace: GOAL_PACE,
+          startMileage: currentMileage,
+          goalMileage,
+          startAISRI: aisriScore,
+          goalAISRI: GOAL_AISRI,
+          weeklyImprovement,
+          paceImprovement,
+        };
+      }
+
+      function formatPace(pace) {
+        const minutes = Math.floor(pace);
+        const seconds = Math.round((pace - minutes) * 60);
+        return `${minutes}:${seconds.toString().padStart(2, "0")}/km`;
+      }
+
+      function displayResult(result, elementId) {
+        const element = document.getElementById(elementId);
+        element.innerHTML = `
+                <div class="space-y-2">
+                    <div class="text-2xl">⏱️ ${result.totalWeeks} weeks</div>
+                    <div class="text-sm text-gray-400">(${result.months} months)</div>
+                </div>
+            `;
+
+        showDetailedResults(result);
+      }
+
+      function showDetailedResults(result) {
+        const detailedDiv = document.getElementById("detailed-results");
+        const contentDiv = document.getElementById("results-content");
+
+        contentDiv.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Summary Stats -->
+                    <div class="space-y-4">
+                        <h4 class="text-xl font-bold text-amber-400 mb-3">📈 Journey Summary</h4>
+                        <div class="bg-gray-700 rounded p-4">
+                            <p class="text-gray-400 text-sm">Timeline</p>
+                            <p class="text-2xl font-bold">${result.totalWeeks} weeks (${result.months} months)</p>
+                        </div>
+                        <div class="bg-gray-700 rounded p-4">
+                            <p class="text-gray-400 text-sm">Pace Journey</p>
+                            <p class="text-xl font-bold">${formatPace(result.startPace)} → 3:30/km</p>
+                            <p class="text-sm text-green-400">Improve ${formatPace(result.paceImprovement)}</p>
+                        </div>
+                        <div class="bg-gray-700 rounded p-4">
+                            <p class="text-gray-400 text-sm">Mileage Build</p>
+                            <p class="text-xl font-bold">${result.startMileage.toFixed(0)} → ${result.goalMileage.toFixed(0)} km/week</p>
+                            <p class="text-sm text-blue-400">Max 10% weekly increase</p>
+                        </div>
+                        <div class="bg-gray-700 rounded p-4">
+                            <p class="text-gray-400 text-sm">AISRI Journey</p>
+                            <p class="text-xl font-bold">${result.startAISRI} → ${result.goalAISRI}+</p>
+                            <p class="text-sm text-purple-400">~2 points per week</p>
+                        </div>
+                    </div>
+
+                    <!-- Week Breakdown -->
+                    <div class="space-y-4">
+                        <h4 class="text-xl font-bold text-amber-400 mb-3">📅 Constraint Analysis</h4>
+                        <div class="bg-gray-700 rounded p-4">
+                            <p class="text-sm text-gray-400">Pace Improvement Constraint</p>
+                            <div class="flex items-center justify-between mt-2">
+                                <span class="font-bold">${result.paceWeeks} weeks</span>
+                                <span class="text-xs text-gray-400">${formatPace(result.weeklyImprovement)}/week</span>
+                            </div>
+                            <div class="w-full bg-gray-600 rounded-full h-2 mt-2">
+                                <div class="bg-blue-500 h-2 rounded-full" style="width: ${((result.paceWeeks / result.totalWeeks) * 100).toFixed(0)}%"></div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-700 rounded p-4">
+                            <p class="text-sm text-gray-400">Mileage Build Constraint</p>
+                            <div class="flex items-center justify-between mt-2">
+                                <span class="font-bold">${result.mileageWeeks} weeks</span>
+                                <span class="text-xs text-gray-400">+${((result.goalMileage / result.startMileage - 1) * 100).toFixed(0)}% total</span>
+                            </div>
+                            <div class="w-full bg-gray-600 rounded-full h-2 mt-2">
+                                <div class="bg-green-500 h-2 rounded-full" style="width: ${((result.mileageWeeks / result.totalWeeks) * 100).toFixed(0)}%"></div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-700 rounded p-4">
+                            <p class="text-sm text-gray-400">AISRI Improvement Constraint</p>
+                            <div class="flex items-center justify-between mt-2">
+                                <span class="font-bold">${result.aisriWeeks} weeks</span>
+                                <span class="text-xs text-gray-400">+${result.goalAISRI - result.startAISRI} points needed</span>
+                            </div>
+                            <div class="w-full bg-gray-600 rounded-full h-2 mt-2">
+                                <div class="bg-purple-500 h-2 rounded-full" style="width: ${((result.aisriWeeks / result.totalWeeks) * 100).toFixed(0)}%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Final Timeline -->
+                        <div class="bg-amber-900 bg-opacity-50 border border-amber-700 rounded p-4">
+                            <p class="text-sm text-amber-400 mb-2">⚡ Total Timeline (max constraint)</p>
+                            <p class="text-3xl font-bold text-amber-400">${result.totalWeeks} weeks</p>
+                            <p class="text-xs text-gray-400 mt-2">
+                                ${
+                                  result.totalWeeks === result.paceWeeks
+                                    ? "✓ Limited by pace improvement"
+                                    : result.totalWeeks === result.mileageWeeks
+                                      ? "✓ Limited by mileage build"
+                                      : result.totalWeeks === result.aisriWeeks
+                                        ? "✓ Limited by AISRI improvement"
+                                        : "✓ Calculated"
+                                }
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Key Insights -->
+                <div class="mt-6 p-4 bg-blue-900 bg-opacity-30 border border-blue-700 rounded">
+                    <h4 class="font-bold text-blue-400 mb-2">💡 Key Insights</h4>
+                    <ul class="text-sm space-y-1 text-gray-300">
+                        <li>• Weekly pace improvement: ${formatPace(result.weeklyImprovement)} (based on AISRI ${result.startAISRI})</li>
+                        <li>• Safe mileage progression: Max 10% per week</li>
+                        <li>• AISRI will improve ~2 points per week with proper protocols</li>
+                        <li>• ${result.totalWeeks > 26 ? "Long-term commitment ensures sustainable progress" : "Accelerated timeline possible with current fitness"}</li>
+                    </ul>
+                </div>
+            `;
+
+        detailedDiv.classList.remove("hidden");
+        setTimeout(() => {
+          detailedDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }, 100);
+      }
+
+      // Test Functions
+      function testBeginner() {
+        const result = calculateTimeline(11.0, 10, 42, "beginner");
+        displayResult(result, "beginner-result");
+      }
+
+      function testIntermediate() {
+        const result = calculateTimeline(6.0, 35, 58, "intermediate");
+        displayResult(result, "intermediate-result");
+      }
+
+      function testAdvanced() {
+        const result = calculateTimeline(4.5, 65, 78, "advanced");
+        displayResult(result, "advanced-result");
+      }
+
+      function testCustom() {
+        const pace = parseFloat(document.getElementById("customPace").value);
+        const mileage = parseFloat(
+          document.getElementById("customMileage").value,
+        );
+        const aisri = parseInt(document.getElementById("customAISRI").value);
+        const experience = document.getElementById("customExperience").value;
+
+        const result = calculateTimeline(pace, mileage, aisri, experience);
+        displayResult(result, "custom-result");
+      }
+
+      // Auto-test on load
+      console.log("✅ Adaptive Timeline Calculator Test Page Loaded!");
+      console.log("Ready to test different scenarios...");
+    </script>
+  </body>
+</html>

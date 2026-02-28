@@ -125,3 +125,31 @@ services:
         sync: false
       - key: TELEGRAM_BOT_TOKEN
         sync: false
+
+  # ===================================================================
+  # SafeStride Training Calendar - React Web App
+  # ===================================================================
+  - type: web
+    name: safestride-calendar
+    runtime: static
+    region: oregon
+    plan: starter
+    branch: main
+    rootDir: web_calendar
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    pullRequestPreviewsEnabled: true
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: SAMEORIGIN
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_SUPABASE_URL
+        value: https://bdisppaxbvygsspcuymb.supabase.co
+      - key: VITE_SUPABASE_ANON_KEY
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkaXNwcGF4YnZ5Z3NzcGN1eW1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDM1MjY0MDAsImV4cCI6MjAxOTEwMjQwMH0.VXZ0Wd2_TzKZ5Pu7fV6hGjLXQb8wN4tZY3QS8f_uK0c
+

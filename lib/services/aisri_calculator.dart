@@ -1,13 +1,14 @@
 // AISRI Calculator Service
 //
 // Calculates the Athlete Injury Susceptibility and Readiness Index (AISRI)
-// based on 6 core pillars:
+// based on 7 core pillars:  // UPDATED: Added Agility!
 // 1. Adaptability - Training experience and frequency
 // 2. Injury Risk - Current pain and injury history
 // 3. Fatigue - Training intensity and volume
 // 4. Recovery - Sleep quality and stress levels
 // 5. Intensity - Training intensity relative to fitness level
 // 6. Consistency - Training frequency and regularity
+// 7. Agility - Movement control and change of direction ability
 
 class AISRICalculator {
   /// Calculate AISRI score from assessment data
@@ -17,22 +18,24 @@ class AISRICalculator {
   /// - risk_level: 'Low', 'Moderate', or 'High'
   /// - pillar_scores: Map of individual pillar scores
   static Map<String, dynamic> calculateScore(Map<String, dynamic> assessment) {
-    // Calculate each of the 6 pillars (0-100 points each)
+    // Calculate each of the 7 pillars (0-100 points each)  // UPDATED: 7 pillars now
     int adaptability = _calculateAdaptability(assessment);
     int injuryRisk = _calculateInjuryRisk(assessment);
     int fatigue = _calculateFatigue(assessment);
     int recovery = _calculateRecovery(assessment);
     int intensity = _calculateIntensity(assessment);
     int consistency = _calculateConsistency(assessment);
+    int agility = _calculateAgility(assessment); // NEW PILLAR
 
-    // Total score is the average of all 6 pillars (0-100)
+    // Total score is the average of all 7 pillars (0-100)  // UPDATED: 7 pillars
     int totalScore = ((adaptability +
                 injuryRisk +
                 fatigue +
                 recovery +
                 intensity +
-                consistency) /
-            6)
+                consistency +
+                agility) /
+            7) // UPDATED: Divide by 7
         .round();
 
     // Determine risk level based on total score
@@ -54,6 +57,7 @@ class AISRICalculator {
       'pillar_recovery': recovery,
       'pillar_intensity': intensity,
       'pillar_consistency': consistency,
+      'pillar_agility': agility, // NEW PILLAR
     };
   }
 
@@ -352,6 +356,82 @@ class AISRICalculator {
       score += 20;
     } else if (plank > 30) {
       score += 10;
+    }
+
+    return score.clamp(0, 100);
+  }
+
+  /// Pillar 7: Agility (NEW!)
+  /// Based on movement control, change of direction ability, lateral stability
+  ///
+  /// Higher scores indicate better agility and dynamic movement control
+  static int _calculateAgility(Map<String, dynamic> a) {
+    // Balance tests indicate agility foundation
+    String singleLegLeft = a['single_leg_balance_left'] ?? 'Lower back';
+    String singleLegRight = a['single_leg_balance_right'] ?? 'Lower back';
+
+    // ROM tests indicate mobility for quick movements
+    String hiFlexLeft = a['hip_flexion_left'] ?? 'Lower back';
+    String hiFlexRight = a['hip_flexion_right'] ?? 'Lower back';
+
+    // Core strength supports agility
+    int plank = a['plank_hold_seconds'] ?? 0;
+
+    // Consistency in training builds neuromuscular patterns
+    String trainingFreq = a['training_frequency'] ?? '1-2 days/week';
+
+    int score = 50; // Base score
+
+    // Balance capability (30 points) - critical for change of direction
+    int balanceScore = 0;
+    if (singleLegLeft == 'No pain' ||
+        singleLegLeft == 'Hip' ||
+        singleLegLeft == 'Knee') {
+      balanceScore += 7;
+    }
+    if (singleLegRight == 'No pain' ||
+        singleLegRight == 'Hip' ||
+        singleLegRight == 'Knee') {
+      balanceScore += 7;
+    }
+    // Bonus for symmetry
+    if (singleLegLeft == singleLegRight && singleLegLeft != 'Lower back') {
+      balanceScore += 6;
+    }
+    score += balanceScore;
+
+    // Hip mobility (25 points) - needed for lateral movements
+    int mobilityScore = 0;
+    if (hiFlexLeft == 'No pain' || hiFlexLeft == 'Hip') {
+      mobilityScore += 6;
+    }
+    if (hiFlexRight == 'No pain' || hiFlexRight == 'Hip') {
+      mobilityScore += 6;
+    }
+    // Bonus for symmetry
+    if (hiFlexLeft == hiFlexRight && hiFlexLeft != 'Lower back') {
+      mobilityScore += 8;
+    }
+    score += mobilityScore;
+
+    // Core stability (20 points) - foundation for agility
+    if (plank > 90) {
+      score += 20;
+    } else if (plank > 60) {
+      score += 15;
+    } else if (plank > 30) {
+      score += 10;
+    } else if (plank > 15) {
+      score += 5;
+    }
+
+    // Training consistency (15 points) - neuromuscular adaptation
+    if (trainingFreq == '5+ days/week') {
+      score += 15;
+    } else if (trainingFreq == '3-4 days/week') {
+      score += 10;
+    } else if (trainingFreq == '1-2 days/week') {
+      score += 5;
     }
 
     return score.clamp(0, 100);

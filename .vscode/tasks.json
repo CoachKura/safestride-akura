@@ -5,12 +5,7 @@
       "label": "Supabase: Create Migration",
       "type": "shell",
       "command": "npx",
-      "args": [
-        "supabase",
-        "migration",
-        "new",
-        "${input:migrationName}"
-      ],
+      "args": ["supabase", "migration", "new", "${input:migrationName}"],
       "problemMatcher": [],
       "group": "build"
     },
@@ -18,11 +13,7 @@
       "label": "Supabase: Push Migrations",
       "type": "shell",
       "command": "npx",
-      "args": [
-        "supabase",
-        "db",
-        "push"
-      ],
+      "args": ["supabase", "db", "push"],
       "problemMatcher": [],
       "group": "build",
       "presentation": {
@@ -34,11 +25,7 @@
       "label": "Supabase: Pull Schema",
       "type": "shell",
       "command": "npx",
-      "args": [
-        "supabase",
-        "db",
-        "pull"
-      ],
+      "args": ["supabase", "db", "pull"],
       "problemMatcher": [],
       "group": "build"
     },
@@ -46,11 +33,7 @@
       "label": "Supabase: SQL Shell",
       "type": "shell",
       "command": "npx",
-      "args": [
-        "supabase",
-        "db",
-        "shell"
-      ],
+      "args": ["supabase", "db", "shell"],
       "problemMatcher": [],
       "presentation": {
         "reveal": "always",
@@ -72,12 +55,36 @@
       "label": "Backup: Run Database Backup",
       "type": "shell",
       "command": "powershell",
-      "args": [
-        "-File",
-        "${workspaceFolder}\\backup-database.ps1"
-      ],
+      "args": ["-File", "${workspaceFolder}\\backup-database.ps1"],
       "problemMatcher": [],
       "group": "build"
+    },
+    {
+      "label": "Supabase: Run Strava Migration",
+      "type": "shell",
+      "command": "powershell",
+      "args": ["-File", "${workspaceFolder}\\run-migration.ps1"],
+      "problemMatcher": [],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "focus": true
+      }
+    },
+    {
+      "label": "Supabase: Execute SQL File",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-Command",
+        "Get-Content '${file}' -Raw | Set-Clipboard; Start-Process 'https://app.supabase.com/project/xzxnnswggwqtctcgpocr/sql/new'; Write-Host 'SQL copied to clipboard. Paste in browser and click Run.'"
+      ],
+      "problemMatcher": [],
+      "group": "build",
+      "presentation": {
+        "reveal": "always"
+      }
     }
   ],
   "inputs": [

@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'assessment_results_screen.dart';
+// import 'archived/assessment_results_screen.dart'; // Archived
 import '../services/aisri_calculator.dart';
 import 'dart:developer' as developer;
+import 'strava_home_dashboard.dart';
+import 'strava_oauth_screen.dart'; // For StravaAuthResult
+import 'aisri_improvement_screen.dart'; // NEW: Show improvement after 2nd+ assessment
 
 class EvaluationFormScreen extends StatefulWidget {
-  const EvaluationFormScreen({super.key});
+  final Map<String, dynamic>? athleteData; // Strava athlete data (optional)
+  final StravaAuthResult? stravaResult; // Full Strava auth result (optional)
+
+  const EvaluationFormScreen({super.key, this.athleteData, this.stravaResult});
 
   @override
   State<EvaluationFormScreen> createState() => _EvaluationFormScreenState();
@@ -23,6 +29,9 @@ class _EvaluationFormScreenState extends State<EvaluationFormScreen> {
   String _selectedGender = 'Male';
   final _weightController = TextEditingController();
   final _heightController = TextEditingController();
+
+  // Track if data came from Strava (makes fields READ-ONLY)
+  bool _isDataFromStrava = false;
 
   // Step 2: Training Background
   final _yearsRunningController = TextEditingController();
@@ -71,6 +80,119 @@ class _EvaluationFormScreenState extends State<EvaluationFormScreen> {
   String _selectedRaceDistance = '10K';
   DateTime _targetRaceDate = DateTime.now().add(const Duration(days: 90));
   String _selectedPrimaryGoal = 'PR time';
+
+  @override
+  void initState() {
+    super.initState();
+    _autoFillFromStrava();
+    _checkForReassessmentDue(); // Check if 25-day reminder needed
+  }
+
+  // Auto-fill form fields from Strava athlete data
+  void _autoFillFromStrava() {
+    if (widget.athleteData == null) return;
+
+    final athlete = widget.athleteData!;
+    developer
+        .log('✅ Auto-filling from Strava (data received BEFORE form load)');
+
+    // Mark that data came from Strava (will make fields READ-ONLY)
+    setState(() {
+      _isDataFromStrava = true;
+    });
+
+    // Age - FROM STRAVA (no need to ask!)
+    if (athlete['age'] != null) {
+      _ageController.text = athlete['age'].toString();
+      developer.log('✓ Age auto-filled: ${athlete['age']}');
+    }
+
+    // Gender - FROM STRAVA (no need to ask!)
+    if (athlete['sex'] != null) {
+      final sex = athlete['sex'].toString().toUpperCase();
+      _selectedGender = sex == 'M' ? 'Male' : (sex == 'F' ? 'Female' : 'Male');
+      developer.log('✓ Gender auto-filled: $_selectedGender');
+    }
+
+    // Weight - FROM STRAVA (no need to ask!)
+    if (athlete['weight'] != null) {
+      final weightKg = (athlete['weight'] as num).toDouble();
+      _weightController.text = weightKg.toStringAsFixed(1);
+      developer.log('✓ Weight auto-filled: ${weightKg}kg');
+    }
+
+    // Show confirmation banner
+    if (mounted) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('✅ Profile data synced from Strava!'),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      });
+    }
+  }
+
+  // Check if user needs 25-day re-assessment
+  Future<void> _checkForReassessmentDue() async {
+    try {
+      final userId = Supabase.instance.client.auth.currentUser?.id;
+      if (userId == null) return;
+
+      // Get last assessment date
+      final lastAssessment = await Supabase.instance.client
+          .from('aisri_assessments')
+          .select('created_at')
+          .eq('user_id', userId)
+          .order('created_at', ascending: false)
+          .limit(1)
+          .maybeSingle();
+
+      if (lastAssessment != null && mounted) {
+        final lastDate = DateTime.parse(lastAssessment['created_at'] as String);
+        final daysSince = DateTime.now().difference(lastDate).inDays;
+
+        if (daysSince >= 25) {
+          // Show 25-day reminder
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('⏰ Time for Re-Assessment!'),
+                content: Text(
+                  'It\'s been $daysSince days since your last assessment.\n\n'
+                  'Let\'s recheck your:\n'
+                  '• Range of Motion (ROM)\n'
+                  '• Mobility\n'
+                  '• Strength\n'
+                  '• Balance\n'
+                  '• Agility\n\n'
+                  'Complete this to track your improvement!',
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Later'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      // Continue with assessment
+                    },
+                    child: const Text('Let\'s Go!'),
+                  ),
+                ],
+              ),
+            );
+          });
+        }
+      }
+    } catch (e) {
+      developer.log('Error checking reassessment: $e');
+    }
+  }
 
   @override
   void dispose() {
@@ -488,6 +610,7 @@ class _EvaluationFormScreenState extends State<EvaluationFormScreen> {
             'pillar_recovery': scoreData['pillar_recovery'],
             'pillar_intensity': scoreData['pillar_intensity'],
             'pillar_consistency': scoreData['pillar_consistency'],
+            'pillar_agility': scoreData['pillar_agility'], // NEW: 7th pillar
 
             // Metadata
             'created_at': DateTime.now().toIso8601String(),
@@ -504,66 +627,42 @@ class _EvaluationFormScreenState extends State<EvaluationFormScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Assessment completed successfully! 🎉'),
+            content: Text(
+                'Assessment completed successfully! 🎉 Welcome to SafeStride!'),
             backgroundColor: Colors.green,
+            duration: Duration(seconds: 4),
           ),
         );
 
-        // Navigate to Assessment Results Screen with all data
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => AssessmentResultsScreen(
-              assessmentData: {
-                'user_id': userId,
-                'age': int.tryParse(_ageController.text),
-                'gender': _selectedGender,
-                'weight': double.tryParse(_weightController.text),
-                'height': double.tryParse(_heightController.text),
-                'ankle_dorsiflexion_cm':
-                    double.tryParse(_ankleDorsiflexionController.text),
-                'knee_flexion_gap_cm':
-                    double.tryParse(_kneeFlexionController.text),
-                'knee_extension_strength': _selectedKneeStrength,
-                'hip_flexion_angle': int.tryParse(_hipFlexionController.text),
-                'hip_abduction_reps':
-                    int.tryParse(_hipAbductionController.text),
-                'hamstring_flexibility_cm':
-                    double.tryParse(_hamstringFlexController.text),
-                'balance_test_seconds':
-                    int.tryParse(_balanceTestController.text),
-                'plank_hold_seconds': int.tryParse(_plankHoldController.text),
-                'shoulder_flexion_angle':
-                    int.tryParse(_shoulderFlexionController.text),
-                'shoulder_abduction_angle':
-                    int.tryParse(_shoulderAbductionController.text),
-                'shoulder_internal_rotation': _selectedShoulderRotation,
-                'neck_rotation_angle':
-                    int.tryParse(_neckRotationController.text),
-                'neck_flexion_status': _selectedNeckFlexion,
-                'resting_heart_rate': int.tryParse(_restingHRController.text),
-                'perceived_fatigue': _perceivedFatigue.toInt(),
-                'previous_injuries': _injuryHistoryController.text,
-                'current_pain': _currentPain.toInt(),
-                'weekly_mileage':
-                    double.tryParse(_weeklyMileageController.text),
-                'goals': _selectedPrimaryGoal,
-                'years_running': double.tryParse(_yearsRunningController.text),
-                'training_frequency': _selectedTrainingFrequency,
-                'target_race_distance': _selectedRaceDistance,
-                'target_race_date': _targetRaceDate.toIso8601String(),
-              },
-              aistriScore: scoreData['AISRI_score'],
-              pillarScores: {
-                'Adaptability': scoreData['pillar_adaptability'],
-                'Injury Risk': scoreData['pillar_injury_risk'],
-                'Fatigue Management': scoreData['pillar_fatigue'],
-                'Recovery Capacity': scoreData['pillar_recovery'],
-                'Training Intensity': scoreData['pillar_intensity'],
-                'Consistency': scoreData['pillar_consistency'],
-              },
+        // Check if this is the 2nd+ assessment - show improvement screen
+        final previousAssessments = await Supabase.instance.client
+            .from('aisri_assessments')
+            .select('id')
+            .eq('user_id', userId);
+
+        final assessmentCount = (previousAssessments as List).length;
+
+        if (assessmentCount >= 2 &&
+            widget.stravaResult?.stravaAthleteId != null) {
+          // Show improvement screen for 2nd+ assessments
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => AISRIImprovementScreen(
+                userId: userId,
+                stravaAthleteId: widget.stravaResult!.stravaAthleteId,
+              ),
             ),
-          ),
-        );
+          );
+        } else {
+          // Navigate to Strava Home Dashboard for 1st assessment
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => StravaHomeDashboard(
+                session: widget.stravaResult,
+              ),
+            ),
+          );
+        }
       }
     } catch (e, stackTrace) {
       developer.log('❌ ERROR saving assessment: $e');
@@ -798,13 +897,20 @@ class _EvaluationFormScreenState extends State<EvaluationFormScreen> {
           TextFormField(
             controller: _ageController,
             keyboardType: TextInputType.number,
+            enabled: !_isDataFromStrava, // READ-ONLY if from Strava
             decoration: InputDecoration(
-              labelText: 'Age *',
+              labelText:
+                  _isDataFromStrava ? 'Age * (Synced from Strava 🔒)' : 'Age *',
               suffixText: 'years',
               hintText: 'Enter your age',
               border:
                   OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-              prefixIcon: const Icon(Icons.cake),
+              prefixIcon: Icon(
+                _isDataFromStrava ? Icons.lock : Icons.cake,
+                color: _isDataFromStrava ? Colors.green : null,
+              ),
+              filled: _isDataFromStrava,
+              fillColor: _isDataFromStrava ? Colors.green[50] : null,
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -836,13 +942,21 @@ class _EvaluationFormScreenState extends State<EvaluationFormScreen> {
           TextFormField(
             controller: _weightController,
             keyboardType: TextInputType.number,
+            enabled: !_isDataFromStrava, // READ-ONLY if from Strava
             decoration: InputDecoration(
-              labelText: 'Weight *',
+              labelText: _isDataFromStrava
+                  ? 'Weight * (Synced from Strava 🔒)'
+                  : 'Weight *',
               suffixText: 'kg',
               hintText: 'Enter your weight',
               border:
                   OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-              prefixIcon: const Icon(Icons.monitor_weight),
+              prefixIcon: Icon(
+                _isDataFromStrava ? Icons.lock : Icons.monitor_weight,
+                color: _isDataFromStrava ? Colors.green : null,
+              ),
+              filled: _isDataFromStrava,
+              fillColor: _isDataFromStrava ? Colors.green[50] : null,
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {

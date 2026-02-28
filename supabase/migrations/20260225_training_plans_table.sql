@@ -25,21 +25,25 @@ CREATE INDEX IF NOT EXISTS idx_training_plans_created_at ON training_plans(creat
 ALTER TABLE training_plans ENABLE ROW LEVEL SECURITY;
 
 -- Create policy to allow users to read their own training plans
+DROP POLICY IF EXISTS "Users can view their own training plans" ON training_plans;
 CREATE POLICY "Users can view their own training plans"
     ON training_plans FOR SELECT
     USING (auth.uid() = user_id OR user_id IS NULL);
 
 -- Create policy to allow users to insert their own training plans
+DROP POLICY IF EXISTS "Users can create training plans" ON training_plans;
 CREATE POLICY "Users can create training plans"
     ON training_plans FOR INSERT
     WITH CHECK (auth.uid() = user_id OR user_id IS NULL);
 
 -- Create policy to allow users to update their own training plans
+DROP POLICY IF EXISTS "Users can update their own training plans" ON training_plans;
 CREATE POLICY "Users can update their own training plans"
     ON training_plans FOR UPDATE
     USING (auth.uid() = user_id OR user_id IS NULL);
 
 -- Create policy to allow users to delete their own training plans
+DROP POLICY IF EXISTS "Users can delete their own training plans" ON training_plans;
 CREATE POLICY "Users can delete their own training plans"
     ON training_plans FOR DELETE
     USING (auth.uid() = user_id OR user_id IS NULL);

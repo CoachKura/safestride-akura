@@ -6,13 +6,13 @@ import '../services/auth_service.dart';
 import '../services/strava_service.dart';
 import '../services/strava_protocol_service.dart';
 import '../services/workout_analysis_service.dart';
-import 'analysis_report_screen.dart';
+// import 'archived/analysis_report_screen.dart'; // Archived
 import 'login_screen.dart';
-import 'workout_creator_screen.dart';
-import 'body_measurements_screen.dart';
-import 'injuries_screen.dart';
-import 'goals_screen.dart';
-import 'start_run_screen.dart';
+// import 'workout_creator_screen.dart'; // Deleted - replaced by training plan
+// import 'archived/body_measurements_screen.dart'; // Archived
+// import 'archived/injuries_screen.dart'; // Archived
+// import 'archived/goals_screen.dart'; // Archived
+// import 'start_run_screen.dart'; // Deleted - replaced by tracker
 import 'dart:developer' as developer;
 
 class ProfileScreen extends StatefulWidget {
@@ -105,11 +105,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
 
       // Navigate to analysis report screen
+      // TODO: Re-implement analysis screen
       if (mounted) {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => AnalysisReportScreen(analysis: analysis),
+            builder: (context) => Scaffold(
+              appBar: AppBar(title: Text('Analysis Report')),
+              body: Center(child: Text('Analysis report feature coming soon')),
+            ),
           ),
         );
       }
@@ -495,618 +499,611 @@ class _ProfileScreenState extends State<ProfileScreen> {
               )
             : ListView(
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
-              children: [
-                // Profile Header
-                Container(
-                  alignment: Alignment.center,
-                  child: Column(
-                    children: [
-                      CircleAvatar(
-                        radius: 50,
-                        backgroundColor: Colors.purple.shade100,
-                        child: Icon(
-                          Icons.person,
-                          size: 50,
-                          color: Colors.deepPurple,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        userName,
-                        style:
-                            Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        userEmail,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Colors.grey[600],
-                            ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 32),
-
-                // Account Settings Section
-                Text(
-                  'Account Settings',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.w500,
-                      ),
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Column(
-                    children: [
-                      _MenuItem(
-                        icon: Icons.person,
-                        iconColor: Colors.purple,
-                        title: 'Edit Profile',
-                        onTap: () {},
-                      ),
-                      const Divider(height: 1),
-                      _MenuItem(
-                        icon: Icons.flag,
-                        iconColor: Colors.purple,
-                        title: 'Weekly Goals',
-                        onTap: () {},
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // Notifications Section
-                Text(
-                  'Notifications',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.w500,
-                      ),
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Column(
-                    children: [
-                      _MenuItem(
-                        icon: Icons.notifications,
-                        iconColor: Colors.green,
-                        title: 'Push Notifications',
-                        trailing: Text(
-                          'Enabled',
-                          style: TextStyle(
-                            color: Colors.green,
-                            fontWeight: FontWeight.w600,
+                children: [
+                  // Profile Header
+                  Container(
+                    alignment: Alignment.center,
+                    child: Column(
+                      children: [
+                        CircleAvatar(
+                          radius: 50,
+                          backgroundColor: Colors.purple.shade100,
+                          child: Icon(
+                            Icons.person,
+                            size: 50,
+                            color: Colors.deepPurple,
                           ),
                         ),
-                        onTap: () {},
-                      ),
-                      const Divider(height: 1),
-                      _MenuItem(
-                        icon: Icons.access_time,
-                        iconColor: Colors.purple,
-                        title: 'Reminder Times',
-                        onTap: () {},
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // Data & Sync Section
-                Text(
-                  'Data & Sync',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.w500,
-                      ),
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Column(
-                    children: [
-                      // Strava Connection
-                      _MenuItem(
-                        icon: Icons.directions_run,
-                        iconColor: Colors.orange,
-                        title: 'Connect to Strava',
-                        subtitle: isStravaConnected
-                            ? stravaInfo != null
-                                ? 'Connected ${_formatDate(stravaInfo!['connected_at'])}'
-                                : 'Connected ✓'
-                            : 'Sync your workouts automatically',
-                        trailing: isStravaConnected
-                            ? const Icon(Icons.check_circle,
-                                color: Colors.green, size: 24)
-                            : ElevatedButton(
-                                onPressed: _connectStrava,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.orange,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 8),
-                                ),
-                                child: const Text('Connect'),
+                        const SizedBox(height: 16),
+                        Text(
+                          userName,
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineSmall
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
                               ),
-                        onTap: isStravaConnected
-                            ? _disconnectStrava
-                            : _connectStrava,
-                      ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          userEmail,
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Colors.grey[600],
+                                  ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 32),
 
-                      // Sync Now button (only if connected)
-                      if (isStravaConnected) ...[
+                  // Account Settings Section
+                  Text(
+                    'Account Settings',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w500,
+                        ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      children: [
+                        _MenuItem(
+                          icon: Icons.person,
+                          iconColor: Colors.purple,
+                          title: 'Edit Profile',
+                          onTap: () {},
+                        ),
                         const Divider(height: 1),
                         _MenuItem(
-                          icon: Icons.sync,
+                          icon: Icons.flag,
+                          iconColor: Colors.purple,
+                          title: 'Weekly Goals',
+                          onTap: () {},
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Notifications Section
+                  Text(
+                    'Notifications',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w500,
+                        ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      children: [
+                        _MenuItem(
+                          icon: Icons.notifications,
+                          iconColor: Colors.green,
+                          title: 'Push Notifications',
+                          trailing: Text(
+                            'Enabled',
+                            style: TextStyle(
+                              color: Colors.green,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          onTap: () {},
+                        ),
+                        const Divider(height: 1),
+                        _MenuItem(
+                          icon: Icons.access_time,
+                          iconColor: Colors.purple,
+                          title: 'Reminder Times',
+                          onTap: () {},
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Data & Sync Section
+                  Text(
+                    'Data & Sync',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w500,
+                        ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      children: [
+                        // Strava Connection
+                        _MenuItem(
+                          icon: Icons.directions_run,
+                          iconColor: Colors.orange,
+                          title: 'Connect to Strava',
+                          subtitle: isStravaConnected
+                              ? stravaInfo != null
+                                  ? 'Connected ${_formatDate(stravaInfo!['connected_at'])}'
+                                  : 'Connected ✓'
+                              : 'Sync your workouts automatically',
+                          trailing: isStravaConnected
+                              ? const Icon(Icons.check_circle,
+                                  color: Colors.green, size: 24)
+                              : ElevatedButton(
+                                  onPressed: _connectStrava,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.orange,
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 8),
+                                  ),
+                                  child: const Text('Connect'),
+                                ),
+                          onTap: isStravaConnected
+                              ? _disconnectStrava
+                              : _connectStrava,
+                        ),
+
+                        // Sync Now button (only if connected)
+                        if (isStravaConnected) ...[
+                          const Divider(height: 1),
+                          _MenuItem(
+                            icon: Icons.sync,
+                            iconColor: Colors.blue,
+                            title: 'Sync Now',
+                            subtitle: 'Import recent activities from Strava',
+                            trailing: isSyncingStrava
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2),
+                                  )
+                                : const Icon(Icons.arrow_forward_ios, size: 16),
+                            onTap: isSyncingStrava ? null : _syncStrava,
+                          ),
+                        ],
+
+                        const Divider(height: 1),
+                        _MenuItem(
+                          icon: Icons.upload,
+                          iconColor: Colors.purple,
+                          title: 'Export Data',
+                          onTap: () {},
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Analyze Workout Data Section
+                  Card(
+                    elevation: 3,
+                    margin:
+                        const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color(0xFF2196F3),
+                                      Color(0xFF64B5F6)
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: const Icon(Icons.analytics,
+                                    color: Colors.white, size: 28),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'AI-Powered Analysis',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey[800],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Identify issues & get remedies',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Get a comprehensive analysis of your workout data. Identify biomechanical issues (cadence, vertical oscillation, ground contact time) with AI-powered insights and personalized remedies.',
+                            style: TextStyle(
+                                fontSize: 14, color: Colors.grey[700]),
+                          ),
+                          const SizedBox(height: 16),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed:
+                                  _isAnalyzing ? null : _analyzeWorkoutData,
+                              icon: _isAnalyzing
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Icon(Icons.insights),
+                              label: Text(_isAnalyzing
+                                  ? 'Analyzing...'
+                                  : 'Analyze My Data'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF2196F3),
+                                foregroundColor: Colors.white,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                elevation: 2,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Generate Protocol Section
+                  Card(
+                    elevation: 3,
+                    margin:
+                        const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color(0xFF4CAF50),
+                                      Color(0xFF66BB6A)
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: const Icon(Icons.fitness_center,
+                                    color: Colors.white, size: 28),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Generate Workout Protocol',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey[800],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Create personalized workouts',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Based on your AISRI assessment and Strava data, we\'ll create a 2-week workout protocol with 6 personalized exercises.',
+                            style: TextStyle(
+                                fontSize: 14, color: Colors.grey[700]),
+                          ),
+                          const SizedBox(height: 16),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed:
+                                  _isGenerating ? null : _generateProtocol,
+                              icon: _isGenerating
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Icon(Icons.auto_awesome),
+                              label: Text(_isGenerating
+                                  ? 'Generating...'
+                                  : 'Generate Protocol'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF4CAF50),
+                                foregroundColor: Colors.white,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                elevation: 2,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Training & Workouts Section
+                  Text(
+                    'Training & Workouts',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w500,
+                        ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      children: [
+                        // Start Run and Workout Creator replaced by Training Plan feature
+                        const Divider(height: 1),
+                        _MenuItem(
+                          icon: Icons.calendar_month,
+                          iconColor: Colors.purple,
+                          title: 'Training Calendar',
+                          subtitle: 'View scheduled workouts',
+                          onTap: () {
+                            // Navigate to calendar
+                          },
+                        ),
+                        const Divider(height: 1),
+                        _MenuItem(
+                          icon: Icons.history,
+                          iconColor: Colors.orange,
+                          title: 'Workout History',
+                          subtitle: 'Past activities & progress',
+                          onTap: () {
+                            // Navigate to history
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Health & Tracking Section
+                  Text(
+                    'Health & Tracking',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w500,
+                        ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      children: [
+                        _MenuItem(
+                          icon: Icons.monitor_weight,
+                          iconColor: Colors.purple,
+                          title: 'Body Measurements',
+                          subtitle: 'Track weight, BMI & composition',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Scaffold(
+                                  appBar:
+                                      AppBar(title: Text('Body Measurements')),
+                                  body: Center(
+                                      child: Text('Feature coming soon')),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        const Divider(height: 1),
+                        _MenuItem(
+                          icon: Icons.healing,
+                          iconColor: Colors.red,
+                          title: 'Injury Management',
+                          subtitle: 'Log & track recovery',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Scaffold(
+                                  appBar:
+                                      AppBar(title: Text('Injury Management')),
+                                  body: Center(
+                                      child: Text('Feature coming soon')),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        const Divider(height: 1),
+                        _MenuItem(
+                          icon: Icons.flag,
+                          iconColor: Colors.amber,
+                          title: 'Goals Dashboard',
+                          subtitle: 'Set & achieve targets',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Scaffold(
+                                  appBar:
+                                      AppBar(title: Text('Goals Dashboard')),
+                                  body: Center(
+                                      child: Text('Feature coming soon')),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // About Section
+                  Text(
+                    'About',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w500,
+                        ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      children: [
+                        _MenuItem(
+                          icon: Icons.bar_chart,
+                          iconColor: Colors.red,
+                          title: 'App Version 1.0.0',
+                          onTap: () {},
+                        ),
+                        const Divider(height: 1),
+                        _MenuItem(
+                          icon: Icons.help,
                           iconColor: Colors.blue,
-                          title: 'Sync Now',
-                          subtitle: 'Import recent activities from Strava',
-                          trailing: isSyncingStrava
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child:
-                                      CircularProgressIndicator(strokeWidth: 2),
-                                )
-                              : const Icon(Icons.arrow_forward_ios, size: 16),
-                          onTap: isSyncingStrava ? null : _syncStrava,
+                          title: 'Help & Support',
+                          onTap: () {},
+                        ),
+                        const Divider(height: 1),
+                        _MenuItem(
+                          icon: Icons.privacy_tip,
+                          iconColor: Colors.grey,
+                          title: 'Privacy Policy',
+                          onTap: () {},
                         ),
                       ],
-
-                      const Divider(height: 1),
-                      _MenuItem(
-                        icon: Icons.upload,
-                        iconColor: Colors.purple,
-                        title: 'Export Data',
-                        onTap: () {},
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 24),
+                  const SizedBox(height: 32),
 
-                // Analyze Workout Data Section
-                Card(
-                  elevation: 3,
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                gradient: const LinearGradient(
-                                  colors: [
-                                    Color(0xFF2196F3),
-                                    Color(0xFF64B5F6)
-                                  ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: const Icon(Icons.analytics,
-                                  color: Colors.white, size: 28),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'AI-Powered Analysis',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.grey[800],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Identify issues & get remedies',
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                  // Log Out Button
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.red, width: 2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ListTile(
+                      leading: Icon(Icons.logout, color: Colors.red),
+                      title: Text(
+                        'Log Out',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.w600,
                         ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Get a comprehensive analysis of your workout data. Identify biomechanical issues (cadence, vertical oscillation, ground contact time) with AI-powered insights and personalized remedies.',
-                          style:
-                              TextStyle(fontSize: 14, color: Colors.grey[700]),
-                        ),
-                        const SizedBox(height: 16),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton.icon(
-                            onPressed:
-                                _isAnalyzing ? null : _analyzeWorkoutData,
-                            icon: _isAnalyzing
-                                ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      color: Colors.white,
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : const Icon(Icons.insights),
-                            label: Text(_isAnalyzing
-                                ? 'Analyzing...'
-                                : 'Analyze My Data'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF2196F3),
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
+                      ),
+                      onTap: () async {
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Sign Out'),
+                            content: const Text(
+                                'Are you sure you want to sign out?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: const Text('Cancel'),
                               ),
-                              elevation: 2,
-                            ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                child: const Text('Sign Out'),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
+                        );
 
-                // Generate Protocol Section
-                Card(
-                  elevation: 3,
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                gradient: const LinearGradient(
-                                  colors: [
-                                    Color(0xFF4CAF50),
-                                    Color(0xFF66BB6A)
-                                  ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: const Icon(Icons.fitness_center,
-                                  color: Colors.white, size: 28),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Generate Workout Protocol',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.grey[800],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Create personalized workouts',
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Based on your AISRI assessment and Strava data, we\'ll create a 2-week workout protocol with 6 personalized exercises.',
-                          style:
-                              TextStyle(fontSize: 14, color: Colors.grey[700]),
-                        ),
-                        const SizedBox(height: 16),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton.icon(
-                            onPressed: _isGenerating ? null : _generateProtocol,
-                            icon: _isGenerating
-                                ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      color: Colors.white,
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : const Icon(Icons.auto_awesome),
-                            label: Text(_isGenerating
-                                ? 'Generating...'
-                                : 'Generate Protocol'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF4CAF50),
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              elevation: 2,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
+                        if (confirm == true && context.mounted) {
+                          // Sign out
+                          await context.read<AuthService>().signOut();
 
-                // Training & Workouts Section
-                Text(
-                  'Training & Workouts',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.w500,
-                      ),
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Column(
-                    children: [
-                      _MenuItem(
-                        icon: Icons.directions_run,
-                        iconColor: Colors.blue,
-                        title: 'Start Run',
-                        subtitle: 'AI-powered run type selection',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const StartRunScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      const Divider(height: 1),
-                      _MenuItem(
-                        icon: Icons.add_circle,
-                        iconColor: Colors.green,
-                        title: 'Create Workout',
-                        subtitle: 'Custom running, strength & rehab',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const WorkoutCreatorScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      const Divider(height: 1),
-                      _MenuItem(
-                        icon: Icons.calendar_month,
-                        iconColor: Colors.purple,
-                        title: 'Training Calendar',
-                        subtitle: 'View scheduled workouts',
-                        onTap: () {
-                          // Navigate to calendar
-                        },
-                      ),
-                      const Divider(height: 1),
-                      _MenuItem(
-                        icon: Icons.history,
-                        iconColor: Colors.orange,
-                        title: 'Workout History',
-                        subtitle: 'Past activities & progress',
-                        onTap: () {
-                          // Navigate to history
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // Health & Tracking Section
-                Text(
-                  'Health & Tracking',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.w500,
-                      ),
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Column(
-                    children: [
-                      _MenuItem(
-                        icon: Icons.monitor_weight,
-                        iconColor: Colors.purple,
-                        title: 'Body Measurements',
-                        subtitle: 'Track weight, BMI & composition',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const BodyMeasurementsScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      const Divider(height: 1),
-                      _MenuItem(
-                        icon: Icons.healing,
-                        iconColor: Colors.red,
-                        title: 'Injury Management',
-                        subtitle: 'Log & track recovery',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const InjuriesScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      const Divider(height: 1),
-                      _MenuItem(
-                        icon: Icons.flag,
-                        iconColor: Colors.amber,
-                        title: 'Goals Dashboard',
-                        subtitle: 'Set & achieve targets',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const GoalsScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // About Section
-                Text(
-                  'About',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.w500,
-                      ),
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Column(
-                    children: [
-                      _MenuItem(
-                        icon: Icons.bar_chart,
-                        iconColor: Colors.red,
-                        title: 'App Version 1.0.0',
-                        onTap: () {},
-                      ),
-                      const Divider(height: 1),
-                      _MenuItem(
-                        icon: Icons.help,
-                        iconColor: Colors.blue,
-                        title: 'Help & Support',
-                        onTap: () {},
-                      ),
-                      const Divider(height: 1),
-                      _MenuItem(
-                        icon: Icons.privacy_tip,
-                        iconColor: Colors.grey,
-                        title: 'Privacy Policy',
-                        onTap: () {},
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 32),
-
-                // Log Out Button
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.red, width: 2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: ListTile(
-                    leading: Icon(Icons.logout, color: Colors.red),
-                    title: Text(
-                      'Log Out',
-                      style: TextStyle(
-                        color: Colors.red,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    onTap: () async {
-                      final confirm = await showDialog<bool>(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('Sign Out'),
-                          content:
-                              const Text('Are you sure you want to sign out?'),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context, false),
-                              child: const Text('Cancel'),
-                            ),
-                            TextButton(
-                              onPressed: () => Navigator.pop(context, true),
-                              child: const Text('Sign Out'),
-                            ),
-                          ],
-                        ),
-                      );
-
-                      if (confirm == true && context.mounted) {
-                        // Sign out
-                        await context.read<AuthService>().signOut();
-
-                        // Navigate to login screen and clear navigation stack
-                        if (context.mounted) {
-                          Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                                builder: (context) => const LoginScreen()),
-                            (route) => false,
-                          );
+                          // Navigate to login screen and clear navigation stack
+                          if (context.mounted) {
+                            Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                  builder: (context) => const LoginScreen()),
+                              (route) => false,
+                            );
+                          }
                         }
-                      }
-                    },
+                      },
+                    ),
                   ),
-                ),
-                const SizedBox(height: 20),
-              ],
+                  const SizedBox(height: 20),
+                ],
               ),
-        ),
+      ),
     );
   }
 

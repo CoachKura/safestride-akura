@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'strava_stats_screen.dart';
 import '../services/strava_session_service.dart';
 
@@ -42,8 +43,9 @@ class _StravaOAuthScreenState extends State<StravaOAuthScreen> {
   static String get _apiUrl =>
       dotenv.env['SAFESTRIDE_STRAVA_API_URL'] ?? 'https://api.akura.in';
 
-  // Strava app has `www.akura.in` registered as callback domain
-  static const String _redirectUri = 'https://www.akura.in/strava-callback';
+  // For mobile WebView OAuth, use localhost (which is in Strava allowed domains)
+  // This allows the WebView to intercept the callback before it tries to navigate externally
+  static const String _redirectUri = 'http://localhost/strava-callback';
 
   @override
   void initState() {
@@ -87,60 +89,114 @@ class _StravaOAuthScreenState extends State<StravaOAuthScreen> {
     setState(() {
       _loading = true;
       _loadingMessage = 'Signing you in…';
-      _subMessage = 'Fetching your Strava profile';
+      _subMessage = 'Exchanging authorization code';
     });
+
     try {
-      final resp = await http.post(
-        Uri.parse('$_apiUrl/api/strava-signup'),
+      // Step 1: Exchange code for tokens directly with Strava
+      // IMPORTANT: redirect_uri must match the one used during authorization
+      final tokenResp = await http.post(
+        Uri.parse('https://www.strava.com/oauth/token'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'code': code}),
+        body: jsonEncode({
+          'client_id': dotenv.env['STRAVA_CLIENT_ID'] ?? '162971',
+          'client_secret': dotenv.env['STRAVA_CLIENT_SECRET'],
+          'code': code,
+          'grant_type': 'authorization_code',
+          'redirect_uri': _redirectUri, // MUST match authorization request
+        }),
       );
 
-      if (resp.statusCode == 200) {
-        final data = jsonDecode(resp.body) as Map<String, dynamic>;
-        final isNew = data['is_new_user'] as bool? ?? true;
-        if (mounted)
-          setState(() {
-            _loadingMessage =
-                isNew ? 'Welcome to SafeStride!' : 'Welcome back!';
-            _subMessage = 'Loading your running stats…';
-          });
-        final result = StravaAuthResult(
-          userId: data['user_id'] as String,
-          stravaAthleteId: data['strava_athlete_id'] as String,
-          accessToken: data['access_token'] as String,
-          refreshToken: data['refresh_token'] as String? ?? '',
-          athlete: data['athlete'] as Map<String, dynamic>,
-          isNewUser: isNew,
-        );
-        // Persist session for auto-login on next app start
-        await StravaSessionService.save(result);
-        if (mounted) {
-          // Navigate to stats screen — it will pop with the result when done
-          final confirmed = await Navigator.push<StravaAuthResult>(
-            context,
-            MaterialPageRoute(
-              builder: (_) => StravaStatsScreen(
-                result: result,
-                apiUrl: _apiUrl,
-              ),
-            ),
-          );
-          if (mounted) Navigator.pop(context, confirmed);
-        }
+      if (tokenResp.statusCode != 200) {
+        throw Exception('Token exchange failed: ${tokenResp.body}');
+      }
+
+      final tokenData = jsonDecode(tokenResp.body) as Map<String, dynamic>;
+      final accessToken = tokenData['access_token'] as String;
+      final refreshToken = tokenData['refresh_token'] as String;
+      final athlete = tokenData['athlete'] as Map<String, dynamic>;
+      final stravaAthleteId = athlete['id'].toString();
+
+      setState(() {
+        _loadingMessage = 'Creating your profile…';
+        _subMessage = 'Setting up your account';
+      });
+
+      // Step 2: Get current Supabase user or create one
+      final supabaseClient = Supabase.instance.client;
+      final currentUser = supabaseClient.auth.currentUser;
+
+      String userId;
+      bool isNewUser = false;
+
+      if (currentUser != null) {
+        // User already logged in with email
+        userId = currentUser.id;
       } else {
-        final detail = (jsonDecode(resp.body) as Map?)?['detail'] ?? resp.body;
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Sign-in failed: $detail')),
+        // Create new user with Strava email
+        final email =
+            athlete['email'] as String? ?? '$stravaAthleteId@strava.user';
+        final password =
+            'strava_$stravaAthleteId\_${DateTime.now().millisecondsSinceEpoch}';
+
+        try {
+          final authResp = await supabaseClient.auth.signUp(
+            email: email,
+            password: password,
           );
-          Navigator.pop(context, null);
+          userId = authResp.user!.id;
+          isNewUser = true;
+        } catch (e) {
+          // User might already exist, try to sign in
+          final authResp = await supabaseClient.auth.signInWithPassword(
+            email: email,
+            password: password,
+          );
+          userId = authResp.user!.id;
         }
+      }
+
+      setState(() {
+        _loadingMessage = 'Saving Strava connection…';
+        _subMessage = 'Almost done!';
+      });
+
+      // Step 3: Save to database
+      await supabaseClient.from('athletes').upsert({
+        'id': userId,
+        'strava_athlete_id': stravaAthleteId,
+        'access_token': accessToken,
+        'refresh_token': refreshToken,
+        'firstname': athlete['firstname'],
+        'lastname': athlete['lastname'],
+        'profile_photo': athlete['profile'],
+        'city': athlete['city'],
+        'state': athlete['state'],
+        'country': athlete['country'],
+        'sex': athlete['sex'],
+        'weight': athlete['weight'],
+        'updated_at': DateTime.now().toIso8601String(),
+      });
+
+      final result = StravaAuthResult(
+        userId: userId,
+        stravaAthleteId: stravaAthleteId,
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        athlete: athlete,
+        isNewUser: isNewUser,
+      );
+
+      // Persist session for auto-login
+      await StravaSessionService.save(result);
+
+      if (mounted) {
+        Navigator.pop(context, result);
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Network error: $e')),
+          SnackBar(content: Text('Connection failed: $e')),
         );
         Navigator.pop(context, null);
       }

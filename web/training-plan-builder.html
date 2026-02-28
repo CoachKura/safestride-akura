@@ -792,12 +792,170 @@
       let analysisResults = {};
       let trainingPlan = null;
       let currentWeek = 1;
+      let isStravaConnected = false;
+      let stravaProfile = null;
 
       // ============================================================================
       // STEP 1: DEVICE CONNECTION
       // ============================================================================
 
+      // Check Strava connection status on page load
+      async function checkStravaConnection() {
+        try {
+          const {
+            data: { user },
+          } = await supabaseClient.auth.getUser();
+          if (!user) return;
+
+          // Check if user has Strava access token in database
+          const { data: profile, error } = await supabaseClient
+            .from("profiles")
+            .select(
+              "strava_access_token, strava_athlete_id, strava_firstname, strava_lastname, strava_username, strava_profile_image, strava_connected_at",
+            )
+            .eq("id", user.id)
+            .maybeSingle();
+
+          if (error) {
+            console.error("Error checking Strava connection:", error);
+            return;
+          }
+
+          if (profile && profile.strava_access_token) {
+            isStravaConnected = true;
+            stravaProfile = profile;
+            updateStravaUI(true);
+
+            // Auto-fetch activity count
+            fetchActivityCount();
+          } else {
+            updateStravaUI(false);
+          }
+        } catch (error) {
+          console.error("Error checking Strava connection:", error);
+          updateStravaUI(false);
+        }
+      }
+
+      async function fetchActivityCount() {
+        try {
+          const {
+            data: { user },
+          } = await supabaseClient.auth.getUser();
+          if (!user) return;
+
+          const { count, error } = await supabaseClient
+            .from("strava_activities")
+            .select("*", { count: "exact", head: true })
+            .eq("athlete_id", user.id);
+
+          if (!error && count !== null) {
+            document.getElementById("strava-status").innerHTML =
+              `<span class="text-green-600 font-semibold"><i class="fas fa-check-circle mr-1"></i>Connected • ${count} activities synced</span>`;
+          }
+        } catch (error) {
+          console.error("Error fetching activity count:", error);
+        }
+      }
+
+      function updateStravaUI(connected) {
+        const stravaButton = document.querySelector(
+          'button[onclick="connectStrava()"]',
+        );
+        const statusDiv = document.getElementById("strava-status");
+
+        if (connected && stravaProfile) {
+          // Change button to Sync Activities
+          stravaButton.className =
+            "w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition";
+          stravaButton.innerHTML =
+            '<i class="fas fa-sync-alt mr-2"></i>Sync Activities';
+          stravaButton.setAttribute("onclick", "syncStravaActivities()");
+
+          // Show connection status
+          const connectedDate = stravaProfile.strava_connected_at
+            ? new Date(stravaProfile.strava_connected_at).toLocaleDateString()
+            : "recently";
+
+          statusDiv.innerHTML = `<span class="text-green-600 font-semibold"><i class="fas fa-check-circle mr-1"></i>Connected • Fetching activity count...</span>`;
+
+          // Show athlete profile
+          if (document.getElementById("athlete-profile-section")) {
+            const profileSection = document.getElementById(
+              "athlete-profile-section",
+            );
+            profileSection.classList.remove("hidden");
+
+            if (stravaProfile.strava_profile_image) {
+              profileSection
+                .querySelector("img")
+                ?.setAttribute("src", stravaProfile.strava_profile_image);
+            }
+          }
+        } else {
+          // Show Connect button
+          stravaButton.className =
+            "w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-lg transition";
+          stravaButton.innerHTML =
+            '<i class="fab fa-strava mr-2"></i>Connect Strava';
+          stravaButton.setAttribute("onclick", "connectStrava()");
+          statusDiv.innerHTML = "";
+        }
+      }
+
+      async function syncStravaActivities() {
+        const statusDiv = document.getElementById("strava-status");
+        statusDiv.innerHTML =
+          '<i class="fas fa-spinner fa-spin mr-2"></i>Syncing activities...';
+
+        try {
+          const {
+            data: { user },
+          } = await supabaseClient.auth.getUser();
+          if (!user) {
+            statusDiv.innerHTML =
+              '<span class="text-red-600">Please log in first</span>';
+            return;
+          }
+
+          // Call sync function
+          const { data, error } = await supabaseClient.functions.invoke(
+            "strava-sync",
+            {
+              body: { userId: user.id },
+            },
+          );
+
+          if (error) {
+            console.error("Sync error:", error);
+            statusDiv.innerHTML = `<span class="text-red-600">Sync failed: ${error.message}</span>`;
+            return;
+          }
+
+          // Update activity count
+          await fetchActivityCount();
+
+          // Show success message
+          statusDiv.innerHTML = `<span class="text-green-600 font-semibold"><i class="fas fa-check-circle mr-1"></i>Sync complete! ${data?.count || 0} activities synced</span>`;
+
+          // Auto-proceed to next step if activities exist
+          if (data?.count > 0) {
+            setTimeout(() => {
+              document.getElementById("nextToStep2").click();
+            }, 2000);
+          }
+        } catch (error) {
+          console.error("Sync error:", error);
+          statusDiv.innerHTML = `<span class="text-red-600">Sync failed. Please try again.</span>`;
+        }
+      }
+
       function connectStrava() {
+        if (isStravaConnected) {
+          syncStravaActivities();
+          return;
+        }
+
         const authUrl = `https://www.strava.com/oauth/authorize?client_id=${STRAVA_CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(STRAVA_REDIRECT_URI)}&scope=activity:read_all`;
         window.location.href = authUrl;
       }
@@ -808,8 +966,12 @@
         );
       }
 
-      // Check for Strava OAuth callback
-      window.addEventListener("load", function () {
+      // Check for Strava OAuth callback and connection status
+      window.addEventListener("load", async function () {
+        // First check if user is already connected
+        await checkStravaConnection();
+
+        // Then handle OAuth callback if present
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get("code");
 
@@ -1158,11 +1320,11 @@
           const mlResults = await mlAnalyzer.analyzeAthleteData({
             trainingLoad: {
               ratio: athleteData.trainingLoadRatio || 1.0,
-              weeklyDistance: athleteData.totalDistance || 0
+              weeklyDistance: athleteData.totalDistance || 0,
             },
             hrv: athleteData.hrv || null,
             sleep: athleteData.averageSleep || null,
-            recentActivities: athleteData.activities.slice(0, 30)
+            recentActivities: athleteData.activities.slice(0, 30),
           });
           athleteData.mlInsights = mlResults;
         }
@@ -1796,10 +1958,7 @@
               );
             }
           } catch (dbError) {
-            console.error(
-              "Database save failed, using localStorage:",
-              dbError,
-            );
+            console.error("Database save failed, using localStorage:", dbError);
             savePlanLocally(planData);
           }
         } catch (error) {

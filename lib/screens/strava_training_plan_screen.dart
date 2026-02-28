@@ -1,5 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:developer' as developer;
 
 class StravaTrainingPlanScreen extends StatefulWidget {
   final Map<String, dynamic> stats;
@@ -22,6 +24,10 @@ class _StravaTrainingPlanScreenState extends State<StravaTrainingPlanScreen> {
   int _weeks = 12;
   int? _expandedWeek;
 
+  // AISRI Score (fetched from database)
+  Map<String, dynamic>? _aisriScore;
+  bool _isLoadingAISRI = true;
+
   static const List<String> _goalLabels = [
     '5K',
     '10K',
@@ -41,6 +47,48 @@ class _StravaTrainingPlanScreenState extends State<StravaTrainingPlanScreen> {
     'pb_half_marathon',
     'pb_marathon'
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAISRIScore();
+  }
+
+  /// Fetch latest AISRI score from database
+  Future<void> _loadAISRIScore() async {
+    try {
+      final userId = Supabase.instance.client.auth.currentUser?.id;
+      if (userId == null) {
+        setState(() => _isLoadingAISRI = false);
+        return;
+      }
+
+      // Query latest AISRI score
+      final response = await Supabase.instance.client
+          .from('athlete_aisri_scores')
+          .select()
+          .eq('user_id', userId)
+          .order('calculated_at', ascending: false)
+          .limit(1)
+          .maybeSingle();
+
+      if (mounted) {
+        setState(() {
+          _aisriScore = response;
+          _isLoadingAISRI = false;
+        });
+
+        if (_aisriScore != null) {
+          developer.log('Loaded AISRI score: ${_aisriScore!['aisri_score']}');
+        }
+      }
+    } catch (e) {
+      developer.log('Error loading AISRI score: $e');
+      if (mounted) {
+        setState(() => _isLoadingAISRI = false);
+      }
+    }
+  }
 
   // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -118,6 +166,22 @@ class _StravaTrainingPlanScreenState extends State<StravaTrainingPlanScreen> {
   List<_TrainingWeek> _buildPlan() {
     final label = _goalLabels[_goalIndex];
     final profile = _profiles[label]!;
+
+    // Adjust plan volume based on AISRI score
+    double volumeMultiplier = 1.0;
+    if (_aisriScore != null) {
+      final aisriScore = _aisriScore!['aisri_score'] as int;
+      if (aisriScore >= 80) {
+        volumeMultiplier = 1.0; // Full volume for low risk
+      } else if (aisriScore >= 60) {
+        volumeMultiplier = 0.85; // Reduced volume for moderate risk
+      } else {
+        volumeMultiplier = 0.70; // Conservative volume for high risk
+      }
+      developer.log(
+          'Adjusting training volume by ${(volumeMultiplier * 100).round()}% based on AISRI: $aisriScore');
+    }
+
     final weeks = <_TrainingWeek>[];
 
     for (int w = 1; w <= _weeks; w++) {
@@ -126,9 +190,11 @@ class _StravaTrainingPlanScreenState extends State<StravaTrainingPlanScreen> {
       final taperMult = isTaper ? (w == _weeks ? 0.6 : 0.75) : 1.0;
       final vol =
           (profile.baseKm + (profile.peakKm - profile.baseKm) * progress) *
-              taperMult;
-      final longRun =
-          (5.0 + (profile.longRunPeak - 5.0) * progress) * taperMult;
+              taperMult *
+              volumeMultiplier; // Apply AISRI-based adjustment
+      final longRun = (5.0 + (profile.longRunPeak - 5.0) * progress) *
+          taperMult *
+          volumeMultiplier;
       final phase = isTaper
           ? 'Taper'
           : progress < 0.33
@@ -181,6 +247,54 @@ class _StravaTrainingPlanScreenState extends State<StravaTrainingPlanScreen> {
       ),
       body: Column(
         children: [
+          // ── AISRI Score Banner ─────────────────────────────────────────────
+          if (!_isLoadingAISRI && _aisriScore != null)
+            Container(
+              color: _aisriScore!['risk_level'] == 'Low'
+                  ? _green.withOpacity(0.2)
+                  : _aisriScore!['risk_level'] == 'Moderate'
+                      ? Colors.amber.withOpacity(0.2)
+                      : Colors.red.withOpacity(0.2),
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.health_and_safety,
+                    color: _aisriScore!['risk_level'] == 'Low'
+                        ? _green
+                        : _aisriScore!['risk_level'] == 'Moderate'
+                            ? Colors.amber
+                            : Colors.red,
+                    size: 24,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'AISRI Score: ${_aisriScore!['aisri_score']} (${_aisriScore!['risk_level']} Risk)',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                        if (_aisriScore!['calculation_method'] == 'strava_auto')
+                          Text(
+                            'Auto-calculated from your Strava activities • ${_aisriScore!['confidence']}% confidence',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.7),
+                              fontSize: 11,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
           // ── Settings panel ───────────────────────────────────────────────
           Container(
             color: _card,
@@ -437,7 +551,7 @@ class _StravaTrainingPlanScreenState extends State<StravaTrainingPlanScreen> {
           ),
           if (isExpanded) ...[
             const Divider(color: Colors.white10, height: 1),
-            ...week.workouts.map((w) => _workoutRow(w)),
+            ...week.workouts.map((w) => _workoutRow(w, week.weekNum)),
             const SizedBox(height: 8),
           ],
         ],
@@ -445,8 +559,10 @@ class _StravaTrainingPlanScreenState extends State<StravaTrainingPlanScreen> {
     );
   }
 
-  Widget _workoutRow(_Workout w) {
+  Widget _workoutRow(_Workout w, int weekNumber) {
     final color = _workoutColor(w.type);
+    final canStart = w.type != WorkoutType.rest && w.distKm > 0;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
       child: Row(
@@ -485,11 +601,74 @@ class _StravaTrainingPlanScreenState extends State<StravaTrainingPlanScreen> {
             ),
           ),
           if (w.distKm > 0)
-            Text('${w.distKm.round()} km',
+            Text('${w.distKm.round()} km  ',
                 style: const TextStyle(color: Colors.white54, fontSize: 12)),
+          if (canStart)
+            GestureDetector(
+              onTap: () => _startWorkout(w, weekNumber),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: color),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.play_arrow, color: color, size: 16),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Start',
+                      style: TextStyle(
+                        color: color,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
         ],
       ),
     );
+  }
+
+  void _startWorkout(_Workout workout, int weekNumber) {
+    // Prepare workout data for tracker
+    final workoutData = {
+      'name': workout.name,
+      'type': workout.type.toString().split('.').last,
+      'distance_km': workout.distKm,
+      'pace_guidance': _getPaceGuidance(workout.type),
+      'week_number': weekNumber,
+      'training_plan_goal':
+          _goalLabels[_goalIndex], // e.g., '5K', '10K', 'HM', 'Marathon'
+    };
+
+    // Navigate to tracker with workout context
+    Navigator.pushNamed(
+      context,
+      '/tracker',
+      arguments: workoutData,
+    );
+  }
+
+  String _getPaceGuidance(WorkoutType type) {
+    switch (type) {
+      case WorkoutType.easy:
+        return 'Easy: ${_fmtPaceSec(_easyPaceSecKm)}';
+      case WorkoutType.tempo:
+        return 'Tempo: ${_fmtPaceSec(_tempoPaceSecKm)}';
+      case WorkoutType.interval:
+        return 'Intervals: ${_fmtPaceSec(_intervalPaceSecKm)}';
+      case WorkoutType.longRun:
+        return 'Long Run (Easy): ${_fmtPaceSec(_easyPaceSecKm)}';
+      default:
+        return 'Run at comfortable pace';
+    }
   }
 
   Color _phaseColor(String phase) {

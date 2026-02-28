@@ -12,5 +12,6 @@
   "[dart]": {
     "editor.formatOnSave": true,
     "editor.rulers": [80]
-  }
+  },
+  "java.configuration.updateBuildConfiguration": "automatic"
 }

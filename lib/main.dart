@@ -7,19 +7,18 @@ import 'services/auth_service.dart';
 import 'services/strava_service.dart';
 import 'services/strava_session_service.dart';
 import 'screens/login_screen.dart';
-import 'screens/register_screen.dart';
-import 'screens/dashboard_screen.dart';
 import 'screens/evaluation_form_screen.dart';
 import 'screens/tracker_screen.dart';
-import 'screens/start_run_screen.dart';
-import 'screens/logger_screen.dart';
-import 'screens/workout_creator_screen.dart';
-import 'screens/history_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/devices_screen.dart';
 import 'screens/strava_oauth_screen.dart';
 import 'screens/strava_home_dashboard.dart';
+import 'screens/run_complete_screen.dart';
+import 'screens/run_history_screen.dart';
+import 'screens/analytics_dashboard_screen.dart';
+import 'screens/calendar_screen.dart';
 import 'theme/app_theme.dart';
+import 'models/run_session.dart';
 import 'dart:developer' as developer;
 
 void main() async {
@@ -166,6 +165,29 @@ class _MyAppState extends State<MyApp> {
             final session = settings.arguments as StravaAuthResult?;
             return MaterialPageRoute(
                 builder: (_) => StravaHomeDashboard(session: session));
+          case '/run-complete':
+            final runSession = settings.arguments as RunSession?;
+            if (runSession == null) {
+              // If no run session, navigate to Strava home
+              return MaterialPageRoute(
+                  builder: (_) => StravaHomeDashboard(session: null));
+            }
+            return MaterialPageRoute(
+                builder: (_) => RunCompleteScreen(session: runSession));
+          case '/tracker':
+            final workout = settings.arguments as Map<String, dynamic>?;
+            return MaterialPageRoute(
+                builder: (_) => TrackerScreen(workout: workout));
+          case '/aisri':
+            // Extract athleteData and stravaResult from arguments if provided
+            final args = settings.arguments as Map<String, dynamic>?;
+            final athleteData = args?['athleteData'] as Map<String, dynamic>?;
+            final stravaResult = args?['stravaResult'];
+            return MaterialPageRoute(
+                builder: (_) => EvaluationFormScreen(
+                      athleteData: athleteData,
+                      stravaResult: stravaResult,
+                    ));
           default:
             return null;
         }
@@ -173,17 +195,14 @@ class _MyAppState extends State<MyApp> {
       routes: {
         '/': (context) => const _StravaAutoLoginSplash(),
         '/login': (context) => const LoginScreen(),
-        '/register': (context) => const RegisterScreen(),
-        '/dashboard': (context) => const DashboardScreen(),
         '/devices': (context) => const DevicesScreen(),
-        '/aisri': (context) => const EvaluationFormScreen(),
+        '/dashboard': (context) => StravaHomeDashboard(session: null),
+        // Note: /aisri route with arguments handled in onGenerateRoute below
         '/strava-oauth': (context) => const StravaOAuthScreen(),
-        '/tracker': (context) => const TrackerScreen(),
-        '/start_run': (context) => const StartRunScreen(),
-        '/logger': (context) => const LoggerScreen(),
-        '/workout_creator': (context) => const WorkoutCreatorScreen(),
-        '/history': (context) => const HistoryScreen(),
+        '/run-history': (context) => const RunHistoryScreen(),
+        '/analytics': (context) => const AnalyticsDashboardScreen(),
         '/profile': (context) => const ProfileScreen(),
+        '/calendar': (context) => const CalendarScreen(),
       },
     );
   }
@@ -245,11 +264,8 @@ class _AuthCheckScreenState extends State<AuthCheckScreen> {
       );
     }
 
-    if (_hasCompletedAssessment) {
-      return const DashboardScreen();
-    } else {
-      return const EvaluationFormScreen();
-    }
+    // If no assessment completed, show Strava home (user can complete assessment from profile)
+    return StravaHomeDashboard(session: null);
   }
 }
 
