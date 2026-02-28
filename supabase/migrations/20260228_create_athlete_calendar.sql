@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS public.athlete_calendar (
   
   -- Workout details
   workout_name TEXT NOT NULL,
-  workout_type TEXT NOT NULL, -- 'Easy Run', 'Tempo', 'Intervals', 'Long Run', 'Strength', 'Rest'
+  workout_type TEXT NOT NULL,
   description TEXT,
   
   -- Scheduling
@@ -21,15 +21,15 @@ CREATE TABLE IF NOT EXISTS public.athlete_calendar (
   -- Workout parameters
   duration_minutes INTEGER,
   distance_km NUMERIC(6,2),
-  target_pace TEXT, -- e.g., '5:30/km'
-  intensity TEXT, -- 'Easy', 'Moderate', 'Hard'
+  target_pace TEXT,
+  intensity TEXT,
   
   -- Structure details
-  intervals JSONB, -- [{distance, pace, rest}, ...]
-  exercises JSONB, -- For strength workouts
+  intervals JSONB,
+  exercises JSONB,
   
   -- Status tracking
-  status TEXT DEFAULT 'scheduled', -- 'scheduled', 'completed', 'skipped', 'in_progress'
+  status TEXT DEFAULT 'scheduled',
   completed_at TIMESTAMPTZ,
   completed_distance_km NUMERIC(6,2),
   completed_duration_minutes INTEGER,
@@ -64,20 +64,20 @@ CREATE INDEX IF NOT EXISTS idx_athlete_calendar_athlete_date
 ALTER TABLE public.athlete_calendar ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
-DROP POLICY IF EXISTS ''Users can view own workouts'' ON public.athlete_calendar;
-CREATE POLICY ''Users can view own workouts'' ON public.athlete_calendar
+DROP POLICY IF EXISTS "Users can view own workouts" ON public.athlete_calendar;
+CREATE POLICY "Users can view own workouts" ON public.athlete_calendar
   FOR SELECT USING (auth.uid() = athlete_id OR auth.uid() = user_id);
 
-DROP POLICY IF EXISTS ''Users can insert own workouts'' ON public.athlete_calendar;
-CREATE POLICY ''Users can insert own workouts'' ON public.athlete_calendar
+DROP POLICY IF EXISTS "Users can insert own workouts" ON public.athlete_calendar;
+CREATE POLICY "Users can insert own workouts" ON public.athlete_calendar
   FOR INSERT WITH CHECK (auth.uid() = athlete_id OR auth.uid() = user_id);
 
-DROP POLICY IF EXISTS ''Users can update own workouts'' ON public.athlete_calendar;
-CREATE POLICY ''Users can update own workouts'' ON public.athlete_calendar
+DROP POLICY IF EXISTS "Users can update own workouts" ON public.athlete_calendar;
+CREATE POLICY "Users can update own workouts" ON public.athlete_calendar
   FOR UPDATE USING (auth.uid() = athlete_id OR auth.uid() = user_id);
 
-DROP POLICY IF EXISTS ''Users can delete own workouts'' ON public.athlete_calendar;
-CREATE POLICY ''Users can delete own workouts'' ON public.athlete_calendar
+DROP POLICY IF EXISTS "Users can delete own workouts" ON public.athlete_calendar;
+CREATE POLICY "Users can delete own workouts" ON public.athlete_calendar
   FOR DELETE USING (auth.uid() = athlete_id OR auth.uid() = user_id);
 
 COMMIT;
