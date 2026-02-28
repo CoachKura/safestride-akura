@@ -353,24 +353,30 @@ function App() {
             setEditingWorkout(null)
           }}
           onSave={async (workoutData) => {
-            if (demoMode) {
-              // In demo mode, add/update in local state
-              if (editingWorkout?.id) {
-                setWorkouts(workouts.map(w => 
-                  w.id === editingWorkout.id 
-                    ? { ...w, ...workoutData, workout: workoutData }
-                    : w
-                ))
-              } else {
-                const newWorkout = {
-                  id: `demo-${Date.now()}`,
+            if (editingWorkout?.id) {
+              // Update existing workout
+              await supabase
+                .from('athlete_calendar')
+                .update({
                   scheduled_date: workoutData.scheduled_date,
-                  status: 'pending',
-                  workout: workoutData
-                }
-                setWorkouts([...workouts, newWorkout])
-              }
+                  status: workoutData.status || 'pending'
+                })
+                .eq('id', editingWorkout.id)
+            } else {
+              // Create new workout
+              await supabase.from('athlete_calendar').insert({
+                athlete_id: user.id,
+                scheduled_date: workoutData.scheduled_date,
+                status: 'pending'
+              })
+            }
             
+            setShowWorkoutModal(false)
+            setEditingWorkout(null)
+            await loadWorkouts()
+          }}
+        />
+      )}
     </div>
   )
 }
