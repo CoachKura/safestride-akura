@@ -94,14 +94,10 @@ async def startup_event():
     print('AISRI ENGINE STARTUP')
     print('='*70)
     
-    # Run integrity checks
+    # Run integrity checks - STRICT MODE (violations crash deployment)
     if _GUARDIAN_OK:
-        try:
-            run_integrity_checks(strict=False)  # Non-strict: warnings OK, violations fail
-            print('✅ Guardian: All integrity checks passed')
-        except Exception as e:
-            print(f'⚠️  Guardian: {e}')
-            print('   Continuing with caution...')
+        run_integrity_checks(strict=True)  # Hard block: any violation crashes startup
+        print('✅ Guardian: All integrity checks passed')
     
     if _PHASE0_OK:
         try:
@@ -114,6 +110,8 @@ async def startup_event():
             print('Orchestrator initialized')
         except Exception as e:
             print(f'Orchestrator init failed: {e}')
+            import sys
+            sys.exit(1)  # Orchestrator failure is fatal
     print('AISRI ENGINE READY')
     print('='*70)
 
