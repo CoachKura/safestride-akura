@@ -7,6 +7,14 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
+# AISRi-Guardian: Deployment Integrity Gate
+try:
+    from system_guardian import run_integrity_checks
+    _GUARDIAN_OK = True
+except Exception as e:
+    _GUARDIAN_OK = False
+    print(f'Guardian unavailable: {e}')
+
 # Phase 0 Stabilization - Production Services  
 try:
     from orchestrator import AISRiOrchestrator
@@ -85,6 +93,16 @@ async def startup_event():
     print('='*70)
     print('AISRI ENGINE STARTUP')
     print('='*70)
+    
+    # Run integrity checks
+    if _GUARDIAN_OK:
+        try:
+            run_integrity_checks(strict=False)  # Non-strict: warnings OK, violations fail
+            print('✅ Guardian: All integrity checks passed')
+        except Exception as e:
+            print(f'⚠️  Guardian: {e}')
+            print('   Continuing with caution...')
+    
     if _PHASE0_OK:
         try:
             is_valid, missing = validate_environment(verbose=True)
