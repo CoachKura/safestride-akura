@@ -1,9 +1,9 @@
 ﻿# AISRi AI Engine - Python Dependencies
-# Updated: March 1, 2026 - CVE vulnerability fixes applied
+# Updated: March 1, 2026 - CVE vulnerability fixes applied with compatibility
 
 # Web Framework
-fastapi==0.115.5
-uvicorn[standard]==0.32.0
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
 
 # AI/ML
 openai==1.83.0
@@ -14,12 +14,10 @@ langgraph==0.2.16
 supabase==2.15.3
 
 # HTTP Client (CVE-2024-35195 fixed in 2.32.0+)
-httpx==0.27.2
-requests==2.32.5
+httpx==0.27.0
+requests==2.32.3
 
 # Utilities
 pydantic==2.9.2
 python-dotenv==1.0.1
 apscheduler==3.10.4
-python-multipart>=0.0.9
-legacy-cgi>=2.6
