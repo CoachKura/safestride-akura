@@ -11,7 +11,8 @@ Components:
 - Performance Tracking
 
 Usage:
-    orchestrator = AISRiOrchestrator()
+    orchestrator = AISRiOrchestrator()  # Assignment first
+    print('Orchestrator initialized')    # Print second
     
     # Connect athlete to Strava
     auth_url = orchestrator.initiate_strava_connection(athlete_id)
@@ -41,7 +42,7 @@ class AISRiOrchestrator:
         # Initialize services
         self.strava_oauth = StravaOAuthService(self.db)
         self.safety_gate = AISRISafetyGate(self.db)
-        self.aisri_calculator = AISRIAutoCalculator(self.db)
+        self.aisri_calculator = AISRIAutoCalculator  # Static class, no instantiation needed
         
         print("✅ AISRi Orchestrator initialized")
     
