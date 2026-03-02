@@ -8,9 +8,9 @@
 const SAFESTRIDE_CONFIG = {
     // Supabase Configuration
     supabase: {
-        url: 'https://your-project.supabase.co',
-        anonKey: 'your-anon-key-here',
-        functionsUrl: 'https://your-project.supabase.co/functions/v1'
+        url: 'https://bdisppaxbvygsspcuymb.supabase.co',
+        anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkaXNwcGF4YnZ5Z3NzcGN1eW1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk2MjYwMzgsImV4cCI6MjA1NTIwMjAzOH0.YOUR_ACTUAL_KEY_HERE',
+        functionsUrl: 'https://bdisppaxbvygsspcuymb.supabase.co/functions/v1'
     },
     
     // Strava OAuth Configuration
