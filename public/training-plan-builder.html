@@ -17,6 +17,12 @@
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
+    <!-- Config -->
+    <script src="/config.js"></script>
+    
+    <!-- Strava Session Persistence -->
+    <script src="/strava-session-persistence.js"></script>
+    
     <style>
         .pillar-card {
             transition: transform 0.2s, box-shadow 0.2s;
@@ -274,9 +280,12 @@
 
         // On page load
         document.addEventListener('DOMContentLoaded', async () => {
+            console.log('🚀 AISRI Training Plan Builder loaded');
+            
             // Check authentication
             const token = localStorage.getItem('authToken');
             if (!token) {
+                console.log('❌ Not authenticated, redirecting to login');
                 window.location.href = '/index.html';
                 return;
             }
@@ -284,7 +293,14 @@
             // Load athlete data
             await loadAthleteData();
 
-            // Check for OAuth callbacks
+            // ✨ NEW: Check for existing Strava connection
+            console.log('🔍 Checking for existing Strava connection...');
+            const existingConnection = await checkExistingStravaConnection();
+            
+            // Update UI based on connection status
+            updateStravaConnectionUI(existingConnection);
+
+            // Check for OAuth callbacks (if coming back from Strava)
             checkOAuthCallback();
         });
 
