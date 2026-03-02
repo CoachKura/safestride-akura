@@ -19,7 +19,7 @@ except Exception as e:
 try:
     from orchestrator import AISRiOrchestrator
     _ORCHESTRATOR_OK = True
-except Exception as e:
+except:
     _ORCHESTRATOR_OK = False
     print(f'Orchestrator unavailable: {e}')
 
@@ -121,10 +121,14 @@ async def startup_event():
         try:
             orchestrator = AISRiOrchestrator()
             print('Orchestrator initialized')
+            print(f'DEBUG: orchestrator is {"None" if orchestrator is None else "initialized"}')
+            print(f'DEBUG: orchestrator type: {type(orchestrator)}')
         except Exception as e:
             print(f'Orchestrator init failed: {e}')
             import sys
             sys.exit(1)  # Orchestrator failure is fatal
+    else:
+        print('WARNING: Orchestrator module not available (_ORCHESTRATOR_OK=False)')
     print('AISRI ENGINE READY')
     print('='*70)
 
@@ -462,6 +466,8 @@ async def strava_connect(athlete_id: str = Query(..., description='SafeStride at
     Initiate Strava OAuth connection.
     Returns authorization URL for athlete to visit.
     '''
+    if orchestrator is None:
+        raise HTTPException(status_code=503, detail='Orchestrator not initialized - check startup logs')
     try:
         auth_url = orchestrator.initiate_strava_connection(athlete_id)
         return {
@@ -582,6 +588,11 @@ async def generate_safe_workout(
 @app.get('/system/health')
 async def system_health():
     '''Comprehensive system health check'''
+    if orchestrator is None:
+        return {
+            'status': 'error',
+            'message': 'Orchestrator not initialized - check startup logs'
+        }
     try:
         health = await orchestrator.health_check()
         return health
