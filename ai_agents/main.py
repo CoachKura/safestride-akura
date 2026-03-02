@@ -487,12 +487,60 @@ async def strava_callback(
     '''
     Handle Strava OAuth callback.
     Exchanges code for access token and stores in database.
+    Returns HTML for browser display.
     '''
+    from fastapi.responses import HTMLResponse
+    
     try:
         result = await orchestrator.complete_strava_connection(code, state, scope)
-        return result
+        
+        # Return HTML response for browser
+        html_content = f"""<!DOCTYPE html>
+<html>
+<head>
+    <title>Connected to Strava</title>
+    <style>
+        body {{ font-family: Arial, sans-serif; text-align: center; padding: 50px; }}
+        h1 {{ color: #FC4C02; }}
+        .success {{ color: green; }}
+        .info {{ color: #666; margin-top: 20px; }}
+    </style>
+</head>
+<body>
+    <h1 class="success">✅ Connected to Strava</h1>
+    <p><strong>Athlete:</strong> {result.get('strava_name', 'Unknown')}</p>
+    <p><strong>Athlete ID:</strong> {result.get('athlete_id', state)}</p>
+    <p><strong>Strava ID:</strong> {result.get('strava_athlete_id', 'N/A')}</p>
+    <p class="info">You can close this window now.</p>
+    <script>
+        if (window.opener) {{
+            window.opener.postMessage({{type: "strava_connected", athlete_id: "{state}"}}, "*");
+            setTimeout(() => window.close(), 3000);
+        }}
+    </script>
+</body>
+</html>"""
+        
+        return HTMLResponse(content=html_content, status_code=200)
+        
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        error_html = f"""<!DOCTYPE html>
+<html>
+<head>
+    <title>Connection Failed</title>
+    <style>
+        body {{ font-family: Arial, sans-serif; text-align: center; padding: 50px; }}
+        h1 {{ color: #d32f2f; }}
+        .error {{ color: #d32f2f; margin-top: 20px; }}
+    </style>
+</head>
+<body>
+    <h1>❌ Connection Failed</h1>
+    <p class="error">{str(e)}</p>
+    <p>Please try connecting again.</p>
+</body>
+</html>"""
+        return HTMLResponse(content=error_html, status_code=400)
 
 @app.get('/strava/status/{athlete_id}')
 async def strava_status(athlete_id: str):
