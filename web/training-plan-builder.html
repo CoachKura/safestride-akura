@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -758,7 +758,7 @@
           <a href="#" class="hover:text-white transition">Contact</a>
         </div>
         <div class="mt-4 text-sm text-gray-500">
-          © 2026 Akura. All rights reserved.
+          Â© 2026 Akura. All rights reserved.
         </div>
       </div>
     </footer>
@@ -800,44 +800,90 @@
       // ============================================================================
 
       // Check Strava connection status on page load
-      async function checkStravaConnection() {
-        try {
-          const {
-            data: { user },
-          } = await supabaseClient.auth.getUser();
-          if (!user) return;
 
-          // Check if user has Strava access token in database
-          const { data: profile, error } = await supabaseClient
-            .from("profiles")
-            .select(
-              "strava_access_token, strava_athlete_id, strava_firstname, strava_lastname, strava_username, strava_profile_image, strava_connected_at",
-            )
-            .eq("id", user.id)
-            .maybeSingle();
-
-          if (error) {
-            console.error("Error checking Strava connection:", error);
-            return;
-          }
-
-          if (profile && profile.strava_access_token) {
-            isStravaConnected = true;
-            stravaProfile = profile;
-            updateStravaUI(true);
-
-            // Auto-fetch activity count
-            fetchActivityCount();
-          } else {
-            updateStravaUI(false);
-          }
-        } catch (error) {
-          console.error("Error checking Strava connection:", error);
-          updateStravaUI(false);
-        }
-      }
-
-      async function fetchActivityCount() {
+// ============================================================================
+// STRAVA SESSION PERSISTENCE - CHECK FOR EXISTING CONNECTION //
+============================================================================
+async function checkExistingStravaConnection() { try { console.log('ðŸ” Checking
+for existing Strava connection...'); const { data: { user } } = await
+supabaseClient.auth.getUser(); if (!user) { console.log('âŒ No user session
+found'); return null; } // Query strava_connections table const { data, error }
+= await supabaseClient .from('strava_connections') .select('*')
+.eq('athlete_id', user.id) .single(); if (error) { console.log('â„¹ï¸ No Strava
+connection found:', error.message); return null; } console.log('âœ… Found
+existing Strava connection:', data); // Check if token expired const expiresAt =
+new Date(data.expires_at); const now = new Date(); if (expiresAt < now) {
+console.log('âš ï¸ Token expired, refreshing...'); const refreshed = await
+refreshStravaToken(data.athlete_id, data.refresh_token); if (!refreshed) return
+null; return refreshed; } // Update global state isStravaConnected = true;
+stravaProfile = { strava_athlete_id: data.strava_athlete_id,
+strava_access_token: data.access_token, athlete_data: data.athlete_data };
+return data; } catch (error) { console.error('âŒ Error checking connection:',
+error); return null; } } async function refreshStravaToken(athleteId,
+refreshToken) { try { console.log('ðŸ”„ Refreshing Strava token...'); const
+response = await
+fetch('https://bdisppaxbvygsspcuymb.supabase.co/functions/v1/strava-refresh-token',
+{ method: 'POST', headers: { 'Content-Type': 'application/json',
+'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }, body: JSON.stringify({
+athleteId, refreshToken }) }); if (!response.ok) throw new Error('Refresh
+failed'); const result = await response.json(); console.log('âœ… Token
+refreshed'); return result.data; } catch (error) { console.error('âŒ Token
+refresh error:', error); return null; } } function
+updateStravaConnectionUI(connectionData) { const connectBtn =
+document.getElementById('connectStravaBtn'); const statusDiv =
+document.getElementById('strava-status'); if (!connectBtn) return; if
+(connectionData) { // Connected - show green connectBtn.innerHTML = '<i
+  class="fas fa-check-circle mr-2"
+></i
+>Strava Connected'; connectBtn.className = 'w-full bg-green-600
+hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition';
+connectBtn.onclick = async () => { connectBtn.innerHTML = '<i
+  class="fas fa-spinner fa-spin mr-2"
+></i
+>Syncing...'; await loadStravaActivities(connectionData.athlete_id);
+connectBtn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Strava
+Connected'; }; if (statusDiv) { statusDiv.innerHTML = `<span
+  class="text-green-600"
+  ><i class="fas fa-sync-alt mr-1"></i>Last synced: ${new
+  Date(connectionData.updated_at).toLocaleString()}</span
+>`; } loadStravaActivities(connectionData.athlete_id); } else { // Not connected
+- show orange connectBtn.innerHTML = '<i class="fab fa-strava mr-2"></i>Connect
+Strava'; connectBtn.className = 'w-full bg-orange-500 hover:bg-orange-600
+text-white font-semibold py-3 rounded-lg transition'; connectBtn.onclick =
+connectStrava; } } async function loadStravaActivities(athleteId) { try {
+console.log('ðŸ“Š Loading Strava activities from database...'); const { data,
+error } = await supabaseClient .from('strava_activities') .select('*')
+.eq('athlete_id', athleteId) .order('start_date', { ascending: false })
+.limit(100); if (error) { console.error('âŒ Error loading activities:', error);
+return; } console.log(`âœ… Loaded ${data.length} activities from database`); if
+(data.length > 0) { athleteData.stravaActivities = data;
+athleteData.totalActivities = data.length; calculateStravaStats(data); } await
+loadAISRIScores(athleteId); } catch (error) { console.error('âŒ Error loading
+activities:', error); } } function calculateStravaStats(activities) { const
+last30Days = activities.filter(a => { const activityDate = new
+Date(a.start_date); const daysAgo = (Date.now() - activityDate.getTime()) /
+(1000 * 60 * 60 * 24); return daysAgo <= 30; }); athleteData.recentActivityCount
+= last30Days.length; athleteData.totalDistance = last30Days.reduce((sum, a) =>
+sum + (a.distance || 0), 0) / 1000; athleteData.totalDuration =
+last30Days.reduce((sum, a) => sum + (a.moving_time || 0), 0) / 3600;
+console.log('ðŸ“ˆ Stats calculated:', athleteData); } async function
+loadAISRIScores(athleteId) { try { const { data, error } = await supabaseClient
+.from('aisri_scores') .select('*') .eq('athlete_id', athleteId)
+.order('assessment_date', { ascending: false }) .limit(1); if (error) {
+console.error('âŒ Error loading scores:', error); return; } if (data.length > 0)
+{ console.log('âœ… Loaded AISRI score:', data[0]); athleteData.aisriScore =
+data[0]; } } catch (error) { console.error('âŒ Error loading scores:', error); }
+} // Check for Strava OAuth callback and connection status
+window.addEventListener("load", async function () { console.log('ðŸš€ AISRI
+Training Plan Builder loaded'); // Check existing connection FIRST const
+existingConnection = await checkExistingStravaConnection();
+updateStravaConnectionUI(existingConnection); // Handle OAuth callback if
+present const urlParams = new URLSearchParams(window.location.search); const
+code = urlParams.get("code"); if (code) { console.log('ðŸ”µ OAuth callback
+detected'); await handleStravaCallback(code); } else if (existingConnection) {
+console.log('âœ… User already connected'); } else { console.log('â„¹ï¸ No Strava
+connection found'); } });
+async function fetchActivityCount() {
         try {
           const {
             data: { user },
@@ -851,7 +897,7 @@
 
           if (!error && count !== null) {
             document.getElementById("strava-status").innerHTML =
-              `<span class="text-green-600 font-semibold"><i class="fas fa-check-circle mr-1"></i>Connected • ${count} activities synced</span>`;
+              `<span class="text-green-600 font-semibold"><i class="fas fa-check-circle mr-1"></i>Connected â€¢ ${count} activities synced</span>`;
           }
         } catch (error) {
           console.error("Error fetching activity count:", error);
@@ -877,7 +923,7 @@
             ? new Date(stravaProfile.strava_connected_at).toLocaleDateString()
             : "recently";
 
-          statusDiv.innerHTML = `<span class="text-green-600 font-semibold"><i class="fas fa-check-circle mr-1"></i>Connected • Fetching activity count...</span>`;
+          statusDiv.innerHTML = `<span class="text-green-600 font-semibold"><i class="fas fa-check-circle mr-1"></i>Connected â€¢ Fetching activity count...</span>`;
 
           // Show athlete profile
           if (document.getElementById("athlete-profile-section")) {
@@ -986,13 +1032,13 @@
 
         try {
           console.log(
-            "🔵 Starting Strava OAuth with code:",
+            "ðŸ”µ Starting Strava OAuth with code:",
             code.substring(0, 10) + "...",
           );
 
           // Generate consistent athlete ID to use for both OAuth and sync
           const athleteId = `athlete_${Date.now()}`;
-          console.log("🔵 Generated athlete ID:", athleteId);
+          console.log("ðŸ”µ Generated athlete ID:", athleteId);
 
           // Step 1: Exchange authorization code for access token
           const { data: oauthData, error: oauthError } =
@@ -1003,20 +1049,20 @@
               },
             });
 
-          console.log("🔵 OAuth Response:", {
+          console.log("ðŸ”µ OAuth Response:", {
             data: oauthData,
             error: oauthError,
           });
 
           if (oauthError) {
-            console.error("❌ OAuth error details:", oauthError);
+            console.error("âŒ OAuth error details:", oauthError);
             // Try to extract detailed error message from response data
             let errorMsg = oauthError.message || JSON.stringify(oauthError);
 
             // If edge function returned error details in data, use that
             if (oauthData && oauthData.error) {
               errorMsg = oauthData.error;
-              console.error("❌ Edge Function error:", errorMsg);
+              console.error("âŒ Edge Function error:", errorMsg);
             }
 
             throw new Error(errorMsg);
@@ -1025,14 +1071,14 @@
           if (!oauthData || !oauthData.success) {
             const errorMsg =
               oauthData?.error || "OAuth failed - no data returned";
-            console.error("❌ OAuth failed:", errorMsg);
+            console.error("âŒ OAuth failed:", errorMsg);
             throw new Error(errorMsg);
           }
 
           document.getElementById("strava-status").innerHTML =
             '<i class="fas fa-check-circle text-green-600 mr-2"></i>Connected! Analyzing your activities...';
 
-          console.log("🔵 OAuth successful, using athlete ID:", athleteId);
+          console.log("ðŸ”µ OAuth successful, using athlete ID:", athleteId);
 
           // Step 2: Sync activities and calculate AISRI scores
           const { data: syncData, error: syncError } =
@@ -1043,26 +1089,26 @@
               },
             });
 
-          console.log("🔵 Sync Response:", {
+          console.log("ðŸ”µ Sync Response:", {
             data: syncData,
             error: syncError,
           });
 
           if (syncError) {
-            console.error("❌ Sync error details:", syncError);
+            console.error("âŒ Sync error details:", syncError);
             // Try to extract the actual error message from the Edge Function
             const errorMsg =
               syncData?.error ||
               syncError.message ||
               "Failed to sync activities";
-            console.error("❌ Extracted error:", errorMsg);
+            console.error("âŒ Extracted error:", errorMsg);
             throw new Error(errorMsg);
           }
 
           if (!syncData || !syncData.success) {
             const errorMsg =
               syncData?.error || "Sync failed - no data returned";
-            console.error("❌ Sync failed:", errorMsg);
+            console.error("âŒ Sync failed:", errorMsg);
             throw new Error(errorMsg);
           }
 
@@ -1105,7 +1151,7 @@
       }
 
       function displayAthleteProfile(syncData) {
-        console.log("🎨 Displaying athlete profile:", syncData);
+        console.log("ðŸŽ¨ Displaying athlete profile:", syncData);
 
         // Show the profile section
         document
@@ -1278,7 +1324,7 @@
       }
 
       // ============================================================================
-      // STEP 1 → STEP 2 TRANSITION
+      // STEP 1 â†’ STEP 2 TRANSITION
       // ============================================================================
 
       async function proceedToAnalysis() {
@@ -1663,7 +1709,7 @@
 
         // Safety check: ensure zones exist
         if (!zones || typeof zones !== "object") {
-          console.warn("⚠️ HR Zones not available, using default values");
+          console.warn("âš ï¸ HR Zones not available, using default values");
           const age = athleteData.age || 30;
           const maxHR = 220 - age;
           // Create default zones if calculateHRZones failed
@@ -1725,7 +1771,7 @@
       }
 
       // ============================================================================
-      // STEP 2 → STEP 3 TRANSITION
+      // STEP 2 â†’ STEP 3 TRANSITION
       // ============================================================================
 
       function proceedToTrainingPlan() {
@@ -1946,7 +1992,7 @@
               // If table doesn't exist, fall back to localStorage
               if (error.code === "PGRST205") {
                 console.warn(
-                  "⚠️ training_plans table not found, saving to localStorage",
+                  "âš ï¸ training_plans table not found, saving to localStorage",
                 );
                 savePlanLocally(planData);
               } else {
@@ -1954,7 +2000,7 @@
               }
             } else {
               alert(
-                "✅ Training plan saved to database successfully!\n\nYou can access it anytime from your dashboard.",
+                "âœ… Training plan saved to database successfully!\n\nYou can access it anytime from your dashboard.",
               );
             }
           } catch (dbError) {
@@ -1985,11 +2031,11 @@
           );
 
           alert(
-            "✅ Training plan saved locally!\n\n" +
+            "âœ… Training plan saved locally!\n\n" +
               "Note: This plan is stored in your browser. To save to the database:\n" +
               "1. Open: https://supabase.com/dashboard/project/bdisppaxbvygsspcuymb/editor\n" +
               "2. Run the SQL from: supabase/migrations/20260225_training_plans_table.sql\n\n" +
-              `📊 You have ${existingPlans.length} plan(s) saved locally.`,
+              `ðŸ“Š You have ${existingPlans.length} plan(s) saved locally.`,
           );
         } catch (error) {
           console.error("localStorage save failed:", error);
