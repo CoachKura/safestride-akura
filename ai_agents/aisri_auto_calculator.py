@@ -60,6 +60,9 @@ class AISRIAutoCalculator:
     5. Performance trends (fitness progression)
     """
 
+    def __init__(self):
+        self.aisri_calculator = AISRIAutoCalculator  # ✅ Reference the class
+
     @staticmethod
     async def calculate_from_strava(
         user_id: str,

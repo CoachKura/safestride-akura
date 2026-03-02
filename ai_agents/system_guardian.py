@@ -82,6 +82,135 @@ class AISRiGuardian:
         
         return all_passed
     
+    def check_directory_contamination(self) -> bool:
+        """Check for directory contamination - Flutter/mobile artifacts in backend deploy root"""
+        print("\n" + "=" * 70)
+        print("DIRECTORY CONTAMINATION CHECKS")
+        print("=" * 70)
+        
+        all_passed = True
+        
+        # Check 1: No Flutter mobile platform directories
+        flutter_artifacts = ['android', 'ios', 'macos', 'windows', 'linux', 'build']
+        found_artifacts = []
+        
+        for artifact in flutter_artifacts:
+            artifact_path = self.base_dir / artifact
+            if artifact_path.exists() and artifact_path.is_dir():
+                found_artifacts.append(artifact)
+        
+        if found_artifacts:
+            self.violations.append(f"❌ CRITICAL: Flutter mobile artifacts found in backend deploy root: {found_artifacts}")
+            self.violations.append("    These directories belong in repository root, NOT in ai_agents/")
+            all_passed = False
+        else:
+            self.passed.append("✅ No Flutter mobile platform directories in backend deploy root")
+        
+        # Check 2: No Flutter configuration files
+        flutter_files = ['.flutter-plugins', '.flutter-plugins-dependencies', '.packages', 'pubspec.yaml', 'pubspec.lock']
+        found_flutter_files = []
+        
+        for flutter_file in flutter_files:
+            file_path = self.base_dir / flutter_file
+            if file_path.exists():
+                found_flutter_files.append(flutter_file)
+        
+        if found_flutter_files:
+            self.violations.append(f"❌ CRITICAL: Flutter configuration files found in backend: {found_flutter_files}")
+            all_passed = False
+        else:
+            self.passed.append("✅ No Flutter configuration files in backend deploy root")
+        
+        # Check 3: No nested .git repositories
+        nested_git_dirs = []
+        for item in self.base_dir.rglob(".git"):
+            if item.is_dir() and item != self.base_dir / ".git":
+                nested_git_dirs.append(str(item.relative_to(self.base_dir)))
+        
+        if nested_git_dirs:
+            self.violations.append(f"❌ CRITICAL: Nested .git repositories found: {nested_git_dirs}")
+            self.violations.append("    Only repository root should contain .git directory")
+            all_passed = False
+        else:
+            self.passed.append("✅ No nested .git repositories detected")
+        
+        # Check 4: Non-production agent directories (conditional warning)
+        allow_nonprod = os.getenv("ALLOW_NONPROD_MODULES", "false").lower() in ["true", "1", "yes"]
+        nonprod_dirs = ['mobile_agent', 'test_agent', 'devops_agent']
+        found_nonprod = []
+        
+        for nonprod_dir in nonprod_dirs:
+            dir_path = self.base_dir / nonprod_dir
+            if dir_path.exists() and dir_path.is_dir():
+                found_nonprod.append(nonprod_dir)
+        
+        if found_nonprod:
+            if allow_nonprod:
+                self.warnings.append(f"⚠️  INFO: Non-production modules present (allowed by ALLOW_NONPROD_MODULES): {found_nonprod}")
+            else:
+                self.violations.append(f"❌ CRITICAL: Non-production modules in deploy root: {found_nonprod}")
+                self.violations.append("    Set ALLOW_NONPROD_MODULES=true to allow, or remove these directories")
+                all_passed = False
+        else:
+            self.passed.append("✅ No non-production agent directories in deploy root")
+        
+        return all_passed
+    
+    def check_requirements_sanity(self) -> bool:
+        """Check requirements.txt exists and contains critical dependencies"""
+        print("\n" + "=" * 70)
+        print("REQUIREMENTS SANITY CHECKS")
+        print("=" * 70)
+        
+        all_passed = True
+        
+        requirements_file = self.base_dir / "requirements.txt"
+        
+        # Check 1: requirements.txt exists
+        if not requirements_file.exists():
+            self.violations.append("❌ CRITICAL: requirements.txt not found in deploy root")
+            return False
+        else:
+            self.passed.append("✅ requirements.txt exists")
+        
+        # Check 2: requirements.txt is not empty
+        try:
+            with open(requirements_file, 'r', encoding='utf-8') as f:
+                content = f.read().strip()
+            
+            if not content:
+                self.violations.append("❌ CRITICAL: requirements.txt is empty")
+                return False
+            
+            lines = [line.strip() for line in content.split('\n') if line.strip() and not line.startswith('#')]
+            
+            if len(lines) == 0:
+                self.violations.append("❌ CRITICAL: requirements.txt contains no package specifications")
+                return False
+            else:
+                self.passed.append(f"✅ requirements.txt contains {len(lines)} package specifications")
+            
+            # Check 3: Critical packages present
+            critical_packages = ['fastapi', 'uvicorn', 'supabase', 'pydantic']
+            missing_packages = []
+            
+            content_lower = content.lower()
+            for package in critical_packages:
+                if package not in content_lower:
+                    missing_packages.append(package)
+            
+            if missing_packages:
+                self.violations.append(f"❌ CRITICAL: Missing critical packages in requirements.txt: {missing_packages}")
+                all_passed = False
+            else:
+                self.passed.append(f"✅ All critical packages present: {critical_packages}")
+            
+        except Exception as e:
+            self.violations.append(f"❌ CRITICAL: Failed to read requirements.txt: {e}")
+            return False
+        
+        return all_passed
+    
     def check_router_integrity(self) -> bool:
         """Check router registration and imports"""
         print("\n" + "=" * 70)
@@ -255,6 +384,136 @@ class AISRiGuardian:
         
         return all_passed
     
+    def check_directory_contamination(self) -> bool:
+        """Check for directory contamination - Flutter/mobile artifacts in backend deploy root"""
+        print("\n" + "=" * 70)
+        print("DIRECTORY CONTAMINATION CHECKS")
+        print("=" * 70)
+        
+        all_passed = True
+        
+        # Check 1: No Flutter mobile platform directories
+        flutter_artifacts = ['android', 'ios', 'macos', 'windows', 'linux', 'build']
+        found_artifacts = []
+        
+        for artifact in flutter_artifacts:
+            artifact_path = self.base_dir / artifact
+            if artifact_path.exists() and artifact_path.is_dir():
+                found_artifacts.append(artifact)
+        
+        if found_artifacts:
+            self.violations.append(f"❌ CRITICAL: Flutter mobile artifacts found in backend deploy root: {found_artifacts}")
+            self.violations.append("    These directories belong in repository root, NOT in ai_agents/")
+            all_passed = False
+        else:
+            self.passed.append("✅ No Flutter mobile platform directories in backend deploy root")
+        
+        # Check 2: No Flutter configuration files
+        flutter_files = ['.flutter-plugins', '.flutter-plugins-dependencies', '.packages', 'pubspec.yaml', 'pubspec.lock']
+        found_flutter_files = []
+        
+        for flutter_file in flutter_files:
+            file_path = self.base_dir / flutter_file
+            if file_path.exists():
+                found_flutter_files.append(flutter_file)
+        
+        if found_flutter_files:
+            self.violations.append(f"❌ CRITICAL: Flutter configuration files found in backend: {found_flutter_files}")
+            all_passed = False
+        
+        else:
+            self.passed.append("✅ No Flutter configuration files in backend deploy root")
+        
+        # Check 3: No nested .git repositories
+        nested_git_dirs = []
+        for item in self.base_dir.rglob(".git"):
+            if item.is_dir() and item != self.base_dir / ".git":
+                nested_git_dirs.append(str(item.relative_to(self.base_dir)))
+        
+        if nested_git_dirs:
+            self.violations.append(f"❌ CRITICAL: Nested .git repositories found: {nested_git_dirs}")
+            self.violations.append("    Only repository root should contain .git directory")
+            all_passed = False
+        else:
+            self.passed.append("✅ No nested .git repositories detected")
+        
+        # Check 4: Non-production agent directories (conditional warning)
+        allow_nonprod = os.getenv("ALLOW_NONPROD_MODULES", "false").lower() in ["true", "1", "yes"]
+        nonprod_dirs = ['mobile_agent', 'test_agent', 'devops_agent']
+        found_nonprod = []
+        
+        for nonprod_dir in nonprod_dirs:
+            dir_path = self.base_dir / nonprod_dir
+            if dir_path.exists() and dir_path.is_dir():
+                found_nonprod.append(nonprod_dir)
+        
+        if found_nonprod:
+            if allow_nonprod:
+                self.warnings.append(f"⚠️  INFO: Non-production modules present (allowed by ALLOW_NONPROD_MODULES): {found_nonprod}")
+            else:
+                self.violations.append(f"❌ CRITICAL: Non-production modules in deploy root: {found_nonprod}")
+                self.violations.append("    Set ALLOW_NONPROD_MODULES=true to allow, or remove these directories")
+                all_passed = False
+        else:
+            self.passed.append("✅ No non-production agent directories in deploy root")
+        
+        return all_passed
+    
+    def check_requirements_sanity(self) -> bool:
+        """Check requirements.txt exists and contains critical dependencies"""
+        print("\n" + "=" * 70)
+        print("REQUIREMENTS SANITY CHECKS")
+        print("=" * 70)
+        
+        all_passed = True
+        
+        requirements_file = self.base_dir / "requirements.txt"
+        
+        # Check 1: requirements.txt exists
+        if not requirements_file.exists():
+            self.violations.append("❌ CRITICAL: requirements.txt not found in deploy root")
+            return False
+        else:
+            self.passed.append("✅ requirements.txt exists")
+        
+        # Check 2: requirements.txt is not empty
+        try:
+            with open(requirements_file, 'r', encoding='utf-8') as f:
+                content = f.read().strip()
+            
+            if not content:
+                self.violations.append("❌ CRITICAL: requirements.txt is empty")
+                return False
+            
+            lines = [line.strip() for line in content.split('\n') if line.strip() and not line.startswith('#')]
+            
+            if len(lines) == 0:
+                self.violations.append("❌ CRITICAL: requirements.txt contains no package specifications")
+                return False
+            else:
+                self.passed.append(f"✅ requirements.txt contains {len(lines)} package specifications")
+            
+            # Check 3: Critical packages present
+            critical_packages = ['fastapi', 'uvicorn', 'supabase', 'pydantic']
+            missing_packages = []
+            
+            content_lower = content.lower()
+            for package in critical_packages:
+                if package not in content_lower:
+                    missing_packages.append(package)
+            
+            if missing_packages:
+                self.violations.append(f"❌ CRITICAL: Missing critical packages in requirements.txt: {missing_packages}")
+                all_passed = False
+            else:
+                self.passed.append(f"✅ All critical packages present: {critical_packages}")
+            
+        except Exception as e:
+            self.violations.append(f"❌ CRITICAL: Failed to read requirements.txt: {e}")
+            return False
+        
+        return all_passed
+    
     def print_report(self):
         """Print detailed integrity report"""
         print("\n" + "=" * 70)
@@ -300,6 +559,8 @@ class AISRiGuardian:
         print(f"Strict Mode: {strict}")
         
         file_ok = self.check_file_structure()
+        contamination_ok = self.check_directory_contamination()  # ADD THIS LINE
+        requirements_ok = self.check_requirements_sanity()  # ADD THIS LINE
         router_ok = self.check_router_integrity()
         env_ok = self.check_environment()
         deps_ok = self.check_dependencies()
@@ -308,7 +569,7 @@ class AISRiGuardian:
         
         if strict:
             # In strict mode, any violation fails
-            return file_ok and router_ok and env_ok and deps_ok
+            return file_ok and contamination_ok and requirements_ok and router_ok and env_ok and deps_ok
         else:
             # In non-strict mode, only critical violations fail, warnings are OK
             return len(self.violations) == 0

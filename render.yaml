@@ -12,8 +12,8 @@ services:
     branch: main
     rootDir: ai_agents
     buildCommand: pip install -r requirements.txt
-    startCommand: python api_endpoints.py
-    healthCheckPath: /health
+    startCommand: uvicorn main:app --host 0.0.0.0 --port ${PORT:-10000}
+    healthCheckPath: /system/health
     autoDeploy: true
     envVars:
       - key: PYTHONUNBUFFERED

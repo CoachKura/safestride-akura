@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from typing import Any, Optional
 
 import uvicorn
@@ -6,6 +7,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+from system_guardian import run_integrity_checks
 
 # AISRi-Guardian: Deployment Integrity Gate
 try:
@@ -182,39 +184,76 @@ def env_check():
         "supabase_client_initialized": supabase is not None
     }
 @app.get("/test-supabase")
-def test_supabase() -> dict[str, Any]:
-    if supabase is None:
-        raise HTTPException(status_code=500, detail=f"Supabase not configured: {_SUPABASE_INIT_ERROR}")
-
+async def test_supabase() -> dict[str, Any]:
+    """
+    Debug endpoint for database connectivity verification.
+    Only enabled when ALLOW_DEBUG_ENDPOINTS=true (disabled in production).
+    """
+    # Environment gate: disabled by default
+    allow_debug = os.getenv("ALLOW_DEBUG_ENDPOINTS", "false").lower() in ["true", "1", "yes"]
+    if not allow_debug:
+        raise HTTPException(status_code=404, detail="Not found")
+    
+    # Orchestrator gate
+    if orchestrator is None:
+        raise HTTPException(status_code=503, detail="Orchestrator not initialized")
+    
     try:
-        response = supabase.table("profiles").select("id").limit(5).execute()
+        # Route through orchestrator's database handler
+        response = orchestrator.db.supabase.table("athlete_profiles").select("id").limit(5).execute()
         data = response.data or []
-        return {"status": "success", "records_found": len(data), "data": data}
+        
+        # Audit log (stub for now, can be extended)
+        print(f"[AUDIT] /test-supabase accessed | records_found={len(data)} | timestamp={datetime.now().isoformat()}")
+        
+        return {
+            "status": "success",
+            "records_found": len(data),
+            "data": data,
+            "message": "Debug endpoint - production should have ALLOW_DEBUG_ENDPOINTS=false"
+        }
     except Exception as exc:
-        raise HTTPException(status_code=502, detail=str(exc))
+        raise HTTPException(status_code=502, detail=f"Database error: {str(exc)}")
 
 
 @app.get("/aisri-score/{athlete_id}")
-def get_aisri_score(athlete_id: str) -> dict[str, Any]:
-    if supabase is None:
-        raise HTTPException(status_code=500, detail=f"Supabase not configured: {_SUPABASE_INIT_ERROR}")
-
+async def get_aisri_score(athlete_id: str) -> dict[str, Any]:
+    """
+    Get latest AISRi score for athlete.
+    Routes through orchestrator for safety gate enforcement.
+    """
+    # Orchestrator gate
+    if orchestrator is None:
+        raise HTTPException(status_code=503, detail="Orchestrator not initialized")
+    
+    # Validate athlete_id format (basic sanity check)
+    if not athlete_id or len(athlete_id) < 3:
+        raise HTTPException(status_code=400, detail="Invalid athlete_id")
+    
     try:
-        # In this repo's canonical schema, AISRI_assessments uses `athlete_id`.
-        response = (
-            supabase.table('AISRI_assessments')
-            .select("*")
-            .eq("athlete_id", athlete_id)
-            .order("created_at", desc=True)
-            .limit(1)
-            .execute()
-        )
-
-        data = response.data or []
-        latest = data[0] if data else None
-        return {"status": "success", "aisri_score": latest}
+        # Route through orchestrator's method (uses orchestrator.db internally)
+        result = await orchestrator.get_latest_aisri(athlete_id)
+        
+        # Audit log
+        print(f"[AUDIT] /aisri-score/{athlete_id} | status={result.get('status')} | timestamp={datetime.now().isoformat()}")
+        
+        if result.get('status') == 'not_found':
+            return {
+                "status": "success",
+                "aisri_score": None,
+                "message": "No AISRi assessment found for this athlete"
+            }
+        elif result.get('status') == 'error':
+            raise HTTPException(status_code=502, detail=result.get('message', 'Database error'))
+        else:
+            return {
+                "status": "success",
+                "aisri_score": result.get('data')
+            }
+    except HTTPException:
+        raise
     except Exception as exc:
-        raise HTTPException(status_code=502, detail=str(exc))
+        raise HTTPException(status_code=502, detail=f"Orchestrator error: {str(exc)}")
 
 
 @app.post("/agent/commander")
