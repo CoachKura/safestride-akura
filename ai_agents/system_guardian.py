@@ -175,17 +175,28 @@ class AISRiGuardian:
         ]
         
         for var_name, description in required_vars:
-            value = os.getenv(var_name)
-            if value:
-                # Mask sensitive values
-                if "SECRET" in var_name or "KEY" in var_name:
+            # Special handling: SUPABASE accepts either SERVICE_ROLE_KEY or SERVICE_KEY
+            if var_name == "SUPABASE_SERVICE_ROLE_KEY":
+                value = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_SERVICE_KEY")
+                if value:
                     masked = value[:8] + "..." if len(value) > 8 else "***"
-                    self.passed.append(f"✅ {var_name} = {masked} ({description})")
+                    actual_key = "SUPABASE_SERVICE_ROLE_KEY or SUPABASE_SERVICE_KEY"
+                    self.passed.append(f"✅ {actual_key} = {masked} ({description})")
                 else:
-                    self.passed.append(f"✅ {var_name} = {value} ({description})")
+                    self.violations.append(f"❌ CRITICAL: SUPABASE_SERVICE_ROLE_KEY or SUPABASE_SERVICE_KEY not set ({description})")
+                    all_passed = False
             else:
-                self.violations.append(f"❌ CRITICAL: {var_name} not set ({description})")
-                all_passed = False
+                value = os.getenv(var_name)
+                if value:
+                    # Mask sensitive values
+                    if "SECRET" in var_name or "KEY" in var_name:
+                        masked = value[:8] + "..." if len(value) > 8 else "***"
+                        self.passed.append(f"✅ {var_name} = {masked} ({description})")
+                    else:
+                        self.passed.append(f"✅ {var_name} = {value} ({description})")
+                else:
+                    self.violations.append(f"❌ CRITICAL: {var_name} not set ({description})")
+                    all_passed = False
         
         # Optional but recommended
         optional_vars = [
