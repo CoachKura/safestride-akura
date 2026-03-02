@@ -18,7 +18,18 @@ except Exception as e:
 # Phase 0 Stabilization - Production Services  
 try:
     from orchestrator import AISRiOrchestrator
+    _ORCHESTRATOR_OK = True
+except Exception as e:
+    _ORCHESTRATOR_OK = False
+    print(f'Orchestrator unavailable: {e}')
+
+try:
     from env_validator import validate_environment
+    _ENV_VALIDATOR_OK = True
+except:
+    _ENV_VALIDATOR_OK = False
+
+try:
     from aisri_safety_gate import AISRISafetyGate
     from strava_oauth_service import StravaOAuthService
     _PHASE0_OK = True
@@ -99,12 +110,14 @@ async def startup_event():
         run_integrity_checks(strict=True)  # Hard block: any violation crashes startup
         print('✅ Guardian: All integrity checks passed')
     
-    if _PHASE0_OK:
+    if _ENV_VALIDATOR_OK:
         try:
             is_valid, missing = validate_environment(verbose=True)
             if not is_valid:
                 print(f'WARNING: Missing {len(missing)} variables')
         except: pass
+    
+    if _ORCHESTRATOR_OK:
         try:
             orchestrator = AISRiOrchestrator()
             print('Orchestrator initialized')
