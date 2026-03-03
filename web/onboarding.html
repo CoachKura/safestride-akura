@@ -500,29 +500,28 @@
         let assessmentData = {};
         let capturedImages = {};
 
-        // Define nextStep early so onclick handlers can access it
-        window.nextStep = async function() { alert("Please wait, initializing..."); };
-        
-        // Initialize authentication
-        (async function() {
+        // Define nextStep as placeholder first
+        window.nextStep = function() { alert('Loading...'); };
 
-        // Check authentication
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
-            alert('Please log in first');
-            window.location.href = '/login.html';
-        }
+        // Check authentication and initialize
+        let userId;
+        (async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                alert('Please log in first');
+                window.location.href = '/login.html';
+                return;
+            }
+            userId = session.user.id;
 
-        const userId = session.user.id;
-
-        
-        
-        // Now redefine nextStep with full functionality
-        window.nextStep = async function() {
-            if (currentStep === 1) {
-                if (!validateStep1()) return;
-                await savePersonalInfo();
-            } else if (currentStep === 2) {
+            // Now define full nextStep functionality
+            window.nextStep = async function() {
+                if (currentStep === 1) {
+                    if (!validateStep1()) return;
+                    
+            
+                    await savePersonalInfo();
+                } else if (currentStep === 2) {
                 await savePhysicalAssessment();
             } else if (currentStep === 3) {
                 // Strava connection is optional
@@ -539,6 +538,8 @@
                 }
             }
         };
+
+        })();  // Close async IIFE
 
         window.prevStep = function() {
             if (currentStep > 1) {
@@ -699,3 +700,6 @@
     </script>
 </body>
 </html>
+
+
+
