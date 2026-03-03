@@ -503,8 +503,8 @@
         // Check authentication
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) {
-            alert(''Please log in first'');
-            window.location.href = ''/login.html'';
+            alert('Please log in first');
+            window.location.href = '/login.html';
         }
 
         const userId = session.user.id;
