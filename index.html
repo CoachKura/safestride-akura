@@ -1,58 +1,281 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AISRI Training System - Redirecting...</title>
-    <meta http-equiv="refresh" content="0;url=training-plan-builder.html" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeStride - Main Navigation</title>
+    <link rel="stylesheet" href="/safestride-design-system.css">
     <style>
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 100vh;
-        margin: 0;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-      }
-      .container {
-        text-align: center;
-      }
-      .spinner {
-        border: 4px solid rgba(255, 255, 255, 0.3);
-        border-top: 4px solid white;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        animation: spin 1s linear infinite;
-        margin: 20px auto;
-      }
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
+        .page-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            padding: 2rem;
         }
-        100% {
-          transform: rotate(360deg);
+        
+        .page-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 2px solid transparent;
         }
-      }
+        
+        .page-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border-color: #667eea;
+        }
+        
+        .page-card.new {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .page-card.new .badge {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+        
+        .page-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        
+        .page-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-desc {
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+        
+        .badge-new {
+            background: #10b981;
+            color: white;
+        }
+        
+        .badge-updated {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .badge-old {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 2rem 0 1rem 2rem;
+            color: #1f2937;
+        }
     </style>
-  </head>
-  <body>
-    <div class="container">
-      <div class="spinner"></div>
-      <h1>AISRI Training Plan Builder</h1>
-      <p>Redirecting...</p>
-      <p>
-        <a
-          href="training-plan-builder.html"
-          style="color: white; text-decoration: underline"
-          >Click here if not redirected automatically</a
-        >
-      </p>
+</head>
+<body style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh;">
+    
+    <div style="max-width: 1400px; margin: 0 auto; padding: 3rem 1rem;">
+        <div style="text-align: center; margin-bottom: 3rem;">
+            <h1 style="font-size: 3rem; font-weight: 800; color: white; margin-bottom: 1rem;">
+                <i class="fas fa-running" style="margin-right: 1rem;"></i>
+                SafeStride Platform
+            </h1>
+            <p style="font-size: 1.25rem; color: rgba(255,255,255,0.9);">
+                Development & Testing Navigation
+            </p>
+            <p style="color: rgba(255,255,255,0.7); margin-top: 0.5rem;">
+                Click any card to open that page
+            </p>
+        </div>
+
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 24px; padding: 2rem; margin-bottom: 2rem;">
+            <div class="section-title" style="color: white; margin-left: 0;">✨ New Modern Pages (Created Today)</div>
+            <div class="page-grid">
+                <div class="page-card new" onclick="window.location.href='/public/athlete-dashboard.html'">
+                    <i class="fas fa-home page-icon"></i>
+                    <div class="page-title">
+                        Athlete Dashboard
+                        <span class="badge badge-new">NEW</span>
+                    </div>
+                    <div class="page-desc">
+                        Main hub with today's workout, AISRI score, weekly progress, 7-day preview
+                    </div>
+                </div>
+
+                <div class="page-card new" onclick="window.location.href='/public/training-calendar.html'">
+                    <i class="fas fa-calendar-alt page-icon"></i>
+                    <div class="page-title">
+                        Training Calendar
+                        <span class="badge badge-new">NEW</span>
+                    </div>
+                    <div class="page-desc">
+                        12-week view with workout tracking, completion forms, evaluation markers
+                    </div>
+                </div>
+
+                <div class="page-card new" onclick="window.location.href='/public/athlete-evaluation.html'">
+                    <i class="fas fa-clipboard-check page-icon"></i>
+                    <div class="page-title">
+                        Athlete Evaluation
+                        <span class="badge badge-new">NEW</span>
+                    </div>
+                    <div class="page-desc">
+                        7-step wizard with 6-pillar assessment and image/video capture
+                    </div>
+                </div>
+
+                <div class="page-card new" onclick="window.location.href='/public/generate-training-plan-ui.html'">
+                    <i class="fas fa-magic page-icon"></i>
+                    <div class="page-title">
+                        Generate Training Plan
+                        <span class="badge badge-new">NEW</span>
+                    </div>
+                    <div class="page-desc">
+                        Create 12-week plan with 84 workouts, AISRI scores, demo data
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="background: white; border-radius: 24px; padding: 2rem;">
+            <div class="section-title">📋 Existing Pages</div>
+            <div class="page-grid">
+                <div class="page-card" onclick="window.location.href='/public/home.html'">
+                    <i class="fas fa-rocket page-icon" style="color: #667eea;"></i>
+                    <div class="page-title">
+                        Home Page
+                        <span class="badge badge-updated">UPDATED</span>
+                    </div>
+                    <div class="page-desc">
+                        Landing page with features, CTA buttons
+                    </div>
+                </div>
+
+                <div class="page-card" onclick="window.location.href='/login.html'">
+                    <i class="fas fa-sign-in-alt page-icon" style="color: #3b82f6;"></i>
+                    <div class="page-title">Login</div>
+                    <div class="page-desc">
+                        User authentication
+                    </div>
+                </div>
+
+                <div class="page-card" onclick="window.location.href='/public/onboarding.html'">
+                    <i class="fas fa-user-plus page-icon" style="color: #10b981;"></i>
+                    <div class="page-title">
+                        Onboarding
+                        <span class="badge badge-updated">UPDATED</span>
+                    </div>
+                    <div class="page-desc">
+                        4-step wizard for new athletes
+                    </div>
+                </div>
+
+                <div class="page-card" onclick="window.location.href='/public/strava-dashboard.html'">
+                    <i class="fab fa-strava page-icon" style="color: #fc4c02;"></i>
+                    <div class="page-title">Strava Dashboard</div>
+                    <div class="page-desc">
+                        Strava integration and activity sync
+                    </div>
+                </div>
+
+                <div class="page-card" onclick="window.location.href='/public/training-plan-builder.html'">
+                    <i class="fas fa-tools page-icon" style="color: #f59e0b;"></i>
+                    <div class="page-title">
+                        Training Plan Builder
+                        <span class="badge badge-old">NEEDS REDESIGN</span>
+                    </div>
+                    <div class="page-desc">
+                        Old version - needs modern UI update
+                    </div>
+                </div>
+
+                <div class="page-card" onclick="window.location.href='/coach-dashboard.html'">
+                    <i class="fas fa-users page-icon" style="color: #8b5cf6;"></i>
+                    <div class="page-title">
+                        Coach Dashboard
+                        <span class="badge badge-old">OLD</span>
+                    </div>
+                    <div class="page-desc">
+                        Old version - athlete management
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 24px; padding: 2rem; margin-top: 2rem;">
+            <div class="section-title" style="color: white; margin-left: 0;">📚 Documentation</div>
+            <div class="page-grid">
+                <div class="page-card" onclick="window.open('/NAVIGATION_FLOW.md')">
+                    <i class="fas fa-map page-icon" style="color: #667eea;"></i>
+                    <div class="page-title">Navigation Flow</div>
+                    <div class="page-desc">
+                        Complete user journey documentation
+                    </div>
+                </div>
+
+                <div class="page-card" onclick="window.open('/COMPLETE_PROJECT_STATUS.md')">
+                    <i class="fas fa-tasks page-icon" style="color: #10b981;"></i>
+                    <div class="page-title">Project Status</div>
+                    <div class="page-desc">
+                        What's complete, what's remaining, data flows
+                    </div>
+                </div>
+
+                <div class="page-card" onclick="window.open('/MIGRATION_INSTRUCTIONS.md')">
+                    <i class="fas fa-database page-icon" style="color: #3b82f6;"></i>
+                    <div class="page-title">Migration Guide</div>
+                    <div class="page-desc">
+                        How to apply database changes
+                    </div>
+                </div>
+
+                <div class="page-card" onclick="window.open('/README.md')">
+                    <i class="fas fa-book page-icon" style="color: #f59e0b;"></i>
+                    <div class="page-title">README</div>
+                    <div class="page-desc">
+                        Project overview and features
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 3rem; color: white;">
+            <p style="font-size: 1.125rem; margin-bottom: 1rem;">
+                <i class="fas fa-info-circle"></i>
+                <strong>Quick Start:</strong>
+            </p>
+            <p style="opacity: 0.9; margin-bottom: 0.5rem;">
+                1. Open <strong>Generate Training Plan</strong> → Create 84 workouts
+            </p>
+            <p style="opacity: 0.9; margin-bottom: 0.5rem;">
+                2. Open <strong>Athlete Dashboard</strong> → See today's workout
+            </p>
+            <p style="opacity: 0.9;">
+                3. Open <strong>Training Calendar</strong> → View 12-week plan
+            </p>
+        </div>
+
+        <div style="text-align: center; margin-top: 2rem; color: rgba(255,255,255,0.7); font-size: 0.875rem;">
+            <p>SafeStride Platform v2.0 | Database: ✅ Migrated | Status: 🚧 Development</p>
+        </div>
     </div>
-    <script>
-      window.location.href = "training-plan-builder.html";
-    </script>
-  </body>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+</body>
 </html>

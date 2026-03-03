@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physical Assessment | SafeStride by AKURA</title>
+    
+    <!-- Design System CSS -->
+    <link rel="stylesheet" href="/safestride-design-system.css">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        .assessment-progress {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .assessment-progress::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #e5e7eb;
+            z-index: 0;
+        }
+        
+        .progress-step {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            flex: 1;
+        }
+        
+        .progress-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #e5e7eb;
+            margin: 0 auto 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+        
+        .progress-step.active .progress-circle {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+        
+        .progress-step.completed .progress-circle {
+            border-color: #10b981;
+            background: #10b981;
+            color: white;
+        }
+        
+        .progress-label {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+        
+        .progress-step.active .progress-label {
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .test-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 2px solid #e5e7eb;
+            transition: all 0.3s;
+        }
+        
+        .test-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .test-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .test-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .test-info h3 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        .test-info p {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin: 0;
+        }
+        
+        .image-capture {
+            position: relative;
+            border: 2px dashed #d1d5db;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .image-capture:hover {
+            border-color: #667eea;
+            background: #f9fafb;
+        }
+        
+        .image-capture.has-image {
+            border-style: solid;
+            border-color: #10b981;
+            padding: 0;
+        }
+        
+        .captured-image {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+        
+        .capture-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .measurement-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .measurement-input {
+            position: relative;
+        }
+        
+        .measurement-input label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+        
+        .measurement-input input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .measurement-input input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .measurement-unit {
+            position: absolute;
+            right: 0.75rem;
+            top: 2.25rem;
+            color: #9ca3af;
+            font-size: 0.875rem;
+            pointer-events: none;
+        }
+        
+        .pillar-section {
+            display: none;
+        }
+        
+        .pillar-section.active {
+            display: block;
+        }
+        
+        .demo-video {
+            width: 100%;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+        
+        .score-preview {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+        }
+        
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 1rem;
+        }
+        
+        .pillar-scores {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .pillar-score-card {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 1rem;
+            border-radius: 12px;
+        }
+        
+        .notes-section {
+            margin-top: 1.5rem;
+        }
+        
+        .notes-section textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 1rem;
+            resize: vertical;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            gap: 1rem;
+        }
+    </style>
+</head>
+<body class="dashboard-body">
+    
+    <!-- Top Navigation -->
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-running"></i>
+                <span>SafeStride</span>
+                <span class="text-sm text-neutral-500 ml-2">by AKURA</span>
+            </div>
+            
+            <div class="nav-menu">
+                <a href="/public/athlete-dashboard.html" class="nav-link">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/public/training-calendar.html" class="nav-link">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Calendar</span>
+                </a>
+                <a href="/public/athlete-evaluation.html" class="nav-link active">
+                    <i class="fas fa-clipboard-check"></i>
+                    <span>Evaluation</span>
+                </a>
+            </div>
+            
+            <div class="nav-actions">
+                <button class="btn-secondary btn-sm" onclick="saveDraft()">
+                    <i class="fas fa-save mr-2"></i>
+                    Save Draft
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+        <div class="container mx-auto" style="max-width: 900px;">
+            
+            <!-- Header -->
+            <div class="mb-8">
+                <h1 class="text-4xl font-bold text-neutral-900 mb-2">
+                    <i class="fas fa-clipboard-check mr-3"></i>
+                    Physical Assessment
+                </h1>
+                <p class="text-lg text-neutral-600">
+                    Complete your 6-pillar evaluation to calculate your AISRI score
+                </p>
+            </div>
+
+            <!-- Progress Indicator -->
+            <div class="assessment-progress">
+                <div class="progress-step completed" id="step1">
+                    <div class="progress-circle">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="progress-label">ROM</div>
+                </div>
+                <div class="progress-step active" id="step2">
+                    <div class="progress-circle">2</div>
+                    <div class="progress-label">Strength</div>
+                </div>
+                <div class="progress-step" id="step3">
+                    <div class="progress-circle">3</div>
+                    <div class="progress-label">Balance</div>
+                </div>
+                <div class="progress-step" id="step4">
+                    <div class="progress-circle">4</div>
+                    <div class="progress-label">Mobility</div>
+                </div>
+                <div class="progress-step" id="step5">
+                    <div class="progress-circle">5</div>
+                    <div class="progress-label">Alignment</div>
+                </div>
+                <div class="progress-step" id="step6">
+                    <div class="progress-circle">6</div>
+                    <div class="progress-label">Running</div>
+                </div>
+                <div class="progress-step" id="step7">
+                    <div class="progress-circle">
+                        <i class="fas fa-flag-checkered"></i>
+                    </div>
+                    <div class="progress-label">Review</div>
+                </div>
+            </div>
+
+            <!-- Assessment Form -->
+            <div class="card">
+                <div class="card-body">
+                    
+                    <!-- Pillar 1: ROM (Range of Motion) -->
+                    <div class="pillar-section active" id="rom-section">
+                        <h2 class="text-2xl font-bold mb-4" style="color: #f59e0b;">
+                            <i class="fas fa-arrows-alt mr-2"></i>
+                            Range of Motion (ROM) Tests
+                        </h2>
+                        
+                        <!-- Ankle Dorsiflexion Test -->
+                        <div class="test-card">
+                            <div class="test-header">
+                                <div class="test-icon" style="background: #fef3c7;">
+                                    <i class="fas fa-shoe-prints" style="color: #f59e0b;"></i>
+                                </div>
+                                <div class="test-info">
+                                    <h3>Ankle Dorsiflexion</h3>
+                                    <p>Knee-to-wall test measuring ankle flexibility</p>
+                                </div>
+                            </div>
+                            
+                            <div class="measurement-grid">
+                                <div class="measurement-input">
+                                    <label>Left Ankle</label>
+                                    <input type="number" step="0.1" placeholder="0.0" id="rom_ankle_left">
+                                    <span class="measurement-unit">degrees</span>
+                                </div>
+                                <div class="measurement-input">
+                                    <label>Right Ankle</label>
+                                    <input type="number" step="0.1" placeholder="0.0" id="rom_ankle_right">
+                                    <span class="measurement-unit">degrees</span>
+                                </div>
+                            </div>
+                            
+                            <div class="image-capture" onclick="captureImage('rom_ankle')">
+                                <i class="fas fa-camera text-4xl text-neutral-400 mb-2"></i>
+                                <p class="text-neutral-600 font-medium">Click to capture photo/video</p>
+                                <p class="text-sm text-neutral-500">Optional: Document test execution</p>
+                            </div>
+                            <input type="file" id="rom_ankle_file" accept="image/*,video/*" style="display: none;">
+                        </div>
+
+                        <!-- Hip Flexion Test -->
+                        <div class="test-card">
+                            <div class="test-header">
+                                <div class="test-icon" style="background: #fef3c7;">
+                                    <i class="fas fa-running" style="color: #f59e0b;"></i>
+                                </div>
+                                <div class="test-info">
+                                    <h3>Hip Flexion</h3>
+                                    <p>Supine hip flexion with straight leg</p>
+                                </div>
+                            </div>
+                            
+                            <div class="measurement-grid">
+                                <div class="measurement-input">
+                                    <label>Left Hip</label>
+                                    <input type="number" step="0.1" placeholder="0.0" id="rom_hip_flex_left">
+                                    <span class="measurement-unit">degrees</span>
+                                </div>
+                                <div class="measurement-input">
+                                    <label>Right Hip</label>
+                                    <input type="number" step="0.1" placeholder="0.0" id="rom_hip_flex_right">
+                                    <span class="measurement-unit">degrees</span>
+                                </div>
+                            </div>
+                            
+                            <div class="image-capture" onclick="captureImage('rom_hip_flex')">
+                                <i class="fas fa-camera text-4xl text-neutral-400 mb-2"></i>
+                                <p class="text-neutral-600 font-medium">Click to capture photo/video</p>
+                            </div>
+                            <input type="file" id="rom_hip_flex_file" accept="image/*,video/*" style="display: none;">
+                        </div>
+
+                        <!-- Hip Extension Test -->
+                        <div class="test-card">
+                            <div class="test-header">
+                                <div class="test-icon" style="background: #fef3c7;">
+                                    <i class="fas fa-arrows-alt-v" style="color: #f59e0b;"></i>
+                                </div>
+                                <div class="test-info">
+                                    <h3>Hip Extension</h3>
+                                    <p>Prone hip extension measurement</p>
+                                </div>
+                            </div>
+                            
+                            <div class="measurement-grid">
+                                <div class="measurement-input">
+                                    <label>Left Hip</label>
+                                    <input type="number" step="0.1" placeholder="0.0" id="rom_hip_ext_left">
+                                    <span class="measurement-unit">degrees</span>
+                                </div>
+                                <div class="measurement-input">
+                                    <label>Right Hip</label>
+                                    <input type="number" step="0.1" placeholder="0.0" id="rom_hip_ext_right">
+                                    <span class="measurement-unit">degrees</span>
+                                </div>
+                            </div>
+                            
+                            <div class="image-capture" onclick="captureImage('rom_hip_ext')">
+                                <i class="fas fa-camera text-4xl text-neutral-400 mb-2"></i>
+                                <p class="text-neutral-600 font-medium">Click to capture photo/video</p>
+                            </div>
+                            <input type="file" id="rom_hip_ext_file" accept="image/*,video/*" style="display: none;">
+                        </div>
+                    </div>
+
+                    <!-- Pillar 2: Strength -->
+                    <div class="pillar-section" id="strength-section">
+                        <h2 class="text-2xl font-bold mb-4" style="color: #10b981;">
+                            <i class="fas fa-dumbbell mr-2"></i>
+                            Strength Tests
+                        </h2>
+                        
+                        <div class="test-card">
+                            <div class="test-header">
+                                <div class="test-icon" style="background: #d1fae5;">
+                                    <i class="fas fa-user-shield" style="color: #10b981;"></i>
+                                </div>
+                                <div class="test-info">
+                                    <h3>Single Leg Squat</h3>
+                                    <p>Number of controlled single leg squats</p>
+                                </div>
+                            </div>
+                            
+                            <div class="measurement-grid">
+                                <div class="measurement-input">
+                                    <label>Left Leg</label>
+                                    <input type="number" placeholder="0" id="strength_squat_left">
+                                    <span class="measurement-unit">reps</span>
+                                </div>
+                                <div class="measurement-input">
+                                    <label>Right Leg</label>
+                                    <input type="number" placeholder="0" id="strength_squat_right">
+                                    <span class="measurement-unit">reps</span>
+                                </div>
+                            </div>
+                            
+                            <div class="image-capture" onclick="captureImage('strength_squat')">
+                                <i class="fas fa-camera text-4xl text-neutral-400 mb-2"></i>
+                                <p class="text-neutral-600 font-medium">Click to capture photo/video</p>
+                            </div>
+                            <input type="file" id="strength_squat_file" accept="image/*,video/*" style="display: none;">
+                        </div>
+
+                        <div class="test-card">
+                            <div class="test-header">
+                                <div class="test-icon" style="background: #d1fae5;">
+                                    <i class="fas fa-walking" style="color: #10b981;"></i>
+                                </div>
+                                <div class="test-info">
+                                    <h3>Calf Raises</h3>
+                                    <p>Single leg calf raises to failure</p>
+                                </div>
+                            </div>
+                            
+                            <div class="measurement-grid">
+                                <div class="measurement-input">
+                                    <label>Left Leg</label>
+                                    <input type="number" placeholder="0" id="strength_calf_left">
+                                    <span class="measurement-unit">reps</span>
+                                </div>
+                                <div class="measurement-input">
+                                    <label>Right Leg</label>
+                                    <input type="number" placeholder="0" id="strength_calf_right">
+                                    <span class="measurement-unit">reps</span>
+                                </div>
+                            </div>
+                            
+                            <div class="image-capture" onclick="captureImage('strength_calf')">
+                                <i class="fas fa-camera text-4xl text-neutral-400 mb-2"></i>
+                                <p class="text-neutral-600 font-medium">Click to capture photo/video</p>
+                            </div>
+                            <input type="file" id="strength_calf_file" accept="image/*,video/*" style="display: none;">
+                        </div>
+
+                        <div class="test-card">
+                            <div class="test-header">
+                                <div class="test-icon" style="background: #d1fae5;">
+                                    <i class="fas fa-stopwatch" style="color: #10b981;"></i>
+                                </div>
+                                <div class="test-info">
+                                    <h3>Core Plank</h3>
+                                    <p>Plank hold duration</p>
+                                </div>
+                            </div>
+                            
+                            <div class="measurement-grid">
+                                <div class="measurement-input">
+                                    <label>Hold Time</label>
+                                    <input type="number" placeholder="0" id="strength_plank">
+                                    <span class="measurement-unit">seconds</span>
+                                </div>
+                            </div>
+                            
+                            <div class="image-capture" onclick="captureImage('strength_plank')">
+                                <i class="fas fa-camera text-4xl text-neutral-400 mb-2"></i>
+                                <p class="text-neutral-600 font-medium">Click to capture photo/video</p>
+                            </div>
+                            <input type="file" id="strength_plank_file" accept="image/*,video/*" style="display: none;">
+                        </div>
+                    </div>
+
+                    <!-- Pillar 3: Balance -->
+                    <div class="pillar-section" id="balance-section">
+                        <h2 class="text-2xl font-bold mb-4" style="color: #06b6d4;">
+                            <i class="fas fa-balance-scale mr-2"></i>
+                            Balance Tests
+                        </h2>
+                        
+                        <div class="test-card">
+                            <div class="test-header">
+                                <div class="test-icon" style="background: #cffafe;">
+                                    <i class="fas fa-user-alt" style="color: #06b6d4;"></i>
+                                </div>
+                                <div class="test-info">
+                                    <h3>Single Leg Stand</h3>
+                                    <p>Eyes closed balance test</p>
+                                </div>
+                            </div>
+                            
+                            <div class="measurement-grid">
+                                <div class="measurement-input">
+                                    <label>Left Leg</label>
+                                    <input type="number" placeholder="0" id="balance_stand_left">
+                                    <span class="measurement-unit">seconds</span>
+                                </div>
+                                <div class="measurement-input">
+                                    <label>Right Leg</label>
+                                    <input type="number" placeholder="0" id="balance_stand_right">
+                                    <span class="measurement-unit">seconds</span>
+                                </div>
+                            </div>
+                            
+                            <div class="image-capture" onclick="captureImage('balance_stand')">
+                                <i class="fas fa-camera text-4xl text-neutral-400 mb-2"></i>
+                                <p class="text-neutral-600 font-medium">Click to capture photo/video</p>
+                            </div>
+                            <input type="file" id="balance_stand_file" accept="image/*,video/*" style="display: none;">
+                        </div>
+
+                        <div class="test-card">
+                            <div class="test-header">
+                                <div class="test-icon" style="background: #cffafe;">
+                                    <i class="fas fa-project-diagram" style="color: #06b6d4;"></i>
+                                </div>
+                                <div class="test-info">
+                                    <h3>Y-Balance Test</h3>
+                                    <p>Dynamic balance reach test</p>
+                                </div>
+                            </div>
+                            
+                            <div class="measurement-grid">
+                                <div class="measurement-input">
+                                    <label>Left Leg</label>
+                                    <input type="number" step="0.1" placeholder="0.0" id="balance_y_left">
+                                    <span class="measurement-unit">cm</span>
+                                </div>
+                                <div class="measurement-input">
+                                    <label>Right Leg</label>
+                                    <input type="number" step="0.1" placeholder="0.0" id="balance_y_right">
+                                    <span class="measurement-unit">cm</span>
+                                </div>
+                            </div>
+                            
+                            <div class="image-capture" onclick="captureImage('balance_y')">
+                                <i class="fas fa-camera text-4xl text-neutral-400 mb-2"></i>
+                                <p class="text-neutral-600 font-medium">Click to capture photo/video</p>
+                            </div>
+                            <input type="file" id="balance_y_file" accept="image/*,video/*" style="display: none;">
+                        </div>
+                    </div>
+
+                    <!-- Pillar 4: Mobility -->
+                    <div class="pillar-section" id="mobility-section">
+                        <h2 class="text-2xl font-bold mb-4" style="color: #ec4899;">
+                            <i class="fas fa-walking mr-2"></i>
+                            Mobility Tests
+                        </h2>
+                        
+                        <div class="test-card">
+                            <div class="test-header">
+                                <div class="test-icon" style="background: #fce7f3;">
+                                    <i class="fas fa-shoe-prints" style="color: #ec4899;"></i>
+                                </div>
+                                <div class="test-info">
+                                    <h3>Hip Flexor Mobility</h3>
+                                    <p>Thomas test - score 1-10</p>
+                                </div>
+                            </div>
+                            
+                            <div class="measurement-grid">
+                                <div class="measurement-input">
+                                    <label>Left Hip</label>
+                                    <input type="number" min="1" max="10" placeholder="5" id="mobility_hip_left">
+                                    <span class="measurement-unit">/10</span>
+                                </div>
+                                <div class="measurement-input">
+                                    <label>Right Hip</label>
+                                    <input type="number" min="1" max="10" placeholder="5" id="mobility_hip_right">
+                                    <span class="measurement-unit">/10</span>
+                                </div>
+                            </div>
+                            
+                            <div class="image-capture" onclick="captureImage('mobility_hip')">
+                                <i class="fas fa-camera text-4xl text-neutral-400 mb-2"></i>
+                                <p class="text-neutral-600 font-medium">Click to capture photo/video</p>
+                            </div>
+                            <input type="file" id="mobility_hip_file" accept="image/*,video/*" style="display: none;">
+                        </div>
+
+                        <div class="test-card">
+                            <div class="test-header">
+                                <div class="test-icon" style="background: #fce7f3;">
+                                    <i class="fas fa-arrows-alt-h" style="color: #ec4899;"></i>
+                                </div>
+                                <div class="test-info">
+                                    <h3>Hamstring Mobility</h3>
+                                    <p>Straight leg raise - score 1-10</p>
+                                </div>
+                            </div>
+                            
+                            <div class="measurement-grid">
+                                <div class="measurement-input">
+                                    <label>Left Leg</label>
+                                    <input type="number" min="1" max="10" placeholder="5" id="mobility_hamstring_left">
+                                    <span class="measurement-unit">/10</span>
+                                </div>
+                                <div class="measurement-input">
+                                    <label>Right Leg</label>
+                                    <input type="number" min="1" max="10" placeholder="5" id="mobility_hamstring_right">
+                                    <span class="measurement-unit">/10</span>
+                                </div>
+                            </div>
+                            
+                            <div class="image-capture" onclick="captureImage('mobility_hamstring')">
+                                <i class="fas fa-camera text-4xl text-neutral-400 mb-2"></i>
+                                <p class="text-neutral-600 font-medium">Click to capture photo/video</p>
+                            </div>
+                            <input type="file" id="mobility_hamstring_file" accept="image/*,video/*" style="display: none;">
+                        </div>
+
+                        <div class="test-card">
+                            <div class="test-header">
+                                <div class="test-icon" style="background: #fce7f3;">
+                                    <i class="fas fa-sync-alt" style="color: #ec4899;"></i>
+                                </div>
+                                <div class="test-info">
+                                    <h3>Thoracic Rotation</h3>
+                                    <p>Seated rotation test - score 1-10</p>
+                                </div>
+                            </div>
+                            
+                            <div class="measurement-grid">
+                                <div class="measurement-input">
+                                    <label>Rotation Score</label>
+                                    <input type="number" min="1" max="10" placeholder="5" id="mobility_thoracic">
+                                    <span class="measurement-unit">/10</span>
+                                </div>
+                            </div>
+                            
+                            <div class="image-capture" onclick="captureImage('mobility_thoracic')">
+                                <i class="fas fa-camera text-4xl text-neutral-400 mb-2"></i>
+                                <p class="text-neutral-600 font-medium">Click to capture photo/video</p>
+                            </div>
+                            <input type="file" id="mobility_thoracic_file" accept="image/*,video/*" style="display: none;">
+                        </div>
+                    </div>
+
+                    <!-- Pillar 5: Alignment -->
+                    <div class="pillar-section" id="alignment-section">
+                        <h2 class="text-2xl font-bold mb-4" style="color: #8b5cf6;">
+                            <i class="fas fa-align-center mr-2"></i>
+                            Alignment Assessment
+                        </h2>
+                        
+                        <div class="test-card">
+                            <div class="test-header">
+                                <div class="test-icon" style="background: #ede9fe;">
+                                    <i class="fas fa-user-check" style="color: #8b5cf6;"></i>
+                                </div>
+                                <div class="test-info">
+                                    <h3>Posture Assessment</h3>
+                                    <p>Standing posture evaluation (0-100)</p>
+                                </div>
+                            </div>
+                            
+                            <div class="measurement-grid">
+                                <div class="measurement-input">
+                                    <label>Posture Score</label>
+                                    <input type="number" min="0" max="100" placeholder="0" id="alignment_posture">
+                                    <span class="measurement-unit">/100</span>
+                                </div>
+                            </div>
+                            
+                            <div class="image-capture" onclick="captureImage('alignment_posture')">
+                                <i class="fas fa-camera text-4xl text-neutral-400 mb-2"></i>
+                                <p class="text-neutral-600 font-medium">Click to capture photo/video</p>
+                            </div>
+                            <input type="file" id="alignment_posture_file" accept="image/*,video/*" style="display: none;">
+                        </div>
+
+                        <div class="test-card">
+                            <div class="test-header">
+                                <div class="test-icon" style="background: #ede9fe;">
+                                    <i class="fas fa-running" style="color: #8b5cf6;"></i>
+                                </div>
+                                <div class="test-info">
+                                    <h3>Gait Analysis</h3>
+                                    <p>Running gait evaluation (0-100)</p>
+                                </div>
+                            </div>
+                            
+                            <div class="measurement-grid">
+                                <div class="measurement-input">
+                                    <label>Gait Score</label>
+                                    <input type="number" min="0" max="100" placeholder="0" id="alignment_gait">
+                                    <span class="measurement-unit">/100</span>
+                                </div>
+                            </div>
+                            
+                            <div class="image-capture" onclick="captureImage('alignment_gait')">
+                                <i class="fas fa-camera text-4xl text-neutral-400 mb-2"></i>
+                                <p class="text-neutral-600 font-medium">Click to capture photo/video</p>
+                            </div>
+                            <input type="file" id="alignment_gait_file" accept="image/*,video/*" style="display: none;">
+                        </div>
+                    </div>
+
+                    <!-- Pillar 6: Running (Auto from Strava) -->
+                    <div class="pillar-section" id="running-section">
+                        <h2 class="text-2xl font-bold mb-4" style="color: #667eea;">
+                            <i class="fas fa-running mr-2"></i>
+                            Running Performance
+                        </h2>
+                        
+                        <div class="p-6 bg-blue-50 rounded-lg text-center">
+                            <i class="fab fa-strava text-6xl text-orange-500 mb-4"></i>
+                            <h3 class="text-xl font-bold mb-2">Automated from Strava Data</h3>
+                            <p class="text-neutral-600 mb-4">
+                                Your running performance score is automatically calculated from your Strava activities
+                            </p>
+                            <button class="btn-primary" onclick="syncStravaData()">
+                                <i class="fab fa-strava mr-2"></i>
+                                Sync Strava Activities
+                            </button>
+                        </div>
+                        
+                        <div class="mt-6" id="runningScorePreview">
+                            <div class="test-card">
+                                <h3 class="font-bold mb-4">Recent Running Metrics</h3>
+                                <div class="measurement-grid">
+                                    <div class="stat-box">
+                                        <div class="stat-value" id="runningScore">--</div>
+                                        <div class="stat-label">Running Score</div>
+                                    </div>
+                                    <div class="stat-box">
+                                        <div class="stat-value" id="totalDistance">--</div>
+                                        <div class="stat-label">Total km (30d)</div>
+                                    </div>
+                                    <div class="stat-box">
+                                        <div class="stat-value" id="avgPace">--</div>
+                                        <div class="stat-label">Avg Pace</div>
+                                    </div>
+                                    <div class="stat-box">
+                                        <div class="stat-value" id="consistency">--</div>
+                                        <div class="stat-label">Consistency</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Review & Submit -->
+                    <div class="pillar-section" id="review-section">
+                        <h2 class="text-2xl font-bold mb-4">
+                            <i class="fas fa-flag-checkered mr-2"></i>
+                            Review & Submit
+                        </h2>
+                        
+                        <div class="score-preview">
+                            <h3 class="text-3xl font-bold mb-2">Your AISRI Score</h3>
+                            <div class="score-circle">
+                                <svg viewBox="0 0 150 150">
+                                    <circle cx="75" cy="75" r="70" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="10"/>
+                                    <circle id="reviewScoreCircle" cx="75" cy="75" r="70" fill="none" stroke="white" 
+                                            stroke-width="10" stroke-linecap="round" stroke-dasharray="439.8" 
+                                            stroke-dashoffset="110" transform="rotate(-90 75 75)"/>
+                                    <text x="75" y="75" text-anchor="middle" dy=".3em" 
+                                          class="text-5xl font-bold" fill="white" id="reviewScoreText">75</text>
+                                </svg>
+                            </div>
+                            <p class="text-xl opacity-90" id="reviewRiskCategory">Low Risk</p>
+                        </div>
+
+                        <div class="pillar-scores">
+                            <div class="pillar-score-card">
+                                <div class="text-sm opacity-75 mb-1">Running</div>
+                                <div class="text-2xl font-bold" id="reviewRunning">--</div>
+                            </div>
+                            <div class="pillar-score-card">
+                                <div class="text-sm opacity-75 mb-1">Strength</div>
+                                <div class="text-2xl font-bold" id="reviewStrength">--</div>
+                            </div>
+                            <div class="pillar-score-card">
+                                <div class="text-sm opacity-75 mb-1">ROM</div>
+                                <div class="text-2xl font-bold" id="reviewROM">--</div>
+                            </div>
+                            <div class="pillar-score-card">
+                                <div class="text-sm opacity-75 mb-1">Balance</div>
+                                <div class="text-2xl font-bold" id="reviewBalance">--</div>
+                            </div>
+                            <div class="pillar-score-card">
+                                <div class="text-sm opacity-75 mb-1">Alignment</div>
+                                <div class="text-2xl font-bold" id="reviewAlignment">--</div>
+                            </div>
+                            <div class="pillar-score-card">
+                                <div class="text-sm opacity-75 mb-1">Mobility</div>
+                                <div class="text-2xl font-bold" id="reviewMobility">--</div>
+                            </div>
+                        </div>
+
+                        <div class="notes-section">
+                            <label class="block font-semibold mb-2">Assessor Notes (Optional)</label>
+                            <textarea id="assessorNotes" placeholder="Add any observations or notes about this assessment..."></textarea>
+                        </div>
+
+                        <div class="notes-section">
+                            <label class="block font-semibold mb-2">Athlete Feedback (Optional)</label>
+                            <textarea id="athleteFeedback" placeholder="How are you feeling? Any concerns or questions?"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <div class="nav-buttons">
+                        <button class="btn-secondary" id="prevBtn" onclick="previousSection()" style="display: none;">
+                            <i class="fas fa-arrow-left mr-2"></i>
+                            Previous
+                        </button>
+                        <button class="btn-primary" id="nextBtn" onclick="nextSection()">
+                            Next
+                            <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                        <button class="btn-primary" id="submitBtn" onclick="submitAssessment()" style="display: none;">
+                            <i class="fas fa-check mr-2"></i>
+                            Submit Assessment
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+        
+        // Initialize Supabase
+        const SUPABASE_URL = 'https://bdisppaxbvygsspcuymb.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkaXNwcGF4YnZ5Z3NzcGN1eW1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzYxMzk5NjIsImV4cCI6MjA1MTcxNTk2Mn0.abc123def456';
+        
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Check authentication
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+            window.location.href = '/login.html';
+        }
+
+        const athleteId = session.user.id;
+        
+        let currentSection = 1;
+        const totalSections = 7;
+        const capturedMedia = {};
+
+        // Image capture function
+        window.captureImage = function(testName) {
+            const fileInput = document.getElementById(`${testName}_file`);
+            fileInput.click();
+            
+            fileInput.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const captureDiv = fileInput.previousElementSibling;
+                        captureDiv.classList.add('has-image');
+                        captureDiv.innerHTML = `
+                            <img src="${event.target.result}" class="captured-image" alt="${testName}">
+                            <div class="capture-controls">
+                                <button class="btn-secondary btn-sm flex-1" onclick="recaptureImage('${testName}')">
+                                    <i class="fas fa-redo mr-2"></i>Retake
+                                </button>
+                                <button class="btn-danger btn-sm" onclick="removeImage('${testName}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        `;
+                        
+                        // Store file for upload
+                        capturedMedia[testName] = file;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+        };
+
+        window.recaptureImage = function(testName) {
+            window.captureImage(testName);
+        };
+
+        window.removeImage = function(testName) {
+            delete capturedMedia[testName];
+            const fileInput = document.getElementById(`${testName}_file`);
+            fileInput.value = '';
+            const captureDiv = fileInput.previousElementSibling;
+            captureDiv.classList.remove('has-image');
+            captureDiv.innerHTML = `
+                <i class="fas fa-camera text-4xl text-neutral-400 mb-2"></i>
+                <p class="text-neutral-600 font-medium">Click to capture photo/video</p>
+                <p class="text-sm text-neutral-500">Optional: Document test execution</p>
+            `;
+        };
+
+        // Navigation functions
+        window.nextSection = function() {
+            if (currentSection < totalSections) {
+                currentSection++;
+                updateSectionDisplay();
+            }
+        };
+
+        window.previousSection = function() {
+            if (currentSection > 1) {
+                currentSection--;
+                updateSectionDisplay();
+            }
+        };
+
+        function updateSectionDisplay() {
+            // Hide all sections
+            document.querySelectorAll('.pillar-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Show current section
+            const sections = ['rom', 'strength', 'balance', 'mobility', 'alignment', 'running', 'review'];
+            document.getElementById(`${sections[currentSection - 1]}-section`).classList.add('active');
+
+            // Update progress indicators
+            for (let i = 1; i <= totalSections; i++) {
+                const step = document.getElementById(`step${i}`);
+                step.classList.remove('active', 'completed');
+                
+                if (i < currentSection) {
+                    step.classList.add('completed');
+                    step.querySelector('.progress-circle').innerHTML = '<i class="fas fa-check"></i>';
+                } else if (i === currentSection) {
+                    step.classList.add('active');
+                    step.querySelector('.progress-circle').textContent = i;
+                } else {
+                    step.querySelector('.progress-circle').textContent = i;
+                }
+            }
+
+            // Update buttons
+            document.getElementById('prevBtn').style.display = currentSection > 1 ? 'block' : 'none';
+            document.getElementById('nextBtn').style.display = currentSection < totalSections ? 'block' : 'none';
+            document.getElementById('submitBtn').style.display = currentSection === totalSections ? 'block' : 'none';
+
+            // Calculate scores when reaching review
+            if (currentSection === totalSections) {
+                calculateScores();
+            }
+
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        function calculateScores() {
+            // ROM Score (average of all ROM tests, normalized to 0-100)
+            const romAnkleLeft = parseFloat(document.getElementById('rom_ankle_left').value) || 0;
+            const romAnkleRight = parseFloat(document.getElementById('rom_ankle_right').value) || 0;
+            const romHipFlexLeft = parseFloat(document.getElementById('rom_hip_flex_left').value) || 0;
+            const romHipFlexRight = parseFloat(document.getElementById('rom_hip_flex_right').value) || 0;
+            const romHipExtLeft = parseFloat(document.getElementById('rom_hip_ext_left').value) || 0;
+            const romHipExtRight = parseFloat(document.getElementById('rom_hip_ext_right').value) || 0;
+            
+            const romScore = Math.round(((romAnkleLeft + romAnkleRight + romHipFlexLeft + romHipFlexRight + romHipExtLeft + romHipExtRight) / 6) * 1.2);
+
+            // Strength Score (normalized to 0-100)
+            const strengthSquatLeft = parseInt(document.getElementById('strength_squat_left').value) || 0;
+            const strengthSquatRight = parseInt(document.getElementById('strength_squat_right').value) || 0;
+            const strengthCalfLeft = parseInt(document.getElementById('strength_calf_left').value) || 0;
+            const strengthCalfRight = parseInt(document.getElementById('strength_calf_right').value) || 0;
+            const strengthPlank = parseInt(document.getElementById('strength_plank').value) || 0;
+            
+            const strengthScore = Math.min(100, Math.round(((strengthSquatLeft + strengthSquatRight + strengthCalfLeft + strengthCalfRight) / 4) * 2 + (strengthPlank / 60) * 20));
+
+            // Balance Score
+            const balanceStandLeft = parseInt(document.getElementById('balance_stand_left').value) || 0;
+            const balanceStandRight = parseInt(document.getElementById('balance_stand_right').value) || 0;
+            const balanceYLeft = parseFloat(document.getElementById('balance_y_left').value) || 0;
+            const balanceYRight = parseFloat(document.getElementById('balance_y_right').value) || 0;
+            
+            const balanceScore = Math.min(100, Math.round((balanceStandLeft + balanceStandRight) / 2 + (balanceYLeft + balanceYRight) / 2));
+
+            // Mobility Score
+            const mobilityHipLeft = parseInt(document.getElementById('mobility_hip_left').value) || 0;
+            const mobilityHipRight = parseInt(document.getElementById('mobility_hip_right').value) || 0;
+            const mobilityHamstringLeft = parseInt(document.getElementById('mobility_hamstring_left').value) || 0;
+            const mobilityHamstringRight = parseInt(document.getElementById('mobility_hamstring_right').value) || 0;
+            const mobilityThoracic = parseInt(document.getElementById('mobility_thoracic').value) || 0;
+            
+            const mobilityScore = Math.round(((mobilityHipLeft + mobilityHipRight + mobilityHamstringLeft + mobilityHamstringRight + mobilityThoracic) / 5) * 10);
+
+            // Alignment Score
+            const alignmentPosture = parseInt(document.getElementById('alignment_posture').value) || 0;
+            const alignmentGait = parseInt(document.getElementById('alignment_gait').value) || 0;
+            
+            const alignmentScore = Math.round((alignmentPosture + alignmentGait) / 2);
+
+            // Running Score (placeholder - would come from Strava)
+            const runningScore = 75; // Mock value
+
+            // Calculate weighted AISRI score
+            const aisriScore = Math.round(
+                runningScore * 0.40 +
+                strengthScore * 0.15 +
+                romScore * 0.12 +
+                balanceScore * 0.13 +
+                alignmentScore * 0.10 +
+                mobilityScore * 0.10
+            );
+
+            // Update review display
+            document.getElementById('reviewScoreText').textContent = aisriScore;
+            document.getElementById('reviewRunning').textContent = runningScore;
+            document.getElementById('reviewStrength').textContent = strengthScore;
+            document.getElementById('reviewROM').textContent = romScore;
+            document.getElementById('reviewBalance').textContent = balanceScore;
+            document.getElementById('reviewAlignment').textContent = alignmentScore;
+            document.getElementById('reviewMobility').textContent = mobilityScore;
+
+            // Update risk category
+            let riskCategory, riskColor;
+            if (aisriScore >= 75) {
+                riskCategory = 'Low Risk';
+                riskColor = '#10b981';
+            } else if (aisriScore >= 55) {
+                riskCategory = 'Medium Risk';
+                riskColor = '#f59e0b';
+            } else if (aisriScore >= 35) {
+                riskCategory = 'High Risk';
+                riskColor = '#ef4444';
+            } else {
+                riskCategory = 'Critical Risk';
+                riskColor = '#dc2626';
+            }
+
+            document.getElementById('reviewRiskCategory').textContent = riskCategory;
+            
+            // Update circle
+            const circumference = 439.8;
+            const offset = circumference - (aisriScore / 100) * circumference;
+            document.getElementById('reviewScoreCircle').style.strokeDashoffset = offset;
+            document.getElementById('reviewScoreCircle').setAttribute('stroke', 'white');
+
+            // Store for submission
+            window.calculatedScores = {
+                aisriScore,
+                riskCategory,
+                runningScore,
+                strengthScore,
+                romScore,
+                balanceScore,
+                alignmentScore,
+                mobilityScore
+            };
+        }
+
+        window.submitAssessment = async function() {
+            if (!window.calculatedScores) {
+                alert('Please complete all assessments first');
+                return;
+            }
+
+            try {
+                // Create physical assessment record
+                const assessmentData = {
+                    athlete_id: athleteId,
+                    assessment_date: new Date().toISOString(),
+                    assessment_type: 'monthly',
+                    
+                    // ROM data
+                    rom_ankle_dorsiflexion_left: parseFloat(document.getElementById('rom_ankle_left').value) || null,
+                    rom_ankle_dorsiflexion_right: parseFloat(document.getElementById('rom_ankle_right').value) || null,
+                    rom_hip_flexion_left: parseFloat(document.getElementById('rom_hip_flex_left').value) || null,
+                    rom_hip_flexion_right: parseFloat(document.getElementById('rom_hip_flex_right').value) || null,
+                    rom_hip_extension_left: parseFloat(document.getElementById('rom_hip_ext_left').value) || null,
+                    rom_hip_extension_right: parseFloat(document.getElementById('rom_hip_ext_right').value) || null,
+                    
+                    // Strength data
+                    strength_single_leg_squat_left: parseInt(document.getElementById('strength_squat_left').value) || null,
+                    strength_single_leg_squat_right: parseInt(document.getElementById('strength_squat_right').value) || null,
+                    strength_calf_raise_left: parseInt(document.getElementById('strength_calf_left').value) || null,
+                    strength_calf_raise_right: parseInt(document.getElementById('strength_calf_right').value) || null,
+                    strength_core_plank_seconds: parseInt(document.getElementById('strength_plank').value) || null,
+                    
+                    // Balance data
+                    balance_single_leg_left: parseInt(document.getElementById('balance_stand_left').value) || null,
+                    balance_single_leg_right: parseInt(document.getElementById('balance_stand_right').value) || null,
+                    balance_y_test_left: parseFloat(document.getElementById('balance_y_left').value) || null,
+                    balance_y_test_right: parseFloat(document.getElementById('balance_y_right').value) || null,
+                    
+                    // Mobility data
+                    mobility_hip_flexor_left: parseInt(document.getElementById('mobility_hip_left').value) || null,
+                    mobility_hip_flexor_right: parseInt(document.getElementById('mobility_hip_right').value) || null,
+                    mobility_hamstring_left: parseInt(document.getElementById('mobility_hamstring_left').value) || null,
+                    mobility_hamstring_right: parseInt(document.getElementById('mobility_hamstring_right').value) || null,
+                    mobility_thoracic_rotation: parseInt(document.getElementById('mobility_thoracic').value) || null,
+                    
+                    // Alignment data
+                    alignment_posture_score: parseInt(document.getElementById('alignment_posture').value) || null,
+                    alignment_gait_score: parseInt(document.getElementById('alignment_gait').value) || null,
+                    
+                    // Notes
+                    assessor_notes: document.getElementById('assessorNotes').value || null,
+                    athlete_feedback: document.getElementById('athleteFeedback').value || null,
+                    
+                    completed_by: athleteId
+                };
+
+                const { data: assessment, error: assessmentError } = await supabase
+                    .from('physical_assessments')
+                    .insert(assessmentData)
+                    .select()
+                    .single();
+
+                if (assessmentError) throw assessmentError;
+
+                // Upload media files (if any)
+                for (const [testName, file] of Object.entries(capturedMedia)) {
+                    // Upload to Supabase Storage
+                    const fileName = `${athleteId}/${assessment.id}/${testName}_${Date.now()}.${file.type.split('/')[1]}`;
+                    const { data: uploadData, error: uploadError } = await supabase.storage
+                        .from('assessment-media')
+                        .upload(fileName, file);
+
+                    if (!uploadError && uploadData) {
+                        // Create media record
+                        const mediaType = file.type.startsWith('video') ? 'video' : 'image';
+                        await supabase
+                            .from('assessment_media')
+                            .insert({
+                                assessment_id: assessment.id,
+                                test_name: testName,
+                                media_type: mediaType,
+                                file_url: uploadData.path,
+                                file_size: file.size,
+                                mime_type: file.type
+                            });
+                    }
+                }
+
+                // Create AISRI score history record
+                const { error: scoreError } = await supabase
+                    .from('aisri_score_history')
+                    .insert({
+                        athlete_id: athleteId,
+                        assessment_id: assessment.id,
+                        aisri_score: window.calculatedScores.aisriScore,
+                        risk_category: window.calculatedScores.riskCategory,
+                        pillar_running: window.calculatedScores.runningScore,
+                        pillar_strength: window.calculatedScores.strengthScore,
+                        pillar_rom: window.calculatedScores.romScore,
+                        pillar_balance: window.calculatedScores.balanceScore,
+                        pillar_alignment: window.calculatedScores.alignmentScore,
+                        pillar_mobility: window.calculatedScores.mobilityScore
+                    });
+
+                if (scoreError) throw scoreError;
+
+                // Schedule next evaluation
+                const nextEvalDate = new Date();
+                nextEvalDate.setDate(nextEvalDate.getDate() + 30);
+                
+                await supabase
+                    .from('evaluation_schedule')
+                    .insert({
+                        athlete_id: athleteId,
+                        next_evaluation_date: nextEvalDate.toISOString().split('T')[0],
+                        evaluation_type: 'monthly'
+                    });
+
+                alert('✅ Assessment submitted successfully!\n\nYour AISRI score: ' + window.calculatedScores.aisriScore);
+                window.location.href = '/public/athlete-dashboard.html';
+
+            } catch (error) {
+                console.error('Error submitting assessment:', error);
+                alert('Error submitting assessment. Please try again.');
+            }
+        };
+
+        window.saveDraft = function() {
+            // Save form data to localStorage
+            const formData = {
+                // Save all input values
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem('assessment_draft', JSON.stringify(formData));
+            alert('Draft saved!');
+        };
+
+        window.syncStravaData = async function() {
+            alert('Syncing with Strava... (Feature in development)');
+            // Would fetch and display Strava metrics here
+        };
+
+        // Initialize first section
+        updateSectionDisplay();
+    </script>
+</body>
+</html>

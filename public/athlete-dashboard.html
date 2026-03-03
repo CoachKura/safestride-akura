@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Athlete Dashboard | SafeStride by AKURA</title>
+    
+    <!-- Design System CSS -->
+    <link rel="stylesheet" href="/safestride-design-system.css">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        /* Additional dashboard-specific styles */
+        .workout-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .workout-card h2 {
+            margin: 0 0 1rem 0;
+            font-size: 1.5rem;
+        }
+        
+        .workout-detail {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+            font-size: 1.1rem;
+        }
+        
+        .pillar-card {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pillar-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary-600);
+        }
+        
+        .risk-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        .risk-low {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .risk-medium {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .risk-high {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .risk-critical {
+            background-color: #fce7f3;
+            color: #831843;
+        }
+        
+        .calendar-mini {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .calendar-day:hover {
+            transform: scale(1.05);
+        }
+        
+        .calendar-day.completed {
+            background-color: var(--success-100);
+            color: var(--success-700);
+        }
+        
+        .calendar-day.scheduled {
+            background-color: var(--primary-100);
+            color: var(--primary-700);
+        }
+        
+        .calendar-day.today {
+            background-color: var(--primary-600);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .calendar-day.rest {
+            background-color: var(--neutral-100);
+            color: var(--neutral-500);
+        }
+        
+        .progress-ring {
+            width: 120px;
+            height: 120px;
+        }
+        
+        .strava-connect-banner {
+            background: linear-gradient(135deg, #fc4c02 0%, #e34402 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+        
+        .evaluation-reminder {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body class="dashboard-body">
+    
+    <!-- Top Navigation -->
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-running"></i>
+                <span>SafeStride</span>
+                <span class="text-sm text-neutral-500 ml-2">by AKURA</span>
+            </div>
+            
+            <div class="nav-menu">
+                <a href="/public/athlete-dashboard.html" class="nav-link active">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/public/training-calendar.html" class="nav-link">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Calendar</span>
+                </a>
+                <a href="/public/athlete-evaluation.html" class="nav-link">
+                    <i class="fas fa-clipboard-check"></i>
+                    <span>Evaluation</span>
+                </a>
+                <a href="/public/strava-dashboard.html" class="nav-link">
+                    <i class="fab fa-strava"></i>
+                    <span>Strava</span>
+                </a>
+            </div>
+            
+            <div class="nav-actions">
+                <button class="btn-icon" id="notificationsBtn" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">2</span>
+                </button>
+                <button class="btn-icon" id="userMenuBtn" title="User Menu">
+                    <i class="fas fa-user-circle"></i>
+                </button>
+                <button class="btn-secondary btn-sm" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+        <div class="container mx-auto">
+            
+            <!-- Welcome Header -->
+            <div class="mb-8">
+                <h1 class="text-4xl font-bold text-neutral-900 mb-2">
+                    Welcome back, <span id="athleteName">Athlete</span>! 👋
+                </h1>
+                <p class="text-lg text-neutral-600">
+                    Here's your training overview for today
+                </p>
+            </div>
+
+            <!-- Strava Connection Banner (if not connected) -->
+            <div class="strava-connect-banner" id="stravaConnectBanner" style="display: none;">
+                <div>
+                    <h3 class="text-xl font-bold mb-2">
+                        <i class="fab fa-strava mr-2"></i>
+                        Connect your Strava account
+                    </h3>
+                    <p class="opacity-90">
+                        Sync your activities automatically and get personalized insights
+                    </p>
+                </div>
+                <button class="btn-white btn-lg" onclick="connectStrava()">
+                    Connect Strava
+                </button>
+            </div>
+
+            <!-- Evaluation Reminder Banner (if due) -->
+            <div class="evaluation-reminder" id="evaluationReminder" style="display: none;">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-xl font-bold mb-2">
+                            <i class="fas fa-calendar-check mr-2"></i>
+                            Monthly evaluation due
+                        </h3>
+                        <p class="opacity-90" id="reminderText">
+                            Your monthly re-evaluation is scheduled for today
+                        </p>
+                    </div>
+                    <button class="btn-white btn-lg" onclick="window.location.href='/public/athlete-evaluation.html'">
+                        Start Evaluation
+                    </button>
+                </div>
+            </div>
+
+            <!-- Grid Layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- Left Column: Today's Workout & Weekly Summary -->
+                <div class="lg:col-span-2 space-y-6">
+                    
+                    <!-- Today's Workout -->
+                    <div class="card">
+                        <div class="workout-card">
+                            <div class="flex items-center justify-between mb-4">
+                                <h2>
+                                    <i class="fas fa-dumbbell mr-2"></i>
+                                    Today's Workout
+                                </h2>
+                                <span class="badge badge-white" id="workoutZone">Foundation</span>
+                            </div>
+                            
+                            <h3 class="text-2xl font-bold mb-4" id="workoutName">
+                                Easy Recovery Run
+                            </h3>
+                            
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div class="workout-detail">
+                                    <i class="fas fa-route"></i>
+                                    <div>
+                                        <div class="text-sm opacity-75">Distance</div>
+                                        <div class="font-bold text-xl" id="workoutDistance">5.0 km</div>
+                                    </div>
+                                </div>
+                                <div class="workout-detail">
+                                    <i class="fas fa-clock"></i>
+                                    <div>
+                                        <div class="text-sm opacity-75">Duration</div>
+                                        <div class="font-bold text-xl" id="workoutDuration">30 min</div>
+                                    </div>
+                                </div>
+                                <div class="workout-detail">
+                                    <i class="fas fa-heartbeat"></i>
+                                    <div>
+                                        <div class="text-sm opacity-75">HR Zone</div>
+                                        <div class="font-bold text-xl" id="workoutHR">Zone 2</div>
+                                    </div>
+                                </div>
+                                <div class="workout-detail">
+                                    <i class="fas fa-tachometer-alt"></i>
+                                    <div>
+                                        <div class="text-sm opacity-75">Intensity</div>
+                                        <div class="font-bold text-xl" id="workoutIntensity">Easy</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 p-4 bg-white/20 rounded-lg">
+                                <p class="text-sm opacity-90" id="workoutNotes">
+                                    Focus on maintaining easy pace. Should be able to hold a conversation throughout.
+                                </p>
+                            </div>
+                            
+                            <div class="mt-6 flex gap-3">
+                                <button class="btn-white flex-1" onclick="markWorkoutComplete()">
+                                    <i class="fas fa-check mr-2"></i>
+                                    Mark Complete
+                                </button>
+                                <button class="btn-outline-white" onclick="skipWorkout()">
+                                    <i class="fas fa-forward mr-2"></i>
+                                    Skip
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Weekly Summary -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                <i class="fas fa-chart-line mr-2"></i>
+                                This Week's Progress
+                            </h2>
+                            <span class="text-sm text-neutral-500">Week 3 of 12</span>
+                        </div>
+                        
+                        <div class="card-body">
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
+                                <div class="stat-card">
+                                    <div class="stat-value" id="weeklyActivities">4</div>
+                                    <div class="stat-label">Activities</div>
+                                    <div class="stat-change positive">+1 from last week</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value" id="weeklyDistance">18.5</div>
+                                    <div class="stat-label">km</div>
+                                    <div class="stat-change positive">+2.5 km</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value" id="weeklyTime">125</div>
+                                    <div class="stat-label">minutes</div>
+                                    <div class="stat-change positive">+15 min</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value" id="weeklyPace">6:45</div>
+                                    <div class="stat-label">avg pace</div>
+                                    <div class="stat-change">Same</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Weekly Activity Chart -->
+                            <canvas id="weeklyChart" height="80"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Training Calendar Preview -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                <i class="fas fa-calendar-week mr-2"></i>
+                                Next 7 Days
+                            </h2>
+                            <a href="/public/training-calendar.html" class="link">
+                                View Full Calendar
+                                <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+                        
+                        <div class="card-body">
+                            <div class="calendar-mini" id="calendarPreview">
+                                <!-- Generated by JavaScript -->
+                            </div>
+                            
+                            <div class="mt-6 grid grid-cols-2 gap-4 text-sm">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-4 h-4 rounded bg-primary-100"></div>
+                                    <span>Scheduled</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-4 h-4 rounded bg-success-100"></div>
+                                    <span>Completed</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-4 h-4 rounded bg-primary-600"></div>
+                                    <span>Today</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-4 h-4 rounded bg-neutral-100"></div>
+                                    <span>Rest Day</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: AISRI Score & Insights -->
+                <div class="space-y-6">
+                    
+                    <!-- AISRI Score Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                <i class="fas fa-shield-alt mr-2"></i>
+                                AISRI Score
+                            </h2>
+                            <span class="risk-badge risk-low" id="riskBadge">
+                                <i class="fas fa-check-circle"></i>
+                                Low Risk
+                            </span>
+                        </div>
+                        
+                        <div class="card-body text-center">
+                            <div class="flex justify-center mb-6">
+                                <svg class="progress-ring" viewBox="0 0 120 120">
+                                    <circle cx="60" cy="60" r="54" fill="none" stroke="#e5e7eb" stroke-width="8"/>
+                                    <circle id="progressCircle" cx="60" cy="60" r="54" fill="none" 
+                                            stroke="#10b981" stroke-width="8" stroke-linecap="round"
+                                            stroke-dasharray="339.292" stroke-dashoffset="85"
+                                            transform="rotate(-90 60 60)"/>
+                                    <text x="60" y="60" text-anchor="middle" dy=".3em" 
+                                          class="text-3xl font-bold" fill="#1f2937" id="aisriScoreText">75</text>
+                                </svg>
+                            </div>
+                            
+                            <p class="text-sm text-neutral-600 mb-4">
+                                Last assessed: <span id="lastAssessmentDate">2 days ago</span>
+                            </p>
+                            
+                            <button class="btn-primary btn-sm w-full" onclick="window.location.href='/public/athlete-evaluation.html'">
+                                <i class="fas fa-sync-alt mr-2"></i>
+                                Re-evaluate
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 6 Pillars Breakdown -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                <i class="fas fa-columns mr-2"></i>
+                                6 Pillars Breakdown
+                            </h2>
+                        </div>
+                        
+                        <div class="card-body space-y-4" id="pillarsBreakdown">
+                            <!-- Generated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Training Zones -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                <i class="fas fa-unlock-alt mr-2"></i>
+                                Unlocked Zones
+                            </h2>
+                        </div>
+                        
+                        <div class="card-body">
+                            <div class="space-y-3" id="trainingZones">
+                                <!-- Generated by JavaScript -->
+                            </div>
+                            
+                            <div class="mt-4 p-4 bg-neutral-50 rounded-lg">
+                                <p class="text-sm text-neutral-600">
+                                    <i class="fas fa-info-circle mr-2"></i>
+                                    Complete your training plan to unlock higher intensity zones
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Insights -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                <i class="fas fa-brain mr-2"></i>
+                                AI Insights
+                            </h2>
+                        </div>
+                        
+                        <div class="card-body">
+                            <div class="space-y-4" id="aiInsights">
+                                <div class="p-4 bg-success-50 border-l-4 border-success-500 rounded">
+                                    <p class="text-sm font-medium text-success-900 mb-1">
+                                        <i class="fas fa-check-circle mr-2"></i>
+                                        Great progress this week!
+                                    </p>
+                                    <p class="text-sm text-success-700">
+                                        Your training load is well-balanced. Keep up the consistency.
+                                    </p>
+                                </div>
+                                
+                                <div class="p-4 bg-warning-50 border-l-4 border-warning-500 rounded">
+                                    <p class="text-sm font-medium text-warning-900 mb-1">
+                                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                                        Watch your recovery
+                                    </p>
+                                    <p class="text-sm text-warning-700">
+                                        Consider adding an extra rest day next week.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+        
+        // Initialize Supabase
+        const SUPABASE_URL = 'https://bdisppaxbvygsspcuymb.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkaXNwcGF4YnZ5Z3NzcGN1eW1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzYxMzk5NjIsImV4cCI6MjA1MTcxNTk2Mn0.abc123def456'; // Replace with actual key
+        
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Check authentication
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+            window.location.href = '/login.html';
+        }
+
+        const athleteId = session.user.id;
+
+        // Load athlete data
+        async function loadDashboard() {
+            try {
+                // Get athlete profile
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', athleteId)
+                    .single();
+
+                if (profile) {
+                    document.getElementById('athleteName').textContent = profile.full_name || 'Athlete';
+                }
+
+                // Check Strava connection
+                const { data: stravaConnection } = await supabase
+                    .from('strava_connections')
+                    .select('*')
+                    .eq('athlete_id', athleteId)
+                    .eq('connected', true)
+                    .maybeSingle();
+
+                if (!stravaConnection) {
+                    document.getElementById('stravaConnectBanner').style.display = 'flex';
+                }
+
+                // Get latest AISRI score
+                const { data: latestScore } = await supabase
+                    .from('v_latest_aisri_scores')
+                    .select('*')
+                    .eq('athlete_id', athleteId)
+                    .maybeSingle();
+
+                if (latestScore) {
+                    displayAISRIScore(latestScore);
+                }
+
+                // Get today's workout
+                const today = new Date().toISOString().split('T')[0];
+                const { data: todayWorkout } = await supabase
+                    .from('daily_workouts')
+                    .select('*')
+                    .eq('athlete_id', athleteId)
+                    .eq('workout_date', today)
+                    .maybeSingle();
+
+                if (todayWorkout) {
+                    displayTodayWorkout(todayWorkout);
+                } else {
+                    displayRestDay();
+                }
+
+                // Get weekly summary
+                loadWeeklySummary();
+
+                // Load calendar preview
+                loadCalendarPreview();
+
+                // Check evaluation schedule
+                checkEvaluationDue();
+
+                // Load training zones
+                loadTrainingZones();
+
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+
+        function displayAISRIScore(score) {
+            const scoreValue = score.aisri_score;
+            document.getElementById('aisriScoreText').textContent = scoreValue;
+
+            // Update progress circle (339.292 is circumference for r=54)
+            const circumference = 339.292;
+            const offset = circumference - (scoreValue / 100) * circumference;
+            document.getElementById('progressCircle').style.strokeDashoffset = offset;
+
+            // Update risk badge
+            const riskBadge = document.getElementById('riskBadge');
+            const riskCategory = score.risk_category;
+            
+            riskBadge.className = 'risk-badge';
+            
+            if (riskCategory === 'Low Risk') {
+                riskBadge.classList.add('risk-low');
+                riskBadge.innerHTML = '<i class="fas fa-check-circle"></i> Low Risk';
+                document.getElementById('progressCircle').setAttribute('stroke', '#10b981');
+            } else if (riskCategory === 'Medium Risk') {
+                riskBadge.classList.add('risk-medium');
+                riskBadge.innerHTML = '<i class="fas fa-exclamation-circle"></i> Medium Risk';
+                document.getElementById('progressCircle').setAttribute('stroke', '#f59e0b');
+            } else if (riskCategory === 'High Risk') {
+                riskBadge.classList.add('risk-high');
+                riskBadge.innerHTML = '<i class="fas fa-exclamation-triangle"></i> High Risk';
+                document.getElementById('progressCircle').setAttribute('stroke', '#ef4444');
+            } else {
+                riskBadge.classList.add('risk-critical');
+                riskBadge.innerHTML = '<i class="fas fa-times-circle"></i> Critical Risk';
+                document.getElementById('progressCircle').setAttribute('stroke', '#dc2626');
+            }
+
+            // Display pillars breakdown
+            const pillars = [
+                { name: 'Running', score: score.pillar_running, icon: 'fa-running', color: '#667eea' },
+                { name: 'Strength', score: score.pillar_strength, icon: 'fa-dumbbell', color: '#10b981' },
+                { name: 'ROM', score: score.pillar_rom, icon: 'fa-arrows-alt', color: '#f59e0b' },
+                { name: 'Balance', score: score.pillar_balance, icon: 'fa-balance-scale', color: '#06b6d4' },
+                { name: 'Alignment', score: score.pillar_alignment, icon: 'fa-align-center', color: '#8b5cf6' },
+                { name: 'Mobility', score: score.pillar_mobility, icon: 'fa-walking', color: '#ec4899' }
+            ];
+
+            const pillarsHTML = pillars.map(pillar => `
+                <div class="pillar-card">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-2">
+                            <i class="fas ${pillar.icon}" style="color: ${pillar.color}"></i>
+                            <span class="font-medium">${pillar.name}</span>
+                        </div>
+                        <span class="font-bold">${pillar.score}</span>
+                    </div>
+                    <div class="w-full bg-neutral-200 rounded-full h-2">
+                        <div class="h-2 rounded-full transition-all duration-500" 
+                             style="width: ${pillar.score}%; background-color: ${pillar.color}"></div>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('pillarsBreakdown').innerHTML = pillarsHTML;
+        }
+
+        function displayTodayWorkout(workout) {
+            document.getElementById('workoutName').textContent = workout.workout_name;
+            document.getElementById('workoutZone').textContent = workout.workout_type;
+            document.getElementById('workoutDistance').textContent = `${workout.distance} km`;
+            document.getElementById('workoutDuration').textContent = `${workout.duration} min`;
+            document.getElementById('workoutHR').textContent = workout.hr_zone || 'Zone 2';
+            document.getElementById('workoutIntensity').textContent = workout.intensity || 'Easy';
+            document.getElementById('workoutNotes').textContent = workout.notes || 'No additional notes';
+        }
+
+        function displayRestDay() {
+            const workoutCard = document.querySelector('.workout-card');
+            workoutCard.style.background = 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)';
+            document.getElementById('workoutName').textContent = 'Rest Day';
+            document.getElementById('workoutZone').textContent = 'Recovery';
+            document.getElementById('workoutDistance').textContent = '0 km';
+            document.getElementById('workoutDuration').textContent = '0 min';
+            document.getElementById('workoutNotes').textContent = 'Enjoy your rest day! Focus on recovery and mobility.';
+        }
+
+        async function loadWeeklySummary() {
+            // Mock data - replace with actual Strava data
+            const weeklyData = {
+                activities: 4,
+                distance: 18.5,
+                time: 125,
+                pace: '6:45'
+            };
+
+            document.getElementById('weeklyActivities').textContent = weeklyData.activities;
+            document.getElementById('weeklyDistance').textContent = weeklyData.distance;
+            document.getElementById('weeklyTime').textContent = weeklyData.time;
+            document.getElementById('weeklyPace').textContent = weeklyData.pace;
+
+            // Create weekly chart
+            const ctx = document.getElementById('weeklyChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Distance (km)',
+                        data: [5, 0, 6, 3.5, 4, 0, 0],
+                        backgroundColor: '#667eea',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { display: false }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        function loadCalendarPreview() {
+            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            const preview = document.getElementById('calendarPreview');
+            
+            // Mock data - replace with actual workout data
+            const dayStatus = ['completed', 'completed', 'today', 'scheduled', 'scheduled', 'rest', 'scheduled'];
+            
+            const html = days.map((day, i) => `
+                <div class="calendar-day ${dayStatus[i]}" title="${day}">
+                    ${day.substring(0, 1)}
+                </div>
+            `).join('');
+            
+            preview.innerHTML = html;
+        }
+
+        async function checkEvaluationDue() {
+            const { data: schedule } = await supabase
+                .from('evaluation_schedule')
+                .select('*')
+                .eq('athlete_id', athleteId)
+                .eq('status', 'pending')
+                .lte('next_evaluation_date', new Date().toISOString().split('T')[0])
+                .maybeSingle();
+
+            if (schedule) {
+                document.getElementById('evaluationReminder').style.display = 'block';
+                const daysOverdue = Math.floor((new Date() - new Date(schedule.next_evaluation_date)) / (1000 * 60 * 60 * 24));
+                
+                if (daysOverdue === 0) {
+                    document.getElementById('reminderText').textContent = 'Your monthly re-evaluation is scheduled for today';
+                } else if (daysOverdue > 0) {
+                    document.getElementById('reminderText').textContent = `Your monthly re-evaluation is ${daysOverdue} day(s) overdue`;
+                }
+            }
+        }
+
+        function loadTrainingZones() {
+            const zones = [
+                { code: 'AR', name: 'Active Recovery', unlocked: true, color: '#10b981' },
+                { code: 'F', name: 'Foundation', unlocked: true, color: '#3b82f6' },
+                { code: 'EN', name: 'Endurance', unlocked: true, color: '#8b5cf6' },
+                { code: 'TH', name: 'Threshold', unlocked: false, color: '#f59e0b' },
+                { code: 'P', name: 'Power', unlocked: false, color: '#ef4444' },
+                { code: 'SP', name: 'Speed', unlocked: false, color: '#dc2626' }
+            ];
+
+            const html = zones.map(zone => `
+                <div class="flex items-center justify-between p-3 rounded-lg ${zone.unlocked ? 'bg-neutral-50' : 'bg-neutral-100 opacity-50'}">
+                    <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 rounded-full" style="background-color: ${zone.color}"></div>
+                        <span class="font-medium">${zone.name}</span>
+                    </div>
+                    ${zone.unlocked 
+                        ? '<i class="fas fa-check-circle text-success-600"></i>'
+                        : '<i class="fas fa-lock text-neutral-400"></i>'
+                    }
+                </div>
+            `).join('');
+
+            document.getElementById('trainingZones').innerHTML = html;
+        }
+
+        // Global functions
+        window.connectStrava = function() {
+            window.location.href = '/public/strava-callback.html';
+        };
+
+        window.markWorkoutComplete = async function() {
+            alert('Workout marked as complete! (Implementation pending)');
+        };
+
+        window.skipWorkout = function() {
+            if (confirm('Are you sure you want to skip today\'s workout?')) {
+                alert('Workout skipped. (Implementation pending)');
+            }
+        };
+
+        window.logout = async function() {
+            await supabase.auth.signOut();
+            window.location.href = '/login.html';
+        };
+
+        // Load dashboard on page load
+        loadDashboard();
+    </script>
+</body>
+</html>

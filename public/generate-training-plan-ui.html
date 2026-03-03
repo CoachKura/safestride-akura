@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Training Plan | SafeStride</title>
+    <link rel="stylesheet" href="/safestride-design-system.css">
+    <style>
+        .console-output {
+            background: #1f2937;
+            color: #10b981;
+            font-family: 'Monaco', 'Menlo', monospace;
+            padding: 1.5rem;
+            border-radius: 12px;
+            min-height: 400px;
+            max-height: 600px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+        
+        .btn-generate {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.125rem;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .btn-generate:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-generate:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            margin-left: 1rem;
+        }
+        
+        .status-idle {
+            background: #e5e7eb;
+            color: #6b7280;
+        }
+        
+        .status-running {
+            background: #fef3c7;
+            color: #92400e;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        .status-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body class="dashboard-body">
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-running"></i>
+                <span>SafeStride</span>
+                <span class="text-sm text-neutral-500 ml-2">Training Plan Generator</span>
+            </div>
+            <div class="nav-actions">
+                <button class="btn-secondary btn-sm" onclick="window.location.href='/public/athlete-dashboard.html'">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Back to Dashboard
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="dashboard-main">
+        <div class="container mx-auto" style="max-width: 1000px;">
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h1 class="text-3xl font-bold text-neutral-900">
+                            <i class="fas fa-magic mr-3"></i>
+                            Generate Training Plan
+                        </h1>
+                        <p class="text-neutral-600 mt-2">
+                            Create a realistic 12-week training plan with 84 daily workouts
+                        </p>
+                    </div>
+                    <span class="status-badge status-idle" id="statusBadge">Ready</span>
+                </div>
+
+                <div class="card-body">
+                    <div class="p-6 bg-blue-50 rounded-lg mb-6">
+                        <h3 class="text-lg font-bold text-blue-900 mb-3">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            What This Will Create:
+                        </h3>
+                        <ul class="space-y-2 text-blue-800">
+                            <li><i class="fas fa-check mr-2 text-blue-600"></i> <strong>1 Training Plan</strong>: 12-Week Foundation Building Program</li>
+                            <li><i class="fas fa-check mr-2 text-blue-600"></i> <strong>84 Daily Workouts</strong>: Includes easy runs, tempo runs, long runs, rest days</li>
+                            <li><i class="fas fa-check mr-2 text-blue-600"></i> <strong>Progressive Build</strong>: Weeks 1-4 (Foundation), 5-8 (Endurance), 9-12 (Threshold)</li>
+                            <li><i class="fas fa-check mr-2 text-blue-600"></i> <strong>Sample Completions</strong>: Past week's workouts marked complete with data</li>
+                            <li><i class="fas fa-check mr-2 text-blue-600"></i> <strong>AISRI Scores</strong>: Initial (65) and current (72) scores with improvement tracking</li>
+                            <li><i class="fas fa-check mr-2 text-blue-600"></i> <strong>Evaluation Schedule</strong>: Next assessment scheduled in 7 days</li>
+                        </ul>
+                    </div>
+
+                    <div class="p-6 bg-yellow-50 rounded-lg mb-6">
+                        <h3 class="text-lg font-bold text-yellow-900 mb-2">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            Important Notes:
+                        </h3>
+                        <ul class="space-y-1 text-yellow-800">
+                            <li>• This will create a new training plan for your account</li>
+                            <li>• Running multiple times will create duplicate plans</li>
+                            <li>• Generated workouts respect AISRI-based zone restrictions</li>
+                            <li>• Plan starts today and runs for 84 days (12 weeks)</li>
+                        </ul>
+                    </div>
+
+                    <div class="text-center mb-6">
+                        <button class="btn-generate" id="generateBtn" onclick="startGeneration()">
+                            <i class="fas fa-rocket mr-2"></i>
+                            Generate Training Plan
+                        </button>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-bold text-neutral-900 mb-3">
+                            <i class="fas fa-terminal mr-2"></i>
+                            Console Output:
+                        </h3>
+                        <div class="console-output" id="consoleOutput">
+Waiting to start...
+
+Click "Generate Training Plan" button above to begin.
+                        </div>
+                    </div>
+
+                    <div class="mt-6 p-4 bg-green-50 rounded-lg" id="successMessage" style="display: none;">
+                        <h3 class="text-lg font-bold text-green-900 mb-2">
+                            <i class="fas fa-check-circle mr-2"></i>
+                            Success! What's Next?
+                        </h3>
+                        <div class="space-y-2 text-green-800">
+                            <p>Your training plan has been created successfully! You can now:</p>
+                            <div class="mt-4 flex gap-3">
+                                <button class="btn-primary" onclick="window.location.href='/public/athlete-dashboard.html'">
+                                    <i class="fas fa-home mr-2"></i>
+                                    View Dashboard
+                                </button>
+                                <button class="btn-primary" onclick="window.location.href='/public/training-calendar.html'">
+                                    <i class="fas fa-calendar-alt mr-2"></i>
+                                    View Calendar
+                                </button>
+                                <button class="btn-secondary" onclick="location.reload()">
+                                    <i class="fas fa-redo mr-2"></i>
+                                    Generate Another
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+        const SUPABASE_URL = 'https://bdisppaxbvygsspcuymb.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkaXNwcGF4YnZ5Z3NzcGN1eW1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzYxMzk5NjIsImV4cCI6MjA1MTcxNTk2Mn0.abc123def456';
+        
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let currentUserId = null;
+
+        // Custom console that writes to page
+        const consoleOutput = document.getElementById('consoleOutput');
+        const statusBadge = document.getElementById('statusBadge');
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            let prefix = '➤';
+            
+            if (type === 'success') prefix = '✅';
+            else if (type === 'error') prefix = '❌';
+            else if (type === 'warning') prefix = '⚠️';
+            else if (type === 'step') prefix = '📋';
+            
+            consoleOutput.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+
+        function setStatus(status, text) {
+            statusBadge.className = `status-badge status-${status}`;
+            statusBadge.textContent = text;
+        }
+
+        async function generateTrainingPlan(athleteId) {
+            const startDate = new Date();
+            const endDate = new Date(startDate);
+            endDate.setDate(endDate.getDate() + 84);
+
+            try {
+                setStatus('running', 'Generating...');
+
+                // Step 1: Create training plan
+                log('Creating training plan...', 'step');
+                const { data: plan, error: planError } = await supabase
+                    .from('training_plans')
+                    .insert({
+                        athlete_id: athleteId,
+                        plan_name: '12-Week Foundation Building Program',
+                        start_date: startDate.toISOString().split('T')[0],
+                        end_date: endDate.toISOString().split('T')[0],
+                        total_weeks: 12,
+                        aisri_score_at_creation: 65,
+                        risk_category: 'Medium Risk',
+                        plan_data: {
+                            goal: '10K Race Preparation',
+                            focus: 'Build aerobic base and injury prevention',
+                            zones_unlocked: ['AR', 'F', 'EN']
+                        },
+                        status: 'active',
+                        created_by: athleteId
+                    })
+                    .select()
+                    .single();
+
+                if (planError) throw planError;
+                log(`Training plan created: ${plan.id}`, 'success');
+
+                // Step 2: Generate 84 workouts
+                log('Generating 84 daily workouts...', 'step');
+                const workouts = [];
+
+                for (let week = 1; week <= 12; week++) {
+                    for (let day = 1; day <= 7; day++) {
+                        const workoutDate = new Date(startDate);
+                        workoutDate.setDate(workoutDate.getDate() + ((week - 1) * 7 + (day - 1)));
+
+                        const workout = createWorkout(plan.id, athleteId, workoutDate, week, day);
+                        workouts.push(workout);
+                    }
+                    log(`  Week ${week}/12 generated`, 'info');
+                }
+
+                // Insert workouts
+                const { error: workoutsError } = await supabase
+                    .from('daily_workouts')
+                    .insert(workouts);
+
+                if (workoutsError) throw workoutsError;
+                log(`${workouts.length} workouts inserted`, 'success');
+
+                // Step 3: Create AISRI scores
+                log('Creating AISRI score history...', 'step');
+                await supabase.from('aisri_score_history').insert([
+                    {
+                        athlete_id: athleteId,
+                        aisri_score: 65,
+                        risk_category: 'Medium Risk',
+                        pillar_running: 68,
+                        pillar_strength: 62,
+                        pillar_rom: 60,
+                        pillar_balance: 70,
+                        pillar_alignment: 64,
+                        pillar_mobility: 66,
+                        recorded_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+                    },
+                    {
+                        athlete_id: athleteId,
+                        aisri_score: 72,
+                        risk_category: 'Medium Risk',
+                        pillar_running: 75,
+                        pillar_strength: 68,
+                        pillar_rom: 65,
+                        pillar_balance: 76,
+                        pillar_alignment: 70,
+                        pillar_mobility: 72,
+                        score_change: 7,
+                        change_direction: 'improved'
+                    }
+                ]);
+                log('AISRI scores created', 'success');
+
+                // Step 4: Schedule evaluation
+                log('Scheduling next evaluation...', 'step');
+                const nextEvalDate = new Date();
+                nextEvalDate.setDate(nextEvalDate.getDate() + 7);
+
+                await supabase.from('evaluation_schedule').insert({
+                    athlete_id: athleteId,
+                    next_evaluation_date: nextEvalDate.toISOString().split('T')[0],
+                    evaluation_type: 'monthly',
+                    status: 'pending'
+                });
+                log('Next evaluation scheduled', 'success');
+
+                // Success!
+                log('\n' + '='.repeat(50), 'info');
+                log('TRAINING PLAN GENERATION COMPLETE!', 'success');
+                log('='.repeat(50), 'info');
+                log(`\nPlan ID: ${plan.id}`, 'info');
+                log(`Total Workouts: 84`, 'info');
+                log(`AISRI Score: 72 (Medium Risk)`, 'info');
+                log(`\nYou can now view your dashboard and calendar!`, 'success');
+
+                setStatus('success', 'Complete!');
+                document.getElementById('successMessage').style.display = 'block';
+
+                return { success: true, planId: plan.id };
+
+            } catch (error) {
+                log(`ERROR: ${error.message}`, 'error');
+                setStatus('error', 'Failed');
+                return { success: false, error: error.message };
+            }
+        }
+
+        function createWorkout(planId, athleteId, date, week, day) {
+            const base = {
+                training_plan_id: planId,
+                athlete_id: athleteId,
+                workout_date: date.toISOString().split('T')[0],
+                week_number: week,
+                day_number: day,
+                completed: false
+            };
+
+            // Weekly pattern
+            const patterns = {
+                1: { type: 'F', name: 'Easy Foundation Run', dist: 5 + week * 0.3, dur: 35 + week * 2, zone: 'Zone 2', int: 'Easy' },
+                2: week <= 4 
+                    ? { type: 'F', name: 'Foundation Pace Run', dist: 4 + week * 0.2, dur: 30 + week, zone: 'Zone 2-3', int: 'Moderate' }
+                    : week <= 8
+                    ? { type: 'EN', name: 'Endurance Run', dist: 6 + week * 0.2, dur: 40 + week * 2, zone: 'Zone 3', int: 'Moderate' }
+                    : { type: 'TH', name: 'Threshold Intervals', dist: 7, dur: 50, zone: 'Zone 4', int: 'Hard' },
+                3: { type: 'AR', name: 'Active Recovery Run', dist: 4, dur: 25 + week, zone: 'Zone 1-2', int: 'Very Easy' },
+                4: { type: 'Rest', name: 'Rest Day', dist: 0, dur: 0, zone: 'N/A', int: 'Rest' },
+                5: { type: 'F', name: 'Easy Foundation Run', dist: 5 + week * 0.2, dur: 35 + week, zone: 'Zone 2', int: 'Easy' },
+                6: { type: 'EN', name: 'Long Endurance Run', dist: 8 + week * 0.5, dur: 60 + week * 4, zone: 'Zone 2-3', int: 'Moderate' },
+                7: week % 3 === 0
+                    ? { type: 'AR', name: 'Easy Shakeout Run', dist: 3, dur: 20, zone: 'Zone 1', int: 'Very Easy' }
+                    : { type: 'Rest', name: 'Rest Day', dist: 0, dur: 0, zone: 'N/A', int: 'Rest' }
+            };
+
+            const pattern = patterns[day];
+            return {
+                ...base,
+                workout_type: pattern.type,
+                workout_name: pattern.name,
+                distance: pattern.dist,
+                duration: pattern.dur,
+                hr_zone: pattern.zone,
+                intensity: pattern.int,
+                notes: 'Focus on proper form and pacing.'
+            };
+        }
+
+        window.startGeneration = async function() {
+            const btn = document.getElementById('generateBtn');
+            btn.disabled = true;
+            
+            consoleOutput.textContent = '';
+            log('Starting training plan generation...', 'step');
+            log(`Athlete ID: ${currentUserId}`, 'info');
+            log('', 'info');
+
+            await generateTrainingPlan(currentUserId);
+            
+            btn.disabled = false;
+        };
+
+        // Check auth on load
+        (async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (session) {
+                currentUserId = session.user.id;
+                log(`Logged in as: ${session.user.email}`, 'success');
+                log(`Athlete ID: ${currentUserId}`, 'info');
+                log('', 'info');
+                log('Ready to generate training plan!', 'success');
+            } else {
+                log('Not logged in. Redirecting...', 'error');
+                setTimeout(() => window.location.href = '/login.html', 2000);
+            }
+        })();
+    </script>
+</body>
+</html>

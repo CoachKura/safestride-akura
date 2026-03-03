@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - SafeStride by AKURA</title>
+    
+    <!-- Modern Design System -->
+    <link rel="stylesheet" href="safestride-design-system.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Config -->
+    <script src="config.js"></script>
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .signup-container {
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        .signup-card {
+            background: white;
+            border-radius: var(--radius-2xl);
+            box-shadow: var(--shadow-xl);
+            padding: 3rem;
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .logo-icon {
+            font-size: 3rem;
+            background: linear-gradient(135deg, #9333EA, #7C3AED);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .logo-text {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-top: 0.5rem;
+        }
+        
+        .role-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .role-option {
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+        
+        .role-option:hover {
+            border-color: var(--primary-300);
+            background-color: var(--primary-50);
+        }
+        
+        .role-option.selected {
+            border-color: var(--primary-600);
+            background-color: var(--primary-50);
+        }
+        
+        .role-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-600);
+        }
+        
+        .role-name {
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 0.25rem;
+        }
+        
+        .role-description {
+            font-size: var(--text-sm);
+            color: var(--gray-600);
+        }
+        
+        .divider {
+            text-align: center;
+            margin: 1.5rem 0;
+            color: var(--gray-500);
+            font-size: var(--text-sm);
+        }
+        
+        .footer-text {
+            text-align: center;
+            margin-top: 2rem;
+            color: var(--gray-600);
+            font-size: var(--text-sm);
+        }
+        
+        .footer-text a {
+            color: var(--primary-600);
+            font-weight: 600;
+        }
+        
+        .alert {
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <div class="signup-card">
+            <!-- Logo -->
+            <div class="logo">
+                <i class="fas fa-running logo-icon"></i>
+                <div class="logo-text">SafeStride</div>
+                <p style="color: var(--gray-600); font-size: var(--text-sm); margin-top: 0.5rem;">
+                    By AKURA
+                </p>
+            </div>
+            
+            <!-- Alert messages -->
+            <div id="alert-container"></div>
+            
+            <!-- Role Selection -->
+            <div class="role-selector">
+                <div class="role-option" data-role="athlete" onclick="selectRole('athlete')">
+                    <i class="fas fa-user-athlete role-icon"></i>
+                    <div class="role-name">Athlete</div>
+                    <div class="role-description">Track your training & prevent injuries</div>
+                </div>
+                
+                <div class="role-option" data-role="coach" onclick="selectRole('coach')">
+                    <i class="fas fa-user-tie role-icon"></i>
+                    <div class="role-name">Coach</div>
+                    <div class="role-description">Manage athletes & create plans</div>
+                </div>
+            </div>
+            
+            <!-- Signup Form -->
+            <form id="signup-form" onsubmit="handleSignup(event)">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input 
+                        type="text" 
+                        id="full-name" 
+                        class="form-input" 
+                        placeholder="John Doe" 
+                        required
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        class="form-input" 
+                        placeholder="john@example.com" 
+                        required
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        class="form-input" 
+                        placeholder="••••••••" 
+                        minlength="8"
+                        required
+                    >
+                    <p class="form-help">At least 8 characters</p>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Confirm Password</label>
+                    <input 
+                        type="password" 
+                        id="confirm-password" 
+                        class="form-input" 
+                        placeholder="••••••••" 
+                        required
+                    >
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" required>
+                        <span style="font-size: var(--text-sm); color: var(--gray-700);">
+                            I agree to the <a href="#" style="color: var(--primary-600);">Terms of Service</a> and <a href="#" style="color: var(--primary-600);">Privacy Policy</a>
+                        </span>
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%;" id="submit-btn">
+                    <i class="fas fa-user-plus"></i>
+                    Create Account
+                </button>
+            </form>
+            
+            <div class="footer-text">
+                Already have an account? <a href="login.html">Sign In</a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize Supabase
+        const supabase = window.supabase.createClient(
+            SAFESTRIDE_CONFIG.supabase.url,
+            SAFESTRIDE_CONFIG.supabase.anonKey
+        );
+        
+        let selectedRole = 'athlete'; // Default
+        
+        // Role Selection
+        function selectRole(role) {
+            selectedRole = role;
+            
+            // Update UI
+            document.querySelectorAll('.role-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            document.querySelector(`[data-role="${role}"]`).classList.add('selected');
+        }
+        
+        // Initialize with athlete selected
+        selectRole('athlete');
+        
+        // Show Alert
+        function showAlert(message, type = 'info') {
+            const alertClass = `alert-${type}`;
+            const icons = {
+                success: 'fa-check-circle',
+                danger: 'fa-times-circle',
+                warning: 'fa-exclamation-triangle',
+                info: 'fa-info-circle'
+            };
+            
+            const alertHTML = `
+                <div class="alert ${alertClass}">
+                    <i class="fas ${icons[type]}"></i>
+                    <div>${message}</div>
+                </div>
+            `;
+            
+            document.getElementById('alert-container').innerHTML = alertHTML;
+            
+            // Auto-dismiss after 5 seconds
+            if (type === 'success') {
+                setTimeout(() => {
+                    document.getElementById('alert-container').innerHTML = '';
+                }, 5000);
+            }
+        }
+        
+        // Handle Signup
+        async function handleSignup(event) {
+            event.preventDefault();
+            
+            const submitBtn = document.getElementById('submit-btn');
+            const originalHTML = submitBtn.innerHTML;
+            
+            // Get form values
+            const fullName = document.getElementById('full-name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            
+            // Validate
+            if (password !== confirmPassword) {
+                showAlert('Passwords do not match', 'danger');
+                return;
+            }
+            
+            if (password.length < 8) {
+                showAlert('Password must be at least 8 characters', 'danger');
+                return;
+            }
+            
+            try {
+                // Disable button and show loading
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+                
+                // 1. Sign up with Supabase Auth
+                const { data: authData, error: authError } = await supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        data: {
+                            full_name: fullName,
+                            role: selectedRole
+                        }
+                    }
+                });
+                
+                if (authError) throw authError;
+                
+                // 2. Create profile in database
+                const { data: profileData, error: profileError } = await supabase
+                    .from('profiles')
+                    .insert([
+                        {
+                            id: authData.user.id,
+                            email: email,
+                            full_name: fullName,
+                            role: selectedRole,
+                            onboarding_completed: false
+                        }
+                    ]);
+                
+                if (profileError) throw profileError;
+                
+                // 3. Success!
+                showAlert('Account created successfully! Check your email to verify your account.', 'success');
+                
+                // Redirect based on role after 2 seconds
+                setTimeout(() => {
+                    if (selectedRole === 'athlete') {
+                        window.location.href = 'onboarding.html';
+                    } else {
+                        window.location.href = 'coach-dashboard-new.html';
+                    }
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Signup error:', error);
+                showAlert(error.message || 'Failed to create account. Please try again.', 'danger');
+                
+                // Re-enable button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalHTML;
+            }
+        }
+    </script>
+</body>
+</html>

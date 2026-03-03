@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Athlete Onboarding - SafeStride</title>
+    
+    <!-- Modern Design System -->
+    <link rel="stylesheet" href="safestride-design-system.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Config -->
+    <script src="config.js"></script>
+    
+    <style>
+        body {
+            background-color: var(--gray-50);
+        }
+        
+        .progress-steps {
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+            padding: 2rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .steps-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 1;
+            max-width: 150px;
+        }
+        
+        .step-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.25rem;
+            background-color: var(--gray-200);
+            color: var(--gray-600);
+            transition: all var(--transition-base);
+        }
+        
+        .step.active .step-circle {
+            background: linear-gradient(135deg, #9333EA, #7C3AED);
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .step.completed .step-circle {
+            background-color: var(--success-600);
+            color: white;
+        }
+        
+        .step-label {
+            font-size: var(--text-sm);
+            font-weight: 500;
+            color: var(--gray-600);
+            text-align: center;
+        }
+        
+        .step.active .step-label {
+            color: var(--primary-600);
+            font-weight: 600;
+        }
+        
+        .step-connector {
+            height: 2px;
+            background-color: var(--gray-200);
+            flex: 1;
+            margin: 0 0.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .step-connector.completed {
+            background-color: var(--success-600);
+        }
+        
+        .onboarding-content {
+            max-width: 900px;
+            margin: 3rem auto;
+            padding: 0 1.5rem;
+        }
+        
+        .step-content {
+            display: none;
+        }
+        
+        .step-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .test-card {
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .test-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .test-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: var(--radius-lg);
+            background: linear-gradient(135deg, #9333EA, #7C3AED);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .test-info h4 {
+            font-size: var(--text-lg);
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .test-info p {
+            font-size: var(--text-sm);
+            color: var(--gray-600);
+            margin: 0;
+        }
+        
+        .test-body {
+            margin: 1rem 0;
+        }
+        
+        .demo-image {
+            width: 100%;
+            height: 150px;
+            background-color: var(--gray-100);
+            border-radius: var(--radius-lg);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-400);
+            font-size: 3rem;
+        }
+        
+        .capture-area {
+            margin-top: 1rem;
+        }
+        
+        .capture-preview {
+            width: 100%;
+            height: 200px;
+            border: 2px dashed var(--gray-300);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            background-color: var(--gray-50);
+        }
+        
+        .capture-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .capture-placeholder {
+            text-align: center;
+            color: var(--gray-400);
+        }
+        
+        .device-card {
+            background: white;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            text-align: center;
+            transition: all var(--transition-base);
+            cursor: pointer;
+        }
+        
+        .device-card:hover {
+            border-color: var(--primary-300);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .device-card.connected {
+            border-color: var(--success-600);
+            background-color: var(--success-50);
+        }
+        
+        .device-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1rem;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+        
+        .device-icon.strava {
+            background-color: #FC4C02;
+            color: white;
+        }
+        
+        .device-icon.garmin {
+            background-color: #007CC3;
+            color: white;
+        }
+        
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 3rem;
+            gap: 1rem;
+        }
+        
+        .result-score {
+            text-align: center;
+            padding: 3rem;
+            background: linear-gradient(135deg, #9333EA, #7C3AED);
+            color: white;
+            border-radius: var(--radius-2xl);
+            margin-bottom: 2rem;
+        }
+        
+        .result-score-number {
+            font-size: 5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+        
+        .result-score-label {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .result-score-category {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .pillar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .pillar-item {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .pillar-name {
+            font-size: var(--text-sm);
+            color: var(--gray-600);
+            margin-bottom: 0.5rem;
+        }
+        
+        .pillar-score {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-600);
+        }
+    </style>
+</head>
+<body>
+    <!-- Progress Steps -->
+    <div class="progress-steps">
+        <div class="steps-container">
+            <div class="step active" data-step="1">
+                <div class="step-circle">1</div>
+                <div class="step-label">Personal Info</div>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step" data-step="2">
+                <div class="step-circle">2</div>
+                <div class="step-label">Physical Tests</div>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step" data-step="3">
+                <div class="step-circle">3</div>
+                <div class="step-label">Connect Device</div>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step" data-step="4">
+                <div class="step-circle">4</div>
+                <div class="step-label">AISRI Score</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Onboarding Content -->
+    <div class="onboarding-content">
+        <!-- STEP 1: Personal Information -->
+        <div class="step-content active" data-step="1">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-user"></i>
+                        Personal Information
+                    </h2>
+                    <p class="card-subtitle">Tell us about yourself to personalize your training</p>
+                </div>
+                
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label">Age</label>
+                        <input type="number" id="age" class="form-input" placeholder="30" min="18" max="100" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Gender</label>
+                        <select id="gender" class="form-select" required>
+                            <option value="">Select...</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Weight (kg)</label>
+                        <input type="number" id="weight" class="form-input" placeholder="70" step="0.1" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Height (cm)</label>
+                        <input type="number" id="height" class="form-input" placeholder="175" step="0.1" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Resting Heart Rate (bpm)</label>
+                        <input type="number" id="resting-hr" class="form-input" placeholder="60" min="30" max="100">
+                        <p class="form-help">Optional - Measure first thing in the morning</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Max Heart Rate (bpm)</label>
+                        <input type="number" id="max-hr" class="form-input" placeholder="185" min="100" max="220">
+                        <p class="form-help">Optional - We can estimate if unknown</p>
+                    </div>
+                </div>
+                
+                <div class="actions">
+                    <div></div>
+                    <button class="btn btn-primary" onclick="nextStep()">
+                        Continue
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- STEP 2: Physical Assessment Tests -->
+        <div class="step-content" data-step="2">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-heartbeat"></i>
+                        Physical Assessment Tests
+                    </h2>
+                    <p class="card-subtitle">Complete these tests and capture images for accurate measurement</p>
+                </div>
+                
+                <div class="card-body">
+                    <div id="assessment-tests">
+                        <!-- Tests will be dynamically loaded here -->
+                    </div>
+                </div>
+                
+                <div class="actions">
+                    <button class="btn btn-secondary" onclick="prevStep()">
+                        <i class="fas fa-arrow-left"></i>
+                        Back
+                    </button>
+                    <button class="btn btn-primary" onclick="nextStep()">
+                        Continue
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- STEP 3: Connect Devices -->
+        <div class="step-content" data-step="3">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-sync"></i>
+                        Connect Your Devices
+                    </h2>
+                    <p class="card-subtitle">Connect Strava or Garmin to automatically track your running performance</p>
+                </div>
+                
+                <div class="card-body">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-top: 2rem;">
+                        <div class="device-card" id="strava-card" onclick="connectStrava()">
+                            <div class="device-icon strava">
+                                <i class="fab fa-strava"></i>
+                            </div>
+                            <h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.5rem;">Strava</h3>
+                            <p style="color: var(--gray-600); font-size: var(--text-sm); margin-bottom: 1.5rem;">
+                                Connect your Strava account
+                            </p>
+                            <button class="btn btn-secondary" style="width: 100%;">
+                                <i class="fab fa-strava"></i>
+                                Connect Strava
+                            </button>
+                            <div id="strava-status" style="margin-top: 1rem; font-size: var(--text-sm);"></div>
+                        </div>
+                        
+                        <div class="device-card" onclick="alert('Garmin integration coming soon!')">
+                            <div class="device-icon garmin">
+                                <i class="fas fa-watch"></i>
+                            </div>
+                            <h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.5rem;">Garmin</h3>
+                            <p style="color: var(--gray-600); font-size: var(--text-sm); margin-bottom: 1.5rem;">
+                                Connect your Garmin device
+                            </p>
+                            <button class="btn btn-secondary" style="width: 100%;" disabled>
+                                <i class="fas fa-watch"></i>
+                                Coming Soon
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info" style="margin-top: 2rem;">
+                        <i class="fas fa-info-circle"></i>
+                        <div>
+                            <strong>Why connect a device?</strong> We automatically calculate your Running Pillar score based on your activity data, training load, and consistency.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="actions">
+                    <button class="btn btn-secondary" onclick="prevStep()">
+                        <i class="fas fa-arrow-left"></i>
+                        Back
+                    </button>
+                    <button class="btn btn-primary" onclick="generateAISRI()">
+                        Generate AISRI Score
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- STEP 4: AISRI Score Results -->
+        <div class="step-content" data-step="4">
+            <div class="result-score">
+                <div class="result-score-number" id="final-aisri-score">--</div>
+                <div class="result-score-label">Your AISRI Score</div>
+                <div class="result-score-category" id="final-risk-category">Calculating...</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">6-Pillar Breakdown</h3>
+                    <p class="card-subtitle">Your detailed assessment across all pillars</p>
+                </div>
+                
+                <div class="card-body">
+                    <div class="pillar-grid" id="pillar-breakdown">
+                        <!-- Pillars will be dynamically loaded -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="actions" style="margin-top: 2rem;">
+                <button class="btn btn-secondary" onclick="prevStep()">
+                    <i class="fas fa-arrow-left"></i>
+                    Back
+                </button>
+                <button class="btn btn-success" onclick="completeOnboarding()" style="flex: 1;">
+                    <i class="fas fa-check"></i>
+                    Complete Onboarding & View Dashboard
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize Supabase
+        const supabase = window.supabase.createClient(
+            SAFESTRIDE_CONFIG.supabase.url,
+            SAFESTRIDE_CONFIG.supabase.anonKey
+        );
+        
+        let currentStep = 1;
+        let assessmentData = {
+            personal: {},
+            tests: {},
+            devices: {},
+            aisri: {}
+        };
+        
+        // Physical Tests Configuration
+        const physicalTests = [
+            {
+                id: 'rom_ankle_dorsiflexion',
+                name: 'Ankle Dorsiflexion (ROM)',
+                icon: 'fa-shoe-prints',
+                description: 'Measure ankle flexibility',
+                instruction: 'Stand facing a wall, knee bent forward. Measure angle.',
+                pillar: 'rom'
+            },
+            {
+                id: 'strength_single_leg_squat',
+                name: 'Single Leg Squat',
+                icon: 'fa-dumbbell',
+                description: 'Test leg strength',
+                instruction: 'Balance on one leg, squat down. Count reps.',
+                pillar: 'strength'
+            },
+            {
+                id: 'balance_single_leg',
+                name: 'Single Leg Balance',
+                icon: 'fa-balance-scale',
+                description: 'Test balance ability',
+                instruction: 'Stand on one leg, eyes closed. Time in seconds.',
+                pillar: 'balance'
+            },
+            {
+                id: 'mobility_hip_flexor',
+                name: 'Hip Flexor Mobility',
+                icon: 'fa-walking',
+                description: 'Test hip mobility',
+                instruction: 'Lunge position, measure range. Score 1-10.',
+                pillar: 'mobility'
+            }
+        ];
+        
+        // Load assessment tests
+        function loadAssessmentTests() {
+            const container = document.getElementById('assessment-tests');
+            container.innerHTML = physicalTests.map(test => `
+                <div class="test-card">
+                    <div class="test-header">
+                        <div class="test-icon">
+                            <i class="fas ${test.icon}"></i>
+                        </div>
+                        <div class="test-info">
+                            <h4>${test.name}</h4>
+                            <p>${test.description}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="test-body">
+                        <p style="color: var(--gray-700); font-size: var(--text-sm); margin-bottom: 1rem;">
+                            <strong>Instructions:</strong> ${test.instruction}
+                        </p>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Measured Value (Left)</label>
+                            <input 
+                                type="number" 
+                                id="${test.id}_left" 
+                                class="form-input" 
+                                placeholder="Enter value"
+                                min="0"
+                                max="100"
+                            >
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Measured Value (Right)</label>
+                            <input 
+                                type="number" 
+                                id="${test.id}_right" 
+                                class="form-input" 
+                                placeholder="Enter value"
+                                min="0"
+                                max="100"
+                            >
+                        </div>
+                        
+                        <div class="capture-area">
+                            <label class="form-label">Capture Image</label>
+                            <div class="capture-preview" id="${test.id}_preview">
+                                <div class="capture-placeholder">
+                                    <i class="fas fa-camera" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                                    <p>Tap to capture image</p>
+                                </div>
+                            </div>
+                            <input 
+                                type="file" 
+                                accept="image/*" 
+                                capture="environment" 
+                                id="${test.id}_image"
+                                style="display: none;"
+                                onchange="handleImageCapture('${test.id}', this)"
+                            >
+                            <button 
+                                class="btn btn-secondary" 
+                                style="width: 100%;"
+                                onclick="document.getElementById('${test.id}_image').click()"
+                            >
+                                <i class="fas fa-camera"></i>
+                                Take Photo
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Handle Image Capture
+        function handleImageCapture(testId, input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById(`${testId}_preview`);
+                    preview.innerHTML = `<img src="${e.target.result}" alt="Captured">`;
+                    
+                    // Store image data
+                    assessmentData.tests[testId + '_image'] = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        // Navigation
+        function nextStep() {
+            // Validate current step
+            if (!validateStep(currentStep)) return;
+            
+            // Save data from current step
+            saveStepData(currentStep);
+            
+            if (currentStep < 4) {
+                currentStep++;
+                updateStepUI();
+                
+                // Load specific step content
+                if (currentStep === 2) {
+                    loadAssessmentTests();
+                }
+            }
+        }
+        
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateStepUI();
+            }
+        }
+        
+        function updateStepUI() {
+            // Update step indicators
+            document.querySelectorAll('.step').forEach((step, index) => {
+                const stepNum = index + 1;
+                step.classList.remove('active', 'completed');
+                
+                if (stepNum < currentStep) {
+                    step.classList.add('completed');
+                } else if (stepNum === currentStep) {
+                    step.classList.add('active');
+                }
+            });
+            
+            // Update connectors
+            document.querySelectorAll('.step-connector').forEach((connector, index) => {
+                connector.classList.toggle('completed', index < currentStep - 1);
+            });
+            
+            // Show correct content
+            document.querySelectorAll('.step-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelector(`.step-content[data-step="${currentStep}"]`).classList.add('active');
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        function validateStep(step) {
+            if (step === 1) {
+                const age = document.getElementById('age').value;
+                const gender = document.getElementById('gender').value;
+                const weight = document.getElementById('weight').value;
+                const height = document.getElementById('height').value;
+                
+                if (!age || !gender || !weight || !height) {
+                    alert('Please fill in all required fields');
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        function saveStepData(step) {
+            if (step === 1) {
+                assessmentData.personal = {
+                    age: parseInt(document.getElementById('age').value),
+                    gender: document.getElementById('gender').value,
+                    weight: parseFloat(document.getElementById('weight').value),
+                    height: parseFloat(document.getElementById('height').value),
+                    resting_hr: parseInt(document.getElementById('resting-hr').value) || null,
+                    max_hr: parseInt(document.getElementById('max-hr').value) || null
+                };
+            } else if (step === 2) {
+                physicalTests.forEach(test => {
+                    assessmentData.tests[test.id] = {
+                        left: parseFloat(document.getElementById(`${test.id}_left`).value) || 0,
+                        right: parseFloat(document.getElementById(`${test.id}_right`).value) || 0,
+                        pillar: test.pillar
+                    };
+                });
+            }
+        }
+        
+        // Connect Strava
+        function connectStrava() {
+            const authUrl = `https://www.strava.com/oauth/authorize?client_id=${SAFESTRIDE_CONFIG.strava.clientId}&response_type=code&redirect_uri=${encodeURIComponent(window.location.origin + '/public/strava-callback.html')}&scope=${SAFESTRIDE_CONFIG.strava.scope}&state=onboarding`;
+            window.location.href = authUrl;
+        }
+        
+        // Generate AISRI Score
+        async function generateAISRI() {
+            // Calculate pillar scores
+            const pillars = {
+                running: 75, // Default, will be updated with Strava data
+                strength: Math.round((assessmentData.tests.strength_single_leg_squat?.left + assessmentData.tests.strength_single_leg_squat?.right) / 2) || 50,
+                rom: Math.round((assessmentData.tests.rom_ankle_dorsiflexion?.left + assessmentData.tests.rom_ankle_dorsiflexion?.right) / 2) || 50,
+                balance: Math.round((assessmentData.tests.balance_single_leg?.left + assessmentData.tests.balance_single_leg?.right) / 2) || 50,
+                alignment: 60, // Default
+                mobility: Math.round((assessmentData.tests.mobility_hip_flexor?.left + assessmentData.tests.mobility_hip_flexor?.right) / 2 * 10) || 50
+            };
+            
+            // Calculate weighted AISRI score
+            const aisriScore = Math.round(
+                pillars.running * 0.40 +
+                pillars.strength * 0.15 +
+                pillars.rom * 0.12 +
+                pillars.balance * 0.13 +
+                pillars.alignment * 0.10 +
+                pillars.mobility * 0.10
+            );
+            
+            // Determine risk category
+            let riskCategory;
+            if (aisriScore >= 75) riskCategory = 'Low Risk';
+            else if (aisriScore >= 55) riskCategory = 'Medium Risk';
+            else if (aisriScore >= 35) riskCategory = 'High Risk';
+            else riskCategory = 'Critical Risk';
+            
+            assessmentData.aisri = {
+                score: aisriScore,
+                category: riskCategory,
+                pillars: pillars
+            };
+            
+            // Move to step 4
+            currentStep = 4;
+            updateStepUI();
+            
+            // Display results
+            document.getElementById('final-aisri-score').textContent = aisriScore;
+            document.getElementById('final-risk-category').textContent = riskCategory;
+            
+            // Display pillar breakdown
+            const pillarBreakdown = document.getElementById('pillar-breakdown');
+            pillarBreakdown.innerHTML = Object.entries(pillars).map(([name, score]) => `
+                <div class="pillar-item">
+                    <div class="pillar-name">${name.charAt(0).toUpperCase() + name.slice(1)}</div>
+                    <div class="pillar-score">${score}</div>
+                </div>
+            `).join('');
+        }
+        
+        // Complete Onboarding
+        async function completeOnboarding() {
+            try {
+                // Get current user
+                const { data: { user } } = await supabase.auth.getUser();
+                
+                if (!user) {
+                    alert('Please log in first');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                // Save assessment to database
+                // TODO: Save to physical_assessments and aisri_score_history tables
+                
+                // Mark onboarding as completed
+                await supabase
+                    .from('profiles')
+                    .update({ onboarding_completed: true })
+                    .eq('id', user.id);
+                
+                // Redirect to athlete dashboard
+                window.location.href = 'athlete-dashboard-new.html';
+                
+            } catch (error) {
+                console.error('Error completing onboarding:', error);
+                alert('Failed to complete onboarding. Please try again.');
+            }
+        }
+        
+        // Check for Strava callback
+        window.addEventListener('load', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('strava_connected') === 'true') {
+                document.getElementById('strava-status').innerHTML = '<span class="badge badge-success"><i class="fas fa-check"></i> Connected</span>';
+                document.getElementById('strava-card').classList.add('connected');
+            }
+        });
+    </script>
+</body>
+</html>
