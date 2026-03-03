@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -491,8 +491,8 @@
     <script type="module">
         import { createClient } from ''https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'';
         
-        const SUPABASE_URL = ''https://bdisppaxbvygsspcuymb.supabase.co'';
-        const SUPABASE_ANON_KEY = ''eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkaXNwcGF4YnZ5Z3NzcGN1eW1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzYxMzk5NjIsImV4cCI6MjA1MTcxNTk2Mn0.bjgoVhVboDQTmIPe_A5_4yiWvTBvckVtw88lQ7GWFrc'';
+        const SUPABASE_URL = 'https://bdisppaxbvygsspcuymb.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkaXNwcGF4YnZ5Z3NzcGN1eW1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzYxMzk5NjIsImV4cCI6MjA1MTcxNTk2Mn0.bjgoVhVboDQTmIPe_A5_4yiWvTBvckVtw88lQ7GWFrc';
         
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -683,7 +683,7 @@
 
         window.connectStrava = function() {
             const clientId = ''162971'';
-            const redirectUri = encodeURIComponent(window.location.origin + ''/strava-callback'');
+            const redirectUri = encodeURIComponent(window.location.origin + '/strava-callback');
             const scope = ''activity:read_all'';
             window.location.href = `https://www.strava.com/oauth/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&scope=${scope}&state=${userId}`;
         };
