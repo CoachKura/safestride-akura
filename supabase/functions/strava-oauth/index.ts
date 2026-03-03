@@ -1,95 +1,74 @@
-// ============================================================================
-// Supabase Edge Function: strava-oauth
-// Handles Strava OAuth token exchange for web authentication
-// Deploy to: Supabase Dashboard → Edge Functions
-// ============================================================================
-
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-// Load credentials from environment variables (set via: supabase secrets set)
-const STRAVA_CLIENT_ID = Deno.env.get("STRAVA_CLIENT_ID") ?? "";
-const STRAVA_CLIENT_SECRET = Deno.env.get("STRAVA_CLIENT_SECRET") ?? "";
+﻿// Modern Deno.serve() pattern for Supabase Edge Functions
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
 
-serve(async (req) => {
-  // Handle CORS preflight requests
-  if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    const { code, athleteId } = await req.json();
-
+    const { code, athleteId } = await req.json()
+    
     if (!code) {
-      throw new Error("Authorization code is required");
+      throw new Error('Authorization code is required')
     }
 
-    console.log("🔄 Exchanging Strava authorization code for tokens...");
+    console.log('🔄 Exchanging Strava authorization code for tokens...')
 
-    // Step 1: Exchange authorization code for access/refresh tokens
-    const tokenResponse = await fetch("https://www.strava.com/oauth/token", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+    const tokenResponse = await fetch('https://www.strava.com/oauth/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        client_id: STRAVA_CLIENT_ID,
-        client_secret: STRAVA_CLIENT_SECRET,
-        code,
-        grant_type: "authorization_code",
+        client_id: Deno.env.get('STRAVA_CLIENT_ID'),
+        client_secret: Deno.env.get('STRAVA_CLIENT_SECRET'),
+        code: code,
+        grant_type: 'authorization_code',
       }),
-    });
+    })
 
     if (!tokenResponse.ok) {
-      const error = await tokenResponse.text();
-      throw new Error(`Strava token exchange failed: ${error}`);
+      const error = await tokenResponse.text()
+      throw new Error('Strava API error: ' + error)
     }
 
-    const tokenData = await tokenResponse.json();
-    console.log("✅ Strava tokens received for athlete:", tokenData.athlete.id);
+    const tokenData = await tokenResponse.json()
+    console.log('✅ Strava tokens received for athlete:', tokenData.athlete.id)
 
-    // Step 2: Calculate token expiration timestamp
-    const expiresAt = new Date(tokenData.expires_at * 1000).toISOString();
+    const expiresAt = new Date(tokenData.expires_at * 1000).toISOString()
+    
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    )
 
-    // Step 3: Save connection to Supabase
-    const supabaseClient = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
-    );
-
-    const { data: connection, error: dbError } = await supabaseClient
-      .from("strava_connections")
-      .upsert(
-        {
-          athlete_id: athleteId || `strava_${tokenData.athlete.id}`,
-          strava_athlete_id: tokenData.athlete.id,
-          access_token: tokenData.access_token,
-          refresh_token: tokenData.refresh_token,
-          expires_at: expiresAt,
-          athlete_data: tokenData.athlete,
-          updated_at: new Date().toISOString(),
-        },
-        {
-          onConflict: "athlete_id",
-        },
-      )
+    const { data: connection, error: dbError } = await supabase
+      .from('strava_connections')
+      .upsert({
+        athlete_id: athleteId || 'strava_' + tokenData.athlete.id,
+        strava_athlete_id: tokenData.athlete.id,
+        access_token: tokenData.access_token,
+        refresh_token: tokenData.refresh_token,
+        expires_at: expiresAt,
+        athlete_data: tokenData.athlete,
+        updated_at: new Date().toISOString(),
+      }, {
+        onConflict: 'athlete_id'
+      })
       .select()
-      .single();
+      .single()
 
     if (dbError) {
-      console.error("❌ Database error:", dbError);
-      throw new Error(`Database error: ${dbError.message}`);
+      console.error('❌ Database error:', dbError)
+      throw new Error('Database error: ' + dbError.message)
     }
 
-    console.log("✅ Strava connection saved to database");
+    console.log('✅ Strava connection saved to database')
 
-    // Step 4: Return success response
     return new Response(
       JSON.stringify({
         success: true,
@@ -104,24 +83,23 @@ serve(async (req) => {
           profile: tokenData.athlete.profile,
         },
         connectionId: connection.id,
-        message: "Strava connected successfully",
       }),
       {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
-      },
-    );
+      }
+    )
   } catch (error) {
-    console.error("❌ Strava OAuth error:", error.message);
+    console.error('❌ Strava OAuth error:', error.message)
     return new Response(
       JSON.stringify({
         success: false,
         error: error.message,
       }),
       {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 400,
-      },
-    );
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500,
+      }
+    )
   }
-});
+})
