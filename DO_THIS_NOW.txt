@@ -1,0 +1,28 @@
+# 🚨 DO THIS NOW - 5 MINUTES
+
+## ❌ PROBLEM
+Supabase page showing 404 error = Edge Functions not deployed = OAuth broken
+
+## ✅ SOLUTION
+Run ONE command:
+
+```powershell
+cd C:\safestride && .\deploy-supabase-functions.ps1
+```
+
+## ⏱️ TIME
+5-10 minutes
+
+## 🧪 THEN TEST
+https://www.akura.in/training-plan-builder.html
+
+## 📞 REPLY WITH
+"Deployed, testing now..." OR "Error: [paste error]"
+
+---
+
+**Git Status:** 33 commits ready (commit `f55fec3`)  
+**Vercel:** Already live at https://www.akura.in  
+**Blocking:** Edge Functions not deployed yet
+
+**Action:** Run the PowerShell script above. That's all! 🚀
