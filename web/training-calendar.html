@@ -1,0 +1,678 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Training Calendar | SafeStride by AKURA</title>
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .stat-box {
+            text-align: center;
+            padding: 1.5rem;
+            background: #f9fafb;
+            border-radius: 12px;
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            text-transform: uppercase;
+            margin-top: 0.5rem;
+        }
+        
+        .calendar-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .week-selector {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .week-tab {
+            flex: 0 0 auto;
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        
+        .week-tab:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .week-tab.active {
+            background: white;
+            color: #667eea;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: #e5e7eb;
+            padding: 1.5rem;
+        }
+        
+        .calendar-header {
+            background: #f9fafb;
+            padding: 1rem;
+            text-align: center;
+            font-weight: 600;
+            color: #6b7280;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+        }
+        
+        .calendar-day {
+            background: white;
+            padding: 1rem;
+            min-height: 150px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .calendar-day:hover {
+            background: #f9fafb;
+            transform: scale(1.02);
+            z-index: 10;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .calendar-day.today {
+            background: #eff6ff;
+            border: 2px solid #3b82f6;
+        }
+        
+        .calendar-day.completed {
+            background: #f0fdf4;
+        }
+        
+        .calendar-day.rest {
+            background: #f9fafb;
+        }
+        
+        .day-number {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+        
+        .workout-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .workout-badge.easy_run { background: #d1fae5; color: #065f46; }
+        .workout-badge.tempo { background: #fef3c7; color: #92400e; }
+        .workout-badge.intervals { background: #fee2e2; color: #991b1b; }
+        .workout-badge.long_run { background: #e0e7ff; color: #3730a3; }
+        .workout-badge.recovery { background: #dbeafe; color: #1e40af; }
+        .workout-badge.rest { background: #f3f4f6; color: #6b7280; }
+        .workout-badge.cross_training { background: #fce7f3; color: #831843; }
+        .workout-badge.strength { background: #fff7ed; color: #9a3412; }
+        
+        .workout-info {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin: 0.25rem 0;
+        }
+        
+        .completion-badge {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            width: 24px;
+            height: 24px;
+            background: #10b981;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.75rem;
+        }
+        
+        .workout-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        
+        .workout-modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: 2px solid #667eea;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        textarea.input {
+            resize: vertical;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header with Stats -->
+        <div class="header">
+            <h1><i class="fas fa-calendar-alt"></i> 12-Week Training Calendar</h1>
+            <p style="color: #6b7280; margin-top: 0.5rem;" id="planName">Loading training plan...</p>
+            
+            <div class="stats-row">
+                <div class="stat-box">
+                    <div class="stat-value" id="totalWorkouts">0</div>
+                    <div class="stat-label">Total Workouts</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="completedWorkouts">0</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="totalDistance">0</div>
+                    <div class="stat-label">Total km</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="completionRate">0%</div>
+                    <div class="stat-label">Completion Rate</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Week Selector -->
+        <div class="calendar-container">
+            <div class="week-selector" id="weekSelector">
+                <!-- Generated by JavaScript -->
+            </div>
+
+            <!-- Calendar Grid -->
+            <div class="calendar-grid">
+                <div class="calendar-header">Monday</div>
+                <div class="calendar-header">Tuesday</div>
+                <div class="calendar-header">Wednesday</div>
+                <div class="calendar-header">Thursday</div>
+                <div class="calendar-header">Friday</div>
+                <div class="calendar-header">Saturday</div>
+                <div class="calendar-header">Sunday</div>
+                
+                <!-- Days generated by JavaScript -->
+                <div id="calendarDays" style="grid-column: 1 / -1; display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Workout Detail Modal -->
+    <div class="workout-modal" id="workoutModal">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1.5rem;">
+                <div>
+                    <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;" id="modalWorkoutName">Workout Name</h2>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span class="workout-badge" id="modalWorkoutType">easy_run</span>
+                        <span style="color: #6b7280;" id="modalWorkoutDate">Monday, Jan 1</span>
+                    </div>
+                </div>
+                <button onclick="closeWorkoutModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #6b7280;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+                <div class="stat-box">
+                    <div class="stat-value" id="modalDistance">5.0</div>
+                    <div class="stat-label">Distance (km)</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="modalDuration">30</div>
+                    <div class="stat-label">Duration (min)</div>
+                </div>
+            </div>
+
+            <div style="padding: 1rem; background: #f9fafb; border-radius: 12px; margin-bottom: 1.5rem;">
+                <h3 style="font-weight: 600; margin-bottom: 0.5rem;">Workout Description</h3>
+                <p style="color: #6b7280;" id="modalDescription">No description available</p>
+            </div>
+
+            <div style="padding: 1rem; background: #dbeafe; border-radius: 12px; margin-bottom: 1.5rem;">
+                <h3 style="font-weight: 600; margin-bottom: 0.5rem; color: #1e40af;">
+                    <i class="fas fa-lightbulb"></i> Coaching Notes
+                </h3>
+                <p style="color: #1e40af;" id="modalCoachingNotes">Follow your training plan</p>
+            </div>
+
+            <div id="completionSection">
+                <h3 style="font-weight: 600; margin-bottom: 1rem;">Mark as Complete</h3>
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; font-weight: 500; margin-bottom: 0.5rem;">Actual Distance (km)</label>
+                    <input type="number" step="0.1" class="input" id="actualDistance" placeholder="5.0">
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; font-weight: 500; margin-bottom: 0.5rem;">Actual Duration (min)</label>
+                    <input type="number" class="input" id="actualDuration" placeholder="30">
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; font-weight: 500; margin-bottom: 0.5rem;">Average Heart Rate</label>
+                    <input type="number" class="input" id="actualHR" placeholder="140">
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; font-weight: 500; margin-bottom: 0.5rem;">How did it feel? (1-10)</label>
+                    <input type="range" min="1" max="10" value="5" style="width: 100%;" id="rpeSlider">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #6b7280;">
+                        <span>Very Easy</span>
+                        <span id="rpeValue">5</span>
+                        <span>Maximum Effort</span>
+                    </div>
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; font-weight: 500; margin-bottom: 0.5rem;">Notes (optional)</label>
+                    <textarea class="input" rows="3" id="completionNotes" placeholder="How did the workout go?"></textarea>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem;">
+                <button class="btn-primary" onclick="completeWorkout()">
+                    <i class="fas fa-check"></i> Mark Complete
+                </button>
+                <button class="btn-secondary" onclick="closeWorkoutModal()">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { createClient } from ''https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'';
+        
+        // Initialize Supabase
+        const SUPABASE_URL = ''https://bdisppaxbvygsspcuymb.supabase.co'';
+        const SUPABASE_ANON_KEY = ''eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkaXNwcGF4YnZ5Z3NzcGN1eW1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzYxMzk5NjIsImV4cCI6MjA1MTcxNTk2Mn0.bjgoVhVboDQTmIPe_A5_4yiWvTBvckVtw88lQ7GWFrc'';
+        
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Check authentication
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+            alert(''Please log in first'');
+            window.location.href = ''/login.html'';
+        }
+
+        const athleteId = session.user.id;
+        let currentWeek = 1;
+        let selectedWorkout = null;
+        let trainingPlan = null;
+        let allWorkouts = [];
+
+        // Load calendar
+        async function loadCalendar() {
+            try {
+                // Get active training plan
+                const { data: plan, error: planError } = await supabase
+                    .from(''training_plans'')
+                    .select(''*'')
+                    .eq(''athlete_id'', athleteId)
+                    .eq(''status'', ''active'')
+                    .order(''created_at'', { ascending: false })
+                    .limit(1)
+                    .maybeSingle();
+
+                if (planError) {
+                    console.error(''Error loading plan:'', planError);
+                    showNoPlansMessage();
+                    return;
+                }
+
+                if (!plan) {
+                    showNoPlansMessage();
+                    return;
+                }
+
+                trainingPlan = plan;
+                document.getElementById(''planName'').textContent = plan.plan_name || ''12-Week Training Plan'';
+
+                // Load workouts
+                const { data: workouts, error: workoutsError } = await supabase
+                    .from(''daily_workouts'')
+                    .select(''*'')
+                    .eq(''training_plan_id'', plan.id)
+                    .order(''workout_date'');
+
+                if (workoutsError) {
+                    console.error(''Error loading workouts:'', workoutsError);
+                    return;
+                }
+
+                if (workouts) {
+                    allWorkouts = workouts;
+                    renderWeekSelector(plan.total_weeks || 12);
+                    renderCalendar(workouts);
+                    updateStats(workouts);
+                }
+
+            } catch (error) {
+                console.error(''Error loading calendar:'', error);
+            }
+        }
+
+        function showNoPlansMessage() {
+            document.getElementById(''calendarDays'').innerHTML = `
+                <div style="grid-column: 1 / -1; padding: 4rem; text-align: center;">
+                    <i class="fas fa-calendar-plus" style="font-size: 4rem; color: #d1d5db; margin-bottom: 1rem;"></i>
+                    <h3 style="font-size: 1.25rem; font-weight: 700; color: #374151; margin-bottom: 0.5rem;">No Active Training Plan</h3>
+                    <p style="color: #6b7280; margin-bottom: 1.5rem;">Create a training plan to get started</p>
+                    <button class="btn-primary" onclick="window.location.href=''/public/training-plan-builder.html''">
+                        <i class="fas fa-plus"></i> Create Training Plan
+                    </button>
+                </div>
+            `;
+        }
+
+        function renderWeekSelector(totalWeeks) {
+            const selector = document.getElementById(''weekSelector'');
+            const weeks = [];
+            
+            for (let i = 1; i <= totalWeeks; i++) {
+                weeks.push(`
+                    <div class="week-tab ${i === currentWeek ? ''active'' : ''''}" onclick="selectWeek(${i})">
+                        Week ${i}
+                    </div>
+                `);
+            }
+            
+            selector.innerHTML = weeks.join('''');
+        }
+
+        function renderCalendar(workouts) {
+            const startDate = new Date(trainingPlan.start_date);
+            const weekStart = new Date(startDate);
+            weekStart.setDate(weekStart.getDate() + (currentWeek - 1) * 7);
+
+            const today = new Date().toISOString().split(''T'')[0];
+            const calendarDays = [];
+
+            for (let i = 0; i < 7; i++) {
+                const currentDate = new Date(weekStart);
+                currentDate.setDate(currentDate.getDate() + i);
+                const dateStr = currentDate.toISOString().split(''T'')[0];
+                
+                const workout = workouts.find(w => w.workout_date === dateStr);
+                const isToday = dateStr === today;
+                const isCompleted = workout?.is_completed || false;
+                const isRest = workout?.workout_type === ''rest'' || !workout;
+
+                let dayClass = ''calendar-day'';
+                if (isToday) dayClass += '' today'';
+                if (isCompleted) dayClass += '' completed'';
+                if (isRest) dayClass += '' rest'';
+
+                const dayNumber = currentDate.getDate();
+                const completionBadge = isCompleted ? ''<div class="completion-badge"><i class="fas fa-check"></i></div>'' : '''';
+
+                let workoutContent = '''';
+                if (workout && !isRest) {
+                    workoutContent = `
+                        <div class="workout-badge ${workout.workout_type}">${getWorkoutTypeLabel(workout.workout_type)}</div>
+                        <div style="font-weight: 600; color: #1f2937; margin-bottom: 0.5rem;">${workout.workout_title || ''Workout''}</div>
+                        <div class="workout-info">
+                            <i class="fas fa-route"></i> ${workout.planned_distance_km || 0} km
+                        </div>
+                        <div class="workout-info">
+                            <i class="fas fa-clock"></i> ${workout.planned_duration_minutes || 0} min
+                        </div>
+                    `;
+                } else if (isRest) {
+                    workoutContent = `
+                        <div class="workout-badge rest">Rest Day</div>
+                        <div style="color: #6b7280; font-size: 0.875rem; margin-top: 0.5rem;">Recovery & Mobility</div>
+                    `;
+                }
+
+                const escapedWorkout = workout ? JSON.stringify(workout).replace(/'/g, "&apos;") : ''null'';
+                
+                calendarDays.push(`
+                    <div class="${dayClass}" onclick=''openWorkoutModal(${escapedWorkout})''>
+                        <div class="day-number">${dayNumber}</div>
+                        ${completionBadge}
+                        ${workoutContent}
+                    </div>
+                `);
+            }
+
+            document.getElementById(''calendarDays'').innerHTML = calendarDays.join('''');
+        }
+
+        function getWorkoutTypeLabel(type) {
+            const labels = {
+                ''easy_run'': ''Easy Run'',
+                ''tempo'': ''Tempo'',
+                ''intervals'': ''Intervals'',
+                ''long_run'': ''Long Run'',
+                ''recovery'': ''Recovery'',
+                ''rest'': ''Rest'',
+                ''cross_training'': ''Cross Training'',
+                ''strength'': ''Strength''
+            };
+            return labels[type] || type;
+        }
+
+        function updateStats(workouts) {
+            const total = workouts.filter(w => w.workout_type !== ''rest'').length;
+            const completed = workouts.filter(w => w.is_completed).length;
+            const totalDist = workouts.reduce((sum, w) => sum + (parseFloat(w.planned_distance_km) || 0), 0);
+            const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+            document.getElementById(''totalWorkouts'').textContent = total;
+            document.getElementById(''completedWorkouts'').textContent = completed;
+            document.getElementById(''totalDistance'').textContent = totalDist.toFixed(1);
+            document.getElementById(''completionRate'').textContent = completionRate + ''%'';
+        }
+
+        window.selectWeek = function(week) {
+            currentWeek = week;
+            loadCalendar();
+        };
+
+        window.openWorkoutModal = function(workout) {
+            if (!workout) return;
+            
+            selectedWorkout = workout;
+            
+            document.getElementById(''modalWorkoutName'').textContent = workout.workout_title || ''Workout'';
+            document.getElementById(''modalWorkoutType'').textContent = getWorkoutTypeLabel(workout.workout_type);
+            document.getElementById(''modalWorkoutType'').className = `workout-badge ${workout.workout_type}`;
+            
+            const date = new Date(workout.workout_date);
+            document.getElementById(''modalWorkoutDate'').textContent = date.toLocaleDateString(''en-US'', { weekday: ''long'', month: ''short'', day: ''numeric'' });
+            
+            document.getElementById(''modalDistance'').textContent = workout.planned_distance_km || ''0'';
+            document.getElementById(''modalDuration'').textContent = workout.planned_duration_minutes || ''0'';
+            document.getElementById(''modalDescription'').textContent = workout.workout_description || ''No description available'';
+            document.getElementById(''modalCoachingNotes'').textContent = workout.coaching_notes || ''Follow your training plan and listen to your body'';
+            
+            // Pre-fill with planned values
+            document.getElementById(''actualDistance'').value = workout.planned_distance_km || '''';
+            document.getElementById(''actualDuration'').value = workout.planned_duration_minutes || '''';
+            
+            document.getElementById(''workoutModal'').classList.add(''active'');
+        };
+
+        window.closeWorkoutModal = function() {
+            document.getElementById(''workoutModal'').classList.remove(''active'');
+        };
+
+        window.completeWorkout = async function() {
+            if (!selectedWorkout) return;
+
+            const actualDistance = parseFloat(document.getElementById(''actualDistance'').value);
+            const actualDuration = parseInt(document.getElementById(''actualDuration'').value);
+            const actualHR = parseInt(document.getElementById(''actualHR'').value) || null;
+            const rpe = parseInt(document.getElementById(''rpeSlider'').value);
+            const notes = document.getElementById(''completionNotes'').value;
+
+            try {
+                // Update workout as completed
+                const { error: workoutError } = await supabase
+                    .from(''daily_workouts'')
+                    .update({
+                        is_completed: true,
+                        completed_at: new Date().toISOString()
+                    })
+                    .eq(''id'', selectedWorkout.id);
+
+                if (workoutError) throw workoutError;
+
+                // Create workout completion record
+                const { error: completionError } = await supabase
+                    .from(''workout_completions'')
+                    .insert({
+                        daily_workout_id: selectedWorkout.id,
+                        athlete_id: athleteId,
+                        actual_distance_km: actualDistance,
+                        actual_duration_minutes: actualDuration,
+                        average_hr: actualHR,
+                        perceived_effort: rpe,
+                        athlete_notes: notes,
+                        completed_at: new Date().toISOString()
+                    });
+
+                if (completionError) throw completionError;
+
+                alert(''✅ Workout completed successfully!'');
+                closeWorkoutModal();
+                loadCalendar();
+
+            } catch (error) {
+                console.error(''Error completing workout:'', error);
+                alert(''Error completing workout: '' + error.message);
+            }
+        };
+
+        // RPE slider value display
+        document.getElementById(''rpeSlider'').addEventListener(''input'', function(e) {
+            document.getElementById(''rpeValue'').textContent = e.target.value;
+        });
+
+        // Load calendar on page load
+        loadCalendar();
+    </script>
+</body>
+</html>

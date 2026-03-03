@@ -1,0 +1,534 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeStride - Generate Sample Training Data</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .status {
+            background: #f7fafc;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #2d3748;
+        }
+        .status.success {
+            border-left-color: #48bb78;
+            background: #f0fff4;
+            color: #22543d;
+        }
+        .status.error {
+            border-left-color: #f56565;
+            background: #fff5f5;
+            color: #742a2a;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s;
+        }
+        button:hover { transform: translateY(-2px); }
+        button:active { transform: translateY(0); }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .log {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .log .success { color: #68d391; }
+        .log .error { color: #fc8181; }
+        .log .info { color: #63b3ed; }
+        .log .warning { color: #f6ad55; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏃 SafeStride Training Plan Generator</h1>
+        <p class="subtitle">Generate 12-week training plan with 84 daily workouts</p>
+        
+        <div id="status" class="status">
+            📋 Ready to generate training data
+        </div>
+        
+        <button id="generateBtn" onclick="startGeneration()">
+            Generate Training Plan
+        </button>
+        
+        <div id="log" class="log" style="display: none;"></div>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+        const SUPABASE_URL = 'https://bdisppaxbvygsspcuymb.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkaXNwcGF4YnZ5Z3NzcGN1eW1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzYxMzk5NjIsImV4cCI6MjA1MTcxNTk2Mn0.bjgoVhVboDQTmIPe_A5_4yiWvTBvckVtw88lQ7GWFrc';
+
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        function log(message, type = 'info') {
+            const logEl = document.getElementById('log');
+            logEl.style.display = 'block';
+            const span = document.createElement('span');
+            span.className = type;
+            span.textContent = message + '\n';
+            logEl.appendChild(span);
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function updateStatus(message, type = 'info') {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = 'status' + (type !== 'info' ? ' ' + type : '');
+        }
+
+        async function generateTrainingPlan(athleteId) {
+            const btn = document.getElementById('generateBtn');
+            btn.disabled = true;
+            btn.textContent = 'Generating...';
+
+            log('🚀 Starting training plan generation...', 'info');
+            log(`👤 Athlete ID: ${athleteId}`, 'info');
+
+            const startDate = new Date();
+            const endDate = new Date(startDate);
+            endDate.setDate(endDate.getDate() + 84);
+
+            try {
+                // Step 1: Create training plan
+                log('\n📋 Creating training plan...', 'info');
+                const { data: plan, error: planError } = await supabase
+                    .from('training_plans')
+                    .insert({
+                        athlete_id: athleteId,
+                        plan_name: '12-Week Foundation Building Program',
+                        start_date: startDate.toISOString().split('T')[0],
+                        end_date: endDate.toISOString().split('T')[0],
+                        total_weeks: 12,
+                        aisri_score_at_creation: 72,
+                        risk_level_at_creation: 'medium',
+                        goal_race_distance: '10K',
+                        target_weekly_volume_km: 35.0,
+                        status: 'active',
+                        generated_by: 'sample_data_generator',
+                        generation_notes: 'Auto-generated sample 12-week plan with progressive weekly load'
+                    })
+                    .select()
+                    .single();
+
+                if (planError) throw planError;
+                log(`✅ Training plan created: ${plan.id}`, 'success');
+
+                // Step 2: Generate 84 daily workouts
+                log('\n🏃 Generating 84 daily workouts...', 'info');
+                const workouts = [];
+
+                for (let week = 1; week <= 12; week++) {
+                    for (let day = 1; day <= 7; day++) {
+                        const workoutDate = new Date(startDate);
+                        workoutDate.setDate(workoutDate.getDate() + ((week - 1) * 7 + (day - 1)));
+
+                        let workout = {
+                            training_plan_id: plan.id,
+                            workout_date: workoutDate.toISOString().split('T')[0],
+                            week_number: week,
+                            day_of_week: day,
+                            is_completed: false
+                        };
+
+                        // Weekly pattern: Mon-Easy, Tue-Tempo, Wed-Easy, Thu-Intervals, Fri-Recovery, Sat-Long, Sun-Rest
+                        switch (day) {
+                            case 1: // Monday: Easy Run
+                                workout = {
+                                    ...workout,
+                                    workout_type: 'easy_run',
+                                    workout_title: 'Monday Easy Run',
+                                    planned_distance_km: 5.0 + (week * 0.3),
+                                    planned_duration_minutes: 35 + (week * 2),
+                                    target_zone: 'Zone 2',
+                                    target_pace_min_per_km: '6:00',
+                                    warmup_minutes: 5,
+                                    cooldown_minutes: 5,
+                                    workout_description: 'Comfortable pace. Focus on maintaining good form and breathing rhythm.',
+                                    coaching_notes: 'Keep heart rate in Zone 2. Should feel conversational.'
+                                };
+                                break;
+
+                            case 2: // Tuesday: Tempo or Intervals
+                                if (week <= 6) {
+                                    workout = {
+                                        ...workout,
+                                        workout_type: 'tempo',
+                                        workout_title: 'Tempo Run',
+                                        planned_distance_km: 6.0 + (week * 0.2),
+                                        planned_duration_minutes: 40 + (week * 2),
+                                        target_zone: 'Zone 3-4',
+                                        target_pace_min_per_km: '5:20',
+                                        warmup_minutes: 10,
+                                        cooldown_minutes: 10,
+                                        workout_description: 'Steady comfortably hard pace for 20-30 minutes.',
+                                        coaching_notes: 'Build endurance. Maintain consistent pace throughout.'
+                                    };
+                                } else {
+                                    workout = {
+                                        ...workout,
+                                        workout_type: 'intervals',
+                                        workout_title: 'Threshold Intervals',
+                                        planned_distance_km: 8.0,
+                                        planned_duration_minutes: 50,
+                                        target_zone: 'Zone 4',
+                                        target_pace_min_per_km: '4:50',
+                                        warmup_minutes: 15,
+                                        cooldown_minutes: 10,
+                                        intervals_json: {
+                                            sets: 4,
+                                            work: '5 minutes',
+                                            rest: '2 minutes',
+                                            pace: 'comfortably hard'
+                                        },
+                                        workout_description: '4x5min @ threshold pace with 2min recovery.',
+                                        coaching_notes: 'Comfortably hard effort. Should feel challenging but sustainable.'
+                                    };
+                                }
+                                break;
+
+                            case 3: // Wednesday: Easy
+                                workout = {
+                                    ...workout,
+                                    workout_type: 'easy_run',
+                                    workout_title: 'Mid-Week Easy Run',
+                                    planned_distance_km: 6.0 + (week * 0.2),
+                                    planned_duration_minutes: 40 + week,
+                                    target_zone: 'Zone 2',
+                                    target_pace_min_per_km: '6:10',
+                                    warmup_minutes: 5,
+                                    cooldown_minutes: 5,
+                                    workout_description: 'Relaxed pace. Build weekly volume.',
+                                    coaching_notes: 'Keep it easy. Should be able to hold full conversation.'
+                                };
+                                break;
+
+                            case 4: // Thursday: Intervals or Cross-training
+                                if (week % 2 === 0) {
+                                    workout = {
+                                        ...workout,
+                                        workout_type: 'intervals',
+                                        workout_title: 'Speed Intervals',
+                                        planned_distance_km: 7.0,
+                                        planned_duration_minutes: 45,
+                                        target_zone: 'Zone 4-5',
+                                        target_pace_min_per_km: '4:40',
+                                        warmup_minutes: 15,
+                                        cooldown_minutes: 10,
+                                        intervals_json: {
+                                            sets: 6,
+                                            work: '3 minutes',
+                                            rest: '90 seconds',
+                                            pace: 'hard'
+                                        },
+                                        workout_description: '6x3min hard with 90sec recovery.',
+                                        coaching_notes: 'Push pace on intervals, recover fully between sets.'
+                                    };
+                                } else {
+                                    workout = {
+                                        ...workout,
+                                        workout_type: 'cross_training',
+                                        workout_title: 'Cross Training',
+                                        planned_distance_km: 0,
+                                        planned_duration_minutes: 45,
+                                        target_zone: 'Zone 2-3',
+                                        workout_description: 'Cycling, swimming, or strength training.',
+                                        coaching_notes: 'Low-impact alternative. Maintain aerobic fitness without running stress.'
+                                    };
+                                }
+                                break;
+
+                            case 5: // Friday: Recovery
+                                workout = {
+                                    ...workout,
+                                    workout_type: 'recovery',
+                                    workout_title: 'Recovery Run',
+                                    planned_distance_km: 4.0,
+                                    planned_duration_minutes: 30,
+                                    target_zone: 'Zone 1-2',
+                                    target_pace_min_per_km: '6:30',
+                                    warmup_minutes: 5,
+                                    cooldown_minutes: 5,
+                                    workout_description: 'Very easy pace. Active recovery.',
+                                    coaching_notes: 'Save energy for weekend long run. Should feel refreshing.'
+                                };
+                                break;
+
+                            case 6: // Saturday: Long Run
+                                workout = {
+                                    ...workout,
+                                    workout_type: 'long_run',
+                                    workout_title: 'Weekend Long Run',
+                                    planned_distance_km: 10.0 + (week * 0.6),
+                                    planned_duration_minutes: 70 + (week * 5),
+                                    target_zone: 'Zone 2-3',
+                                    target_pace_min_per_km: '5:50',
+                                    warmup_minutes: 10,
+                                    cooldown_minutes: 10,
+                                    workout_description: 'Long steady run. Build aerobic endurance.',
+                                    coaching_notes: 'Start easy and maintain consistent pace. Fuel properly with gels/water.'
+                                };
+                                break;
+
+                            case 7: // Sunday: Rest or Easy
+                                if (week % 3 === 0) {
+                                    workout = {
+                                        ...workout,
+                                        workout_type: 'recovery',
+                                        workout_title: 'Shakeout Run',
+                                        planned_distance_km: 3.0,
+                                        planned_duration_minutes: 20,
+                                        target_zone: 'Zone 1',
+                                        target_pace_min_per_km: '6:40',
+                                        workout_description: 'Light recovery run to flush out legs.',
+                                        coaching_notes: 'Very light. Optional if legs feel heavy.'
+                                    };
+                                } else {
+                                    workout = {
+                                        ...workout,
+                                        workout_type: 'rest',
+                                        workout_title: 'Rest Day',
+                                        planned_distance_km: 0,
+                                        planned_duration_minutes: 0,
+                                        workout_description: 'Complete rest. Focus on recovery.',
+                                        coaching_notes: 'Rest, hydration, mobility work, and preparation for next week.'
+                                    };
+                                }
+                                break;
+                        }
+
+                        workouts.push(workout);
+                    }
+
+                    if (week % 3 === 0) {
+                        log(`  Week ${week}/12 generated...`, 'info');
+                    }
+                }
+
+                log(`✅ ${workouts.length} workouts prepared`, 'success');
+
+                // Insert workouts in batches
+                log('\n💾 Inserting workouts into database...', 'info');
+                const batchSize = 50;
+                let inserted = 0;
+
+                for (let i = 0; i < workouts.length; i += batchSize) {
+                    const batch = workouts.slice(i, i + batchSize);
+                    const { error } = await supabase
+                        .from('daily_workouts')
+                        .insert(batch);
+
+                    if (error) throw error;
+                    inserted += batch.length;
+                    log(`  Inserted ${inserted}/${workouts.length} workouts...`, 'info');
+                }
+
+                log(`✅ All ${inserted} workouts inserted`, 'success');
+
+                // Step 3: Mark past workouts as completed
+                log('\n✅ Marking past workouts as completed...', 'info');
+                const pastDate = new Date();
+                pastDate.setDate(pastDate.getDate() - 5);
+
+                const { data: pastWorkouts } = await supabase
+                    .from('daily_workouts')
+                    .select('id, planned_distance_km, planned_duration_minutes, workout_type')
+                    .eq('training_plan_id', plan.id)
+                    .gte('workout_date', pastDate.toISOString().split('T')[0])
+                    .lt('workout_date', new Date().toISOString().split('T')[0])
+                    .neq('workout_type', 'rest');
+
+                if (pastWorkouts && pastWorkouts.length > 0) {
+                    for (const workout of pastWorkouts) {
+                        const actualDistance = workout.planned_distance_km * (0.95 + Math.random() * 0.1);
+                        const actualDuration = workout.planned_duration_minutes + Math.floor(Math.random() * 10 - 5);
+                        
+                        const avgHR = {
+                            'recovery': 120,
+                            'easy_run': 135,
+                            'tempo': 150,
+                            'intervals': 165,
+                            'long_run': 140,
+                            'cross_training': 130
+                        }[workout.workout_type] || 140;
+
+                        // Update workout
+                        await supabase
+                            .from('daily_workouts')
+                            .update({
+                                is_completed: true,
+                                completed_at: new Date().toISOString()
+                            })
+                            .eq('id', workout.id);
+
+                        // Create completion record
+                        await supabase
+                            .from('workout_completions')
+                            .insert({
+                                daily_workout_id: workout.id,
+                                athlete_id: athleteId,
+                                actual_distance_km: actualDistance.toFixed(2),
+                                actual_duration_minutes: actualDuration,
+                                average_hr: avgHR + Math.floor(Math.random() * 10 - 5),
+                                max_hr: avgHR + 20 + Math.floor(Math.random() * 10),
+                                perceived_effort: 5 + Math.floor(Math.random() * 3),
+                                mood_score: 7 + Math.floor(Math.random() * 3),
+                                athlete_notes: 'Sample completed workout'
+                            });
+                    }
+                    log(`✅ ${pastWorkouts.length} past workouts completed`, 'success');
+                }
+
+                // Step 4: Create AISRI score history
+                log('\n📊 Creating AISRI score history...', 'info');
+                await supabase.from('aisri_score_history').insert([
+                    {
+                        athlete_id: athleteId,
+                        total_aisri_score: 65,
+                        risk_level: 'medium',
+                        running_score: 68,
+                        strength_score: 62,
+                        rom_score: 60,
+                        balance_score: 70,
+                        alignment_score: 64,
+                        mobility_score: 66,
+                        calculation_source: 'initial_assessment'
+                    },
+                    {
+                        athlete_id: athleteId,
+                        total_aisri_score: 72,
+                        risk_level: 'medium',
+                        running_score: 75,
+                        strength_score: 68,
+                        rom_score: 65,
+                        balance_score: 76,
+                        alignment_score: 70,
+                        mobility_score: 72,
+                        previous_score: 65,
+                        score_change: 7,
+                        calculation_source: 'monthly_reassessment'
+                    }
+                ]);
+                log('✅ AISRI score history created', 'success');
+
+                // Step 5: Schedule next evaluation
+                log('\n📅 Scheduling next evaluation...', 'info');
+                const nextEvalDate = new Date();
+                nextEvalDate.setDate(nextEvalDate.getDate() + 21);
+
+                await supabase.from('evaluation_schedule').insert({
+                    athlete_id: athleteId,
+                    scheduled_date: nextEvalDate.toISOString().split('T')[0],
+                    evaluation_type: 'monthly',
+                    status: 'pending'
+                });
+                log('✅ Next evaluation scheduled for ' + nextEvalDate.toISOString().split('T')[0], 'success');
+
+                // Success summary
+                log('\n' + '='.repeat(50), 'success');
+                log('🎉 TRAINING PLAN GENERATION COMPLETE!', 'success');
+                log('='.repeat(50), 'success');
+                log(`\n📊 Summary:`, 'info');
+                log(`  • Training Plan ID: ${plan.id}`, 'info');
+                log(`  • Total Workouts: 84 (12 weeks)`, 'info');
+                log(`  • Start: ${startDate.toISOString().split('T')[0]}`, 'info');
+                log(`  • End: ${endDate.toISOString().split('T')[0]}`, 'info');
+                log(`  • AISRI Score: 72 (Medium Risk)`, 'info');
+                log(`  • Next Eval: ${nextEvalDate.toISOString().split('T')[0]}`, 'info');
+                log(`\n✅ Access your training:`, 'success');
+                log(`  1. View calendar: web/training-calendar.html`, 'success');
+                log(`  2. Check dashboard (build next)`, 'success');
+                log(`\n🚀 Happy training!`, 'success');
+
+                updateStatus('✅ Training plan created successfully!', 'success');
+                btn.textContent = 'Generate Another Plan';
+                btn.disabled = false;
+
+                return { success: true, planId: plan.id };
+
+            } catch (error) {
+                log('\n❌ ERROR: ' + error.message, 'error');
+                updateStatus('❌ Error: ' + error.message, 'error');
+                btn.textContent = 'Try Again';
+                btn.disabled = false;
+                return { success: false, error: error.message };
+            }
+        }
+
+        // Check authentication on load
+        window.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (session) {
+                updateStatus(`👤 Logged in as: ${session.user.email}`, 'success');
+                window.currentAthleteId = session.user.id;
+            } else {
+                updateStatus('⚠️ Not logged in. You need to login first at web/onboarding.html', 'warning');
+                document.getElementById('generateBtn').disabled = true;
+            }
+        });
+
+        // Expose function to button
+        window.startGeneration = async function() {
+            if (window.currentAthleteId) {
+                await generateTrainingPlan(window.currentAthleteId);
+            } else {
+                alert('Please login first at web/onboarding.html');
+            }
+        };
+    </script>
+</body>
+</html>
