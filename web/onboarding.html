@@ -518,16 +518,14 @@
             window.nextStep = async function() {
                 if (currentStep === 1) {
                     if (!validateStep1()) return;
-                    
-            
                     await savePersonalInfo();
                 } else if (currentStep === 2) {
-                await savePhysicalAssessment();
-            } else if (currentStep === 3) {
-                // Strava connection is optional
-            } else if (currentStep === 4) {
-                return; // Final step
-            }
+                    await savePhysicalAssessment();
+                } else if (currentStep === 3) {
+                    // Strava connection is optional
+                } else if (currentStep === 4) {
+                    return; // Final step
+                }
 
             if (currentStep < 4) {
                 currentStep++;
@@ -700,6 +698,7 @@
     </script>
 </body>
 </html>
+
 
 
 
