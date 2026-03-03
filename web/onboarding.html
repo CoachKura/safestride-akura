@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -500,6 +500,12 @@
         let assessmentData = {};
         let capturedImages = {};
 
+        // Define nextStep early so onclick handlers can access it
+        window.nextStep = async function() { alert("Please wait, initializing..."); };
+        
+        // Initialize authentication
+        (async function() {
+
         // Check authentication
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) {
@@ -509,6 +515,9 @@
 
         const userId = session.user.id;
 
+        
+        
+        // Now redefine nextStep with full functionality
         window.nextStep = async function() {
             if (currentStep === 1) {
                 if (!validateStep1()) return;
