@@ -1,0 +1,327 @@
+═══════════════════════════════════════════════════════════════
+   📂 WHERE TO EXTRACT SAFESTRIDE BACKUP
+═══════════════════════════════════════════════════════════════
+
+Coach Kura, here's EXACTLY where to extract the backup! 📍
+
+═══════════════════════════════════════════════════════════════
+🎯 RECOMMENDED LOCATION (Use This!)
+═══════════════════════════════════════════════════════════════
+
+Extract to: C:\safestride\webapp
+
+Why this location?
+✅ Easy to remember
+✅ Short path (no spaces)
+✅ Matches all documentation
+✅ Works with VS Code
+✅ All guides reference this path
+
+═══════════════════════════════════════════════════════════════
+📥 STEP-BY-STEP EXTRACTION GUIDE
+═══════════════════════════════════════════════════════════════
+
+STEP 1: Download the backup file
+─────────────────────────────────────────────────────────────
+
+1. Click this link:
+   https://www.genspark.ai/api/files/s/e6muTzjQ
+
+2. Your browser will download:
+   safestride-complete-abcd-2026-03-04.tar.gz
+
+3. File will save to your Downloads folder:
+   C:\Users\[YourName]\Downloads\safestride-complete-abcd-2026-03-04.tar.gz
+
+File size: 36.8 MB
+
+─────────────────────────────────────────────────────────────
+
+STEP 2: Create the destination folder
+─────────────────────────────────────────────────────────────
+
+1. Open File Explorer (Win + E)
+
+2. Navigate to C:\ drive
+
+3. Create a new folder called "safestride"
+   - Right-click in empty space
+   - Select "New" → "Folder"
+   - Name it: safestride
+
+4. You should now have: C:\safestride\
+
+─────────────────────────────────────────────────────────────
+
+STEP 3: Extract the backup
+─────────────────────────────────────────────────────────────
+
+METHOD 1: Using 7-Zip (Recommended)
+────────────────────────────────────
+
+If you have 7-Zip installed:
+
+1. Navigate to Downloads folder:
+   C:\Users\[YourName]\Downloads\
+
+2. Find file: safestride-complete-abcd-2026-03-04.tar.gz
+
+3. Right-click on the file
+
+4. Select: "7-Zip" → "Extract Here"
+   - This creates: safestride-complete-abcd-2026-03-04.tar
+
+5. Right-click on the .tar file (again)
+
+6. Select: "7-Zip" → "Extract Here"
+   - This creates: webapp\ folder
+
+7. Copy the webapp folder
+
+8. Paste it into: C:\safestride\
+
+9. Final path: C:\safestride\webapp\
+
+METHOD 2: Using WinRAR
+────────────────────────────────────
+
+If you have WinRAR installed:
+
+1. Navigate to Downloads folder
+
+2. Find file: safestride-complete-abcd-2026-03-04.tar.gz
+
+3. Double-click to open in WinRAR
+
+4. Click "Extract To" button at top
+
+5. Choose destination: C:\safestride\
+
+6. Click "OK"
+
+7. WinRAR will extract: C:\safestride\webapp\
+
+METHOD 3: Using Windows Built-in (Windows 10/11)
+────────────────────────────────────────────────
+
+Note: Windows 10/11 doesn't natively support .tar.gz
+You'll need to install 7-Zip first (free):
+
+1. Download 7-Zip from: https://www.7-zip.org/download.html
+
+2. Install 7-Zip
+
+3. Then use METHOD 1 above
+
+METHOD 4: Using PowerShell (Advanced)
+────────────────────────────────────────
+
+If you're comfortable with command line:
+
+1. Open PowerShell (Win + X → "Windows PowerShell")
+
+2. Navigate to Downloads:
+   cd $env:USERPROFILE\Downloads
+
+3. Extract with tar command:
+   tar -xzf safestride-complete-abcd-2026-03-04.tar.gz -C C:\safestride\
+
+4. Wait for extraction to complete
+
+5. Verify: C:\safestride\webapp\ should exist
+
+─────────────────────────────────────────────────────────────
+
+STEP 4: Verify extraction was successful
+─────────────────────────────────────────────────────────────
+
+1. Open File Explorer (Win + E)
+
+2. Navigate to: C:\safestride\webapp\
+
+3. You should see these folders and files:
+
+   C:\safestride\webapp\
+   ├── public/                    (Main folder with HTML files)
+   │   ├── index.html            ✅ (New home page!)
+   │   ├── onboarding.html
+   │   ├── athlete-dashboard.html
+   │   ├── training-calendar.html
+   │   ├── athlete-evaluation.html
+   │   ├── signup.html
+   │   ├── safestride-design-system.css
+   │   └── ...
+   ├── migrations/               (Database migrations)
+   ├── .git/                     (Git repository)
+   ├── README.md
+   ├── package.json
+   ├── wrangler.jsonc
+   ├── NEW_HOME_PAGE_READY.txt          ✅ (Guide 1)
+   ├── HOME_PAGE_VISUAL_GUIDE.md        ✅ (Guide 2)
+   ├── HOME_PAGE_COMPLETE_SUMMARY.txt   ✅ (Guide 3)
+   ├── TESTING_CHECKLIST_HOME_PAGE.txt  ✅ (Guide 4)
+   ├── PRODUCTION_DEPLOYMENT_GUIDE.txt  ✅ (Guide 5)
+   ├── FEATURE_ROADMAP.txt              ✅ (Guide 6)
+   ├── FINAL_DELIVERY_SUMMARY.txt       ✅ (Guide 7)
+   └── ...
+
+4. If you see all these files → SUCCESS! ✅
+
+═══════════════════════════════════════════════════════════════
+🚨 IMPORTANT: FINAL PATH MUST BE
+═══════════════════════════════════════════════════════════════
+
+C:\safestride\webapp\
+
+NOT:
+❌ C:\safestride\                           (missing webapp folder)
+❌ C:\safestride\safestride-complete...\    (too nested)
+❌ C:\Users\...\Downloads\                  (wrong location)
+❌ D:\safestride\webapp\                    (wrong drive - unless you prefer D:)
+
+CORRECT:
+✅ C:\safestride\webapp\public\index.html
+✅ C:\safestride\webapp\README.md
+✅ C:\safestride\webapp\package.json
+
+═══════════════════════════════════════════════════════════════
+🔧 TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════
+
+PROBLEM 1: "I don't have 7-Zip or WinRAR"
+─────────────────────────────────────────────────────────────
+SOLUTION:
+1. Download 7-Zip (free, open-source):
+   https://www.7-zip.org/download.html
+
+2. Install 7-Zip (next → next → install)
+
+3. Right-click on .tar.gz file
+   - You'll now see "7-Zip" option in menu
+
+4. Use METHOD 1 above
+
+PROBLEM 2: "Extraction creates extra nested folder"
+─────────────────────────────────────────────────────────────
+EXAMPLE: C:\safestride\safestride-complete-abcd-2026-03-04\webapp\
+
+SOLUTION:
+1. Cut the "webapp" folder
+
+2. Paste it directly into C:\safestride\
+
+3. Delete the extra parent folder
+
+4. Final result: C:\safestride\webapp\
+
+PROBLEM 3: "File is corrupted or won't extract"
+─────────────────────────────────────────────────────────────
+SOLUTION:
+1. Delete the downloaded .tar.gz file
+
+2. Re-download from link:
+   https://www.genspark.ai/api/files/s/e6muTzjQ
+
+3. Try extraction again
+
+4. If still fails, reply: "D - Extraction error"
+
+PROBLEM 4: "I extracted to wrong location"
+─────────────────────────────────────────────────────────────
+SOLUTION:
+1. Find where you extracted (check Downloads, Desktop, etc.)
+
+2. Cut the entire "webapp" folder
+
+3. Paste it into: C:\safestride\
+
+4. Final path: C:\safestride\webapp\
+
+PROBLEM 5: "I want to use D:\ drive instead"
+─────────────────────────────────────────────────────────────
+SOLUTION:
+That's fine! Use: D:\safestride\webapp\
+
+But remember to use D:\ in all commands and paths.
+
+Example:
+- Instead of: cd C:\safestride\webapp
+- Use: cd D:\safestride\webapp
+
+═══════════════════════════════════════════════════════════════
+✅ AFTER EXTRACTION - WHAT'S NEXT?
+═══════════════════════════════════════════════════════════════
+
+Once you have: C:\safestride\webapp\
+
+NEXT STEP 1: Open in VS Code
+─────────────────────────────────────────────────────────────
+1. Open VS Code
+2. File → Open Folder
+3. Select: C:\safestride\webapp
+4. Click "Select Folder"
+5. VS Code opens with all files visible on left
+
+NEXT STEP 2: Test the home page
+─────────────────────────────────────────────────────────────
+1. In VS Code, navigate to: public/index.html
+2. Right-click on index.html file
+3. Select: "Open with Live Server"
+4. Browser opens: http://127.0.0.1:5500/public/index.html
+5. Scroll through the page
+6. See Rajesh's transformation! 🎉
+
+NEXT STEP 3: Read the guides
+─────────────────────────────────────────────────────────────
+Open in VS Code and read:
+1. NEW_HOME_PAGE_READY.txt (5 min read)
+2. HOME_PAGE_VISUAL_GUIDE.md (10 min read)
+3. TESTING_CHECKLIST_HOME_PAGE.txt (for full testing)
+
+NEXT STEP 4: Deploy to production
+─────────────────────────────────────────────────────────────
+Follow: PRODUCTION_DEPLOYMENT_GUIDE.txt
+Time: 30 minutes
+Result: Live at https://safestride-akura.pages.dev
+
+═══════════════════════════════════════════════════════════════
+📸 SEND ME A SCREENSHOT
+═══════════════════════════════════════════════════════════════
+
+After extraction and opening in VS Code, take a screenshot showing:
+
+1. VS Code with C:\safestride\webapp folder open
+2. File tree on left showing public/, migrations/, etc.
+3. index.html file open in editor
+
+OR
+
+Take screenshot of Live Server showing:
+1. Home page loaded in browser
+2. Rajesh's 4 metric cards visible
+3. URL bar showing: http://127.0.0.1:5500/public/index.html
+
+Reply with: "Extracted successfully! [screenshot]"
+
+═══════════════════════════════════════════════════════════════
+🆘 NEED HELP?
+═══════════════════════════════════════════════════════════════
+
+Reply with:
+- "Extracted to C:\safestride\webapp - Success!" ✅
+- "Extraction failed - Error: [message]" ❌
+- "Extracted to [different path] - Is this OK?" ⚠️
+- "Can't install 7-Zip - Alternative method?" 🤔
+
+I'll help you immediately! 🚀
+
+═══════════════════════════════════════════════════════════════
+
+Created: March 4, 2026
+Download: https://www.genspark.ai/api/files/s/e6muTzjQ
+Extract to: C:\safestride\webapp
+Status: Awaiting your confirmation!
+
+Coach Kura, extract to C:\safestride\webapp and let me know! 📂✅
+
+═══════════════════════════════════════════════════════════════

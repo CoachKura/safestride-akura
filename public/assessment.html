@@ -139,87 +139,102 @@
                 </div>
             </div>
 
-            <!-- AISRI 5 Pillars Self-Assessment -->
+            <!-- AISRI 6 Pillars Self-Assessment -->
             <div class="bg-white rounded-lg shadow-lg p-6">
                 <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
                     <i class="fas fa-chart-bar text-blue-600 mr-3"></i>
-                    AISRI 5 Pillars Self-Assessment
+                    AISRI 6 Pillars Self-Assessment
                 </h2>
                 <p class="text-sm text-gray-600 mb-6">Rate yourself 0-100 on each pillar (0 = Very Poor, 100 = Excellent)</p>
 
-                <!-- Running Performance -->
+                <!-- Pillar 1: Mobility & Flexibility -->
                 <div class="mb-6">
                     <div class="flex items-center justify-between mb-2">
                         <label class="font-semibold text-gray-700">
-                            <i class="fas fa-running text-blue-600 mr-2"></i>
-                            Running Performance (40% weight)
+                            <i class="fas fa-arrows-alt-h text-red-600 mr-2"></i>
+                            Mobility & Flexibility (~17% weight)
                         </label>
-                        <span class="text-2xl font-bold text-blue-600" id="runningScore">50</span>
+                        <span class="text-2xl font-bold text-red-600" id="mobilityFlexibilityScore">50</span>
                     </div>
-                    <input type="range" name="running_performance_score" min="0" max="100" value="50"
-                           class="w-full h-3 bg-blue-200 rounded-lg appearance-none cursor-pointer"
-                           oninput="updateScore('running', this.value); updateProgress()">
-                    <p class="text-xs text-gray-500 mt-2">Pace consistency, endurance, VO2 max, recovery rate</p>
-                </div>
-
-                <!-- Strength -->
-                <div class="mb-6">
-                    <div class="flex items-center justify-between mb-2">
-                        <label class="font-semibold text-gray-700">
-                            <i class="fas fa-dumbbell text-red-600 mr-2"></i>
-                            Strength (20% weight)
-                        </label>
-                        <span class="text-2xl font-bold text-red-600" id="strengthScore">50</span>
-                    </div>
-                    <input type="range" name="strength_score" min="0" max="100" value="50"
+                    <input type="range" name="mobility_flexibility_score" min="0" max="100" value="50"
                            class="w-full h-3 bg-red-200 rounded-lg appearance-none cursor-pointer"
-                           oninput="updateScore('strength', this.value); updateProgress()">
-                    <p class="text-xs text-gray-500 mt-2">Core stability, leg strength, single-leg balance</p>
+                           oninput="updateScore('mobilityFlexibility', this.value); updateProgress()">
+                    <p class="text-xs text-gray-500 mt-2">Joint range of motion, muscle flexibility, ankle dorsiflexion, hip flexion, hamstring flexibility</p>
                 </div>
 
-                <!-- ROM -->
+                <!-- Pillar 2: Core Strength & Stability -->
                 <div class="mb-6">
                     <div class="flex items-center justify-between mb-2">
                         <label class="font-semibold text-gray-700">
-                            <i class="fas fa-arrows-alt text-green-600 mr-2"></i>
-                            Range of Motion (15% weight)
+                            <i class="fas fa-dumbbell text-orange-600 mr-2"></i>
+                            Core Strength & Stability (~17% weight)
                         </label>
-                        <span class="text-2xl font-bold text-green-600" id="romScore">50</span>
+                        <span class="text-2xl font-bold text-orange-600" id="coreStrengthScore">50</span>
                     </div>
-                    <input type="range" name="rom_score" min="0" max="100" value="50"
+                    <input type="range" name="core_strength_score" min="0" max="100" value="50"
+                           class="w-full h-3 bg-orange-200 rounded-lg appearance-none cursor-pointer"
+                           oninput="updateScore('coreStrength', this.value); updateProgress()">
+                    <p class="text-xs text-gray-500 mt-2">Core stability, leg strength, single-leg squat, balance, plank endurance</p>
+                </div>
+
+                <!-- Pillar 3: Mental Resilience -->
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="font-semibold text-gray-700">
+                            <i class="fas fa-brain text-green-600 mr-2"></i>
+                            Mental Resilience (~17% weight)
+                        </label>
+                        <span class="text-2xl font-bold text-green-600" id="mentalResilienceScore">50</span>
+                    </div>
+                    <input type="range" name="mental_resilience_score" min="0" max="100" value="50"
                            class="w-full h-3 bg-green-200 rounded-lg appearance-none cursor-pointer"
-                           oninput="updateScore('rom', this.value); updateProgress()">
-                    <p class="text-xs text-gray-500 mt-2">Ankle dorsiflexion, hip flexion, hamstring flexibility</p>
+                           oninput="updateScore('mentalResilience', this.value); updateProgress()">
+                    <p class="text-xs text-gray-500 mt-2">Focus, stress management, recovery mindset, motivation, mental toughness</p>
                 </div>
 
-                <!-- Balance -->
+                <!-- Pillar 4: Recovery & Regeneration -->
                 <div class="mb-6">
                     <div class="flex items-center justify-between mb-2">
                         <label class="font-semibold text-gray-700">
-                            <i class="fas fa-balance-scale text-yellow-600 mr-2"></i>
-                            Balance (15% weight)
+                            <i class="fas fa-spa text-blue-600 mr-2"></i>
+                            Recovery & Regeneration (~17% weight)
                         </label>
-                        <span class="text-2xl font-bold text-yellow-600" id="balanceScore">50</span>
+                        <span class="text-2xl font-bold text-blue-600" id="recoveryScore">50</span>
                     </div>
-                    <input type="range" name="balance_score" min="0" max="100" value="50"
-                           class="w-full h-3 bg-yellow-200 rounded-lg appearance-none cursor-pointer"
-                           oninput="updateScore('balance', this.value); updateProgress()">
-                    <p class="text-xs text-gray-500 mt-2">Single-leg balance (eyes open/closed), stability</p>
+                    <input type="range" name="recovery_score" min="0" max="100" value="50"
+                           class="w-full h-3 bg-blue-200 rounded-lg appearance-none cursor-pointer"
+                           oninput="updateScore('recovery', this.value); updateProgress()">
+                    <p class="text-xs text-gray-500 mt-2">Sleep quality (7-9 hrs), nutrition, rest days, hydration, recovery protocols</p>
                 </div>
 
-                <!-- Mobility -->
+                <!-- Pillar 5: Injury Prevention -->
                 <div class="mb-6">
                     <div class="flex items-center justify-between mb-2">
                         <label class="font-semibold text-gray-700">
-                            <i class="fas fa-child text-purple-600 mr-2"></i>
-                            Mobility (10% weight)
+                            <i class="fas fa-shield-alt text-purple-600 mr-2"></i>
+                            Injury Prevention (~17% weight)
                         </label>
-                        <span class="text-2xl font-bold text-purple-600" id="mobilityScore">50</span>
+                        <span class="text-2xl font-bold text-purple-600" id="injuryPreventionScore">50</span>
                     </div>
-                    <input type="range" name="mobility_score" min="0" max="100" value="50"
+                    <input type="range" name="injury_prevention_score" min="0" max="100" value="50"
                            class="w-full h-3 bg-purple-200 rounded-lg appearance-none cursor-pointer"
-                           oninput="updateScore('mobility', this.value); updateProgress()">
-                    <p class="text-xs text-gray-500 mt-2">Joint mobility, functional movement, dynamic flexibility</p>
+                           oninput="updateScore('injuryPrevention', this.value); updateProgress()">
+                    <p class="text-xs text-gray-500 mt-2">Biomechanics, running form, alignment, injury history (fewer is better), safety awareness</p>
+                </div>
+
+                <!-- Pillar 6: Performance Optimization -->
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="font-semibold text-gray-700">
+                            <i class="fas fa-rocket text-pink-600 mr-2"></i>
+                            Performance Optimization (~17% weight)
+                        </label>
+                        <span class="text-2xl font-bold text-pink-600" id="performanceScore">50</span>
+                    </div>
+                    <input type="range" name="performance_score" min="0" max="100" value="50"
+                           class="w-full h-3 bg-pink-200 rounded-lg appearance-none cursor-pointer"
+                           oninput="updateScore('performance', this.value); updateProgress()">
+                    <p class="text-xs text-gray-500 mt-2">VO2 max, lactate threshold, zone training, pace consistency, endurance, recovery rate</p>
                 </div>
             </div>
 
@@ -253,13 +268,15 @@
         }
 
         function calculateAISRI() {
-            const running = parseInt(document.querySelector('[name="running_performance_score"]').value);
-            const strength = parseInt(document.querySelector('[name="strength_score"]').value);
-            const rom = parseInt(document.querySelector('[name="rom_score"]').value);
-            const balance = parseInt(document.querySelector('[name="balance_score"]').value);
-            const mobility = parseInt(document.querySelector('[name="mobility_score"]').value);
+            const mobilityFlexibility = parseInt(document.querySelector('[name="mobility_flexibility_score"]').value);
+            const coreStrength = parseInt(document.querySelector('[name="core_strength_score"]').value);
+            const mentalResilience = parseInt(document.querySelector('[name="mental_resilience_score"]').value);
+            const recovery = parseInt(document.querySelector('[name="recovery_score"]').value);
+            const injuryPrevention = parseInt(document.querySelector('[name="injury_prevention_score"]').value);
+            const performance = parseInt(document.querySelector('[name="performance_score"]').value);
 
-            const aisri = Math.round((running * 0.40) + (strength * 0.20) + (rom * 0.15) + (balance * 0.15) + (mobility * 0.10));
+            // NEW 6-Pillar Formula: Equal weight (16.67% each) for balanced assessment
+            const aisri = Math.round((mobilityFlexibility + coreStrength + mentalResilience + recovery + injuryPrevention + performance) / 6);
             
             document.getElementById('aisriResult').textContent = aisri;
 

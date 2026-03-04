@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AISRI 6-Pillar Formula - SafeStride</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-purple-600 to-indigo-700 min-h-screen flex items-center justify-center p-6">
+    
+    <!-- AISRI Formula Card -->
+    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full">
+        <div class="flex items-center mb-6">
+            <i class="fas fa-chart-line text-4xl text-purple-600 mr-4"></i>
+            <h1 class="text-3xl font-bold text-gray-800">AISRI Formula</h1>
+        </div>
+        
+        <p class="text-gray-600 mb-8">The comprehensive 6-pillar system for injury risk assessment</p>
+        
+        <!-- 6 Pillars -->
+        <div class="space-y-4 mb-8">
+            <!-- Pillar 1 -->
+            <div class="flex items-center justify-between p-4 bg-gradient-to-r from-red-50 to-red-100 rounded-lg border-l-4 border-red-600">
+                <div class="flex items-center">
+                    <i class="fas fa-arrows-alt-h text-2xl text-red-600 mr-3"></i>
+                    <span class="font-semibold text-gray-800">Mobility & Flexibility</span>
+                </div>
+                <span class="text-xl font-bold text-red-600">~17%</span>
+            </div>
+            
+            <!-- Pillar 2 -->
+            <div class="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg border-l-4 border-orange-600">
+                <div class="flex items-center">
+                    <i class="fas fa-dumbbell text-2xl text-orange-600 mr-3"></i>
+                    <span class="font-semibold text-gray-800">Core Strength & Stability</span>
+                </div>
+                <span class="text-xl font-bold text-orange-600">~17%</span>
+            </div>
+            
+            <!-- Pillar 3 -->
+            <div class="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-lg border-l-4 border-green-600">
+                <div class="flex items-center">
+                    <i class="fas fa-brain text-2xl text-green-600 mr-3"></i>
+                    <span class="font-semibold text-gray-800">Mental Resilience</span>
+                </div>
+                <span class="text-xl font-bold text-green-600">~17%</span>
+            </div>
+            
+            <!-- Pillar 4 -->
+            <div class="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg border-l-4 border-blue-600">
+                <div class="flex items-center">
+                    <i class="fas fa-spa text-2xl text-blue-600 mr-3"></i>
+                    <span class="font-semibold text-gray-800">Recovery & Regeneration</span>
+                </div>
+                <span class="text-xl font-bold text-blue-600">~17%</span>
+            </div>
+            
+            <!-- Pillar 5 -->
+            <div class="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg border-l-4 border-purple-600">
+                <div class="flex items-center">
+                    <i class="fas fa-shield-alt text-2xl text-purple-600 mr-3"></i>
+                    <span class="font-semibold text-gray-800">Injury Prevention</span>
+                </div>
+                <span class="text-xl font-bold text-purple-600">~17%</span>
+            </div>
+            
+            <!-- Pillar 6 -->
+            <div class="flex items-center justify-between p-4 bg-gradient-to-r from-pink-50 to-pink-100 rounded-lg border-l-4 border-pink-600">
+                <div class="flex items-center">
+                    <i class="fas fa-rocket text-2xl text-pink-600 mr-3"></i>
+                    <span class="font-semibold text-gray-800">Performance Optimization</span>
+                </div>
+                <span class="text-xl font-bold text-pink-600">~17%</span>
+            </div>
+        </div>
+        
+        <!-- Formula -->
+        <div class="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg p-6 text-white">
+            <p class="text-sm mb-2 opacity-90">AISRI Score Calculation:</p>
+            <p class="text-lg font-mono leading-relaxed">
+                AISRI = (MF + CS + MR + RR + IP + PO) / 6
+            </p>
+            <p class="text-xs mt-4 opacity-75">
+                MF = Mobility & Flexibility • CS = Core Strength & Stability • MR = Mental Resilience<br>
+                RR = Recovery & Regeneration • IP = Injury Prevention • PO = Performance Optimization
+            </p>
+        </div>
+        
+        <!-- Score Range -->
+        <div class="mt-6 grid grid-cols-4 gap-2 text-center text-sm">
+            <div class="p-3 bg-red-100 rounded-lg">
+                <p class="font-bold text-red-700">0-39</p>
+                <p class="text-xs text-red-600">Critical</p>
+            </div>
+            <div class="p-3 bg-orange-100 rounded-lg">
+                <p class="font-bold text-orange-700">40-59</p>
+                <p class="text-xs text-orange-600">High Risk</p>
+            </div>
+            <div class="p-3 bg-yellow-100 rounded-lg">
+                <p class="font-bold text-yellow-700">60-74</p>
+                <p class="text-xs text-yellow-600">Medium</p>
+            </div>
+            <div class="p-3 bg-green-100 rounded-lg">
+                <p class="font-bold text-green-700">75-100</p>
+                <p class="text-xs text-green-600">Low Risk</p>
+            </div>
+        </div>
+        
+        <!-- Action Button -->
+        <div class="mt-8 text-center">
+            <a href="assessment.html" class="inline-block bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-lg transition">
+                Take AISRI Assessment
+                <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+        </div>
+    </div>
+    
+</body>
+</html>
