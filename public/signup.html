@@ -15,7 +15,15 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <!-- Config -->
-    <script src="config.js"></script>
+    <script>
+        // Inline config to avoid file loading issues
+        const SAFESTRIDE_CONFIG = {
+            supabase: {
+                url: 'https://swzlxlfprtpxrttfscvf.supabase.co',
+                anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3emx4bGZwcnRweHJ0dGZzY3ZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ2MTU4NjcsImV4cCI6MjA1MDE5MTg2N30.Gq6j8Qu5yiWgzpzwqKa3zg9wZAqmY_FZeOVsPtdI5cs'
+            }
+        };
+    </script>
     
     <style>
         body {
