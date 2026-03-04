@@ -1,0 +1,387 @@
+═══════════════════════════════════════════════════════════════
+   📋 SAFESTRIDE HOME PAGE - TESTING CHECKLIST
+═══════════════════════════════════════════════════════════════
+
+Coach Kura, use this checklist to test your new home page!
+
+═══════════════════════════════════════════════════════════════
+🖥️ DESKTOP TESTING (1920x1080)
+═══════════════════════════════════════════════════════════════
+
+□ HERO SECTION
+  □ Dark gradient background loads (purple/blue)
+  □ "Train Like a Pro. Injury-Free." title visible
+  □ Badge shows "Proven with 18 Months of Real Data"
+  □ Subtitle text is readable (white/light gray)
+  □ Two buttons appear: "Start Your Journey" + "See Real Results"
+  □ Background has subtle pulse animation
+  
+□ RAJESH'S TRANSFORMATION SECTION
+  □ Section badge shows "Real Athlete, Real Results"
+  □ Title: "From Injured to Elite in 18 Months"
+  □ All 4 metric cards visible in row
+  
+  Card 1: 5K Time
+    □ Shows ⏱️ icon
+    □ 52:00 in red
+    □ Down arrow (↓)
+    □ 19:45 in green
+    □ "63% faster" label
+  
+  Card 2: AISRI Score
+    □ Shows 🎯 icon
+    □ 42 in red
+    □ Up arrow (↑)
+    □ 82 in green
+    □ "95% improvement" label
+  
+  Card 3: Weight
+    □ Shows ⚖️ icon
+    □ 83kg in red
+    □ Down arrow (↓)
+    □ 68kg in green
+    □ "18% reduction" label
+  
+  Card 4: Health
+    □ Shows 💪 icon
+    □ "Diabetes" label
+    □ Check mark (✓)
+    □ "Reversed" in green
+    □ "+ BP controlled" label
+
+□ AISRI 6-PILLAR SECTION
+  □ Section in 2-column layout
+  
+  LEFT COLUMN: Radar Chart
+    □ Hexagon shape visible
+    □ Red line shows "Before" data (35-50 range)
+    □ Green line shows "After" data (80-90 range)
+    □ 6 labels around chart:
+      - Mobility & Flexibility
+      - Core Strength & Stability
+      - Mental Resilience
+      - Recovery & Regeneration
+      - Injury Prevention
+      - Performance Optimization
+    □ Legend at bottom shows "Rajesh (Before)" and "Rajesh (After)"
+  
+  RIGHT COLUMN: 6 Pillar Cards
+    □ All 6 cards in vertical list
+    □ Each card has icon on left
+    □ Each card has title + description
+    □ Icons are color-coded:
+      - Red (Mobility)
+      - Orange (Strength)
+      - Green (Mental)
+      - Blue (Recovery)
+      - Purple (Prevention)
+      - Pink (Performance)
+
+□ 6 TRAINING PHASES SECTION
+  □ Timeline layout with alternating left/right
+  □ 6 circular markers numbered 1-6
+  □ Markers have purple gradient background
+  
+  Phase 1 (LEFT):
+    □ "Foundation" title
+    □ "0 - 500 km" range
+    □ Description paragraph
+  
+  Phase 2 (RIGHT):
+    □ "Development" title
+    □ "500 - 1000 km" range
+  
+  Phase 3 (LEFT):
+    □ "Strengthening" title
+    □ "1000 - 2000 km" range
+  
+  Phase 4 (RIGHT):
+    □ "Performance" title
+    □ "2000 - 3000 km" range
+  
+  Phase 5 (LEFT):
+    □ "Optimization" title
+    □ "3000 - 4000 km" range
+  
+  Phase 6 (RIGHT):
+    □ "Mastery" title
+    □ "4000 - 5000 km" range
+
+□ 7 CORE PROTOCOLS SECTION
+  □ Grid layout showing 7 cards
+  □ First row: 3 cards (START, ENGINE, OXYGEN)
+  □ Second row: 2 cards (POWER, ZONES)
+  □ Third row: 2 cards (STRENGTH, LONG RUN)
+  □ Each card has purple gradient icon at top
+  □ Each card has protocol name + description
+
+□ CTA (CALL-TO-ACTION) SECTION
+  □ Purple to blue gradient background
+  □ Animated dots floating upward
+  □ "Ready to Transform Your Running?" title
+  □ Subtitle text visible
+  □ Two buttons: "Create Free Account" + "View Dashboard Demo"
+
+□ FOOTER SECTION
+  □ Dark navy background
+  □ 4 columns of links:
+    - SafeStride (About)
+    - Product (Features, Dashboard, etc.)
+    - Company (About, Contact, etc.)
+    - Legal (Privacy, Terms, etc.)
+  □ Bottom copyright text: "© 2026 SafeStride by AKURA"
+
+═══════════════════════════════════════════════════════════════
+📱 MOBILE TESTING (375x667 - iPhone SE)
+═══════════════════════════════════════════════════════════════
+
+HOW TO TEST MOBILE:
+1. Press F12 (open DevTools)
+2. Press Ctrl+Shift+M (toggle device toolbar)
+3. Select "iPhone SE" from dropdown
+4. Scroll through page
+
+□ MOBILE LAYOUT
+  □ All sections stack vertically (single column)
+  □ Text remains readable (not too small)
+  □ No horizontal scrolling required
+  □ Images/charts scale down properly
+
+□ MOBILE SECTIONS
+  □ Hero text size reduces appropriately
+  □ 4 metric cards stack vertically (not side-by-side)
+  □ Radar chart + pillar list both vertical
+  □ Phase timeline goes straight down (no left/right)
+  □ Protocol cards stack in single column
+  □ Buttons are full-width
+  □ Footer columns stack vertically
+
+□ MOBILE INTERACTIONS
+  □ Tap targets are large enough (44px minimum)
+  □ Buttons respond to touch
+  □ Smooth scrolling works
+  □ No elements cut off on sides
+
+═══════════════════════════════════════════════════════════════
+🖱️ HOVER EFFECTS (Desktop Only)
+═══════════════════════════════════════════════════════════════
+
+□ HERO BUTTONS
+  □ "Start Your Journey" lifts up with shadow on hover
+  □ "See Real Results" background lightens on hover
+
+□ METRIC CARDS
+  □ Card lifts up (8px) when mouse over
+  □ Purple shadow appears underneath
+  □ Smooth animation (300ms)
+
+□ PILLAR CARDS
+  □ Card slides to the right (8px) on hover
+  □ Border color changes to purple
+  □ Smooth transition
+
+□ PHASE CARDS
+  □ Card scales up slightly (1.02x) on hover
+  □ Border glows purple
+  □ Smooth animation
+
+□ PROTOCOL CARDS
+  □ Card lifts up (8px) on hover
+  □ Purple shadow appears
+  □ Smooth transition
+
+□ FOOTER LINKS
+  □ Link text changes from gray to white on hover
+
+═══════════════════════════════════════════════════════════════
+🔗 NAVIGATION TESTING
+═══════════════════════════════════════════════════════════════
+
+□ HERO SECTION LINKS
+  □ "Start Your Journey" → opens onboarding.html
+  □ "See Real Results" → smooth scrolls to #proof section
+
+□ CTA SECTION LINKS
+  □ "Create Free Account" → opens signup.html
+  □ "View Dashboard Demo" → opens athlete-dashboard.html
+
+□ FOOTER LINKS
+  □ "Success Stories" → scrolls to #proof
+  □ "Dashboard" → opens athlete-dashboard.html
+  □ "Training Plans" → opens training-calendar.html
+  □ "AISRI Assessment" → opens athlete-evaluation.html
+  □ "About AKURA" → # (placeholder)
+  □ "Contact Us" → mailto:contact@akura.in
+  □ Other footer links → # (placeholders)
+
+□ SMOOTH SCROLLING
+  □ Clicking "See Real Results" smoothly scrolls down
+  □ Not jarring or instant jump
+  □ Animation takes ~800ms
+
+═══════════════════════════════════════════════════════════════
+📊 CHART INTERACTION (Radar Chart)
+═══════════════════════════════════════════════════════════════
+
+□ CHART LOADS
+  □ Hexagon grid appears
+  □ Red line (Before) draws on load
+  □ Green line (After) draws on load
+  □ 6 pillar labels visible around edge
+  □ Grid lines show 0, 20, 40, 60, 80, 100 marks
+
+□ CHART INTERACTION
+  □ Hover over data points → tooltip appears
+  □ Tooltip shows: "Rajesh (Before): 40/100"
+  □ Tooltip follows mouse cursor
+  □ Tooltip has dark background, white text
+  □ Legend at bottom shows colored circles
+
+□ CHART RESPONSIVENESS
+  □ Chart scales down on smaller screens
+  □ Remains readable on mobile
+  □ Labels don't overlap
+
+═══════════════════════════════════════════════════════════════
+⚡ PERFORMANCE TESTING
+═══════════════════════════════════════════════════════════════
+
+□ LOAD SPEED
+  □ Page loads in < 2 seconds
+  □ No long white screen
+  □ Content appears progressively
+
+□ ANIMATION SMOOTHNESS
+  □ Scroll is smooth (no lag)
+  □ Hover effects are fluid (60fps)
+  □ Chart animation is smooth
+  □ Background pulse is subtle, not jarring
+
+□ CONSOLE ERRORS (F12 → Console Tab)
+  □ No red error messages
+  □ Chart.js loads successfully
+  □ Font Awesome loads successfully
+  □ No 404 errors for missing files
+  □ No JavaScript errors
+
+□ NETWORK (F12 → Network Tab)
+  □ Chart.js CDN loads (~135KB)
+  □ Font Awesome CDN loads (~75KB)
+  □ safestride-design-system.css loads
+  □ All resources load with 200 status
+
+═══════════════════════════════════════════════════════════════
+🎨 VISUAL QUALITY
+═══════════════════════════════════════════════════════════════
+
+□ COLORS
+  □ Purple/blue gradients look good
+  □ Dark backgrounds have sufficient contrast
+  □ Text is readable (white on dark)
+  □ Red (before) and green (after) are clear
+
+□ SPACING
+  □ Sections have breathing room
+  □ Text not cramped
+  □ Cards have proper gaps between them
+  □ Padding consistent throughout
+
+□ TYPOGRAPHY
+  □ Headings are bold and clear
+  □ Body text is readable size (16px)
+  □ Font weights appropriate (bold for titles)
+  □ Line spacing comfortable
+
+□ ICONS
+  □ Font Awesome icons load properly
+  □ Icons have appropriate size
+  □ Icons match the context (rocket, trophy, etc.)
+
+═══════════════════════════════════════════════════════════════
+📸 TAKE SCREENSHOTS
+═══════════════════════════════════════════════════════════════
+
+Take screenshots of:
+1. □ Hero section (top of page)
+2. □ Rajesh's 4 metric cards
+3. □ AISRI radar chart
+4. □ 6 training phases timeline
+5. □ 7 core protocols grid
+6. □ Mobile view (full page)
+
+How to screenshot:
+- Windows: Win + Shift + S (snipping tool)
+- Full page: Use browser extension "Full Page Screenshot"
+
+═══════════════════════════════════════════════════════════════
+🐛 BUG TRACKING
+═══════════════════════════════════════════════════════════════
+
+If you find issues, note them here:
+
+VISUAL BUGS:
+□ _____________________________________________
+□ _____________________________________________
+□ _____________________________________________
+
+FUNCTIONAL BUGS:
+□ _____________________________________________
+□ _____________________________________________
+□ _____________________________________________
+
+CONTENT ERRORS:
+□ _____________________________________________
+□ _____________________________________________
+□ _____________________________________________
+
+═══════════════════════════════════════════════════════════════
+✅ FINAL VERDICT
+═══════════════════════════════════════════════════════════════
+
+After completing all tests:
+
+□ READY TO DEPLOY
+  → All tests pass
+  → No major bugs
+  → Looks professional
+  → Navigation works
+  → Mobile responsive
+  → Reply: "A - Everything works! Deploy now!"
+
+□ NEEDS MINOR FIXES
+  → Most tests pass
+  → Small visual tweaks needed
+  → Reply: "A - Works but fix [issue]"
+
+□ NEEDS MAJOR CHANGES
+  → Several tests fail
+  → Significant issues found
+  → Reply: "A - Issues found: [list]"
+
+═══════════════════════════════════════════════════════════════
+📋 TESTING SUMMARY
+═══════════════════════════════════════════════════════════════
+
+Date Tested: _______________
+Browser: Chrome / Firefox / Safari / Edge
+Screen Size: _______________
+Mobile Device: _______________
+
+Total Checks: 100+
+Passed: _____ / 100+
+Failed: _____ / 100+
+
+Overall Score: _____ %
+
+RECOMMENDATION:
+□ Deploy immediately
+□ Fix minor issues first
+□ Needs more work
+
+═══════════════════════════════════════════════════════════════
+
+Created: March 4, 2026
+Location: C:\safestride\webapp\
+Status: Ready for testing
+
+Coach Kura, this is your quality control checklist! 📋✅

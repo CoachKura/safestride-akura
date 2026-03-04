@@ -1,0 +1,408 @@
+═══════════════════════════════════════════════════════════════
+   🚀 SAFESTRIDE PRODUCTION DEPLOYMENT GUIDE
+═══════════════════════════════════════════════════════════════
+
+Coach Kura, this is your step-by-step guide to get SafeStride LIVE!
+
+═══════════════════════════════════════════════════════════════
+📋 PRE-DEPLOYMENT CHECKLIST
+═══════════════════════════════════════════════════════════════
+
+Before deploying, ensure:
+□ Tested locally with Live Server (all pages work)
+□ Checked mobile view (responsive design works)
+□ Verified all navigation links
+□ No console errors (F12 → Console)
+□ Git repository is clean (all changes committed)
+
+═══════════════════════════════════════════════════════════════
+🎯 DEPLOYMENT METHOD: CLOUDFLARE PAGES
+═══════════════════════════════════════════════════════════════
+
+Why Cloudflare Pages?
+✅ FREE hosting (unlimited bandwidth)
+✅ Global CDN (lightning fast worldwide)
+✅ Automatic HTTPS
+✅ GitHub integration (auto-deploy on push)
+✅ Custom domain support
+
+═══════════════════════════════════════════════════════════════
+📝 STEP-BY-STEP DEPLOYMENT (30 MINUTES)
+═══════════════════════════════════════════════════════════════
+
+PHASE 1: PUSH TO GITHUB (10 mins)
+───────────────────────────────────────────────────────────────
+
+Your repository: https://github.com/CoachKura/safestride-akura.git
+Current branch: production
+
+OPTION 1: From Windows PC (Recommended)
+----------------------------------------
+
+Step 1: Open PowerShell in VS Code
+   - Press Ctrl + ` (opens terminal)
+   - Ensure you're in: C:\safestride\webapp
+
+Step 2: Check current status
+   cd C:\safestride\webapp
+   git status
+
+Step 3: Add all new files
+   git add .
+
+Step 4: Commit changes
+   git commit -m "feat: Add revolutionary home page with Rajesh transformation"
+
+Step 5: Push to GitHub
+   git push origin production
+
+EXPECTED OUTPUT:
+   Enumerating objects: 10, done.
+   Counting objects: 100% (10/10), done.
+   Writing objects: 100% (6/6), 45.23 KiB | 11.31 MiB/s, done.
+   Total 6 (delta 4), reused 0 (delta 0), pack-reused 0
+   To https://github.com/CoachKura/safestride-akura.git
+      39aecbd..fa91995  production -> production
+
+✅ SUCCESS: Files are now on GitHub!
+
+OPTION 2: Download & Push from Different PC
+--------------------------------------------
+
+Step 1: Download backup
+   https://www.genspark.ai/api/files/s/QviSl86t
+
+Step 2: Extract to C:\safestride\webapp
+
+Step 3: Open PowerShell in that folder
+
+Step 4: Configure git remote
+   git remote -v
+   # Should show: origin https://github.com/CoachKura/safestride-akura.git
+
+Step 5: Push to GitHub
+   git push origin production
+
+───────────────────────────────────────────────────────────────
+
+PHASE 2: VERIFY GITHUB (2 mins)
+───────────────────────────────────────────────────────────────
+
+Step 1: Open browser
+   https://github.com/CoachKura/safestride-akura
+
+Step 2: Switch to 'production' branch
+   - Click dropdown that says 'main' or 'gh-pages'
+   - Select 'production'
+
+Step 3: Verify new files appear
+   □ public/index.html (updated today)
+   □ HOME_PAGE_VISUAL_GUIDE.md
+   □ NEW_HOME_PAGE_READY.txt
+   □ HOME_PAGE_COMPLETE_SUMMARY.txt
+   □ TESTING_CHECKLIST_HOME_PAGE.txt
+
+✅ SUCCESS: Code is on GitHub!
+
+───────────────────────────────────────────────────────────────
+
+PHASE 3: CLOUDFLARE PAGES SETUP (10 mins)
+───────────────────────────────────────────────────────────────
+
+Step 1: Login to Cloudflare
+   https://dash.cloudflare.com/login
+   
+   Use:
+   - Email: contact@akura.in
+   - Password: [your password]
+   
+   OR create new account if needed
+
+Step 2: Navigate to Pages
+   - Left sidebar → "Workers & Pages"
+   - Click "Create application"
+   - Click "Pages" tab
+   - Click "Connect to Git"
+
+Step 3: Authorize GitHub
+   - Click "GitHub" button
+   - Login to GitHub if prompted
+   - Authorize Cloudflare Pages
+   - Select repository: CoachKura/safestride-akura
+
+Step 4: Configure Build Settings
+   
+   PROJECT NAME: safestride-akura
+   
+   PRODUCTION BRANCH: production
+   
+   BUILD SETTINGS:
+   - Framework preset: None (or select "Static Site")
+   - Build command: (leave empty)
+   - Build output directory: /public
+   
+   ENVIRONMENT VARIABLES:
+   (Skip for now - none needed for static site)
+
+Step 5: Click "Save and Deploy"
+   
+   ⏳ Cloudflare will now:
+   1. Clone your GitHub repo
+   2. Process /public directory
+   3. Deploy to global CDN
+   4. Generate live URL
+   
+   This takes 1-3 minutes...
+
+Step 6: Wait for deployment
+   You'll see:
+   - "Initializing build environment" ✓
+   - "Cloning repository" ✓
+   - "Building application" ✓
+   - "Deploying to Cloudflare's global network" ✓
+   - "Success! Your site is live" ✅
+
+Step 7: Get your live URL
+   
+   Cloudflare provides:
+   - Production URL: https://safestride-akura.pages.dev
+   - OR unique URL: https://[random-id].safestride-akura.pages.dev
+
+✅ SUCCESS: SafeStride is LIVE!
+
+───────────────────────────────────────────────────────────────
+
+PHASE 4: TEST PRODUCTION SITE (5 mins)
+───────────────────────────────────────────────────────────────
+
+Step 1: Open your live URL
+   https://safestride-akura.pages.dev
+
+Step 2: Test all pages
+   □ Home page loads → /index.html or /
+   □ Onboarding → /onboarding.html
+   □ Dashboard → /athlete-dashboard.html
+   □ Calendar → /training-calendar.html
+   □ Evaluation → /athlete-evaluation.html
+   □ Signup → /signup.html
+
+Step 3: Test on different devices
+   □ Desktop (Chrome, Firefox, Safari, Edge)
+   □ Mobile phone (Safari iOS or Chrome Android)
+   □ Tablet (iPad or Android tablet)
+
+Step 4: Check console for errors
+   - Press F12
+   - Go to Console tab
+   - Should see no red errors
+   - Chart.js should load from CDN
+   - Font Awesome should load from CDN
+
+Step 5: Test Rajesh's metrics
+   □ 4 metric cards visible
+   □ Radar chart loads and draws
+   □ All 6 pillars show
+   □ Timeline displays correctly
+   □ 7 protocols grid shows
+
+✅ SUCCESS: Everything works in production!
+
+───────────────────────────────────────────────────────────────
+
+PHASE 5: CUSTOM DOMAIN (OPTIONAL) (5 mins)
+───────────────────────────────────────────────────────────────
+
+Want safestride.akura.in instead of safestride-akura.pages.dev?
+
+Step 1: In Cloudflare Pages dashboard
+   - Go to your project: safestride-akura
+   - Click "Custom domains" tab
+   - Click "Set up a custom domain"
+
+Step 2: Enter domain
+   - Type: safestride.akura.in
+   - OR: www.safestride.akura.in
+   - Click "Continue"
+
+Step 3: Add DNS records (if akura.in is on Cloudflare)
+   - Cloudflare auto-configures DNS
+   - CNAME: safestride → safestride-akura.pages.dev
+   - Wait 1-5 minutes for propagation
+
+Step 4: Verify domain
+   - https://safestride.akura.in should work
+   - Automatic HTTPS enabled
+   - Certificate provisioned
+
+✅ SUCCESS: Custom domain active!
+
+───────────────────────────────────────────────────────────────
+
+PHASE 6: AUTO-DEPLOY SETUP (Already Done!)
+───────────────────────────────────────────────────────────────
+
+Good news: GitHub integration means future updates auto-deploy!
+
+Future workflow:
+1. Edit files in C:\safestride\webapp
+2. Test locally with Live Server
+3. Commit: git add . && git commit -m "message"
+4. Push: git push origin production
+5. Cloudflare auto-deploys in 2-3 minutes! ✅
+
+No manual re-deployment needed!
+
+═══════════════════════════════════════════════════════════════
+🔧 TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════
+
+ISSUE 1: Git push fails with authentication error
+───────────────────────────────────────────────────
+SOLUTION:
+- Create GitHub Personal Access Token
+- Go to: https://github.com/settings/tokens
+- Generate new token (classic)
+- Scopes: repo (full control)
+- Copy token
+- Use as password when pushing
+
+ISSUE 2: Cloudflare build fails
+───────────────────────────────────────────────────
+SOLUTION:
+- Check Build settings
+- Ensure "Build output directory" is /public
+- Ensure public/ folder exists in repo
+- Re-deploy manually
+
+ISSUE 3: Pages show 404 errors
+───────────────────────────────────────────────────
+SOLUTION:
+- Check file names match URLs
+- Ensure .html extension in URLs
+- Example: /onboarding.html NOT /onboarding
+- OR configure _redirects file for clean URLs
+
+ISSUE 4: Chart.js doesn't load in production
+───────────────────────────────────────────────────
+SOLUTION:
+- Check browser console (F12)
+- Verify CDN URL: https://cdn.jsdelivr.net/npm/chart.js@4.4.0
+- Check for CORS or CSP issues
+- Ensure internet connection on device
+
+ISSUE 5: Supabase connection fails in production
+───────────────────────────────────────────────────
+SOLUTION:
+- Check Supabase URL is correct
+- Verify anon key is valid
+- Ensure CORS is enabled in Supabase dashboard
+- Check if RLS policies allow anonymous access
+
+═══════════════════════════════════════════════════════════════
+📊 POST-DEPLOYMENT CHECKLIST
+═══════════════════════════════════════════════════════════════
+
+After deployment, verify:
+
+□ URLS WORK
+  □ https://safestride-akura.pages.dev loads
+  □ All pages accessible (onboarding, dashboard, etc.)
+  □ No 404 errors
+
+□ FUNCTIONALITY
+  □ Rajesh's metrics display correctly
+  □ Radar chart draws and is interactive
+  □ All hover effects work
+  □ Navigation links work
+  □ Mobile responsive
+
+□ PERFORMANCE
+  □ Page loads in < 2 seconds
+  □ No console errors
+  □ CDN assets load (Chart.js, Font Awesome)
+  □ HTTPS is active (padlock icon)
+
+□ SEO & SHARING
+  □ Page title correct: "SafeStride by AKURA..."
+  □ Meta description set
+  □ Favicon loads (if present)
+  □ Social media preview works (test on WhatsApp/Twitter)
+
+□ CROSS-BROWSER
+  □ Chrome (desktop + mobile)
+  □ Firefox (desktop + mobile)
+  □ Safari (desktop + iOS)
+  □ Edge (desktop)
+
+□ ANALYTICS (Optional)
+  □ Google Analytics installed (if tracking)
+  □ Cloudflare Web Analytics enabled
+  □ Track visits, page views, conversions
+
+═══════════════════════════════════════════════════════════════
+🎉 DEPLOYMENT COMPLETE!
+═══════════════════════════════════════════════════════════════
+
+CONGRATULATIONS Coach Kura! 🏆
+
+Your URLs:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Production:  https://safestride-akura.pages.dev
+Home Page:   https://safestride-akura.pages.dev/
+Onboarding:  https://safestride-akura.pages.dev/onboarding.html
+Dashboard:   https://safestride-akura.pages.dev/athlete-dashboard.html
+Calendar:    https://safestride-akura.pages.dev/training-calendar.html
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Share with athletes NOW! 🚀
+
+Example message:
+───────────────────────────────────────────────────
+"Hi [Athlete Name],
+
+I'm excited to introduce SafeStride - my AI-powered injury 
+prevention platform that helped Rajesh improve his 5K time from 
+52:00 to 19:45 in just 18 months, with ZERO injuries!
+
+Check out your personalized AISRI score and get started:
+👉 https://safestride-akura.pages.dev
+
+Let's keep you injury-free while reaching your goals! 💪
+
+- Coach Kura"
+───────────────────────────────────────────────────
+
+═══════════════════════════════════════════════════════════════
+📈 NEXT STEPS AFTER DEPLOYMENT
+═══════════════════════════════════════════════════════════════
+
+1. SHARE WITH 10 TEST ATHLETES
+   - Send URL via WhatsApp/Email
+   - Ask for feedback
+   - Track which pages they visit
+
+2. COLLECT FEEDBACK
+   - What do they love?
+   - What's confusing?
+   - Any bugs or errors?
+
+3. ITERATE
+   - Fix issues based on feedback
+   - Push updates (auto-deploys!)
+   - Improve continuously
+
+4. SCALE
+   - Once 10 athletes successful → invite 50
+   - Once 50 athletes successful → invite 500
+   - Target: 1000 injury-free athletes!
+
+═══════════════════════════════════════════════════════════════
+
+Created: March 4, 2026
+Status: ✅ READY TO DEPLOY
+Coach: Kura D Sathyamoorthy
+Mission: Creating millions of injury-free athletes
+
+LET'S GO! 🏃‍♂️💪🚀
+
+═══════════════════════════════════════════════════════════════

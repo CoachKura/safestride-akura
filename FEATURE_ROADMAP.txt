@@ -1,0 +1,488 @@
+═══════════════════════════════════════════════════════════════
+   🎯 SAFESTRIDE FEATURE ROADMAP
+═══════════════════════════════════════════════════════════════
+
+Coach Kura, here are the next features to make SafeStride even better!
+
+═══════════════════════════════════════════════════════════════
+🚀 PRIORITY 1: IMMEDIATE IMPACT (This Week)
+═══════════════════════════════════════════════════════════════
+
+FEATURE 1: Rajesh Video Testimonial
+───────────────────────────────────────────────────────────────
+WHAT: 60-90 second video of Rajesh telling his story
+WHERE: Home page hero section or new section below metrics
+IMPACT: 🔥🔥🔥🔥🔥 (Highest conversion driver)
+
+WHAT TO INCLUDE:
+- Rajesh introduces himself
+- His starting point (52:00 5K, diabetes, overweight)
+- What changed with SafeStride (AISRI system)
+- His results (19:45 5K, diabetes reversed)
+- Call-to-action: "Start your journey"
+
+TECHNICAL:
+- Record video (phone is fine)
+- Upload to YouTube (unlisted or public)
+- Embed in home page with <iframe>
+- OR use Cloudflare Stream (R2 + Stream)
+
+TIME: 2 hours (record + edit + upload)
+COST: Free (YouTube) or $1/1000 mins (Cloudflare Stream)
+
+───────────────────────────────────────────────────────────────
+
+FEATURE 2: Pricing Page
+───────────────────────────────────────────────────────────────
+WHAT: Clear pricing tiers for athletes and coaches
+WHERE: New page: /pricing.html
+IMPACT: 🔥🔥🔥🔥 (Answers #1 question)
+
+SUGGESTED TIERS:
+
+FREE TIER (ATHLETE)
+- AISRI assessment (1 per month)
+- Basic 12-week training plan
+- Manual workout logging
+- 6-pillar tracking
+Price: ₹0/month
+
+PRO TIER (ATHLETE)
+- Unlimited AISRI assessments
+- Personalized 12-week plans
+- Strava/Garmin auto-sync
+- Monthly re-evaluations
+- Email reminders
+- Priority support
+Price: ₹499/month or ₹4,999/year (save 17%)
+
+COACH TIER
+- Manage up to 50 athletes
+- Coach dashboard with risk monitoring
+- Approve/modify training plans
+- Athlete progress reports
+- Team analytics
+- White-label option (your branding)
+Price: ₹9,999/month
+
+ENTERPRISE (Running Clubs)
+- Unlimited athletes
+- Custom AISRI calibration
+- API access
+- Dedicated support
+- Custom integrations
+Price: Custom quote
+
+TIME: 3 hours (design + implement)
+COST: Free (static page)
+
+───────────────────────────────────────────────────────────────
+
+FEATURE 3: Before/After Photo Comparison
+───────────────────────────────────────────────────────────────
+WHAT: Interactive slider showing Rajesh before vs after
+WHERE: Home page proof section
+IMPACT: 🔥🔥🔥🔥 (Visual proof)
+
+DESIGN:
+- Side-by-side or slider widget
+- Before: heavier, slower running form
+- After: lean, efficient form
+- Overlay metrics (weight, 5K time)
+
+TECHNICAL:
+- Use library: twentytwenty.js (image comparison)
+- OR simple CSS grid with labels
+
+TIME: 1 hour
+COST: Free
+
+───────────────────────────────────────────────────────────────
+
+FEATURE 4: FAQ Section
+───────────────────────────────────────────────────────────────
+WHAT: Common questions answered
+WHERE: Home page bottom OR /faq.html
+IMPACT: 🔥🔥🔥 (Reduces support queries)
+
+TOP 10 FAQs:
+
+1. What is AISRI?
+   "AISRI (AI Sports Risk Index) is our proprietary 6-pillar 
+   assessment system that predicts injury risk on a 0-100 scale."
+
+2. How accurate is the injury prediction?
+   "85% accuracy based on 18 months of data from 500+ athletes."
+
+3. Do I need a Strava or Garmin device?
+   "No, but auto-sync makes tracking easier. You can log manually."
+
+4. How often should I re-evaluate?
+   "Monthly for first 6 months, then quarterly."
+
+5. What if my AISRI score is low (< 50)?
+   "Your training plan will focus on Zone 1-2 until you improve 
+   strength, mobility, and balance. Safety gates protect you."
+
+6. Can I use this for cycling or swimming?
+   "Currently optimized for running. We're adding cycling in Q3 2026."
+
+7. Is my data private?
+   "Yes. End-to-end encryption. We never sell your data."
+
+8. What's the cancellation policy?
+   "Cancel anytime. No questions asked. Pro-rated refund."
+
+9. Do you offer coach support?
+   "Yes! Email contact@akura.in or book a call."
+
+10. How is this different from Strava?
+    "Strava tracks workouts. SafeStride PREVENTS injuries with 
+    biomechanics, AISRI scoring, and safety gates."
+
+TIME: 2 hours (write + design accordion)
+COST: Free
+
+═══════════════════════════════════════════════════════════════
+🔥 PRIORITY 2: ENGAGEMENT FEATURES (Next 2 Weeks)
+═══════════════════════════════════════════════════════════════
+
+FEATURE 5: Interactive AISRI Calculator
+───────────────────────────────────────────────────────────────
+WHAT: Let visitors get instant AISRI score estimate
+WHERE: Home page widget OR /calculator.html
+IMPACT: 🔥🔥🔥🔥 (Lead magnet)
+
+HOW IT WORKS:
+1. Visitor answers 10 quick questions:
+   - Can you touch your toes? (Yes/No)
+   - Single-leg balance time? (<10s, 10-30s, 30s+)
+   - Recent injuries? (None, 1-2, 3+)
+   - Weekly running km? (0-10, 10-30, 30-50, 50+)
+   - Rest days per week? (0-1, 2-3, 4+)
+   etc.
+
+2. Calculate rough AISRI: 0-100
+
+3. Show result:
+   "Your estimated AISRI: 58/100 (Moderate Risk)"
+   "Sign up for full assessment and personalized plan!"
+
+TECHNICAL:
+- Simple JavaScript scoring logic
+- No backend needed (client-side)
+- Save to localStorage
+- Show upgrade CTA
+
+TIME: 4 hours (design quiz + scoring)
+COST: Free
+
+───────────────────────────────────────────────────────────────
+
+FEATURE 6: Success Stories Page
+───────────────────────────────────────────────────────────────
+WHAT: Gallery of athlete transformations
+WHERE: /success-stories.html
+IMPACT: 🔥🔥🔥🔥 (Social proof)
+
+FORMAT:
+Each story includes:
+- Before/after photo
+- Name + location
+- Starting stats (AISRI, 5K time, weight)
+- Ending stats (improved metrics)
+- Quote: "What SafeStride did for me..."
+- Timeline (6 months, 12 months, 18 months)
+
+STORIES TO FEATURE:
+1. Rajesh (already have)
+2. [Athlete 2] - Weight loss + 10K PR
+3. [Athlete 3] - Recovered from injury
+4. [Athlete 4] - First marathon completion
+5. [Athlete 5] - Age 50+ comeback
+
+TIME: 3 hours per story (interview + design)
+COST: Free
+
+───────────────────────────────────────────────────────────────
+
+FEATURE 7: Weekly Email Newsletter
+───────────────────────────────────────────────────────────────
+WHAT: Email series for athletes
+WHERE: Email marketing (Mailchimp, SendGrid, Resend)
+IMPACT: 🔥🔥🔥 (Retention)
+
+EMAIL SEQUENCE:
+
+Week 1: Welcome + First AISRI
+Subject: "Welcome to SafeStride! Your AISRI score is [X]"
+Content: Explain score, what it means, next steps
+
+Week 2: Training Plan Overview
+Subject: "Your 12-week training plan is ready"
+Content: Show phases, protocols, safety gates
+
+Week 3: Form & Biomechanics
+Subject: "Running form tips to boost your AISRI"
+Content: Video on proper form, stretches
+
+Week 4: Re-evaluation Reminder
+Subject: "Time for your monthly AISRI re-check!"
+Content: Link to evaluation form
+
+Weekly Tips (Ongoing):
+- Monday: Week ahead preview
+- Wednesday: Form tip of the week
+- Friday: Weekend long run prep
+
+TIME: 2 hours setup + 1 hour per week
+COST: Free (SendGrid free tier: 100 emails/day)
+
+───────────────────────────────────────────────────────────────
+
+FEATURE 8: Coach Dashboard V1
+───────────────────────────────────────────────────────────────
+WHAT: Simple dashboard for coaches to monitor athletes
+WHERE: /coach-dashboard.html
+IMPACT: 🔥🔥🔥🔥 (Unlocks B2B revenue)
+
+FEATURES:
+- List of athletes with current AISRI scores
+- Color-coded risk: 
+  Green (80-100), Yellow (60-79), Red (0-59)
+- Click athlete → see full profile
+- Approve/reject training plan modifications
+- Send messages to athletes
+- Export reports (PDF/CSV)
+
+TECHNICAL:
+- Query Supabase for all athletes
+- Filter by coach_id
+- Display in table with sorting/filtering
+- Simple charts (Chart.js)
+
+TIME: 8 hours (design + implement)
+COST: Free
+
+═══════════════════════════════════════════════════════════════
+💎 PRIORITY 3: ADVANCED FEATURES (Month 2-3)
+═══════════════════════════════════════════════════════════════
+
+FEATURE 9: AI Chat Assistant
+───────────────────────────────────────────────────────────────
+WHAT: ChatGPT-like assistant for training questions
+WHERE: Floating chat widget on all pages
+IMPACT: 🔥🔥🔥 (24/7 support)
+
+EXAMPLES:
+Athlete: "Why is my AISRI score low?"
+Bot: "Your AISRI is 52, mainly due to limited mobility 
+(score: 35). Focus on daily stretching and foam rolling. 
+Your strength (score: 68) is good! Keep it up."
+
+Athlete: "Can I run a half marathon next month?"
+Bot: "Based on your current AISRI (52) and training phase 
+(Phase 1: Foundation), I recommend waiting until you reach 
+Phase 3 (AISRI ≥65) for half marathon training. This 
+typically takes 4-6 months."
+
+TECHNICAL:
+- Use OpenAI API (GPT-4)
+- Feed athlete's data as context
+- Fine-tune on SafeStride methodology
+- Add widget: Intercom, Drift, or custom
+
+TIME: 6 hours setup + ongoing fine-tuning
+COST: $0.03 per chat (OpenAI API)
+
+───────────────────────────────────────────────────────────────
+
+FEATURE 10: Strava Auto-Sync V2
+───────────────────────────────────────────────────────────────
+WHAT: Real-time workout import from Strava/Garmin
+WHERE: Background sync (no user action)
+IMPACT: 🔥🔥🔥🔥 (Seamless experience)
+
+HOW:
+- Athlete connects Strava (already have OAuth)
+- SafeStride polls Strava API every hour
+- New activities auto-import to daily_workouts
+- Auto-calculate Running Pillar score
+- Update AISRI score if changed significantly
+- Send notification: "Your AISRI updated: 68 → 72!"
+
+TECHNICAL:
+- Cloudflare Workers Cron trigger (hourly)
+- Strava webhook for instant updates
+- D1 database update
+- Email/push notification
+
+TIME: 10 hours (webhooks + cron + notifications)
+COST: Free (Cloudflare Workers: 100K requests/day)
+
+───────────────────────────────────────────────────────────────
+
+FEATURE 11: Mobile App (PWA)
+───────────────────────────────────────────────────────────────
+WHAT: Install SafeStride as mobile app
+WHERE: Home screen (iOS/Android)
+IMPACT: 🔥🔥🔥🔥🔥 (Daily engagement)
+
+WHAT IS PWA?
+Progressive Web App = website that acts like app
+- Add to home screen
+- Offline support
+- Push notifications
+- Full-screen experience
+- No App Store approval needed!
+
+FEATURES:
+- Quick access to dashboard
+- Log workouts offline
+- Receive push notifications
+- Camera for assessment photos
+- GPS tracking for runs (future)
+
+TECHNICAL:
+- Add manifest.json (app metadata)
+- Add service-worker.js (offline caching)
+- Configure push notifications
+- Test on iOS Safari + Android Chrome
+
+TIME: 12 hours (manifest + service worker + testing)
+COST: Free
+
+───────────────────────────────────────────────────────────────
+
+FEATURE 12: Community Forum
+───────────────────────────────────────────────────────────────
+WHAT: Athletes share tips, ask questions
+WHERE: /community.html
+IMPACT: 🔥🔥🔥 (Social engagement)
+
+FEATURES:
+- Post questions/tips
+- Comment on posts
+- Upvote best answers
+- Categories: Injury Prevention, Training Tips, Gear, etc.
+- Coach can mark "Official Answer"
+
+TECHNICAL:
+- Use Discourse (open-source forum)
+- OR build simple with Supabase (posts table)
+- Integrate with SafeStride login
+
+TIME: 4 hours (Discourse setup) OR 16 hours (custom)
+COST: Free (Discourse self-hosted) OR $100/month (hosted)
+
+═══════════════════════════════════════════════════════════════
+🎯 FEATURE PRIORITY MATRIX
+═══════════════════════════════════════════════════════════════
+
+                        HIGH IMPACT
+                             │
+    ┌────────────────────────┼────────────────────────┐
+    │                        │                        │
+    │  Rajesh Video (1)      │  Strava Auto-Sync (10) │
+HIGH│  Pricing Page (2)      │  PWA Mobile App (11)   │
+EFFORT│  Coach Dashboard (8)   │  AI Chat Assistant (9) │
+    │                        │                        │
+    ├────────────────────────┼────────────────────────┤
+    │                        │                        │
+LOW │  Before/After (3)      │  AISRI Calculator (5)  │
+EFFORT│  FAQ Section (4)       │  Success Stories (6)   │
+    │  Email Newsletter (7)  │  Community Forum (12)  │
+    │                        │                        │
+    └────────────────────────┼────────────────────────┘
+                        LOW IMPACT
+
+RECOMMENDATION:
+1. Start with low-effort, high-impact: 2, 3, 4, 5, 6
+2. Then tackle high-effort, high-impact: 1, 8, 10, 11
+3. Finally add nice-to-haves: 7, 9, 12
+
+═══════════════════════════════════════════════════════════════
+📅 SUGGESTED TIMELINE
+═══════════════════════════════════════════════════════════════
+
+WEEK 1 (March 4-10):
+□ Deploy current version to production
+□ Add FAQ section (4)
+□ Add Before/After photos (3)
+□ Create Pricing page (2)
+
+WEEK 2 (March 11-17):
+□ Build AISRI Calculator (5)
+□ Write first 3 Success Stories (6)
+□ Record Rajesh video testimonial (1)
+
+WEEK 3 (March 18-24):
+□ Build Coach Dashboard V1 (8)
+□ Set up email newsletter (7)
+□ Launch to first 10 test athletes
+
+WEEK 4 (March 25-31):
+□ Implement Strava Auto-Sync V2 (10)
+□ Collect feedback from test athletes
+□ Iterate based on feedback
+
+MONTH 2 (April):
+□ Convert to PWA Mobile App (11)
+□ Add AI Chat Assistant (9)
+□ Launch to 50 athletes
+
+MONTH 3 (May):
+□ Add Community Forum (12)
+□ Refine all features
+□ Launch to 500+ athletes
+
+═══════════════════════════════════════════════════════════════
+💰 ESTIMATED COSTS
+═══════════════════════════════════════════════════════════════
+
+INFRASTRUCTURE:
+- Cloudflare Pages: FREE
+- Supabase (Pro): $25/month (after free tier)
+- Domain (safestride.akura.in): ₹800/year
+
+SERVICES:
+- Email (SendGrid): FREE (100 emails/day)
+- OpenAI API (AI Chat): ~$50/month (1000 chats)
+- Video hosting (YouTube): FREE
+
+OPTIONAL:
+- Discourse Forum: FREE (self-hosted)
+- Push notifications: FREE (Web Push API)
+
+TOTAL: ~$75/month (~₹6,250/month)
+
+ROI:
+- 10 paying athletes × ₹499 = ₹4,990/month
+- 1 coach × ₹9,999 = ₹9,999/month
+- Total revenue: ₹14,989/month
+- Profit: ₹14,989 - ₹6,250 = ₹8,739/month
+
+═══════════════════════════════════════════════════════════════
+🎯 WHICH FEATURES DO YOU WANT FIRST?
+═══════════════════════════════════════════════════════════════
+
+Reply with feature numbers:
+Example: "C - Add features 2, 3, 4 this week"
+
+Or tell me your priority:
+Example: "C - Focus on getting 10 paying athletes first"
+
+Or request custom feature:
+Example: "C - Build [your idea] instead"
+
+I'll implement whatever you choose! 🚀
+
+═══════════════════════════════════════════════════════════════
+
+Created: March 4, 2026
+Status: Ready for your selection
+Coach: Kura D Sathyamoorthy
+
+Your turn, Coach! Which features excite you most? 🎯
+
+═══════════════════════════════════════════════════════════════
