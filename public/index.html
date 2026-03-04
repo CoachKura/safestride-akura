@@ -3,203 +3,1129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SafeStride AISRI System</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <title>SafeStride by AKURA - The Science of Injury-Free Performance</title>
+    
+    <!-- Modern Design System -->
+    <link rel="stylesheet" href="safestride-design-system.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js for AISRI visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #1F2937;
+            overflow-x: hidden;
+        }
+        
+        /* Glassmorphism Utility */
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+        }
+        
+        /* Hero Section - Revolutionary */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%);
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(147, 51, 234, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 50%);
+            animation: pulse 15s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.5rem 1.5rem;
+            background: rgba(147, 51, 234, 0.2);
+            border: 1px solid rgba(147, 51, 234, 0.3);
+            border-radius: 50px;
+            color: #E9D5FF;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+        
+        .hero-title {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 900;
+            color: white;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+        
+        .hero-title .gradient-text {
+            background: linear-gradient(135deg, #9333EA 0%, #3B82F6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-subtitle {
+            font-size: clamp(1.125rem, 3vw, 1.5rem);
+            color: #CBD5E1;
+            margin-bottom: 3rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+        }
+        
+        .hero-cta {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 4rem;
+        }
+        
+        .btn {
+            padding: 1rem 2rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            border-radius: 12px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #9333EA 0%, #7C3AED 100%);
+            color: white;
+            box-shadow: 0 10px 30px rgba(147, 51, 234, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(147, 51, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        /* Proof Section - Rajesh's Story */
+        .proof-section {
+            padding: 6rem 2rem;
+            background: linear-gradient(to bottom, #0F172A, #1E293B);
+            position: relative;
+        }
+        
+        .proof-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .section-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.5rem 1.5rem;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 50px;
+            color: #34D399;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .section-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            color: white;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+        
+        .section-subtitle {
+            font-size: 1.25rem;
+            color: #94A3B8;
+            margin-bottom: 3rem;
+        }
+        
+        .transformation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .metric-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(147, 51, 234, 0.5);
+            box-shadow: 0 20px 40px rgba(147, 51, 234, 0.2);
+        }
+        
+        .metric-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .metric-before {
+            font-size: 1.5rem;
+            color: #EF4444;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-arrow {
+            font-size: 2rem;
+            color: #10B981;
+            margin: 0.5rem 0;
+        }
+        
+        .metric-after {
+            font-size: 2rem;
+            color: #10B981;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-label {
+            font-size: 1rem;
+            color: #94A3B8;
+            font-weight: 500;
+        }
+        
+        .metric-improvement {
+            font-size: 0.875rem;
+            color: #10B981;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+        
+        /* AISRI System Section */
+        .aisri-section {
+            padding: 6rem 2rem;
+            background: linear-gradient(to bottom, #1E293B, #0F172A);
+        }
+        
+        .aisri-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .aisri-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            margin-top: 3rem;
+        }
+        
+        .radar-container {
+            position: relative;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .pillars-list {
+            display: grid;
+            gap: 1.5rem;
+        }
+        
+        .pillar-item {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .pillar-item:hover {
+            border-color: rgba(147, 51, 234, 0.5);
+            transform: translateX(8px);
+        }
+        
+        .pillar-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            flex-shrink: 0;
+        }
+        
+        .pillar-content {
+            flex: 1;
+        }
+        
+        .pillar-name {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 0.25rem;
+        }
+        
+        .pillar-desc {
+            font-size: 0.875rem;
+            color: #94A3B8;
+        }
+        
+        /* Training Phases */
+        .phases-section {
+            padding: 6rem 2rem;
+            background: linear-gradient(to bottom, #0F172A, #1E293B);
+        }
+        
+        .phases-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .phases-timeline {
+            position: relative;
+            margin-top: 4rem;
+        }
+        
+        .phase-item {
+            display: grid;
+            grid-template-columns: 1fr 80px 1fr;
+            gap: 2rem;
+            margin-bottom: 4rem;
+            align-items: center;
+        }
+        
+        .phase-item:nth-child(even) .phase-content:first-child {
+            order: 3;
+        }
+        
+        .phase-item:nth-child(even) .phase-marker {
+            order: 2;
+        }
+        
+        .phase-item:nth-child(even) .phase-empty {
+            order: 1;
+        }
+        
+        .phase-content {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .phase-content:hover {
+            border-color: rgba(147, 51, 234, 0.5);
+            transform: scale(1.02);
+        }
+        
+        .phase-marker {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #9333EA, #3B82F6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: white;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 10px 30px rgba(147, 51, 234, 0.4);
+        }
+        
+        .phase-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+        
+        .phase-km {
+            font-size: 1rem;
+            color: #9333EA;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .phase-desc {
+            font-size: 1rem;
+            color: #94A3B8;
+            line-height: 1.6;
+        }
+        
+        .phase-empty {
+            display: none;
+        }
+        
+        /* Protocols Section */
+        .protocols-section {
+            padding: 6rem 2rem;
+            background: linear-gradient(to bottom, #1E293B, #0F172A);
+        }
+        
+        .protocols-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .protocols-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .protocol-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .protocol-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(147, 51, 234, 0.5);
+            box-shadow: 0 20px 40px rgba(147, 51, 234, 0.2);
+        }
+        
+        .protocol-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            background: linear-gradient(135deg, #9333EA, #7C3AED);
+        }
+        
+        .protocol-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 1rem;
+        }
+        
+        .protocol-desc {
+            font-size: 1rem;
+            color: #94A3B8;
+            line-height: 1.6;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            padding: 6rem 2rem;
+            background: linear-gradient(135deg, #9333EA 0%, #3B82F6 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="2" fill="white" opacity="0.1"/></svg>');
+            animation: float 20s linear infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-100px); }
+        }
+        
+        .cta-container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .cta-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            color: white;
+            margin-bottom: 1rem;
+        }
+        
+        .cta-subtitle {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 3rem;
+        }
+        
+        /* Footer */
+        .footer {
+            background: #0F172A;
+            color: #94A3B8;
+            padding: 3rem 2rem 1.5rem;
+        }
+        
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .footer-section h4 {
+            color: white;
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .footer-links a {
+            color: #94A3B8;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1.5rem;
+            text-align: center;
+        }
+        
+        @media (max-width: 768px) {
+            .aisri-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .phase-item {
+                grid-template-columns: 1fr;
+            }
+            
+            .phase-marker {
+                margin: 0 auto;
+            }
+            
+            .phase-item:nth-child(even) .phase-content:first-child {
+                order: 1;
+            }
+            
+            .phase-item:nth-child(even) .phase-marker {
+                order: 2;
+            }
+        }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-700 min-h-screen flex items-center justify-center p-6">
-    <div class="max-w-6xl w-full">
-        <!-- Header -->
-        <div class="text-center mb-12">
-            <i class="fas fa-heartbeat text-white text-6xl mb-4"></i>
-            <h1 class="text-5xl font-bold text-white mb-3">SafeStride AISRI System</h1>
-            <p class="text-xl text-blue-100">Akura Injury & Safety Risk Index - Complete Performance Management</p>
-            <div class="mt-4">
-                <span class="px-4 py-2 bg-green-500 text-white rounded-full font-semibold">
-                    <i class="fas fa-check-circle mr-2"></i>
-                    All Systems Operational
-                </span>
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-award"></i>
+                Proven with 18 Months of Real Data
+            </div>
+            
+            <h1 class="hero-title">
+                Train Like a Pro.<br>
+                <span class="gradient-text">Injury-Free.</span>
+            </h1>
+            
+            <p class="hero-subtitle">
+                The world's first AI-powered training system that combines 6-pillar biomechanics, personalized coaching, and real-time injury prevention. From 52-minute 5K to sub-20 minutes. Zero injuries.
+            </p>
+            
+            <div class="hero-cta">
+                <a href="onboarding.html" class="btn btn-primary">
+                    <i class="fas fa-rocket"></i>
+                    Start Your Journey
+                </a>
+                <a href="#proof" class="btn btn-secondary">
+                    <i class="fas fa-chart-line"></i>
+                    See Real Results
+                </a>
             </div>
         </div>
+    </section>
 
-        <!-- Main Navigation Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <!-- Dashboard -->
-            <a href="/aisri-dashboard.html" class="bg-white rounded-lg shadow-2xl p-6 hover:scale-105 transition transform">
-                <div class="text-center">
-                    <i class="fas fa-tachometer-alt text-5xl text-blue-600 mb-4"></i>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Dashboard</h3>
-                    <p class="text-sm text-gray-600 mb-4">View all athletes with AISRI scores, risk levels, and training zones</p>
-                    <span class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold">
-                        View Athletes
-                    </span>
+    <!-- Proof Section - Rajesh's Transformation -->
+    <section id="proof" class="proof-section">
+        <div class="proof-container">
+            <span class="section-badge">
+                <i class="fas fa-check-circle"></i>
+                Real Athlete, Real Results
+            </span>
+            
+            <h2 class="section-title">
+                From Injured to Elite in 18 Months
+            </h2>
+            
+            <p class="section-subtitle">
+                Meet Rajesh: Reversed diabetes, lost 15kg, improved 5K by 63%, and achieved AISRI score of 82 — all without a single injury.
+            </p>
+            
+            <div class="transformation-grid">
+                <div class="metric-card">
+                    <div class="metric-icon">⏱️</div>
+                    <div class="metric-before">52:00</div>
+                    <div class="metric-arrow">↓</div>
+                    <div class="metric-after">19:45</div>
+                    <div class="metric-label">5K Personal Best</div>
+                    <div class="metric-improvement">63% faster</div>
                 </div>
-            </a>
-
-            <!-- Calculator -->
-            <a href="/calculator.html" class="bg-white rounded-lg shadow-2xl p-6 hover:scale-105 transition transform">
-                <div class="text-center">
-                    <i class="fas fa-calculator text-5xl text-green-600 mb-4"></i>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Calculator</h3>
-                    <p class="text-sm text-gray-600 mb-4">Calculate AISRI score with interactive sliders and real-time feedback</p>
-                    <span class="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-semibold">
-                        Calculate AISRI
-                    </span>
+                
+                <div class="metric-card">
+                    <div class="metric-icon">🎯</div>
+                    <div class="metric-before">42</div>
+                    <div class="metric-arrow">↑</div>
+                    <div class="metric-after">82</div>
+                    <div class="metric-label">AISRI Score</div>
+                    <div class="metric-improvement">95% improvement</div>
                 </div>
-            </a>
-
-            <!-- Assessment -->
-            <a href="/assessment.html" class="bg-white rounded-lg shadow-2xl p-6 hover:scale-105 transition transform">
-                <div class="text-center">
-                    <i class="fas fa-clipboard-check text-5xl text-purple-600 mb-4"></i>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Assessment</h3>
-                    <p class="text-sm text-gray-600 mb-4">Complete comprehensive AISRI intake form with 5 pillar evaluation</p>
-                    <span class="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-semibold">
-                        Start Assessment
-                    </span>
+                
+                <div class="metric-card">
+                    <div class="metric-icon">⚖️</div>
+                    <div class="metric-before">83kg</div>
+                    <div class="metric-arrow">↓</div>
+                    <div class="metric-after">68kg</div>
+                    <div class="metric-label">Body Weight</div>
+                    <div class="metric-improvement">18% reduction</div>
                 </div>
-            </a>
-
-            <!-- Deployment -->
-            <a href="/deploy-aisri.html" class="bg-white rounded-lg shadow-2xl p-6 hover:scale-105 transition transform">
-                <div class="text-center">
-                    <i class="fas fa-database text-5xl text-red-600 mb-4"></i>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Deployment</h3>
-                    <p class="text-sm text-gray-600 mb-4">Database setup guide with SQL download and verification queries</p>
-                    <span class="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-semibold">
-                        View Guide
-                    </span>
-                </div>
-            </a>
-        </div>
-
-        <!-- System Stats -->
-        <div class="bg-white/10 backdrop-blur-md rounded-lg shadow-2xl p-8 mb-8">
-            <h2 class="text-2xl font-bold text-white mb-6 text-center">System Overview</h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                <div class="text-center">
-                    <div class="text-4xl font-bold text-white mb-2">10</div>
-                    <div class="text-blue-100 text-sm">Athletes</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-4xl font-bold text-white mb-2">6</div>
-                    <div class="text-blue-100 text-sm">Training Zones</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-4xl font-bold text-white mb-2">5</div>
-                    <div class="text-blue-100 text-sm">AISRI Pillars</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-4xl font-bold text-white mb-2">4</div>
-                    <div class="text-blue-100 text-sm">Risk Categories</div>
+                
+                <div class="metric-card">
+                    <div class="metric-icon">💪</div>
+                    <div class="metric-before">Diabetes</div>
+                    <div class="metric-arrow">✓</div>
+                    <div class="metric-after">Reversed</div>
+                    <div class="metric-label">Health Status</div>
+                    <div class="metric-improvement">+ Hypertension controlled</div>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- Features Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <!-- Training Zones -->
-            <div class="bg-white/10 backdrop-blur-md rounded-lg shadow-xl p-6">
-                <h3 class="text-xl font-bold text-white mb-4">
-                    <i class="fas fa-running mr-2"></i>
-                    Training Zones
-                </h3>
-                <div class="space-y-2 text-sm">
-                    <div class="flex items-center justify-between bg-white/20 rounded px-3 py-2">
-                        <span class="text-white font-semibold">AR</span>
-                        <span class="text-blue-100">Active Recovery (50-60%)</span>
-                    </div>
-                    <div class="flex items-center justify-between bg-white/20 rounded px-3 py-2">
-                        <span class="text-white font-semibold">F</span>
-                        <span class="text-blue-100">Foundation (60-70%)</span>
-                    </div>
-                    <div class="flex items-center justify-between bg-white/20 rounded px-3 py-2">
-                        <span class="text-white font-semibold">EN</span>
-                        <span class="text-blue-100">Endurance (70-80%)</span>
-                    </div>
-                    <div class="flex items-center justify-between bg-white/20 rounded px-3 py-2">
-                        <span class="text-white font-semibold">TH</span>
-                        <span class="text-blue-100">Threshold (80-87%)</span>
-                    </div>
-                    <div class="flex items-center justify-between bg-white/20 rounded px-3 py-2">
-                        <span class="text-white font-semibold">P</span>
-                        <span class="text-blue-100">Power (87-95%) 🔒</span>
-                    </div>
-                    <div class="flex items-center justify-between bg-white/20 rounded px-3 py-2">
-                        <span class="text-white font-semibold">SP</span>
-                        <span class="text-blue-100">Speed (95-100%) 🔒</span>
-                    </div>
+    <!-- AISRI System Section -->
+    <section class="aisri-section">
+        <div class="aisri-container">
+            <span class="section-badge">
+                <i class="fas fa-brain"></i>
+                The AISRI Algorithm
+            </span>
+            
+            <h2 class="section-title">
+                6 Pillars of Injury-Free Performance
+            </h2>
+            
+            <p class="section-subtitle">
+                Our proprietary AI analyzes your biomechanics across six critical dimensions to predict and prevent injuries before they happen.
+            </p>
+            
+            <div class="aisri-grid">
+                <div class="radar-container">
+                    <canvas id="aisriRadar"></canvas>
                 </div>
-            </div>
-
-            <!-- AISRI Formula -->
-            <div class="bg-white/10 backdrop-blur-md rounded-lg shadow-xl p-6">
-                <h3 class="text-xl font-bold text-white mb-4">
-                    <i class="fas fa-chart-line mr-2"></i>
-                    AISRI Formula
-                </h3>
-                <div class="space-y-3 text-sm">
-                    <div class="bg-white/20 rounded px-3 py-2">
-                        <div class="flex justify-between text-white">
-                            <span><i class="fas fa-running mr-2 text-blue-300"></i>Running Performance</span>
-                            <span class="font-bold">40%</span>
+                
+                <div class="pillars-list">
+                    <div class="pillar-item">
+                        <div class="pillar-icon" style="background: linear-gradient(135deg, #EF4444, #DC2626);">
+                            <i class="fas fa-arrows-alt-h"></i>
+                        </div>
+                        <div class="pillar-content">
+                            <div class="pillar-name">Mobility & Flexibility</div>
+                            <div class="pillar-desc">Joint range of motion and muscle flexibility tests</div>
                         </div>
                     </div>
-                    <div class="bg-white/20 rounded px-3 py-2">
-                        <div class="flex justify-between text-white">
-                            <span><i class="fas fa-dumbbell mr-2 text-red-300"></i>Strength</span>
-                            <span class="font-bold">20%</span>
+                    
+                    <div class="pillar-item">
+                        <div class="pillar-icon" style="background: linear-gradient(135deg, #F59E0B, #D97706);">
+                            <i class="fas fa-dumbbell"></i>
+                        </div>
+                        <div class="pillar-content">
+                            <div class="pillar-name">Core Strength & Stability</div>
+                            <div class="pillar-desc">Strength tests and balance assessments</div>
                         </div>
                     </div>
-                    <div class="bg-white/20 rounded px-3 py-2">
-                        <div class="flex justify-between text-white">
-                            <span><i class="fas fa-arrows-alt mr-2 text-green-300"></i>Range of Motion</span>
-                            <span class="font-bold">15%</span>
+                    
+                    <div class="pillar-item">
+                        <div class="pillar-icon" style="background: linear-gradient(135deg, #10B981, #059669);">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div class="pillar-content">
+                            <div class="pillar-name">Mental Resilience</div>
+                            <div class="pillar-desc">Focus, stress management, and recovery mindset</div>
                         </div>
                     </div>
-                    <div class="bg-white/20 rounded px-3 py-2">
-                        <div class="flex justify-between text-white">
-                            <span><i class="fas fa-balance-scale mr-2 text-yellow-300"></i>Balance</span>
-                            <span class="font-bold">15%</span>
+                    
+                    <div class="pillar-item">
+                        <div class="pillar-icon" style="background: linear-gradient(135deg, #3B82F6, #2563EB);">
+                            <i class="fas fa-spa"></i>
+                        </div>
+                        <div class="pillar-content">
+                            <div class="pillar-name">Recovery & Regeneration</div>
+                            <div class="pillar-desc">Sleep quality, nutrition, and rest protocols</div>
                         </div>
                     </div>
-                    <div class="bg-white/20 rounded px-3 py-2">
-                        <div class="flex justify-between text-white">
-                            <span><i class="fas fa-child mr-2 text-purple-300"></i>Mobility</span>
-                            <span class="font-bold">10%</span>
+                    
+                    <div class="pillar-item">
+                        <div class="pillar-icon" style="background: linear-gradient(135deg, #8B5CF6, #7C3AED);">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="pillar-content">
+                            <div class="pillar-name">Injury Prevention</div>
+                            <div class="pillar-desc">Biomechanics, form analysis, and safety gates</div>
                         </div>
                     </div>
-                    <div class="border-t border-white/30 pt-3 mt-3">
-                        <div class="text-white text-center font-mono text-xs">
-                            AISRI = (R × 0.40) + (S × 0.20) + (ROM × 0.15) + (B × 0.15) + (M × 0.10)
+                    
+                    <div class="pillar-item">
+                        <div class="pillar-icon" style="background: linear-gradient(135deg, #EC4899, #DB2777);">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <div class="pillar-content">
+                            <div class="pillar-name">Performance Optimization</div>
+                            <div class="pillar-desc">VO2 max, lactate threshold, zone training</div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- Footer Info -->
-        <div class="bg-white/10 backdrop-blur-md rounded-lg shadow-xl p-6 text-center">
-            <h3 class="text-xl font-bold text-white mb-3">System Status</h3>
-            <div class="flex items-center justify-center space-x-8 text-white">
-                <div>
-                    <i class="fas fa-check-circle text-green-400 mr-2"></i>
-                    <span>Database Connected</span>
+    <!-- Training Phases Section -->
+    <section class="phases-section">
+        <div class="phases-container">
+            <span class="section-badge">
+                <i class="fas fa-map-marked-alt"></i>
+                The AKURA Training System
+            </span>
+            
+            <h2 class="section-title">
+                Your 0-5000km Journey
+            </h2>
+            
+            <p class="section-subtitle">
+                Six progressive training phases that unlock as your AISRI score improves. Each phase builds strength, endurance, and resilience — safely.
+            </p>
+            
+            <div class="phases-timeline">
+                <div class="phase-item">
+                    <div class="phase-content">
+                        <h3 class="phase-title">Phase 1: Foundation</h3>
+                        <div class="phase-km">0 - 500 km</div>
+                        <p class="phase-desc">
+                            Build base fitness and master proper running form. Focus on Zone 1-2 training with safety gates protecting you from overtraining.
+                        </p>
+                    </div>
+                    <div class="phase-marker">1</div>
+                    <div class="phase-empty"></div>
                 </div>
-                <div>
-                    <i class="fas fa-check-circle text-green-400 mr-2"></i>
-                    <span>All Tools Operational</span>
+                
+                <div class="phase-item">
+                    <div class="phase-empty"></div>
+                    <div class="phase-marker">2</div>
+                    <div class="phase-content">
+                        <h3 class="phase-title">Phase 2: Development</h3>
+                        <div class="phase-km">500 - 1000 km</div>
+                        <p class="phase-desc">
+                            Increase weekly mileage and introduce tempo runs. AISRI ≥60 unlocks Zone 3 training for lactate threshold work.
+                        </p>
+                    </div>
                 </div>
-                <div>
-                    <i class="fas fa-check-circle text-green-400 mr-2"></i>
-                    <span>10 Athletes Loaded</span>
+                
+                <div class="phase-item">
+                    <div class="phase-content">
+                        <h3 class="phase-title">Phase 3: Strengthening</h3>
+                        <div class="phase-km">1000 - 2000 km</div>
+                        <p class="phase-desc">
+                            Add structured strength training and hill repeats. Build muscular endurance and power for injury-free performance.
+                        </p>
+                    </div>
+                    <div class="phase-marker">3</div>
+                    <div class="phase-empty"></div>
                 </div>
-            </div>
-            <div class="mt-4 text-blue-100 text-sm">
-                <p>SafeStride AISRI System v1.0 | Powered by Supabase</p>
-                <p class="mt-1">Project: bdisppaxbvygsspcuymb | All phases deployed successfully</p>
+                
+                <div class="phase-item">
+                    <div class="phase-empty"></div>
+                    <div class="phase-marker">4</div>
+                    <div class="phase-content">
+                        <h3 class="phase-title">Phase 4: Performance</h3>
+                        <div class="phase-km">2000 - 3000 km</div>
+                        <p class="phase-desc">
+                            AISRI ≥70 unlocks Zone 4 intervals. Race-specific training for 5K, 10K, and half marathon distances.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="phase-item">
+                    <div class="phase-content">
+                        <h3 class="phase-title">Phase 5: Optimization</h3>
+                        <div class="phase-km">3000 - 4000 km</div>
+                        <p class="phase-desc">
+                            Peak performance training with VO2 max workouts. AISRI ≥80 unlocks Zone 5 for maximum speed development.
+                        </p>
+                    </div>
+                    <div class="phase-marker">5</div>
+                    <div class="phase-empty"></div>
+                </div>
+                
+                <div class="phase-item">
+                    <div class="phase-empty"></div>
+                    <div class="phase-marker">6</div>
+                    <div class="phase-content">
+                        <h3 class="phase-title">Phase 6: Mastery</h3>
+                        <div class="phase-km">4000 - 5000 km</div>
+                        <p class="phase-desc">
+                            Elite-level training with periodization and tapering strategies. Maintain AISRI ≥85 for injury-free longevity.
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+    </section>
+
+    <!-- 7 Core Protocols Section -->
+    <section class="protocols-section">
+        <div class="protocols-container">
+            <span class="section-badge">
+                <i class="fas fa-clipboard-list"></i>
+                The 7 Core Protocols
+            </span>
+            
+            <h2 class="section-title">
+                Every Week, Perfectly Balanced
+            </h2>
+            
+            <p class="section-subtitle">
+                Seven evidence-based training protocols that rotate throughout your week — optimizing every energy system while preventing overtraining.
+            </p>
+            
+            <div class="protocols-grid">
+                <div class="protocol-card">
+                    <div class="protocol-icon">
+                        <i class="fas fa-play-circle"></i>
+                    </div>
+                    <h3 class="protocol-name">START</h3>
+                    <p class="protocol-desc">
+                        Easy recovery runs at conversational pace. Build aerobic base and active recovery between hard sessions.
+                    </p>
+                </div>
+                
+                <div class="protocol-card">
+                    <div class="protocol-icon">
+                        <i class="fas fa-tachometer-alt"></i>
+                    </div>
+                    <h3 class="protocol-name">ENGINE</h3>
+                    <p class="protocol-desc">
+                        Steady-state aerobic runs at moderate intensity. Improve endurance and fat-burning efficiency.
+                    </p>
+                </div>
+                
+                <div class="protocol-card">
+                    <div class="protocol-icon">
+                        <i class="fas fa-wind"></i>
+                    </div>
+                    <h3 class="protocol-name">OXYGEN</h3>
+                    <p class="protocol-desc">
+                        VO2 max intervals at 95-100% effort. Increase maximum oxygen uptake and cardiovascular capacity.
+                    </p>
+                </div>
+                
+                <div class="protocol-card">
+                    <div class="protocol-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3 class="protocol-name">POWER</h3>
+                    <p class="protocol-desc">
+                        Short explosive intervals and hill sprints. Develop speed, power, and neuromuscular coordination.
+                    </p>
+                </div>
+                
+                <div class="protocol-card">
+                    <div class="protocol-icon">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <h3 class="protocol-name">ZONES</h3>
+                    <p class="protocol-desc">
+                        Progressive zone training based on your AISRI score. Unlock faster paces as you improve.
+                    </p>
+                </div>
+                
+                <div class="protocol-card">
+                    <div class="protocol-icon">
+                        <i class="fas fa-dumbbell"></i>
+                    </div>
+                    <h3 class="protocol-name">STRENGTH</h3>
+                    <p class="protocol-desc">
+                        Running-specific strength training. Build resilience in muscles, tendons, and joints.
+                    </p>
+                </div>
+                
+                <div class="protocol-card">
+                    <div class="protocol-icon">
+                        <i class="fas fa-route"></i>
+                    </div>
+                    <h3 class="protocol-name">LONG RUN</h3>
+                    <p class="protocol-desc">
+                        Weekly long run at easy pace. Build endurance and mental toughness for race day.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="cta-container">
+            <h2 class="cta-title">
+                Ready to Transform Your Running?
+            </h2>
+            <p class="cta-subtitle">
+                Join Rajesh and hundreds of athletes training smarter, faster, and injury-free with SafeStride.
+            </p>
+            <div class="hero-cta">
+                <a href="signup.html" class="btn btn-primary" style="background: white; color: #9333EA; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                    <i class="fas fa-user-plus"></i>
+                    Create Free Account
+                </a>
+                <a href="athlete-dashboard.html" class="btn btn-secondary">
+                    <i class="fas fa-tachometer-alt"></i>
+                    View Dashboard Demo
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4><i class="fas fa-running"></i> SafeStride by AKURA</h4>
+                    <p style="line-height: 1.6; margin-top: 0.5rem;">
+                        The science of injury-free performance. Train like the pros with AI-powered coaching.
+                    </p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul class="footer-links">
+                        <li><a href="#proof">Success Stories</a></li>
+                        <li><a href="athlete-dashboard.html">Dashboard</a></li>
+                        <li><a href="training-calendar.html">Training Plans</a></li>
+                        <li><a href="athlete-evaluation.html">AISRI Assessment</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Company</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">About AKURA</a></li>
+                        <li><a href="mailto:contact@akura.in">Contact Us</a></li>
+                        <li><a href="#">For Coaches</a></li>
+                        <li><a href="#">Research</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Data Security</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2026 SafeStride by AKURA. Creating millions of injury-free athletes.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // AISRI Radar Chart
+        const ctx = document.getElementById('aisriRadar').getContext('2d');
+        
+        const radarData = {
+            labels: [
+                'Mobility &\nFlexibility',
+                'Core Strength &\nStability',
+                'Mental\nResilience',
+                'Recovery &\nRegeneration',
+                'Injury\nPrevention',
+                'Performance\nOptimization'
+            ],
+            datasets: [
+                {
+                    label: 'Rajesh (Before)',
+                    data: [40, 35, 50, 38, 42, 45],
+                    borderColor: 'rgba(239, 68, 68, 0.8)',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    borderWidth: 2,
+                    pointBackgroundColor: 'rgba(239, 68, 68, 1)',
+                    pointBorderColor: '#fff',
+                    pointRadius: 4
+                },
+                {
+                    label: 'Rajesh (After)',
+                    data: [85, 88, 80, 82, 90, 85],
+                    borderColor: 'rgba(16, 185, 129, 0.8)',
+                    backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                    borderWidth: 3,
+                    pointBackgroundColor: 'rgba(16, 185, 129, 1)',
+                    pointBorderColor: '#fff',
+                    pointRadius: 5
+                }
+            ]
+        };
+        
+        const radarConfig = {
+            type: 'radar',
+            data: radarData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    r: {
+                        min: 0,
+                        max: 100,
+                        ticks: {
+                            stepSize: 20,
+                            color: '#94A3B8',
+                            backdropColor: 'transparent',
+                            font: {
+                                size: 12
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(148, 163, 184, 0.2)'
+                        },
+                        pointLabels: {
+                            color: '#E2E8F0',
+                            font: {
+                                size: 13,
+                                weight: '600'
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#E2E8F0',
+                            padding: 20,
+                            font: {
+                                size: 14,
+                                weight: '600'
+                            },
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        titleColor: '#E2E8F0',
+                        bodyColor: '#CBD5E1',
+                        borderColor: 'rgba(147, 51, 234, 0.5)',
+                        borderWidth: 1,
+                        padding: 12,
+                        displayColors: true,
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.parsed.r + '/100';
+                            }
+                        }
+                    }
+                }
+            }
+        };
+        
+        new Chart(ctx, radarConfig);
+    </script>
 </body>
 </html>
