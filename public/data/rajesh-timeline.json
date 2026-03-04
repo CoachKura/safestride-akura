@@ -1,0 +1,93 @@
+[
+  {
+    "month": 0,
+    "date": "September 2024",
+    "aisri": 42,
+    "time_5k": "52:00",
+    "weight": 83,
+    "health": "Type 2 Diabetes, Hypertension",
+    "milestone": "Started SafeStride Journey",
+    "zones_unlocked": [1, 2],
+    "phase": 1,
+    "total_km": 0,
+    "notes": "Completed initial AISRI assessment. High injury risk. Limited to Zone 1-2 training only."
+  },
+  {
+    "month": 3,
+    "date": "December 2024",
+    "aisri": 52,
+    "time_5k": "45:00",
+    "weight": 80,
+    "health": "Glucose levels improving",
+    "milestone": "Completed Phase 1: Foundation",
+    "zones_unlocked": [1, 2],
+    "phase": 2,
+    "total_km": 520,
+    "notes": "AISRI improved by 10 points! Consistent Zone 2 training building aerobic base. Lost 3kg."
+  },
+  {
+    "month": 6,
+    "date": "March 2025",
+    "aisri": 62,
+    "time_5k": "36:00",
+    "weight": 76,
+    "health": "Glucose normalized, BP improving",
+    "milestone": "Zone 3 Unlocked! 🎉",
+    "zones_unlocked": [1, 2, 3],
+    "phase": 2,
+    "total_km": 980,
+    "notes": "Crossed AISRI 60 threshold. Coach approved Zone 3. Started tempo runs. Diabetes under control!"
+  },
+  {
+    "month": 9,
+    "date": "June 2025",
+    "aisri": 71,
+    "time_5k": "28:30",
+    "weight": 72,
+    "health": "Diabetes reversed, BP normal",
+    "milestone": "Phase 3: Strengthening Complete",
+    "zones_unlocked": [1, 2, 3],
+    "phase": 3,
+    "total_km": 1720,
+    "notes": "Added strength training. Lost 11kg total. Health markers all normal range. 5K time dropped 23 minutes!"
+  },
+  {
+    "month": 12,
+    "date": "September 2025",
+    "aisri": 76,
+    "time_5k": "24:15",
+    "weight": 70,
+    "health": "Optimal health - all markers normal",
+    "milestone": "Zone 4 Unlocked! ⚡",
+    "zones_unlocked": [1, 2, 3, 4],
+    "phase": 4,
+    "total_km": 2420,
+    "notes": "Crossed AISRI 70. Started VO2 max intervals. Running sub-25 minute 5K! 13kg weight loss."
+  },
+  {
+    "month": 15,
+    "date": "December 2025",
+    "aisri": 80,
+    "time_5k": "21:30",
+    "weight": 69,
+    "health": "Elite fitness level",
+    "milestone": "Phase 5: Optimization Started",
+    "zones_unlocked": [1, 2, 3, 4],
+    "phase": 5,
+    "total_km": 3280,
+    "notes": "AISRI 80 = OPTIMAL category! Peak performance training. Sub-22 minute 5K achieved."
+  },
+  {
+    "month": 18,
+    "date": "March 2026",
+    "aisri": 82,
+    "time_5k": "19:45",
+    "weight": 68,
+    "health": "Elite athlete status",
+    "milestone": "All Zones Unlocked! 🏆",
+    "zones_unlocked": [1, 2, 3, 4, 5],
+    "phase": 5,
+    "total_km": 4150,
+    "notes": "Sub-20 minute 5K! 15kg weight loss. Zero injuries in 18 months. Diabetes reversed. Hypertension controlled. Living proof of SafeStride!"
+  }
+]
