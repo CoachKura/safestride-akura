@@ -1,0 +1,240 @@
+╔═══════════════════════════════════════════════════════════════════════╗
+║           🚀 VS CODE QUICK START - SafeStride (5 Minutes)            ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+STEP 1: EXTRACT THE DOWNLOADED FILE
+═══════════════════════════════════════════════════════════════════════
+
+📦 You downloaded: safestride-config-fix-2026-03-04.tar.gz
+
+Windows:
+   1. Right-click the file
+   2. Select "Extract All" or use 7-Zip/WinRAR
+   3. Extract to: C:\safestride\webapp
+      (or any location you prefer)
+
+Result: You should have a folder with:
+   webapp/
+   ├── public/
+   │   ├── onboarding.html
+   │   ├── athlete-dashboard.html
+   │   ├── training-calendar.html
+   │   └── ... (more files)
+   ├── migrations/
+   └── README.md
+
+
+STEP 2: OPEN IN VS CODE
+═══════════════════════════════════════════════════════════════════════
+
+Method 1 (Easiest):
+   1. Open VS Code
+   2. Drag the "webapp" folder into VS Code window
+   3. Done! ✅
+
+Method 2:
+   1. Open VS Code
+   2. File → Open Folder
+   3. Select the "webapp" folder
+   4. Click "Select Folder"
+
+
+STEP 3: INSTALL LIVE SERVER
+═══════════════════════════════════════════════════════════════════════
+
+📦 This is a VS Code extension that runs a local web server
+
+   1. Click Extensions icon (left sidebar)
+      Or press: Ctrl+Shift+X
+   
+   2. Search: "Live Server"
+   
+   3. Find: "Live Server" by Ritwick Dey
+      (The one with millions of downloads)
+   
+   4. Click "Install"
+   
+   5. Wait 10 seconds
+   
+   6. ✅ Done!
+
+
+STEP 4: RUN SAFESTRIDE
+═══════════════════════════════════════════════════════════════════════
+
+   1. In VS Code file explorer (left side):
+      Click: public/onboarding.html
+   
+   2. Right-click anywhere in the HTML file
+   
+   3. Select: "Open with Live Server"
+   
+   4. ✅ Browser opens automatically!
+      URL: http://127.0.0.1:5500/public/onboarding.html
+
+
+STEP 5: TEST IT WORKS
+═══════════════════════════════════════════════════════════════════════
+
+You should see:
+   ✅ SafeStride onboarding page
+   ✅ "Welcome to SafeStride" header
+   ✅ 4-step progress bar (1, 2, 3, 4)
+   ✅ Personal Information form
+
+Fill in the form:
+   - Full Name: Kura D Sathyamoorthy
+   - Email: contact@akura.in
+   - Age: 47
+   - Gender: Male
+   - Weight: 82 kg
+   - Height: 170 cm
+   - Resting HR: 58 bpm
+   - Max HR: 174 bpm
+
+Click "Next" button
+   → Should move to Step 2 (Physical Tests)
+   → ✅ NO ERRORS!
+
+Press F12 to check console:
+   → Should be clean (no red errors)
+   → ✅ ALL WORKING!
+
+
+═══════════════════════════════════════════════════════════════════════
+ALTERNATIVE: USE PYTHON SERVER (If you prefer)
+═══════════════════════════════════════════════════════════════════════
+
+If you have Python installed:
+
+   1. In VS Code, press: Ctrl+` (backtick)
+      This opens the terminal at the bottom
+   
+   2. Type:
+      cd public
+   
+   3. Type:
+      python -m http.server 8000
+   
+   4. Open browser:
+      http://localhost:8000/onboarding.html
+   
+   5. ✅ Works the same way!
+
+
+═══════════════════════════════════════════════════════════════════════
+OTHER PAGES TO TEST
+═══════════════════════════════════════════════════════════════════════
+
+After onboarding works, test these:
+
+1. Athlete Dashboard
+   File: public/athlete-dashboard.html
+   Shows: Today's workout, AISRI score, progress
+
+2. Training Calendar
+   File: public/training-calendar.html
+   Shows: 12-week training plan
+
+3. Evaluation Form
+   File: public/athlete-evaluation.html
+   Shows: 6-pillar assessment with image capture
+
+4. Sample Data Generator
+   File: public/generate-training-plan-ui.html
+   Creates: 84 workouts for testing
+
+To test:
+   - Click the file in VS Code
+   - Right-click → "Open with Live Server"
+   - Or use the same Python server
+
+
+═══════════════════════════════════════════════════════════════════════
+TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════════════
+
+❌ Problem: Live Server not starting
+✅ Solution: 
+   - Close VS Code completely
+   - Reopen the folder
+   - Try again
+
+❌ Problem: Page shows 404
+✅ Solution:
+   - Make sure URL has /public/ in it
+   - Should be: http://127.0.0.1:5500/public/onboarding.html
+   - Not: http://127.0.0.1:5500/onboarding.html
+
+❌ Problem: JavaScript errors
+✅ Solution:
+   - Press F12 → Console tab
+   - Make sure you're using Live Server (not file://)
+   - Clear browser cache (Ctrl+Shift+Delete)
+
+❌ Problem: Can't install Live Server
+✅ Solution:
+   - Use Python server instead (see above)
+   - python -m http.server 8000
+
+
+═══════════════════════════════════════════════════════════════════════
+KEYBOARD SHORTCUTS (Useful)
+═══════════════════════════════════════════════════════════════════════
+
+Ctrl+B            Toggle sidebar
+Ctrl+`            Toggle terminal
+Ctrl+P            Quick file open
+Ctrl+Shift+P      Command palette
+Ctrl+/            Comment/uncomment
+Ctrl+S            Save file
+F5                Refresh browser
+
+
+═══════════════════════════════════════════════════════════════════════
+WHAT'S FIXED IN THIS VERSION
+═══════════════════════════════════════════════════════════════════════
+
+✅ onboarding.html - Now uses inline config (no external file)
+✅ signup.html - Now uses inline config
+✅ No more "nextStep is not defined" error
+✅ No more syntax errors
+✅ Works with Live Server perfectly
+✅ All JavaScript functions work
+
+
+═══════════════════════════════════════════════════════════════════════
+CHECKLIST
+═══════════════════════════════════════════════════════════════════════
+
+□ Downloaded backup file
+□ Extracted to a folder (C:\safestride\webapp)
+□ Opened folder in VS Code
+□ Installed Live Server extension
+□ Opened public/onboarding.html
+□ Right-clicked → "Open with Live Server"
+□ Browser opened automatically
+□ Filled in the form
+□ Clicked "Next" button
+□ Moved to Step 2 successfully
+□ Checked console (F12) - no errors
+□ ✅ IT WORKS!
+
+
+═══════════════════════════════════════════════════════════════════════
+NEED HELP?
+═══════════════════════════════════════════════════════════════════════
+
+📖 Full Guide: See VS_CODE_SETUP_GUIDE.md
+📖 Fix Details: See FIX_CONFIG_ERROR.md
+📦 Backup: https://www.genspark.ai/api/files/s/3C2nrJM4
+
+Questions? Just ask! I'm here to help! 💪
+
+
+═══════════════════════════════════════════════════════════════════════
+Created: March 4, 2026
+Status: ✅ READY TO USE
+Time Required: 5-10 minutes
+Difficulty: Easy ⭐⭐☆☆☆
+═══════════════════════════════════════════════════════════════════════

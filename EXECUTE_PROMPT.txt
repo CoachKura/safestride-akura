@@ -1,0 +1,64 @@
+╔═══════════════════════════════════════════════════════════════════════╗
+║                  ⚡ SAFESTRIDE EXECUTE COMMAND ⚡                      ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+PROJECT LOCATION (MEMORIZED):
+═══════════════════════════════════════════════════════════════════════
+C:\safestride\webapp
+
+
+EXECUTE COMMAND (MEMORIZED):
+═══════════════════════════════════════════════════════════════════════
+
+METHOD 1: Live Server (EASIEST)
+───────────────────────────────────────────────────────────────────────
+1. Open VS Code
+2. File → Open Folder → C:\safestride\webapp
+3. Click: public/onboarding.html
+4. Right-click → "Open with Live Server"
+5. ✅ Browser opens automatically!
+
+
+METHOD 2: Terminal Command
+───────────────────────────────────────────────────────────────────────
+cd C:\safestride\webapp\public && python -m http.server 8000
+
+Then open: http://localhost:8000/onboarding.html
+
+
+KEYBOARD SHORTCUT (FASTEST):
+═══════════════════════════════════════════════════════════════════════
+Alt+L Alt+O
+
+
+FILES TO EXECUTE:
+═══════════════════════════════════════════════════════════════════════
+• public/onboarding.html           (Athlete signup)
+• public/athlete-dashboard.html    (Dashboard)
+• public/training-calendar.html    (12-week plan)
+• public/athlete-evaluation.html   (Assessment)
+• public/generate-training-plan-ui.html (Data generator)
+
+
+URL PATTERN:
+═══════════════════════════════════════════════════════════════════════
+http://127.0.0.1:5500/public/[filename].html
+
+
+MEMORIZED FOR FUTURE:
+═══════════════════════════════════════════════════════════════════════
+✅ Location: C:\safestride\webapp
+✅ Method: Live Server (Right-click → Open with Live Server)
+✅ Files: public/*.html
+✅ Port: 5500 (Live Server) or 8000 (Python)
+
+
+QUICK START (3 STEPS):
+═══════════════════════════════════════════════════════════════════════
+1. VS Code → Open C:\safestride\webapp
+2. Click public/onboarding.html
+3. Right-click → "Open with Live Server"
+
+
+STATUS: ✅ READY TO EXECUTE ANYTIME
+═══════════════════════════════════════════════════════════════════════
