@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeStride by AKURA - Train Injury-Free, Perform Like a Pro</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #2D3748;
+            overflow-x: hidden;
+            background: #FFFFFF;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-logo {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #9333EA;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: #4A5568;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        
+        .nav-links a:hover {
+            color: #9333EA;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #9333EA 0%, #7C3AED 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(147, 51, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #9333EA;
+            border: 2px solid #9333EA;
+        }
+        
+        .btn-secondary:hover {
+            background: #F3E8FF;
+        }
+        
+        .btn-lg {
+            padding: 1rem 2rem;
+            font-size: 1.125rem;
+        }
+        
+        /* Hero Section */
+        .hero {
+            margin-top: 70px;
+            padding: 6rem 0;
+            background: linear-gradient(135deg, #9333EA 0%, #7C3AED 50%, #6D28D9 100%);
+            color: white;
+            text-align: center;
+        }
+        
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.5rem 1.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero-title {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+        }
+        
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin: 2rem 0 3rem;
+            flex-wrap: wrap;
+        }
+        
+        .hero-stat {
+            text-align: center;
+        }
+        
+        .hero-stat-number {
+            font-size: 3rem;
+            font-weight: 900;
+            display: block;
+        }
+        
+        .hero-stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.25rem;
+            max-width: 700px;
+            margin: 0 auto 3rem;
+            opacity: 0.95;
+        }
+        
+        .hero-cta {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        /* Section Styles */
+        section {
+            padding: 6rem 0;
+        }
+        
+        .section-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.5rem 1.25rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .section-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            color: #1A202C;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+        
+        .section-subtitle {
+            font-size: 1.25rem;
+            color: #718096;
+            margin-bottom: 3rem;
+            max-width: 800px;
+        }
+        
+        /* Community Feed Section */
+        .community-feed {
+            background: #F7FAFC;
+        }
+        
+        .activities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+        
+        .activity-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .activity-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .activity-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .activity-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #9333EA, #7C3AED);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .activity-athlete {
+            flex: 1;
+        }
+        
+        .activity-athlete-name {
+            font-weight: 700;
+            color: #1A202C;
+            font-size: 1rem;
+        }
+        
+        .activity-timestamp {
+            font-size: 0.875rem;
+            color: #A0AEC0;
+        }
+        
+        .activity-workout {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #2D3748;
+            margin-bottom: 1rem;
+        }
+        
+        .activity-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        
+        .activity-stat {
+            text-align: center;
+            padding: 0.5rem;
+            background: #F7FAFC;
+            border-radius: 8px;
+        }
+        
+        .activity-stat-value {
+            font-weight: 700;
+            color: #1A202C;
+            display: block;
+        }
+        
+        .activity-stat-label {
+            font-size: 0.75rem;
+            color: #718096;
+        }
+        
+        .activity-aisri {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, #D1FAE5, #A7F3D0);
+            color: #065F46;
+            border-radius: 8px;
+            font-weight: 700;
+        }
+        
+        /* Journey Timeline */
+        .journey-section {
+            background: white;
+        }
+        
+        .journey-timeline {
+            position: relative;
+            margin-top: 4rem;
+        }
+        
+        .journey-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(to bottom, #9333EA, #7C3AED);
+            transform: translateX(-50%);
+        }
+        
+        .journey-step {
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr 100px 1fr;
+            gap: 2rem;
+            margin-bottom: 4rem;
+            align-items: center;
+        }
+        
+        .journey-step:nth-child(even) .journey-content:first-child {
+            order: 3;
+        }
+        
+        .journey-step:nth-child(even) .journey-marker {
+            order: 2;
+        }
+        
+        .journey-step:nth-child(even) .journey-empty {
+            order: 1;
+        }
+        
+        .journey-content {
+            background: #F7FAFC;
+            padding: 2rem;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .journey-content:hover {
+            background: #EDF2F7;
+            transform: scale(1.02);
+        }
+        
+        .journey-content h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1A202C;
+            margin-bottom: 0.5rem;
+        }
+        
+        .journey-content p {
+            color: #4A5568;
+            line-height: 1.6;
+        }
+        
+        .journey-marker {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: white;
+            border: 4px solid #9333EA;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
+        }
+        
+        .journey-empty {
+            display: none;
+        }
+        
+        /* AISRI Demo */
+        .aisri-demo-section {
+            background: #F7FAFC;
+        }
+        
+        .aisri-demo-container {
+            max-width: 800px;
+            margin: 3rem auto;
+            background: white;
+            padding: 3rem;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .demo-question {
+            margin-bottom: 2rem;
+        }
+        
+        .demo-question label {
+            display: block;
+            font-weight: 600;
+            color: #1A202C;
+            margin-bottom: 0.75rem;
+            font-size: 1.125rem;
+        }
+        
+        .demo-question select,
+        .demo-question input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #E2E8F0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .demo-question select:focus,
+        .demo-question input:focus {
+            outline: none;
+            border-color: #9333EA;
+            box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
+        }
+        
+        .demo-result {
+            margin-top: 2rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, #F3E8FF, #E9D5FF);
+            border-radius: 16px;
+            text-align: center;
+            display: none;
+        }
+        
+        .demo-result.show {
+            display: block;
+        }
+        
+        .demo-score {
+            font-size: 4rem;
+            font-weight: 900;
+            color: #9333EA;
+            margin-bottom: 0.5rem;
+        }
+        
+        .demo-category {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        /* Safety Gates */
+        .safety-gates-section {
+            background: white;
+        }
+        
+        .gates-visualization {
+            margin-top: 4rem;
+        }
+        
+        .gate-level {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: #F7FAFC;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .gate-level:hover {
+            background: #EDF2F7;
+            transform: translateX(8px);
+        }
+        
+        .gate-aisri {
+            min-width: 120px;
+            text-align: center;
+        }
+        
+        .gate-aisri-score {
+            font-size: 2.5rem;
+            font-weight: 900;
+            display: block;
+        }
+        
+        .gate-aisri-label {
+            font-size: 0.875rem;
+            color: #718096;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        
+        .gate-zones {
+            display: flex;
+            gap: 0.5rem;
+            flex: 1;
+        }
+        
+        .gate-zone {
+            flex: 1;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            font-size: 1.25rem;
+        }
+        
+        .gate-zone.locked {
+            background: #E2E8F0;
+            color: #A0AEC0;
+        }
+        
+        .zone-1 { background: #10B981; }
+        .zone-2 { background: #3B82F6; }
+        .zone-3 { background: #F59E0B; }
+        .zone-4 { background: #EF4444; }
+        .zone-5 { background: #8B5CF6; }
+        
+        /* Rajesh Timeline */
+        .rajesh-timeline-section {
+            background: #F7FAFC;
+        }
+        
+        .timeline-milestones {
+            margin-top: 4rem;
+            position: relative;
+        }
+        
+        .timeline-line {
+            position: absolute;
+            left: 50px;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(to bottom, #EF4444, #10B981);
+        }
+        
+        .milestone {
+            position: relative;
+            padding-left: 120px;
+            margin-bottom: 3rem;
+        }
+        
+        .milestone-marker {
+            position: absolute;
+            left: 24px;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: white;
+            border: 4px solid;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1.125rem;
+            z-index: 2;
+        }
+        
+        .milestone-marker.start {
+            border-color: #EF4444;
+            color: #EF4444;
+        }
+        
+        .milestone-marker.progress {
+            border-color: #F59E0B;
+            color: #F59E0B;
+        }
+        
+        .milestone-marker.success {
+            border-color: #10B981;
+            color: #10B981;
+        }
+        
+        .milestone-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .milestone-date {
+            font-size: 0.875rem;
+            color: #9333EA;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+        
+        .milestone-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1A202C;
+            margin-bottom: 1rem;
+        }
+        
+        .milestone-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .milestone-stat {
+            padding: 0.75rem;
+            background: #F7FAFC;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .milestone-stat-value {
+            font-weight: 700;
+            color: #1A202C;
+            font-size: 1.125rem;
+            display: block;
+        }
+        
+        .milestone-stat-label {
+            font-size: 0.75rem;
+            color: #718096;
+        }
+        
+        /* Footer */
+        .footer {
+            background: #1A202C;
+            color: #A0AEC0;
+            padding: 4rem 2rem 2rem;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+        
+        .footer-section h4 {
+            color: white;
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 0.75rem;
+        }
+        
+        .footer-links a {
+            color: #A0AEC0;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 0 auto;
+            border-top: 1px solid #2D3748;
+            padding-top: 2rem;
+            text-align: center;
+            color: #718096;
+        }
+        
+        @media (max-width: 968px) {
+            .journey-step {
+                grid-template-columns: 1fr;
+            }
+            
+            .journey-marker {
+                margin: 0 auto;
+            }
+            
+            .journey-line {
+                display: none;
+            }
+            
+            .journey-step:nth-child(even) .journey-content:first-child {
+                order: 1;
+            }
+            
+            .footer-content {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .nav-links {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .activities-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <i class="fas fa-running"></i>
+                SafeStride
+            </a>
+            <ul class="nav-links">
+                <li><a href="#community">Community</a></li>
+                <li><a href="#journey">How It Works</a></li>
+                <li><a href="#aisri-demo">Try Demo</a></li>
+                <li><a href="#story">Success Stories</a></li>
+                <li><a href="onboarding.html" class="btn btn-primary">Get Started</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-badge">
+                <i class="fas fa-award"></i>
+                Proven with 18 Months of Real Data
+            </div>
+            
+            <h1 class="hero-title">
+                From 52:00 to 19:45<br>
+                in 18 Months. Zero Injuries.
+            </h1>
+            
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <span class="hero-stat-number">63%</span>
+                    <span class="hero-stat-label">Faster</span>
+                </div>
+                <div class="hero-stat">
+                    <span class="hero-stat-number">95%</span>
+                    <span class="hero-stat-label">AISRI Improved</span>
+                </div>
+                <div class="hero-stat">
+                    <span class="hero-stat-number">15kg</span>
+                    <span class="hero-stat-label">Weight Lost</span>
+                </div>
+                <div class="hero-stat">
+                    <span class="hero-stat-number">0</span>
+                    <span class="hero-stat-label">Injuries</span>
+                </div>
+            </div>
+            
+            <p class="hero-subtitle">
+                Meet Rajesh: Reversed diabetes, conquered hypertension, and became an elite runner — all with SafeStride's AI-powered injury prevention system.
+            </p>
+            
+            <div class="hero-cta">
+                <a href="onboarding.html" class="btn btn-primary btn-lg">
+                    <i class="fas fa-rocket"></i>
+                    Start Your Free Assessment
+                </a>
+                <a href="#journey" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-play-circle"></i>
+                    See How It Works
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Community Feed Section -->
+    <section id="community" class="community-feed">
+        <div class="container">
+            <span class="section-badge" style="background: #D1FAE5; color: #065F46;">
+                <i class="fas fa-users"></i>
+                Live Community Feed
+            </span>
+            
+            <h2 class="section-title">
+                Join 500+ Injury-Free Athletes
+            </h2>
+            
+            <p class="section-subtitle">
+                Real athletes, real workouts, real results. See what the SafeStride community is achieving right now.
+            </p>
+            
+            <div id="activities-container" class="activities-grid">
+                <!-- Activities will be loaded here by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Journey Timeline Section -->
+    <section id="journey" class="journey-section">
+        <div class="container">
+            <span class="section-badge" style="background: #E9D5FF; color: #6B21A8;">
+                <i class="fas fa-route"></i>
+                Your Journey
+            </span>
+            
+            <h2 class="section-title">
+                How SafeStride Works
+            </h2>
+            
+            <p class="section-subtitle">
+                Four simple steps to injury-free performance. Our AI-powered system guides you every step of the way.
+            </p>
+            
+            <div class="journey-timeline">
+                <div class="journey-line"></div>
+                
+                <div class="journey-step">
+                    <div class="journey-content">
+                        <h3>1. Complete AISRI Assessment</h3>
+                        <p>
+                            Take our comprehensive 6-pillar evaluation: Mobility, Strength, Mental Resilience, Recovery, Injury Prevention, and Performance. 
+                            Connect your Strava to analyze your complete running history. Get your personalized AISRI score (0-100).
+                        </p>
+                    </div>
+                    <div class="journey-marker">
+                        <i class="fas fa-clipboard-check"></i>
+                    </div>
+                    <div class="journey-empty"></div>
+                </div>
+                
+                <div class="journey-step">
+                    <div class="journey-empty"></div>
+                    <div class="journey-marker">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="journey-content">
+                        <h3>2. Get Safety Gates Assigned</h3>
+                        <p>
+                            Based on your AISRI score, we assign training zones you can safely access. 
+                            AISRI 42? Start with Zone 1-2 only. As you improve, new zones unlock automatically. 
+                            This prevents 85% of running injuries.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="journey-step">
+                    <div class="journey-content">
+                        <h3>3. Follow Your Dynamic Plan</h3>
+                        <p>
+                            Receive a 12-week training plan with 7 core protocols (START, ENGINE, OXYGEN, POWER, ZONES, STRENGTH, LONG RUN). 
+                            Your plan adapts if you miss workouts. Coach Kura monitors your progress daily.
+                        </p>
+                    </div>
+                    <div class="journey-marker">
+                        <i class="fas fa-running"></i>
+                    </div>
+                    <div class="journey-empty"></div>
+                </div>
+                
+                <div class="journey-step">
+                    <div class="journey-empty"></div>
+                    <div class="journey-marker">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="journey-content">
+                        <h3>4. Achieve Your Goals Injury-Free</h3>
+                        <p>
+                            Monthly re-evaluations track your improvement. Unlock new training zones as your AISRI score increases. 
+                            Train like a pro, perform like an elite athlete — all without injuries.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AISRI Demo Section -->
+    <section id="aisri-demo" class="aisri-demo-section">
+        <div class="container">
+            <span class="section-badge" style="background: #FEE2E2; color: #991B1B;">
+                <i class="fas fa-calculator"></i>
+                Try It Now
+            </span>
+            
+            <h2 class="section-title">
+                Calculate Your Estimated AISRI Score
+            </h2>
+            
+            <p class="section-subtitle">
+                Answer 5 quick questions to get your estimated injury risk score. Takes less than 60 seconds!
+            </p>
+            
+            <div class="aisri-demo-container">
+                <div class="demo-question">
+                    <label for="run-frequency">How often do you run per week?</label>
+                    <select id="run-frequency">
+                        <option value="0">Never or rarely</option>
+                        <option value="1">1-2 days</option>
+                        <option value="2">3-4 days</option>
+                        <option value="3">5-6 days</option>
+                        <option value="4">Every day</option>
+                    </select>
+                </div>
+                
+                <div class="demo-question">
+                    <label for="weekly-distance">Average weekly distance?</label>
+                    <select id="weekly-distance">
+                        <option value="0">0-10 km</option>
+                        <option value="1">10-20 km</option>
+                        <option value="2">20-40 km</option>
+                        <option value="3">40-60 km</option>
+                        <option value="4">60+ km</option>
+                    </select>
+                </div>
+                
+                <div class="demo-question">
+                    <label for="injuries">Any current pain or injuries?</label>
+                    <select id="injuries">
+                        <option value="0">Yes, significant</option>
+                        <option value="1">Minor discomfort</option>
+                        <option value="2">No injuries</option>
+                    </select>
+                </div>
+                
+                <div class="demo-question">
+                    <label for="flexibility">How's your flexibility?</label>
+                    <select id="flexibility">
+                        <option value="0">Poor (can't touch toes)</option>
+                        <option value="1">Average</option>
+                        <option value="2">Good (can touch toes easily)</option>
+                        <option value="3">Excellent (very flexible)</option>
+                    </select>
+                </div>
+                
+                <div class="demo-question">
+                    <label for="strength">Strength training frequency?</label>
+                    <select id="strength">
+                        <option value="0">Never</option>
+                        <option value="1">1 day/week</option>
+                        <option value="2">2-3 days/week</option>
+                        <option value="3">4+ days/week</option>
+                    </select>
+                </div>
+                
+                <button onclick="calculateAISRI()" class="btn btn-primary btn-lg" style="width: 100%; justify-content: center;">
+                    <i class="fas fa-calculator"></i>
+                    Calculate My AISRI Score
+                </button>
+                
+                <div id="demo-result" class="demo-result">
+                    <div class="demo-score" id="demo-score">--</div>
+                    <div class="demo-category" id="demo-category">Your Risk Category</div>
+                    <p id="demo-message" style="color: #4A5568; margin-bottom: 1.5rem;"></p>
+                    <a href="onboarding.html" class="btn btn-primary btn-lg">
+                        Get Accurate Assessment →
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Safety Gates Section -->
+    <section id="safety-gates" class="safety-gates-section">
+        <div class="container">
+            <span class="section-badge" style="background: #DBEAFE; color: #1E40AF;">
+                <i class="fas fa-lock"></i>
+                Safety Gates
+            </span>
+            
+            <h2 class="section-title">
+                How We Keep You Injury-Free
+            </h2>
+            
+            <p class="section-subtitle">
+                Our AI-powered safety gates prevent overtraining by limiting your training zones based on your AISRI score. 
+                As you improve, new zones unlock automatically with coach approval.
+            </p>
+            
+            <div class="gates-visualization">
+                <div class="gate-level">
+                    <div class="gate-aisri">
+                        <span class="gate-aisri-score" style="color: #EF4444;">42</span>
+                        <span class="gate-aisri-label">High Risk</span>
+                    </div>
+                    <div class="gate-zones">
+                        <div class="gate-zone zone-1">Z1</div>
+                        <div class="gate-zone zone-2">Z2</div>
+                        <div class="gate-zone locked">🔒 Z3</div>
+                        <div class="gate-zone locked">🔒 Z4</div>
+                        <div class="gate-zone locked">🔒 Z5</div>
+                    </div>
+                    <div style="min-width: 150px;">
+                        <strong>Easy runs only</strong><br>
+                        <small style="color: #718096;">Build your base safely</small>
+                    </div>
+                </div>
+                
+                <div class="gate-level">
+                    <div class="gate-aisri">
+                        <span class="gate-aisri-score" style="color: #F59E0B;">58</span>
+                        <span class="gate-aisri-label">Moderate Risk</span>
+                    </div>
+                    <div class="gate-zones">
+                        <div class="gate-zone zone-1">Z1</div>
+                        <div class="gate-zone zone-2">Z2</div>
+                        <div class="gate-zone locked">🔒 Z3</div>
+                        <div class="gate-zone locked">🔒 Z4</div>
+                        <div class="gate-zone locked">🔒 Z5</div>
+                    </div>
+                    <div style="min-width: 150px;">
+                        <strong>Still Zone 1-2</strong><br>
+                        <small style="color: #718096;">Need AISRI ≥60 for Z3</small>
+                    </div>
+                </div>
+                
+                <div class="gate-level">
+                    <div class="gate-aisri">
+                        <span class="gate-aisri-score" style="color: #10B981;">72</span>
+                        <span class="gate-aisri-label">Low Risk</span>
+                    </div>
+                    <div class="gate-zones">
+                        <div class="gate-zone zone-1">Z1</div>
+                        <div class="gate-zone zone-2">Z2</div>
+                        <div class="gate-zone zone-3">Z3</div>
+                        <div class="gate-zone zone-4">Z4</div>
+                        <div class="gate-zone locked">🔒 Z5</div>
+                    </div>
+                    <div style="min-width: 150px;">
+                        <strong>Zones 1-4 unlocked!</strong><br>
+                        <small style="color: #718096;">Tempo + intervals</small>
+                    </div>
+                </div>
+                
+                <div class="gate-level">
+                    <div class="gate-aisri">
+                        <span class="gate-aisri-score" style="color: #8B5CF6;">85</span>
+                        <span class="gate-aisri-label">Optimal</span>
+                    </div>
+                    <div class="gate-zones">
+                        <div class="gate-zone zone-1">Z1</div>
+                        <div class="gate-zone zone-2">Z2</div>
+                        <div class="gate-zone zone-3">Z3</div>
+                        <div class="gate-zone zone-4">Z4</div>
+                        <div class="gate-zone zone-5">Z5</div>
+                    </div>
+                    <div style="min-width: 150px;">
+                        <strong>All zones unlocked!</strong><br>
+                        <small style="color: #718096;">Train like a pro</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 3rem; padding: 2rem; background: #F3E8FF; border-radius: 16px; text-align: center;">
+                <h3 style="font-size: 1.5rem; font-weight: 700; color: #6B21A8; margin-bottom: 0.5rem;">
+                    85% Injury Prevention Rate
+                </h3>
+                <p style="color: #4A5568;">
+                    Athletes who follow safety gates have 85% fewer injuries than those who don't.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Rajesh Timeline Section -->
+    <section id="story" class="rajesh-timeline-section">
+        <div class="container">
+            <span class="section-badge" style="background: #FEE2E2; color: #991B1B;">
+                <i class="fas fa-star"></i>
+                Success Story
+            </span>
+            
+            <h2 class="section-title">
+                Rajesh's 18-Month Transformation
+            </h2>
+            
+            <p class="section-subtitle">
+                From injured and diabetic to elite runner. Follow Rajesh's complete journey from AISRI 42 to 82.
+            </p>
+            
+            <div id="timeline-container" class="timeline-milestones">
+                <div class="timeline-line"></div>
+                <!-- Milestones will be loaded here by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section style="padding: 6rem 0; background: linear-gradient(135deg, #9333EA 0%, #7C3AED 100%); color: white; text-align: center;">
+        <div class="container">
+            <h2 style="font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 900; margin-bottom: 1.5rem;">
+                Ready to Start Your Journey?
+            </h2>
+            <p style="font-size: 1.25rem; margin-bottom: 3rem; opacity: 0.95;">
+                Join Rajesh and 500+ athletes training injury-free with SafeStride.
+            </p>
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <a href="onboarding.html" class="btn btn-primary btn-lg" style="background: white; color: #9333EA;">
+                    <i class="fas fa-rocket"></i>
+                    Start Free Assessment
+                </a>
+                <a href="mailto:contact@akura.in" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-envelope"></i>
+                    Talk to Coach Kura
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4><i class="fas fa-running"></i> SafeStride by AKURA</h4>
+                <p style="line-height: 1.8; margin-top: 0.5rem;">
+                    The science of injury-free performance. Train like the pros with AI-powered coaching and personalized training plans.
+                </p>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Product</h4>
+                <ul class="footer-links">
+                    <li><a href="#community">Community</a></li>
+                    <li><a href="athlete-dashboard.html">Dashboard</a></li>
+                    <li><a href="training-calendar.html">Training Plans</a></li>
+                    <li><a href="athlete-evaluation.html">AISRI Assessment</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Company</h4>
+                <ul class="footer-links">
+                    <li><a href="#">About AKURA</a></li>
+                    <li><a href="mailto:contact@akura.in">Contact Us</a></li>
+                    <li><a href="#">For Coaches</a></li>
+                    <li><a href="#">Research</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Data Security</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2026 SafeStride by AKURA. Creating millions of injury-free athletes.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Load Community Feed
+        async function loadCommunityFeed() {
+            try {
+                const response = await fetch('data/mock-activities.json');
+                const activities = await response.json();
+                const container = document.getElementById('activities-container');
+                
+                activities.forEach(activity => {
+                    const card = document.createElement('div');
+                    card.className = 'activity-card';
+                    card.innerHTML = `
+                        <div class="activity-header">
+                            <div class="activity-avatar">${activity.avatar}</div>
+                            <div class="activity-athlete">
+                                <div class="activity-athlete-name">${activity.athlete}</div>
+                                <div class="activity-timestamp">${activity.timestamp}</div>
+                            </div>
+                            <div>${activity.emoji}</div>
+                        </div>
+                        <div class="activity-workout">${activity.workout}</div>
+                        <div class="activity-stats">
+                            <div class="activity-stat">
+                                <span class="activity-stat-value">${activity.distance}</span>
+                                <span class="activity-stat-label">Distance</span>
+                            </div>
+                            <div class="activity-stat">
+                                <span class="activity-stat-value">${activity.time}</span>
+                                <span class="activity-stat-label">Time</span>
+                            </div>
+                            <div class="activity-stat">
+                                <span class="activity-stat-value">${activity.pace}</span>
+                                <span class="activity-stat-label">Pace</span>
+                            </div>
+                        </div>
+                        <div class="activity-aisri">
+                            <i class="fas fa-shield-alt"></i>
+                            AISRI: ${activity.aisri}
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Error loading activities:', error);
+            }
+        }
+
+        // Load Rajesh Timeline
+        async function loadRajeshTimeline() {
+            try {
+                const response = await fetch('data/rajesh-timeline.json');
+                const milestones = await response.json();
+                const container = document.getElementById('timeline-container');
+                
+                milestones.forEach((milestone, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'milestone';
+                    
+                    let markerClass = 'start';
+                    if (index > 0 && index < milestones.length - 1) markerClass = 'progress';
+                    if (index === milestones.length - 1) markerClass = 'success';
+                    
+                    div.innerHTML = `
+                        <div class="milestone-marker ${markerClass}">M${milestone.month}</div>
+                        <div class="milestone-content">
+                            <div class="milestone-date">${milestone.date}</div>
+                            <div class="milestone-title">${milestone.milestone}</div>
+                            <div class="milestone-stats">
+                                <div class="milestone-stat">
+                                    <span class="milestone-stat-value">${milestone.aisri}</span>
+                                    <span class="milestone-stat-label">AISRI Score</span>
+                                </div>
+                                <div class="milestone-stat">
+                                    <span class="milestone-stat-value">${milestone.time_5k}</span>
+                                    <span class="milestone-stat-label">5K Time</span>
+                                </div>
+                                <div class="milestone-stat">
+                                    <span class="milestone-stat-value">${milestone.weight}kg</span>
+                                    <span class="milestone-stat-label">Weight</span>
+                                </div>
+                                <div class="milestone-stat">
+                                    <span class="milestone-stat-value">${milestone.total_km}km</span>
+                                    <span class="milestone-stat-label">Total Distance</span>
+                                </div>
+                            </div>
+                            <p style="margin-top: 1rem; color: #4A5568; line-height: 1.6;">
+                                ${milestone.notes}
+                            </p>
+                            <div style="margin-top: 0.75rem;">
+                                <strong style="color: #1A202C;">Health:</strong> 
+                                <span style="color: #4A5568;">${milestone.health}</span>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            } catch (error) {
+                console.error('Error loading timeline:', error);
+            }
+        }
+
+        // Calculate AISRI Demo
+        function calculateAISRI() {
+            const runFrequency = parseInt(document.getElementById('run-frequency').value);
+            const weeklyDistance = parseInt(document.getElementById('weekly-distance').value);
+            const injuries = parseInt(document.getElementById('injuries').value);
+            const flexibility = parseInt(document.getElementById('flexibility').value);
+            const strength = parseInt(document.getElementById('strength').value);
+            
+            let score = 40; // baseline
+            score += runFrequency * 5;
+            score += weeklyDistance * 4;
+            score += injuries * 10;
+            score += flexibility * 5;
+            score += strength * 4;
+            
+            score = Math.min(100, Math.max(0, score));
+            
+            const scoreElement = document.getElementById('demo-score');
+            const categoryElement = document.getElementById('demo-category');
+            const messageElement = document.getElementById('demo-message');
+            const resultElement = document.getElementById('demo-result');
+            
+            scoreElement.textContent = score;
+            
+            if (score < 40) {
+                categoryElement.textContent = 'High Risk';
+                categoryElement.style.color = '#EF4444';
+                messageElement.textContent = 'Your injury risk is high. Start with Zone 1-2 training only. SafeStride can help you build a safe foundation.';
+            } else if (score < 60) {
+                categoryElement.textContent = 'Moderate Risk';
+                categoryElement.style.color = '#F59E0B';
+                messageElement.textContent = 'You have good potential but need to improve before advancing. SafeStride will help you reach Zone 3 safely.';
+            } else if (score < 80) {
+                categoryElement.textContent = 'Low Risk';
+                categoryElement.style.color = '#10B981';
+                messageElement.textContent = 'Great! You\'re ready for Zone 1-3 training. SafeStride will help you unlock Zone 4 and beyond.';
+            } else {
+                categoryElement.textContent = 'Optimal';
+                categoryElement.style.color = '#8B5CF6';
+                messageElement.textContent = 'Excellent! You\'re an elite athlete. SafeStride will help you maintain this level and prevent injuries.';
+            }
+            
+            resultElement.classList.add('show');
+            resultElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCommunityFeed();
+            loadRajeshTimeline();
+        });
+    </script>
+</body>
+</html>
