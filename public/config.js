@@ -5,19 +5,40 @@
  * Update these values with your actual credentials
  */
 
+const isLocalhost =
+    window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1';
+
+const useLocalSupabase =
+    isLocalhost &&
+    (window.location.port === '8080' || window.location.port === '');
+
+const supabaseConfig = useLocalSupabase
+    ? {
+        // Local Supabase (Docker)
+        url: 'http://127.0.0.1:54321',
+        anonKey: 'sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH',
+        functionsUrl: 'http://127.0.0.1:54321/functions/v1'
+    }
+    : {
+        // Production Supabase (Cloud)
+        url: 'https://bdisppaxbvygsspcuymb.supabase.co',
+        anonKey: 'sb_publishable_BBjk8yeyQ2jgh5iFiQINUQ_mwU2FMnk',
+        functionsUrl: 'https://bdisppaxbvygsspcuymb.supabase.co/functions/v1'
+    };
+
 const SAFESTRIDE_CONFIG = {
     // Supabase Configuration
-    supabase: {
-        url: 'https://bdisppaxbvygsspcuymb.supabase.co',
-        anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkaXNwcGF4YnZ5Z3NzcGN1eW1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk2MjYwMzgsImV4cCI6MjA1NTIwMjAzOH0.YOUR_ACTUAL_KEY_HERE',
-        functionsUrl: 'https://bdisppaxbvygsspcuymb.supabase.co/functions/v1'
-    },
+    supabase: supabaseConfig,
     
     // Strava OAuth Configuration
     strava: {
         clientId: '162971',
-        clientSecret: 'ca2a2ef68680c324e0ba4db3ed6e6006a9dc7626', // Only used in edge functions
-        redirectUri: window.location.origin + '/public/strava-callback.html',
+        // Keep secrets out of frontend code. Use Supabase Edge Function env vars instead.
+        clientSecret: '',
+        redirectUri: isLocalhost
+            ? 'http://localhost:8080/strava-callback.html'
+            : window.location.origin + '/public/strava-callback.html',
         authorizeUrl: 'https://www.strava.com/oauth/authorize',
         tokenUrl: 'https://www.strava.com/oauth/token',
         apiUrl: 'https://www.strava.com/api/v3',
@@ -83,12 +104,20 @@ const SAFESTRIDE_CONFIG = {
         expiryHours: 24,
         rememberMeDays: 30
     },
+
+    // Auth alias for compatibility with newer modules
+    auth: {
+        sessionKey: 'safestride_session',
+        tokenExpiry: 3600000
+    },
     
     // API Configuration
     api: {
         timeout: 30000, // 30 seconds
         retryAttempts: 3,
-        retryDelay: 1000 // 1 second
+        retryDelay: 1000, // 1 second
+        baseUrl: supabaseConfig.url,
+        functionsUrl: supabaseConfig.functionsUrl
     },
     
     // UI Configuration
@@ -96,7 +125,10 @@ const SAFESTRIDE_CONFIG = {
         animationDuration: 300,
         toastDuration: 3000,
         pageLoadTimeout: 10000
-    }
+    },
+
+    environment: isLocalhost ? 'development' : 'production',
+    isLocal: useLocalSupabase
 };
 
 // Export for use in other modules
@@ -107,4 +139,12 @@ if (typeof module !== 'undefined' && module.exports) {
 // Make available globally
 if (typeof window !== 'undefined') {
     window.SAFESTRIDE_CONFIG = SAFESTRIDE_CONFIG;
+
+    if (isLocalhost) {
+        console.log('SafeStride config loaded:', {
+            environment: SAFESTRIDE_CONFIG.environment,
+            supabaseUrl: SAFESTRIDE_CONFIG.supabase.url,
+            functionsUrl: SAFESTRIDE_CONFIG.supabase.functionsUrl
+        });
+    }
 }
