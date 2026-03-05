@@ -50,12 +50,7 @@ CREATE TABLE IF NOT EXISTS public.user_power_cells (
   compliance_notes TEXT,
 
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-
-  CONSTRAINT fk_user_power_cells_strava_activity
-    FOREIGN KEY (strava_activity_id)
-    REFERENCES public.strava_activities(strava_activity_id)
-    ON DELETE SET NULL
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX IF NOT EXISTS idx_power_cell_types_protocol_id ON public.power_cell_types(protocol_id);
@@ -65,6 +60,20 @@ CREATE INDEX IF NOT EXISTS idx_user_power_cells_profile_id ON public.user_power_
 CREATE INDEX IF NOT EXISTS idx_user_power_cells_scheduled_for ON public.user_power_cells(scheduled_for DESC);
 CREATE INDEX IF NOT EXISTS idx_user_power_cells_status ON public.user_power_cells(status);
 CREATE INDEX IF NOT EXISTS idx_user_power_cells_strava_activity_id ON public.user_power_cells(strava_activity_id);
+
+DO $$
+BEGIN
+  IF to_regclass('public.strava_activities') IS NOT NULL THEN
+    ALTER TABLE public.user_power_cells
+      ADD CONSTRAINT fk_user_power_cells_strava_activity
+      FOREIGN KEY (strava_activity_id)
+      REFERENCES public.strava_activities(strava_activity_id)
+      ON DELETE SET NULL;
+  END IF;
+EXCEPTION
+  WHEN duplicate_object THEN
+    NULL;
+END $$;
 
 -- RLS
 ALTER TABLE public.power_cell_protocols ENABLE ROW LEVEL SECURITY;
