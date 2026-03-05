@@ -49,6 +49,9 @@ app.*.map.json
 
 # Environment variables
 .env
+.env.local
+.env.*.local
+*.env
 CORRECTED_ENV_VARS.txt
 CLEANUP_EXECUTION_PLAN.md  
 DEPLOYMENT_HARDENING_COMPLETE.md
