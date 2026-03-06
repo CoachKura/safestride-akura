@@ -239,6 +239,9 @@
             SAFESTRIDE_CONFIG.supabase.url,
             SAFESTRIDE_CONFIG.supabase.anonKey
         );
+        const WORKFLOW_FUNCTION_URL = 'https://bdisppaxbvygsspcuymb.supabase.co/functions/v1/athlete-workflow';
+        const WORKFLOW_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkaXNwcGF4YnZ5Z3NzcGN1eW1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzcxMjcxMzEsImV4cCI6MjA1MjcwMzEzMX0.n9_qU_5X5VZnzMj5YLqn3Kz3v2g9Y3k8X1Y4_3_0_0';
+        const anonKey = WORKFLOW_ANON_KEY;
         
         let selectedRole = 'athlete'; // Default
         
@@ -340,6 +343,26 @@
                     ]);
                 
                 if (profileError) throw profileError;
+
+                // 2.5 Trigger onboarding workflow (non-blocking)
+                if (authData?.user?.id) {
+                    const user = authData.user;
+                    await fetch(WORKFLOW_FUNCTION_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${anonKey}`
+                        },
+                        body: JSON.stringify({
+                            eventType: 'signup_completed',
+                            event: 'signup_completed',
+                            userId: user.id,
+                            email: email,
+                            fullName: fullName,
+                            payload: { email, fullName, role: selectedRole }
+                        })
+                    }).catch(err => console.warn('Workflow trigger failed (non-blocking):', err));
+                }
                 
                 // 3. Success!
                 showAlert('Account created successfully! Check your email to verify your account.', 'success');

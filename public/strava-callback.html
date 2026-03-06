@@ -25,6 +25,10 @@
         .fade-in {
             animation: fadeIn 0.5s ease-in;
         }
+
+        .hidden-state {
+            display: none;
+        }
         
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
@@ -56,7 +60,7 @@
         </div>
 
         <!-- Success State -->
-        <div id="successState" class="bg-white rounded-lg shadow-lg p-8 text-center fade-in" style="display: none;">
+        <div id="successState" class="bg-white rounded-lg shadow-lg p-8 text-center fade-in hidden-state">
             <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <i class="fas fa-check text-4xl text-green-600"></i>
             </div>
@@ -82,7 +86,7 @@
         </div>
 
         <!-- Error State -->
-        <div id="errorState" class="bg-white rounded-lg shadow-lg p-8 text-center fade-in" style="display: none;">
+        <div id="errorState" class="bg-white rounded-lg shadow-lg p-8 text-center fade-in hidden-state">
             <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <i class="fas fa-exclamation-triangle text-4xl text-red-600"></i>
             </div>
@@ -122,6 +126,8 @@
         // Configuration from config.js
         const SUPABASE_URL = SAFESTRIDE_CONFIG.supabase.url;
         const SUPABASE_FUNCTIONS_URL = SAFESTRIDE_CONFIG.supabase.functionsUrl;
+        const WORKFLOW_FUNCTION_URL = `${SUPABASE_FUNCTIONS_URL}/athlete-workflow`;
+        const anonKey = SAFESTRIDE_CONFIG.supabase.anonKey;
         
         let currentSession = null;
         let authCode = null;
@@ -165,6 +171,65 @@
                     document.getElementById('scoreCount').textContent = data.score_count;
                 }
             }
+
+            triggerStravaConnectedWorkflow(data).catch((err) => {
+                console.warn('Workflow trigger failed after Strava connect:', err);
+            });
+        }
+
+        function isUuid(value) {
+            return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value || '');
+        }
+
+        function resolveWorkflowUserId() {
+            if (isUuid(currentSession?.user_id)) return currentSession.user_id;
+            if (isUuid(currentSession?.uid)) return currentSession.uid;
+
+            try {
+                const akuraSession = JSON.parse(sessionStorage.getItem('akura_user') || localStorage.getItem('akura_user') || '{}');
+                if (isUuid(akuraSession.user_id)) return akuraSession.user_id;
+            } catch (e) {
+                console.warn('Failed to parse akura session:', e);
+            }
+
+            return null;
+        }
+
+        async function triggerStravaConnectedWorkflow(syncData) {
+            const userId = resolveWorkflowUserId();
+            if (!userId) return;
+
+            const session = {
+                access_token: currentSession?.token
+            };
+            const user = {
+                id: userId,
+                email: currentSession?.email || ''
+            };
+            const profile = {
+                first_name: currentSession?.full_name ? currentSession.full_name.split(' ')[0] : 'Athlete'
+            };
+            const activityCount = syncData?.activity_count;
+            const scoreCount = syncData?.score_count;
+
+            await fetch(WORKFLOW_FUNCTION_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session?.access_token || anonKey}`
+                },
+                body: JSON.stringify({
+                    eventType: 'strava_connected',
+                    event: 'strava_connected',
+                    userId: user.id,
+                    email: user.email,
+                    fullName: profile?.first_name || 'Athlete',
+                    payload: {
+                        activityCount,
+                        scoreCount
+                    }
+                })
+            }).catch(err => console.warn('Workflow trigger failed (non-blocking):', err));
         }
 
         // Show error state
