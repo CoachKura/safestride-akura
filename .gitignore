@@ -1,0 +1,9 @@
+.wrangler/
+node_modules/
+.env
+*.log
+
+# Local artifacts
+public/index.html.backup_*
+*.tar_2
+webapp/

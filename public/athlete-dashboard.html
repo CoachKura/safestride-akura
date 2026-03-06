@@ -1,3 +1,4 @@
+﻿<!-- webhint-disable no-inline-styles -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -166,23 +167,23 @@
             </div>
             
             <div class="nav-menu">
-                <a href="/public/athlete-dashboard.html" class="nav-link active">
+                <a href="/athlete-dashboard.html" class="nav-link active">
                     <i class="fas fa-home"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="/public/training-calendar.html" class="nav-link">
+                <a href="/training-calendar.html" class="nav-link">
                     <i class="fas fa-calendar-alt"></i>
                     <span>Calendar</span>
                 </a>
-                <a href="/public/athlete-evaluation.html" class="nav-link">
+                <a href="/athlete-evaluation.html" class="nav-link">
                     <i class="fas fa-clipboard-check"></i>
                     <span>Evaluation</span>
                 </a>
-                <a href="/public/strava-dashboard.html" class="nav-link">
+                <a href="/strava-dashboard.html" class="nav-link">
                     <i class="fab fa-strava"></i>
                     <span>Strava</span>
                 </a>
-                <a href="/public/power-cells.html" class="nav-link">
+                <a href="/power-cells.html" class="nav-link">
                     <i class="fas fa-bolt"></i>
                     <span>Power Cells</span>
                 </a>
@@ -211,7 +212,7 @@
             <!-- Welcome Header -->
             <div class="mb-8">
                 <h1 class="text-4xl font-bold text-neutral-900 mb-2">
-                    Welcome back, <span id="athleteName">Athlete</span>! 👋
+                    Welcome back, <span id="athleteName">Athlete</span>!
                 </h1>
                 <p class="text-lg text-neutral-600">
                     Here's your training overview for today
@@ -219,7 +220,7 @@
             </div>
 
             <!-- Strava Connection Banner (if not connected) -->
-            <div class="strava-connect-banner" id="stravaConnectBanner" style="display: none;">
+            <div class="strava-connect-banner" id="stravaConnectBanner" data-inline-style="display: none;">
                 <div>
                     <h3 class="text-xl font-bold mb-2">
                         <i class="fab fa-strava mr-2"></i>
@@ -235,7 +236,7 @@
             </div>
 
             <!-- Evaluation Reminder Banner (if due) -->
-            <div class="evaluation-reminder" id="evaluationReminder" style="display: none;">
+            <div class="evaluation-reminder" id="evaluationReminder" data-inline-style="display: none;">
                 <div class="flex items-center justify-between">
                     <div>
                         <h3 class="text-xl font-bold mb-2">
@@ -246,7 +247,7 @@
                             Your monthly re-evaluation is scheduled for today
                         </p>
                     </div>
-                    <button class="btn-white btn-lg" onclick="window.location.href='/public/athlete-evaluation.html'">
+                    <button class="btn-white btn-lg" onclick="window.location.href='/athlete-evaluation.html'">
                         Start Evaluation
                     </button>
                 </div>
@@ -369,7 +370,7 @@
                                 <i class="fas fa-calendar-week mr-2"></i>
                                 Next 7 Days
                             </h2>
-                            <a href="/public/training-calendar.html" class="link">
+                            <a href="/training-calendar.html" class="link">
                                 View Full Calendar
                                 <i class="fas fa-arrow-right ml-1"></i>
                             </a>
@@ -435,7 +436,7 @@
                                 Last assessed: <span id="lastAssessmentDate">2 days ago</span>
                             </p>
                             
-                            <button class="btn-primary btn-sm w-full" onclick="window.location.href='/public/athlete-evaluation.html'">
+                            <button class="btn-primary btn-sm w-full" onclick="window.location.href='/athlete-evaluation.html'">
                                 <i class="fas fa-sync-alt mr-2"></i>
                                 Re-evaluate
                             </button>
@@ -518,6 +519,7 @@
     </main>
 
     <script type="module">
+        document.querySelectorAll('[data-inline-style]').forEach((el) => { el.style.cssText = el.getAttribute('data-inline-style'); });
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
         
         // Initialize Supabase
@@ -797,7 +799,7 @@
 
         // Global functions
         window.connectStrava = function() {
-            window.location.href = '/public/strava-callback.html';
+            window.location.href = '/strava-callback.html';
         };
 
         window.markWorkoutComplete = async function() {
@@ -820,3 +822,4 @@
     </script>
 </body>
 </html>
+

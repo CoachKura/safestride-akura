@@ -1,85 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SafeStride | Your Power Cells</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-  <link rel="stylesheet" href="css/power-cells.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeStride Power Cells</title>
+
+  <link rel="stylesheet" href="safestride-design-system.css">
+  <link rel="stylesheet" href="css/power-cells-enhanced.css">
+  <link rel="stylesheet" href="css/power-cell-modals.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
 </head>
-<body class="bg-slate-50 text-slate-900">
-  <nav class="bg-white border-b border-slate-200 sticky top-0 z-30">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-      <a href="index.html" class="text-xl font-bold text-purple-700">
-        <i class="fas fa-running"></i> SafeStride
-      </a>
-      <div class="flex items-center gap-4 text-sm font-medium">
-        <a href="athlete-dashboard.html" class="text-slate-600 hover:text-purple-700">Dashboard</a>
-        <a href="training-calendar.html" class="text-slate-600 hover:text-purple-700">Calendar</a>
-        <a href="strava-dashboard.html" class="text-slate-600 hover:text-purple-700">Strava</a>
-        <a href="power-cells.html" class="text-purple-700">Power Cells</a>
-      </div>
-    </div>
-  </nav>
-
-  <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
-    <section class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+<body class="power-cells-page">
+  <main class="pc-container">
+    <section class="pc-header">
       <div>
-        <h1 class="text-3xl font-black text-purple-700">Your Power Cells</h1>
-        <p class="text-sm text-slate-600">AISRI-aware training units grouped by protocol and safety gates.</p>
+        <h1 class="pc-title">Power Cells</h1>
+        <p class="pc-subtitle">Choose a workout, review details, and schedule directly from this page.</p>
       </div>
-      <div class="aisri-badge" id="aisriBadge">
-        <span class="text-xs uppercase tracking-wide text-purple-100">Current AISRI</span>
-        <span class="text-3xl font-black" id="aisriValue">--</span>
-      </div>
+      <a href="athlete-dashboard.html" class="btn btn-secondary">Back to Dashboard</a>
     </section>
 
-    <section id="loadingState" class="panel text-center">
-      <p class="text-slate-600"><i class="fas fa-circle-notch fa-spin"></i> Loading power cells...</p>
-    </section>
-
-    <section id="errorState" class="panel hidden">
-      <p class="text-red-600 font-semibold" id="errorMessage">Unable to load power cells.</p>
-    </section>
-
-    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <article class="panel lg:col-span-2">
-        <div class="panel-header">
-          <h2 class="panel-title">Weekly Schedule</h2>
-          <p class="text-sm text-slate-500">Your next 7 days of planned and completed Power Cells.</p>
-        </div>
-        <div class="weekly-schedule" id="weeklySchedule"></div>
+    <section class="pc-kpis" aria-label="Power Cells Summary">
+      <article class="pc-kpi">
+        <span class="pc-kpi-label">Total Cells</span>
+        <span id="pc-kpi-total" class="pc-kpi-value">0</span>
       </article>
-
-      <article class="panel">
-        <div class="panel-header">
-          <h2 class="panel-title">Protocol Distribution</h2>
-          <p class="text-sm text-slate-500">Based on your completed history.</p>
-        </div>
-        <div class="protocol-chart">
-          <canvas id="protocolChart"></canvas>
-        </div>
+      <article class="pc-kpi">
+        <span class="pc-kpi-label">Available For You</span>
+        <span id="pc-kpi-available" class="pc-kpi-value">0</span>
+      </article>
+      <article class="pc-kpi">
+        <span class="pc-kpi-label">Scheduled</span>
+        <span id="pc-kpi-scheduled" class="pc-kpi-value">0</span>
       </article>
     </section>
 
-    <section class="panel">
-      <div class="panel-header flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-        <div>
-          <h2 class="panel-title">Available Power Cells</h2>
-          <p class="text-sm text-slate-500">Filtered by AISRI and grouped into 7 core protocols.</p>
-        </div>
-        <div class="text-sm text-slate-600">
-          <span id="powerCellCount">0</span> available cells,
-          <span id="historyCount">0</span> history entries
-        </div>
-      </div>
-      <div id="protocolSections"></div>
-    </section>
+    <section id="pc-grid" class="pc-grid" aria-live="polite"></section>
+    <div id="pc-empty" class="pc-empty" hidden>No power cells found.</div>
   </main>
 
-  <script src="config.js"></script>
-  <script src="js/power-cell-manager.js"></script>
+  <div id="pc-detail-backdrop" class="pc-modal-backdrop" role="dialog" aria-modal="true" aria-label="Power Cell Details">
+    <div class="pc-modal">
+      <header class="pc-modal-header">
+        <div>
+          <h2 id="pc-detail-title" class="pc-modal-title">Details</h2>
+          <div id="pc-detail-meta" class="pc-help"></div>
+        </div>
+        <button type="button" class="pc-close" data-close-modal aria-label="Close details">&times;</button>
+      </header>
+      <div class="pc-modal-body">
+        <p id="pc-detail-description"></p>
+        <h3 class="pc-label">Session Plan</h3>
+        <ol id="pc-detail-list" class="pc-detail-list"></ol>
+      </div>
+      <footer class="pc-modal-actions">
+        <button type="button" class="pc-btn pc-btn-secondary" data-close-modal>Close</button>
+      </footer>
+    </div>
+  </div>
+
+  <div id="pc-schedule-backdrop" class="pc-modal-backdrop" role="dialog" aria-modal="true" aria-label="Schedule Power Cell">
+    <div class="pc-modal">
+      <header class="pc-modal-header">
+        <h2 id="pc-schedule-title" class="pc-modal-title">Schedule Workout</h2>
+        <button type="button" class="pc-close" data-close-modal aria-label="Close scheduler">&times;</button>
+      </header>
+      <form id="pc-schedule-form">
+        <div class="pc-modal-body">
+          <div class="pc-field">
+            <label class="pc-label" for="pc-scheduled-date">Date</label>
+            <input id="pc-scheduled-date" class="pc-input" type="date" required>
+          </div>
+          <div class="pc-field">
+            <label class="pc-label" for="pc-scheduled-time">Time</label>
+            <input id="pc-scheduled-time" class="pc-input" type="time" required>
+          </div>
+          <div class="pc-field">
+            <label class="pc-label" for="pc-schedule-notes">Coach Notes (Optional)</label>
+            <textarea id="pc-schedule-notes" class="pc-textarea" rows="3" placeholder="Any notes for this session..."></textarea>
+            <p class="pc-help">This schedule is saved locally first and then synced to Supabase when authenticated.</p>
+          </div>
+        </div>
+        <footer class="pc-modal-actions">
+          <button type="button" class="pc-btn pc-btn-secondary" data-close-modal>Cancel</button>
+          <button type="submit" class="pc-btn pc-btn-primary">Save Schedule</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <div id="pc-toast-wrap" class="pc-toast-wrap" aria-live="assertive"></div>
+
+  <script src="js/power-cell-scheduler.js"></script>
 </body>
 </html>

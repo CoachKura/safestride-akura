@@ -1,0 +1,19 @@
+.pc-modal-backdrop { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); display: none; align-items: center; justify-content: center; padding: 1rem; z-index: 999; }
+.pc-modal-backdrop.show { display: flex; }
+.pc-modal { width: min(640px, 100%); background: #fff; border-radius: 16px; box-shadow: 0 24px 60px rgba(2, 6, 23, 0.25); overflow: hidden; }
+.pc-modal-header { padding: 1rem 1rem 0.75rem; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; gap: 1rem; }
+.pc-modal-title { margin: 0; font-size: 1.1rem; }
+.pc-close { border: 0; background: transparent; font-size: 1.4rem; line-height: 1; cursor: pointer; color: #64748b; }
+.pc-modal-body { padding: 1rem; max-height: 70vh; overflow: auto; }
+.pc-modal-actions { display: flex; justify-content: flex-end; gap: 0.6rem; padding: 0.9rem 1rem 1rem; border-top: 1px solid #e2e8f0; }
+.pc-field { margin-bottom: 0.9rem; }
+.pc-label { display: block; margin-bottom: 0.3rem; font-weight: 600; color: #334155; }
+.pc-input,.pc-select,.pc-textarea { width: 100%; border: 1px solid #cbd5e1; border-radius: 10px; padding: 0.65rem 0.75rem; font-size: 0.95rem; }
+.pc-help { color: #64748b; font-size: 0.84rem; margin-top: 0.35rem; }
+.pc-detail-list { margin: 0; padding-left: 1.1rem; color: #334155; }
+.pc-detail-list li { margin-bottom: 0.35rem; }
+.pc-toast-wrap { position: fixed; right: 1rem; bottom: 1rem; z-index: 1000; display: grid; gap: 0.6rem; }
+.pc-toast { min-width: 260px; max-width: 340px; border-radius: 12px; color: #fff; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.25); padding: 0.75rem 0.85rem; font-size: 0.88rem; }
+.pc-toast.success { background: #059669; }
+.pc-toast.error { background: #dc2626; }
+.pc-toast.info { background: #2563eb; }
