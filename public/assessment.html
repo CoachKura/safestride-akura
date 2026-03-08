@@ -262,6 +262,57 @@
     </div>
 
     <script>
+        const WORKFLOW_FUNCTION_URL = 'https://bdisppaxbvygsspcuymb.supabase.co/functions/v1/athlete-workflow';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkaXNwcGF4YnZ5Z3NzcGN1eW1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzcxMjcxMzEsImV4cCI6MjA1MjcwMzEzMX0.n9_qU_5X5VZnzMj5YLqn3Kz3v2g9Y3k8X1Y4_3_0_0';
+        const anonKey = SUPABASE_ANON_KEY;
+
+        function isUuid(value) {
+            return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value || '');
+        }
+
+        function resolveCurrentUserId() {
+            try {
+                const akuraSession = JSON.parse(sessionStorage.getItem('akura_user') || localStorage.getItem('akura_user') || '{}');
+                if (isUuid(akuraSession.user_id)) return akuraSession.user_id;
+
+                const legacySession = JSON.parse(sessionStorage.getItem('safestride_session') || '{}');
+                if (isUuid(legacySession.user_id)) return legacySession.user_id;
+                if (isUuid(legacySession.uid)) return legacySession.uid;
+            } catch (err) {
+                console.warn('Failed to resolve current user ID for workflow:', err);
+            }
+            return null;
+        }
+
+        async function triggerAisriWorkflow(finalScore, data) {
+            const userId = resolveCurrentUserId();
+            if (!userId) return;
+
+            const user = {
+                id: userId,
+                email: (data?.email || '').trim()
+            };
+            const profile = {
+                first_name: ((data?.full_name || '').trim().split(' ')[0] || 'Athlete')
+            };
+
+            await fetch(WORKFLOW_FUNCTION_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${anonKey}`
+                },
+                body: JSON.stringify({
+                    eventType: 'aisri_completed',
+                    event: 'aisri_completed',
+                    userId: user.id,
+                    email: user.email,
+                    fullName: profile.first_name,
+                    payload: { aisriScore: finalScore }
+                })
+            }).catch(err => console.warn('Workflow trigger failed (non-blocking):', err));
+        }
+
         function updateScore(pillar, value) {
             document.getElementById(pillar + 'Score').textContent = value;
             calculateAISRI();
@@ -323,6 +374,9 @@
                 ...data,
                 submitted_at: new Date().toISOString()
             }));
+
+            const finalScore = parseInt(document.getElementById('aisriResult').textContent, 10);
+            triggerAisriWorkflow(finalScore, data);
             
             alert('✅ Assessment Submitted!\n\nYour AISRI score: ' + document.getElementById('aisriResult').textContent + 
                   '\nRisk Level: ' + document.getElementById('riskCategory').textContent +
