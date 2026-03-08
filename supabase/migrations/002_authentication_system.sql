@@ -5,6 +5,9 @@
 -- Purpose: Add authentication with admin/coach/athlete roles
 -- =====================================================
 
+-- Ensure required extension is available for UUID/password helpers.
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 -- =====================================================
 -- TABLE 1: User Roles and Permissions
 -- =====================================================
@@ -81,11 +84,33 @@ CREATE TABLE IF NOT EXISTS public.users (
   created_by UUID REFERENCES public.users(id)
 );
 
+-- Backward compatibility for pre-existing users table variants.
+ALTER TABLE IF EXISTS public.users
+  ADD COLUMN IF NOT EXISTS email TEXT,
+  ADD COLUMN IF NOT EXISTS password_hash TEXT,
+  ADD COLUMN IF NOT EXISTS full_name TEXT,
+  ADD COLUMN IF NOT EXISTS role_id UUID,
+  ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true,
+  ADD COLUMN IF NOT EXISTS email_verified BOOLEAN DEFAULT false,
+  ADD COLUMN IF NOT EXISTS must_change_password BOOLEAN DEFAULT false,
+  ADD COLUMN IF NOT EXISTS phone TEXT,
+  ADD COLUMN IF NOT EXISTS date_of_birth DATE,
+  ADD COLUMN IF NOT EXISTS gender TEXT,
+  ADD COLUMN IF NOT EXISTS coach_id UUID,
+  ADD COLUMN IF NOT EXISTS last_login_at TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS last_login_ip TEXT,
+  ADD COLUMN IF NOT EXISTS login_count INTEGER DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS reset_token TEXT,
+  ADD COLUMN IF NOT EXISTS reset_token_expires_at TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW(),
+  ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW(),
+  ADD COLUMN IF NOT EXISTS created_by UUID;
+
 -- Create indexes
-CREATE INDEX idx_users_email ON public.users(email);
-CREATE INDEX idx_users_role ON public.users(role_id);
-CREATE INDEX idx_users_coach ON public.users(coach_id);
-CREATE INDEX idx_users_active ON public.users(is_active);
+CREATE INDEX IF NOT EXISTS idx_users_email ON public.users(email);
+CREATE INDEX IF NOT EXISTS idx_users_role ON public.users(role_id);
+CREATE INDEX IF NOT EXISTS idx_users_coach ON public.users(coach_id);
+CREATE INDEX IF NOT EXISTS idx_users_active ON public.users(is_active);
 
 COMMENT ON TABLE public.users IS 'User authentication and profile data with role-based access';
 
@@ -141,9 +166,44 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_profiles_user ON public.profiles(user_id);
-CREATE INDEX idx_profiles_athlete_uid ON public.profiles(athlete_uid);
-CREATE INDEX idx_profiles_strava ON public.profiles(strava_connected);
+-- Backward compatibility for pre-existing profiles table variants.
+ALTER TABLE IF EXISTS public.profiles
+  ADD COLUMN IF NOT EXISTS user_id UUID,
+  ADD COLUMN IF NOT EXISTS athlete_uid TEXT,
+  ADD COLUMN IF NOT EXISTS height_cm DECIMAL(5,2),
+  ADD COLUMN IF NOT EXISTS weight_kg DECIMAL(5,2),
+  ADD COLUMN IF NOT EXISTS max_heart_rate_bpm INTEGER,
+  ADD COLUMN IF NOT EXISTS resting_heart_rate_bpm INTEGER,
+  ADD COLUMN IF NOT EXISTS vo2_max DECIMAL(5,2),
+  ADD COLUMN IF NOT EXISTS primary_goal TEXT,
+  ADD COLUMN IF NOT EXISTS target_race_distance TEXT,
+  ADD COLUMN IF NOT EXISTS target_race_date DATE,
+  ADD COLUMN IF NOT EXISTS injury_history JSONB DEFAULT '[]',
+  ADD COLUMN IF NOT EXISTS current_injuries JSONB DEFAULT '[]',
+  ADD COLUMN IF NOT EXISTS medical_conditions TEXT[],
+  ADD COLUMN IF NOT EXISTS medications TEXT[],
+  ADD COLUMN IF NOT EXISTS allergies TEXT[],
+  ADD COLUMN IF NOT EXISTS emergency_contact_name TEXT,
+  ADD COLUMN IF NOT EXISTS emergency_contact_phone TEXT,
+  ADD COLUMN IF NOT EXISTS emergency_contact_relationship TEXT,
+  ADD COLUMN IF NOT EXISTS strava_connected BOOLEAN DEFAULT false,
+  ADD COLUMN IF NOT EXISTS strava_athlete_id TEXT,
+  ADD COLUMN IF NOT EXISTS garmin_connected BOOLEAN DEFAULT false,
+  ADD COLUMN IF NOT EXISTS garmin_user_id TEXT,
+  ADD COLUMN IF NOT EXISTS coach_notes TEXT,
+  ADD COLUMN IF NOT EXISTS athlete_notes TEXT,
+  ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW(),
+  ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+
+-- If profiles was modeled with id=auth user id, backfill user_id where possible.
+UPDATE public.profiles p
+SET user_id = p.id
+WHERE p.user_id IS NULL
+  AND EXISTS (SELECT 1 FROM public.users u WHERE u.id = p.id);
+
+CREATE INDEX IF NOT EXISTS idx_profiles_user ON public.profiles(user_id);
+CREATE INDEX IF NOT EXISTS idx_profiles_athlete_uid ON public.profiles(athlete_uid);
+CREATE INDEX IF NOT EXISTS idx_profiles_strava ON public.profiles(strava_connected);
 
 COMMENT ON TABLE public.profiles IS 'Extended profile information for athletes including goals, medical data, and device connections';
 
@@ -164,9 +224,20 @@ CREATE TABLE IF NOT EXISTS public.audit_log (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_audit_user ON public.audit_log(user_id);
-CREATE INDEX idx_audit_created ON public.audit_log(created_at DESC);
-CREATE INDEX idx_audit_action ON public.audit_log(action);
+ALTER TABLE IF EXISTS public.audit_log
+  ADD COLUMN IF NOT EXISTS user_id UUID,
+  ADD COLUMN IF NOT EXISTS action TEXT,
+  ADD COLUMN IF NOT EXISTS entity_type TEXT,
+  ADD COLUMN IF NOT EXISTS entity_id UUID,
+  ADD COLUMN IF NOT EXISTS old_data JSONB,
+  ADD COLUMN IF NOT EXISTS new_data JSONB,
+  ADD COLUMN IF NOT EXISTS ip_address TEXT,
+  ADD COLUMN IF NOT EXISTS user_agent TEXT,
+  ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW();
+
+CREATE INDEX IF NOT EXISTS idx_audit_user ON public.audit_log(user_id);
+CREATE INDEX IF NOT EXISTS idx_audit_created ON public.audit_log(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_audit_action ON public.audit_log(action);
 
 COMMENT ON TABLE public.audit_log IS 'Audit trail for all user actions and data modifications';
 
@@ -184,15 +255,25 @@ CREATE TABLE IF NOT EXISTS public.user_sessions (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_sessions_user ON public.user_sessions(user_id);
-CREATE INDEX idx_sessions_token ON public.user_sessions(session_token);
-CREATE INDEX idx_sessions_expires ON public.user_sessions(expires_at);
+ALTER TABLE IF EXISTS public.user_sessions
+  ADD COLUMN IF NOT EXISTS user_id UUID,
+  ADD COLUMN IF NOT EXISTS session_token TEXT,
+  ADD COLUMN IF NOT EXISTS expires_at TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS ip_address TEXT,
+  ADD COLUMN IF NOT EXISTS user_agent TEXT,
+  ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW();
+
+CREATE INDEX IF NOT EXISTS idx_sessions_user ON public.user_sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_sessions_token ON public.user_sessions(session_token);
+CREATE INDEX IF NOT EXISTS idx_sessions_expires ON public.user_sessions(expires_at);
 
 COMMENT ON TABLE public.user_sessions IS 'Active user sessions for authentication';
 
 -- =====================================================
 -- FUNCTION 1: Create Athlete Account (by Coach/Admin)
 -- =====================================================
+
+DROP FUNCTION IF EXISTS public.create_athlete_account(TEXT, TEXT, TEXT, UUID, TEXT, TEXT, DATE, TEXT);
 
 CREATE OR REPLACE FUNCTION public.create_athlete_account(
   p_email TEXT,
@@ -210,6 +291,7 @@ DECLARE
   v_profile_id UUID;
   v_athlete_role_id UUID;
   v_generated_uid TEXT;
+  v_profile_owner_id UUID;
 BEGIN
   -- Get athlete role ID
   SELECT id INTO v_athlete_role_id FROM public.user_roles WHERE role_name = 'athlete';
@@ -247,15 +329,27 @@ BEGIN
   )
   RETURNING id INTO v_user_id;
   
-  -- Create profile
-  INSERT INTO public.profiles (
-    user_id,
-    athlete_uid
-  ) VALUES (
-    v_user_id,
-    v_generated_uid
-  )
-  RETURNING id INTO v_profile_id;
+  -- Create profile (supports environments where profiles.id may reference auth.users)
+  BEGIN
+    INSERT INTO public.profiles (id, user_id, athlete_uid)
+    VALUES (v_user_id, v_user_id, v_generated_uid)
+    ON CONFLICT DO NOTHING
+    RETURNING id INTO v_profile_id;
+  EXCEPTION WHEN foreign_key_violation THEN
+    SELECT au.id INTO v_profile_owner_id
+    FROM auth.users au
+    WHERE au.email = p_email
+    LIMIT 1;
+
+    IF v_profile_owner_id IS NOT NULL THEN
+      INSERT INTO public.profiles (id, user_id, athlete_uid)
+      VALUES (v_profile_owner_id, v_user_id, v_generated_uid)
+      ON CONFLICT DO NOTHING
+      RETURNING id INTO v_profile_id;
+    ELSE
+      RAISE NOTICE 'Profile insert skipped for %, no matching auth.users row for profiles.id foreign key', p_email;
+    END IF;
+  END;
   
   -- Log action
   INSERT INTO public.audit_log (user_id, action, entity_type, entity_id, new_data)
@@ -276,6 +370,8 @@ COMMENT ON FUNCTION public.create_athlete_account IS 'Create a new athlete accou
 -- =====================================================
 -- FUNCTION 2: Authenticate User
 -- =====================================================
+
+DROP FUNCTION IF EXISTS public.authenticate_user(TEXT, TEXT, TEXT);
 
 CREATE OR REPLACE FUNCTION public.authenticate_user(
   p_email TEXT,
@@ -394,6 +490,8 @@ COMMENT ON FUNCTION public.authenticate_user IS 'Authenticate user with email an
 -- FUNCTION 3: Change Password
 -- =====================================================
 
+DROP FUNCTION IF EXISTS public.change_password(UUID, TEXT, TEXT);
+
 CREATE OR REPLACE FUNCTION public.change_password(
   p_user_id UUID,
   p_old_password TEXT,
@@ -448,6 +546,8 @@ COMMENT ON FUNCTION public.change_password IS 'Change user password with old pas
 -- FUNCTION 4: Get Coach Athletes
 -- =====================================================
 
+DROP FUNCTION IF EXISTS public.get_coach_athletes(UUID);
+
 CREATE OR REPLACE FUNCTION public.get_coach_athletes(p_coach_id UUID)
 RETURNS TABLE (
   athlete_id UUID,
@@ -500,10 +600,12 @@ ALTER TABLE public.user_sessions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.audit_log ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for users table
+DROP POLICY IF EXISTS "Users can view own profile" ON public.users;
 CREATE POLICY "Users can view own profile"
   ON public.users FOR SELECT
   USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Coaches can view their athletes" ON public.users;
 CREATE POLICY "Coaches can view their athletes"
   ON public.users FOR SELECT
   USING (
@@ -514,28 +616,32 @@ CREATE POLICY "Coaches can view their athletes"
     )
   );
 
+DROP POLICY IF EXISTS "Users can update own profile" ON public.users;
 CREATE POLICY "Users can update own profile"
   ON public.users FOR UPDATE
   USING (auth.uid() = id);
 
 -- RLS Policies for profiles table
-CREATE POLICY "Users can view own profile"
-  ON public.profiles FOR SELECT
-  USING (user_id = auth.uid());
+DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Coaches can view athlete profiles" ON public.profiles;
+DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
 
-CREATE POLICY "Coaches can view athlete profiles"
-  ON public.profiles FOR SELECT
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.users
-      WHERE users.id = user_id
-        AND users.coach_id = auth.uid()
-    )
-  );
-
-CREATE POLICY "Users can update own profile"
-  ON public.profiles FOR UPDATE
-  USING (user_id = auth.uid());
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'profiles' AND column_name = 'user_id'
+  ) THEN
+    EXECUTE 'CREATE POLICY "Users can view own profile" ON public.profiles FOR SELECT USING (user_id = auth.uid())';
+    EXECUTE 'CREATE POLICY "Coaches can view athlete profiles" ON public.profiles FOR SELECT USING (EXISTS (SELECT 1 FROM public.users WHERE users.id = user_id AND users.coach_id = auth.uid()))';
+    EXECUTE 'CREATE POLICY "Users can update own profile" ON public.profiles FOR UPDATE USING (user_id = auth.uid())';
+  ELSE
+    EXECUTE 'CREATE POLICY "Users can view own profile" ON public.profiles FOR SELECT USING (id = auth.uid())';
+    EXECUTE 'CREATE POLICY "Coaches can view athlete profiles" ON public.profiles FOR SELECT USING (EXISTS (SELECT 1 FROM public.users WHERE users.id = id AND users.coach_id = auth.uid()))';
+    EXECUTE 'CREATE POLICY "Users can update own profile" ON public.profiles FOR UPDATE USING (id = auth.uid())';
+  END IF;
+END
+$$;
 
 -- =====================================================
 -- CREATE DEFAULT ADMIN ACCOUNT
@@ -582,6 +688,7 @@ DECLARE
   v_coach_role_id UUID;
   v_coach_user_id UUID;
   v_coach_profile_id UUID;
+  v_profile_owner_id UUID;
 BEGIN
   -- Get coach role
   SELECT id INTO v_coach_role_id FROM public.user_roles WHERE role_name = 'coach';
@@ -606,12 +713,37 @@ BEGIN
   )
   ON CONFLICT (email) DO NOTHING
   RETURNING id INTO v_coach_user_id;
+
+  -- If coach already exists, ON CONFLICT DO NOTHING returns NULL; resolve existing user id.
+  IF v_coach_user_id IS NULL THEN
+    SELECT id INTO v_coach_user_id
+    FROM public.users
+    WHERE email = 'coach@akura.in'
+    LIMIT 1;
+  END IF;
   
   IF v_coach_user_id IS NOT NULL THEN
     -- Create coach profile
-    INSERT INTO public.profiles (user_id)
-    VALUES (v_coach_user_id)
-    RETURNING id INTO v_coach_profile_id;
+    BEGIN
+      INSERT INTO public.profiles (id, user_id)
+      VALUES (v_coach_user_id, v_coach_user_id)
+      ON CONFLICT DO NOTHING
+      RETURNING id INTO v_coach_profile_id;
+    EXCEPTION WHEN foreign_key_violation THEN
+      SELECT au.id INTO v_profile_owner_id
+      FROM auth.users au
+      WHERE au.email = 'coach@akura.in'
+      LIMIT 1;
+
+      IF v_profile_owner_id IS NOT NULL THEN
+        INSERT INTO public.profiles (id, user_id)
+        VALUES (v_profile_owner_id, v_coach_user_id)
+        ON CONFLICT DO NOTHING
+        RETURNING id INTO v_coach_profile_id;
+      ELSE
+        RAISE NOTICE 'Coach profile insert skipped: profiles.id foreign key target row not found';
+      END IF;
+    END;
     
     RAISE NOTICE 'Default coach created: coach@akura.in / Coach@123';
   END IF;

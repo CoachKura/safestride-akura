@@ -1,0 +1,15 @@
+﻿{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Start SafeStride Local",
+      "type": "shell",
+      "command": "cd public && python -m http.server 8000",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    }
+  ]
+}

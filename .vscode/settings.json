@@ -1,0 +1,11 @@
+﻿{
+    "vscode-edge-devtools.webhintInstallNotification": false,
+    "vscode-edge-devtools.webhint": false,
+    "files.associations": {
+        "supabase/migrations/*.sql": "plaintext",
+        "**/supabase/migrations/*.sql": "plaintext"
+    },
+    "mssql.intelliSense.enableErrorChecking": false,
+    "mssql.intelliSense.enableIntelliSense": false,
+    "mssql.enableRichExperiences": false
+}

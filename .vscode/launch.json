@@ -1,0 +1,26 @@
+﻿{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Open SafeStride Onboarding",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://127.0.0.1:5500/public/onboarding.html",
+      "webRoot": "${workspaceFolder}/public"
+    },
+    {
+      "name": "Open SafeStride Dashboard",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://127.0.0.1:5500/public/athlete-dashboard.html",
+      "webRoot": "${workspaceFolder}/public"
+    },
+    {
+      "name": "Open Training Calendar",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://127.0.0.1:5500/public/training-calendar.html",
+      "webRoot": "${workspaceFolder}/public"
+    }
+  ]
+}

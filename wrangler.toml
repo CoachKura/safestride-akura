@@ -1,0 +1,9 @@
+﻿name = "safestride"
+main = "src/index.tsx"
+compatibility_date = "2026-03-04"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "safestride-production"
+database_id = "d1229804-1e56-4c8d-b353-2aa64d388a75"
