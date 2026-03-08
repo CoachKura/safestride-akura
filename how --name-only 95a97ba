@@ -1,0 +1,23 @@
+[33mcommit 95a97baf2637e55834a73c8644e0bc8b6383601d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mproduction[m[33m, [m[1;31morigin/production[m[33m)[m
+Author: Akuraelite <contact@akura.in>
+Date:   Fri Mar 6 16:20:55 2026 +0530
+
+    feat(power-cells): complete Part A enhancement
+    
+    Add dedicated Power Cells page with enhanced UI and modal components.
+    
+    Implement scheduling logic with local persistence and optional Supabase sync.
+    
+    Add schedule table migration with RLS policies and updated_at trigger.
+    
+    Fix athlete dashboard navigation paths for production hosting.
+    
+    Add .gitignore to exclude .wrangler and local artifacts.
+
+.gitignore
+public/athlete-dashboard.html
+public/css/power-cell-modals.css
+public/css/power-cells-enhanced.css
+public/js/power-cell-scheduler.js
+public/power-cells.html
+supabase/migrations/20260306000000_power_cell_schedule.sql
