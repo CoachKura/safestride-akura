@@ -2,6 +2,17 @@
 
 This project now includes a dedicated import pipeline for Genspark exports.
 
+## Current production status (2026-03-09)
+- Frontend import UI is live on:
+  - `https://production.safestride-akura.pages.dev/genspark-import`
+  - `https://www.akura.in/genspark-import.html`
+- Frontend config is aligned to:
+  - `https://bdisppaxbvygsspcuymb.supabase.co`
+  - `sb_publishable_BBjk8yeyQ2jgh5iFiQINUQ_mwU2FMnk`
+- Backend blocker:
+  - `import-genspark-data` function is not deployed in production yet (`404`).
+  - Deploy requires Supabase CLI login/token on the deployment machine.
+
 ## Added components
 - UI page: `/genspark-import.html`
 - Edge Function: `supabase/functions/import-genspark-data/index.ts`
@@ -28,7 +39,7 @@ Optional:
 
 ## Deploy the function
 ```bash
-supabase functions deploy import-genspark-data
+supabase functions deploy import-genspark-data --project-ref bdisppaxbvygsspcuymb
 ```
 
 Optional hardening:

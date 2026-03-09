@@ -1,40 +1,52 @@
-# Genspark Coordination Brief (SafeStride Login)
+# Genspark Coordination Status (SafeStride)
 
-Date: 2026-03-09
+Date: 2026-03-09  
 Project path: `C:\safestride\webapp`
-Target file: `login.html`
 
-## Current state already implemented
-- Added favicon data URI to reduce missing favicon requests.
-- Updated Supabase URL and anon key to match `public/signup.html`.
-- Switched login RPC call to use a dedicated `supabaseClient` instance.
-- Removed console logs that exposed test credentials.
-- Improved session restore logic to check both `localStorage` and `sessionStorage`, with invalid JSON cleanup.
+## Branch + deployment status
+- `production` head: `e1f28ad` (pushed)
+- `gh-pages` head: `4a4e710` (pushed)
+- Latest Cloudflare Pages manual deploy: `ad560274`
+- Alias URL: `https://production.safestride-akura.pages.dev`
 
-## Known open item
-- Footer text still shows mojibake (copyright symbol appears as garbled text) in `login.html`.
+## What is live and verified
+- `https://production.safestride-akura.pages.dev/` loads updated nav links for:
+  - `/login`
+  - `/genspark-import`
+- `https://production.safestride-akura.pages.dev/login` returns login page (200)
+- `https://production.safestride-akura.pages.dev/genspark-import` returns import page (200)
+- `https://www.akura.in/login.html` returns updated login page (200)
+- `https://www.akura.in/genspark-import.html` returns updated import page (200)
 
-## Prompt to send to Genspark
-Use this exact prompt in the provided Genspark agent chat:
+## Config normalization completed
+Supabase frontend runtime endpoints were aligned to the resolvable production project:
+- URL: `https://bdisppaxbvygsspcuymb.supabase.co`
+- Publishable key: `sb_publishable_BBjk8yeyQ2jgh5iFiQINUQ_mwU2FMnk`
 
----
-I am maintaining `login.html` for SafeStride.
+Files updated:
+- `login.html`
+- `genspark-import.html`
+- `public/login.html`
+- `public/genspark-import.html`
+- `public/signup.html`
+- `public/onboarding.html`
+- `public/index.html` (extensionless route links)
 
-Please do a focused security and reliability review for this login flow:
-1) Supabase client usage and RPC auth pattern (`authenticate_user`) safety.
-2) Client-side session handling (`localStorage` vs `sessionStorage`) and tamper risks.
-3) Error handling/logging that might leak sensitive info.
-4) Recommended secure forgot-password implementation for Supabase.
-5) A minimal patch to fix mojibake in footer text (garbled copyright symbol -> `&copy;`) robustly.
+## Remaining blocker (critical)
+The new edge function is not deployed yet in Supabase production:
+- Endpoint: `https://bdisppaxbvygsspcuymb.supabase.co/functions/v1/import-genspark-data`
+- Current status: `404 Not Found`
 
-Constraints:
-- Keep changes minimal and production-safe.
-- Return actionable patch snippets for `login.html` only.
-- Include a short test checklist for browser console + network panel.
----
+Local environment blocker:
+- `supabase functions deploy ...` cannot run because no Supabase CLI access token is configured on this machine.
 
-## What to bring back from Genspark
-- Their exact patch snippet(s) for `login.html`.
-- Any new security findings with severity (`high`, `medium`, `low`).
-- Their test checklist.
+## Immediate next command once token is available
+```bash
+supabase functions deploy import-genspark-data --project-ref bdisppaxbvygsspcuymb
+```
+
+Then verify:
+```bash
+curl -i -X OPTIONS "https://bdisppaxbvygsspcuymb.supabase.co/functions/v1/import-genspark-data"
+```
 
