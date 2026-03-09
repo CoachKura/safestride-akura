@@ -4,8 +4,8 @@ Date: 2026-03-09
 Project path: `C:\safestride\webapp`
 
 ## Branch + deployment status
-- `production` head: `f37f46d` (pushed)
-- `gh-pages` head: `4464861` (pushed)
+- `production` head: `f645d7d` (pushed)
+- `gh-pages` head: `78ff062` (pushed)
 - Latest Cloudflare Pages manual deploy: `a8426382`
 - Alias URL: `https://production.safestride-akura.pages.dev`
 
@@ -15,8 +15,14 @@ Project path: `C:\safestride\webapp`
   - `/genspark-import`
 - `https://production.safestride-akura.pages.dev/login` returns login page (200)
 - `https://production.safestride-akura.pages.dev/genspark-import` returns import page (200)
+- `https://production.safestride-akura.pages.dev/signup` returns signup page (200)
+- `https://production.safestride-akura.pages.dev/assessment` returns assessment page (200)
+- `https://production.safestride-akura.pages.dev/strava-callback` returns callback page (200)
 - `https://www.akura.in/login.html` returns updated login page (200)
 - `https://www.akura.in/genspark-import.html` returns updated import page (200)
+- `https://www.akura.in/signup.html` returns signup page (200)
+- `https://www.akura.in/assessment.html` returns assessment page (200)
+- `https://www.akura.in/strava-callback.html` returns callback page (200)
 
 ## Config normalization completed
 Supabase frontend runtime endpoints were aligned to the resolvable production project:
