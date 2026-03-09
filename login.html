@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - AKURA SafeStride</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E%F0%9F%8F%83%3C/text%3E%3C/svg%3E">
+    <!-- Note: Replace Tailwind CDN with PostCSS plugin for production -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -154,11 +156,11 @@
     </div>
     
     <script>
-        // Supabase Configuration
-        const SUPABASE_URL = 'https://bdisppaxbvygsspcuymb.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkaXNwcGF4YnZ5Z3NzcGN1eW1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzcxMjcxMzEsImV4cCI6MjA1MjcwMzEzMX0.n9_qU_5X5VZnzMj5YLqn3Kz3v2g9Y3k8X1Y4_3_0_0';
+        // Supabase Configuration (Production)
+        const SUPABASE_URL = 'https://swzlxlfprtpxrttfscvf.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3emx4bGZwcnRweHJ0dGZzY3ZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ2MTU4NjcsImV4cCI6MjA1MDE5MTg2N30.Gq6j8Qu5yiWgzpzwqKa3zg9wZAqmY_FZeOVsPtdI5cs';
         
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         // DOM Elements
         const loginForm = document.getElementById('loginForm');
@@ -175,10 +177,18 @@
         const rememberMeCheckbox = document.getElementById('rememberMe');
         
         // Check if already logged in
-        const currentUser = localStorage.getItem('akura_user');
-        if (currentUser) {
-            const user = JSON.parse(currentUser);
-            redirectToDashboard(user.role_name);
+        const storedUser = localStorage.getItem('akura_user') || sessionStorage.getItem('akura_user');
+        if (storedUser) {
+            try {
+                const user = JSON.parse(storedUser);
+                if (user?.role_name) {
+                    redirectToDashboard(user.role_name);
+                }
+            } catch {
+                // Invalid cached session payload, clear and continue to login form.
+                localStorage.removeItem('akura_user');
+                sessionStorage.removeItem('akura_user');
+            }
         }
         
         // Toggle password visibility
@@ -240,7 +250,7 @@
             
             try {
                 // Call authentication function
-                const { data, error } = await supabase.rpc('authenticate_user', {
+                const { data, error } = await supabaseClient.rpc('authenticate_user', {
                     p_email: email,
                     p_password: password,
                     p_ip_address: await getClientIP()
@@ -312,11 +322,6 @@
                 return 'unknown';
             }
         }
-        
-        // Test credentials info (remove in production)
-        console.log('%c🔐 Test Credentials:', 'color: #667eea; font-size: 16px; font-weight: bold;');
-        console.log('%cAdmin: admin@akura.in / Admin@123', 'color: #667eea; font-size: 14px;');
-        console.log('%cCoach: coach@akura.in / Coach@123', 'color: #667eea; font-size: 14px;');
     </script>
     
 </body>
