@@ -4,9 +4,9 @@ Date: 2026-03-09
 Project path: `C:\safestride\webapp`
 
 ## Branch + deployment status
-- `production` head: `e1f28ad` (pushed)
-- `gh-pages` head: `4a4e710` (pushed)
-- Latest Cloudflare Pages manual deploy: `ad560274`
+- `production` head: `f37f46d` (pushed)
+- `gh-pages` head: `4464861` (pushed)
+- Latest Cloudflare Pages manual deploy: `a8426382`
 - Alias URL: `https://production.safestride-akura.pages.dev`
 
 ## What is live and verified
@@ -31,6 +31,10 @@ Files updated:
 - `public/signup.html`
 - `public/onboarding.html`
 - `public/index.html` (extensionless route links)
+
+Additional hardening completed:
+- Removed exposed Strava client secret from frontend (`public/onboarding.html`)
+- Added explicit 404/401 import error messaging in `genspark-import` UI for safer production behavior
 
 ## Remaining blocker (critical)
 The new edge function is not deployed yet in Supabase production:

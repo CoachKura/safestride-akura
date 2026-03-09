@@ -12,6 +12,8 @@ This project now includes a dedicated import pipeline for Genspark exports.
 - Backend blocker:
   - `import-genspark-data` function is not deployed in production yet (`404`).
   - Deploy requires Supabase CLI login/token on the deployment machine.
+- Frontend safeguard:
+  - Import page now shows an explicit deploy-needed message when function endpoint returns `404`.
 
 ## Added components
 - UI page: `/genspark-import.html`
