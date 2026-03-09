@@ -24,7 +24,8 @@
             },
             strava: {
                 clientId: '139446',
-                clientSecret: 'b58cec58bcc28f5ce8b05f6ee69d98b1ec2f8c55',
+                // Keep Strava secret server-side only (Edge Function env vars).
+                clientSecret: '',
                 redirectUri: window.location.origin + '/public/strava-callback.html',
                 scope: 'read,activity:read_all,profile:read_all'
             },
