@@ -169,6 +169,16 @@
             el.status.classList.remove("hidden");
         }
 
+        function buildImportErrorMessage(response, result) {
+            if (response.status === 404) {
+                return "Import function is not deployed on Supabase yet (404). Deploy `import-genspark-data` and retry.";
+            }
+            if (response.status === 401 || response.status === 403) {
+                return "Authorization failed. Verify Supabase URL and anon key for the target project.";
+            }
+            return result.error || `Import failed with status ${response.status}`;
+        }
+
         function parsePayloadJson(input) {
             const trimmed = input.trim();
             if (!trimmed) return null;
@@ -252,7 +262,7 @@
                 el.result.textContent = JSON.stringify(result, null, 2);
 
                 if (!response.ok || !result.success) {
-                    setStatus("error", result.error || `Import failed with status ${response.status}`);
+                    setStatus("error", buildImportErrorMessage(response, result));
                     return;
                 }
 
