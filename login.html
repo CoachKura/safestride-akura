@@ -249,11 +249,10 @@
             loadingSpinner.classList.remove('hidden');
             
             try {
-                // Call authentication function
-                const { data, error } = await supabaseClient.rpc('authenticate_user', {
-                    p_email: email,
-                    p_password: password,
-                    p_ip_address: await getClientIP()
+                // Use standard Supabase auth
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password
                 });
                 
                 if (error) {
@@ -261,29 +260,17 @@
                 }
                 
                 // Check if authentication was successful
-                if (!data || data.length === 0 || !data[0].success) {
-                    throw new Error(data[0]?.message || 'Invalid email or password');
+                if (!data || !data.user) {
+                    throw new Error('Invalid email or password');
                 }
                 
-                const user = data[0];
+                const user = data.user;
+                const session = data.session;
                 
-                // Check if password change is required
-                if (user.must_change_password) {
-                    // Store user info temporarily
-                    sessionStorage.setItem('temp_user', JSON.stringify(user));
-                    // Redirect to password change page
-                    window.location.href = '/change-password.html';
-                    return;
-                }
-                
-                // Store user session
+                // Store minimal session data (use Supabase user properties)
                 const sessionData = {
-                    user_id: user.user_id,
+                    user_id: user.id,
                     email: user.email,
-                    full_name: user.full_name,
-                    role_name: user.role_name,
-                    coach_id: user.coach_id,
-                    athlete_uid: user.athlete_uid,
                     logged_in_at: new Date().toISOString()
                 };
                 
@@ -294,11 +281,11 @@
                 }
                 
                 // Show success message
-                showAlert('success', `Welcome back, ${user.full_name}!`);
+                showAlert('success', 'Login successful! Redirecting...');
                 
                 // Redirect after 1 second
                 setTimeout(() => {
-                    redirectToDashboard(user.role_name);
+                    window.location.href = '/athlete-dashboard.html';
                 }, 1000);
                 
             } catch (err) {
