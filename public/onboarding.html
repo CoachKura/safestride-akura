@@ -335,6 +335,19 @@
             font-weight: 700;
             color: var(--primary-600);
         }
+        
+        /* Auto-calculated field badge */
+        .badge-auto {
+            display: inline-block;
+            padding: 0.125rem 0.5rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #059669;
+            background-color: #d1fae5;
+            border-radius: 9999px;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body>
@@ -409,9 +422,9 @@
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">Max Heart Rate (bpm)</label>
-                        <input type="number" id="max-hr" class="form-input" placeholder="185" min="100" max="220">
-                        <p class="form-help">Optional - We can estimate if unknown</p>
+                        <label class="form-label">Max Heart Rate (bpm) <span class="badge badge-auto">Auto</span></label>
+                        <input type="number" id="max-hr" class="form-input" placeholder="--" readonly style="background-color: #f3f4f6; cursor: not-allowed;">
+                        <p class="form-help">✨ Auto-calculated from age using formula: 208 - (0.7 × age)</p>
                     </div>
                 </div>
                 
@@ -873,12 +886,42 @@
             }
         }
         
+        // Auto-calculate Max Heart Rate from age
+        // Using Tanaka formula: 208 - (0.7 × age) - more accurate than old 220-age formula
+        function calculateMaxHeartRate() {
+            const ageInput = document.getElementById('age');
+            const maxHrInput = document.getElementById('max-hr');
+            
+            if (ageInput && maxHrInput) {
+                const age = parseInt(ageInput.value);
+                if (age && age >= 18 && age <= 100) {
+                    const maxHr = Math.round(208 - (0.7 * age));
+                    maxHrInput.value = maxHr;
+                    maxHrInput.style.color = '#059669'; // Green color for calculated value
+                } else {
+                    maxHrInput.value = '';
+                    maxHrInput.placeholder = '--';
+                }
+            }
+        }
+        
         // Check for Strava callback
         window.addEventListener('load', () => {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('strava_connected') === 'true') {
                 document.getElementById('strava-status').innerHTML = '<span class="badge badge-success"><i class="fas fa-check"></i> Connected</span>';
                 document.getElementById('strava-card').classList.add('connected');
+            }
+            
+            // Setup age input listener for max heart rate calculation
+            const ageInput = document.getElementById('age');
+            if (ageInput) {
+                ageInput.addEventListener('input', calculateMaxHeartRate);
+                ageInput.addEventListener('change', calculateMaxHeartRate);
+                // Calculate on page load if age is already filled
+                if (ageInput.value) {
+                    calculateMaxHeartRate();
+                }
             }
         });
     </script>
