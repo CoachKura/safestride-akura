@@ -38,7 +38,7 @@ const SAFESTRIDE_CONFIG = {
         clientSecret: '',
         redirectUri: isLocalhost
             ? 'http://localhost:8080/strava-callback.html'
-            : window.location.origin + '/public/strava-callback.html',
+            : window.location.origin + '/strava-callback.html',
         authorizeUrl: 'https://www.strava.com/oauth/authorize',
         tokenUrl: 'https://www.strava.com/oauth/token',
         apiUrl: 'https://www.strava.com/api/v3',
